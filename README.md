@@ -1,8 +1,8 @@
-# Lanyard
+# Lanyards 🧑‍🚀
 
-A dedicated profile for researchers, built on the AT Protocol.
+> One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised.
 
-Researchers will use this as an alternative to the ORCID ID.
+**A dedicated profile for researchers, built on the AT Protocol.**
 
 ## Features
 
