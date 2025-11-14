@@ -1,0 +1,48 @@
+{
+  "name": "at-lanyard",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run lex:gen && next dev",
+    "build": "npm run lex:gen && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "lex:gen": "lex gen-api ./src/types/generated ./lexicons/**/*.json && node scripts/fix-generated-imports.js",
+    "lex:watch": "lex gen-api --watch ./src/types/generated ./lexicons/**/*.json"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@atproto/api": "latest",
+    "@atproto/common": "latest",
+    "@atproto/identity": "latest",
+    "@atproto/lexicon": "latest",
+    "@atproto/oauth-client-node": "latest",
+    "@atproto/syntax": "latest",
+    "@atproto/xrpc-server": "latest",
+    "zod": "latest",
+    "uuid": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "qrcode": "latest",
+    "clsx": "latest",
+    "tailwind-merge": "latest"
+  },
+  "devDependencies": {
+    "@atproto/lex-cli": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/cors": "latest",
+    "@types/qrcode": "latest",
+    "typescript": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "prettier": "latest",
+    "tailwindcss": "latest",
+    "@tailwindcss/postcss": "latest",
+    "postcss": "latest"
+  }
+}

@@ -1,0 +1,75 @@
+import { redirect } from 'next/navigation';
+import { getSession } from '@/lib/auth/session';
+import { getAgent } from '@/lib/auth/atproto';
+import { ProfileRepository } from '@/lib/data/repository';
+import ProfileForm from '@/components/profile/ProfileForm';
+import Link from 'next/link';
+
+export default async function EditProfilePage() {
+  const session = await getSession();
+
+  if (!session) {
+    redirect('/auth');
+  }
+
+  const agent = await getAgent();
+
+  if (!agent) {
+    redirect('/auth');
+  }
+
+  const repo = new ProfileRepository(agent);
+  const profile = await repo.getProfile(session.did);
+
+  if (!profile) {
+    redirect('/dashboard');
+  }
+
+  return (
+    <main className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-2xl mx-auto px-4 py-4">
+          <Link
+            href="/dashboard"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
+          >
+            <svg
+              className="w-4 h-4 mr-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back
+          </Link>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold">Edit Profile</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Update your researcher profile information
+              </p>
+            </div>
+            <Link
+              href={`/${profile.handle}`}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              View Profile
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        <ProfileForm profile={profile} />
+      </div>
+    </main>
+  );
+}

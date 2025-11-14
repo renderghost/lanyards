@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "at.lanyard.event",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An academic event such as a conference, symposium, workshop, or seminar where research is presented or discussed",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "type", "startDate", "createdAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Event name (e.g., 'NeurIPS 2024', 'Annual Biology Symposium')"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "conference",
+              "symposium",
+              "workshop",
+              "seminar",
+              "lecture",
+              "poster-session",
+              "webinar",
+              "other"
+            ],
+            "description": "Type of academic event"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Event start date"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Event end date (optional, for multi-day events)"
+          },
+          "location": {
+            "type": "ref",
+            "ref": "at.lanyard.location#main",
+            "description": "Event location (can be physical or virtual)"
+          },
+          "organizer": {
+            "type": "ref",
+            "ref": "at.lanyard.organization#main",
+            "description": "Organization that organized/hosted the event"
+          },
+          "relatedWorks": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "description": "AT-URI references to related work records presented at this event"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Event website URL"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this event record was created"
+          }
+        }
+      }
+    }
+  }
+}

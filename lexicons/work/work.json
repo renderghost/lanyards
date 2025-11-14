@@ -1,0 +1,83 @@
+{
+  "lexicon": 1,
+  "id": "at.lanyard.work",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A scholarly contribution or research work identified by DOI - represents academic output like papers, posters, conference proceedings, etc.",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["doi", "type", "createdAt"],
+        "properties": {
+          "doi": {
+            "type": "string",
+            "description": "Digital Object Identifier (DOI) for the work - metadata will be fetched from this"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "abstract",
+              "poster",
+              "paper",
+              "conference-proceeding",
+              "journal-article",
+              "book-chapter",
+              "book",
+              "preprint",
+              "dataset",
+              "other"
+            ],
+            "description": "Type of scholarly work"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Work title (fetched from DOI metadata)"
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of authors (fetched from DOI metadata)"
+          },
+          "publicationDate": {
+            "type": "string",
+            "description": "Publication date (fetched from DOI metadata)"
+          },
+          "venue": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Journal or publication venue (fetched from DOI metadata)"
+          },
+          "abstract": {
+            "type": "string",
+            "maxLength": 5000,
+            "description": "Work abstract (fetched from DOI metadata)"
+          },
+          "url": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "URL to the work (fetched from DOI metadata)"
+          },
+          "publication": {
+            "type": "ref",
+            "ref": "at.lanyard.publication#main",
+            "description": "Optional structured reference to publication venue record"
+          },
+          "event": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional AT-URI reference to related event record (for conference presentations)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this work was added to the profile"
+          }
+        }
+      }
+    }
+  }
+}
