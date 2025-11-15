@@ -118,12 +118,15 @@ export class ProfileRepository {
   }
 
   // WebLink operations (all links: social, academic, and custom web)
-  async listWebLinks(did: string): Promise<WebLink[]> {
+  async listWebLinks(did: string): Promise<(WebLink & { rkey: string })[]> {
     const response = await this.agent.com.atproto.repo.listRecords({
       repo: did,
       collection: `${LEXICON_PREFIX}.link`,
     });
-    return response.data.records.map((r) => r.value as unknown as WebLink);
+    return response.data.records.map((r) => ({
+      ...(r.value as unknown as WebLink),
+      rkey: r.uri.split('/').pop() || '',
+    }));
   }
 
   async createWebLink(link: Omit<WebLink, 'createdAt'>): Promise<string> {
@@ -223,12 +226,15 @@ export class ProfileRepository {
   }
 
   // Event operations
-  async listEvents(did: string): Promise<Event[]> {
+  async listEvents(did: string): Promise<(Event & { rkey: string })[]> {
     const response = await this.agent.com.atproto.repo.listRecords({
       repo: did,
       collection: `${LEXICON_PREFIX}.event`,
     });
-    return response.data.records.map((r) => r.value as unknown as Event);
+    return response.data.records.map((r) => ({
+      ...(r.value as unknown as Event),
+      rkey: r.uri.split('/').pop() || '',
+    }));
   }
 
   async createEvent(event: Omit<Event, 'createdAt'>): Promise<string> {
