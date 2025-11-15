@@ -19,11 +19,23 @@ export default async function EditProfilePage() {
   }
 
   const repo = new ProfileRepository(agent);
-  const profile = await repo.getProfile(session.did);
+  const lanyardProfile = await repo.getProfile(session.did);
 
-  if (!profile) {
+  if (!lanyardProfile) {
     redirect('/dashboard');
   }
+
+  // Get fresh Bluesky profile data
+  const bskyProfile = await agent.getProfile({ actor: session.did });
+
+  // Merge fresh Bluesky data with Lanyard profile
+  const profile = {
+    ...lanyardProfile,
+    displayName: bskyProfile.data.displayName,
+    avatar: bskyProfile.data.avatar,
+    banner: bskyProfile.data.banner,
+    description: bskyProfile.data.description,
+  };
 
   return (
     <main className="min-h-screen bg-gray-50">

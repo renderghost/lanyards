@@ -1,61 +1,61 @@
 # Lanyards Setup Guide
 
-## Quick Start with App Password (Recommended for Development)
+## Quick Start
 
-### 1. Create a Bluesky App Password
+### 1. Install Dependencies
 
-1. Go to [https://bsky.app/settings/app-passwords](https://bsky.app/settings/app-passwords)
-2. Click "Add App Password"
-3. Give it a name (e.g., "Lanyards Development")
-4. Copy the generated password
+```bash
+npm install
+```
 
-### 2. Configure Environment Variables
+### 2. Configure Environment Variables (Optional)
 
 1. Copy the example environment file:
    ```bash
    cp .env.example .env
    ```
 
-2. Edit `.env` and add your credentials:
+2. Edit `.env` if you need to customize settings:
    ```env
-   # Set authentication method to app_password
+   # Set authentication method (app_password for development, oauth for production)
    AUTH_METHOD=app_password
 
-   # Add your Bluesky credentials
-   BLUESKY_HANDLE=your-handle.bsky.social
-   BLUESKY_APP_PASSWORD=your-app-password-here
-
-   # Leave these as-is for now
+   # Application URL
    NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+   # PDS Configuration (change if using a different PDS)
    PDS_URL=https://bsky.social
    ```
 
-### 3. Install Dependencies
-
-```bash
-npm install
-```
-
-### 4. Run the Development Server
+### 3. Run the Development Server
 
 ```bash
 npm run dev
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) and click "Sign In". You'll be automatically authenticated with your configured account.
+### 4. Sign In
+
+Visit [http://localhost:3000](http://localhost:3000) and click "Sign In". Enter your Bluesky handle and app password.
+
+#### Creating a Bluesky App Password
+
+1. Go to [https://bsky.app/settings/app-passwords](https://bsky.app/settings/app-passwords)
+2. Click "Add App Password"
+3. Give it a name (e.g., "Lanyards")
+4. Copy the generated password and use it to sign in
 
 ## Authentication Methods
 
 Lanyards supports two authentication methods:
 
-### App Password (Development)
-- **Pros**: Simple setup, no OAuth configuration needed
-- **Cons**: Single account only, credentials in .env file
+### App Password (Recommended for Development)
+- **Pros**: Simple setup, works immediately, no OAuth configuration needed
+- **Cons**: Users must create an app password from Bluesky settings
 - **Use for**: Local development and testing
 - **Configuration**: Set `AUTH_METHOD=app_password` in `.env`
 
 ### OAuth (Production)
-- **Pros**: Multi-user support, secure authorization flow
+- **Pros**: Multi-user support, secure authorization flow, standard OAuth experience
 - **Cons**: Requires OAuth client setup and configuration
 - **Use for**: Production deployment
 - **Configuration**: Set `AUTH_METHOD=oauth` in `.env`
@@ -80,20 +80,21 @@ Coming soon - OAuth setup requires AT Protocol OAuth client configuration.
 
 ## Troubleshooting
 
-### "App password not configured" error
-- Check that `BLUESKY_HANDLE` and `BLUESKY_APP_PASSWORD` are set in `.env`
-- Ensure there are no extra spaces or quotes around the values
-- Restart the development server after changing `.env`
-
 ### Authentication fails
-- Verify your app password is correct
+- Verify your app password is correct (no typos, copied fully)
 - Make sure your Bluesky account is active
-- Check that `PDS_URL` is set to `https://bsky.social`
+- Check that `PDS_URL` is set to `https://bsky.social` (or your PDS URL)
+- Try creating a new app password
 
 ### Can't access dashboard
 - Make sure you're signed in (check for session cookie)
 - Try clearing cookies and signing in again
 - Check the browser console for errors
+
+### Public profiles not loading
+- Check the browser console for errors
+- Ensure the handle is correct (e.g., `alice.bsky.social`)
+- Verify the user has created a Lanyards profile
 
 ## Next Steps
 

@@ -23,17 +23,17 @@
 
 ## Getting Started
 
-### Quick Start (App Password)
+### Quick Start
 
 1. Install dependencies:
    ```bash
    npm install
    ```
 
-2. Set up your Bluesky app password:
+2. Configure environment (optional):
    ```bash
    cp .env.example .env
-   # Edit .env and add your BLUESKY_HANDLE and BLUESKY_APP_PASSWORD
+   # Edit .env if you need to change the PDS URL or other settings
    ```
 
 3. Run the development server:
@@ -41,7 +41,7 @@
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000)
+4. Open [http://localhost:3000](http://localhost:3000) and sign in with your Bluesky app password
 
 See [SETUP.md](SETUP.md) for detailed setup instructions and OAuth configuration.
 

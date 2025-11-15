@@ -6,8 +6,7 @@ import type { Link as WebLink, LinkType, LinkPlatform } from '@/types';
 
 interface LinkFormProps {
   mode: 'create' | 'edit';
-  initialData?: WebLink;
-  linkIndex?: number;
+  initialData?: WebLink & { rkey?: string };
 }
 
 const LINK_TYPES: { value: LinkType; label: string }[] = [
@@ -34,7 +33,6 @@ const PLATFORMS: Record<LinkType, { value: LinkPlatform; label: string }[]> = {
 export default function LinkForm({
   mode,
   initialData,
-  linkIndex,
 }: LinkFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -46,6 +44,7 @@ export default function LinkForm({
     url: initialData?.url || '',
     title: initialData?.title || '',
     username: initialData?.username || '',
+    rkey: initialData?.rkey,
   });
 
   const availablePlatforms =
@@ -65,20 +64,24 @@ export default function LinkForm({
     setError('');
 
     try {
-      const payload = {
-        type: formData.type,
-        platform: formData.platform,
-        url: formData.url,
-        title: formData.title || undefined,
-        username: formData.username || undefined,
-      };
+      const payload = mode === 'create'
+        ? {
+            type: formData.type,
+            platform: formData.platform,
+            url: formData.url,
+            title: formData.title || undefined,
+            username: formData.username || undefined,
+          }
+        : {
+            rkey: formData.rkey,
+            type: formData.type,
+            platform: formData.platform,
+            url: formData.url,
+            title: formData.title || undefined,
+            username: formData.username || undefined,
+          };
 
-      const url =
-        mode === 'edit'
-          ? `/api/profile/links?index=${linkIndex}`
-          : '/api/profile/links';
-
-      const response = await fetch(url, {
+      const response = await fetch('/api/profile/links', {
         method: mode === 'create' ? 'POST' : 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -108,9 +111,12 @@ export default function LinkForm({
     setError('');
 
     try {
-      const response = await fetch(`/api/profile/links?index=${linkIndex}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `/api/profile/links?rkey=${encodeURIComponent(formData.rkey || '')}`,
+        {
+          method: 'DELETE',
+        }
+      );
 
       if (!response.ok) {
         const data = await response.json();

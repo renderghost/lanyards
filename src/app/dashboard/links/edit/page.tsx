@@ -8,7 +8,7 @@ import Link from 'next/link';
 export default async function EditLinkPage({
   searchParams,
 }: {
-  searchParams: { id?: string };
+  searchParams: Promise<{ rkey?: string }>;
 }) {
   const session = await getSession();
 
@@ -16,7 +16,9 @@ export default async function EditLinkPage({
     redirect('/auth');
   }
 
-  if (searchParams.id === undefined) {
+  const params = await searchParams;
+
+  if (!params.rkey) {
     redirect('/dashboard/links');
   }
 
@@ -29,8 +31,8 @@ export default async function EditLinkPage({
   const repo = new ProfileRepository(agent);
   const links = await repo.listWebLinks(session.did);
 
-  const linkIndex = parseInt(searchParams.id, 10);
-  const link = links[linkIndex];
+  // Find the link with the matching rkey
+  const link = links.find((l) => l.rkey === params.rkey);
 
   if (!link) {
     redirect('/dashboard/links');
@@ -72,7 +74,7 @@ export default async function EditLinkPage({
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <LinkForm mode="edit" initialData={link} linkIndex={linkIndex} />
+        <LinkForm mode="edit" initialData={link} />
       </div>
     </main>
   );

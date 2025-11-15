@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
 import Link from 'next/link';
+import Image from 'next/image';
 import ShareProfileButton from '@/components/profile/ShareProfileButton';
 
 export default async function DashboardPage() {
@@ -22,12 +23,13 @@ export default async function DashboardPage() {
 
   try {
     // Get profile
-    let profile = await repo.getProfile(session.did);
+    let lanyardProfile = await repo.getProfile(session.did);
+
+    // Get fresh Bluesky profile data
+    const bskyProfile = await agent.getProfile({ actor: session.did });
 
     // Create profile if it doesn't exist
-    if (!profile) {
-      const bskyProfile = await agent.getProfile({ actor: session.did });
-
+    if (!lanyardProfile) {
       await repo.createProfile({
         did: session.did,
         handle: session.handle,
@@ -36,8 +38,17 @@ export default async function DashboardPage() {
         description: bskyProfile.data.description,
       });
 
-      profile = await repo.getProfile(session.did);
+      lanyardProfile = await repo.getProfile(session.did);
     }
+
+    // Merge fresh Bluesky data with Lanyard profile
+    const profile = {
+      ...lanyardProfile,
+      displayName: bskyProfile.data.displayName,
+      avatar: bskyProfile.data.avatar,
+      banner: bskyProfile.data.banner,
+      description: bskyProfile.data.description,
+    };
 
     // Get counts for each section
     const [works, events, webLinks] = await Promise.all([
@@ -67,18 +78,45 @@ export default async function DashboardPage() {
         <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
           {/* Profile Card */}
           <div className="bg-white rounded-lg p-6 shadow-sm">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h2 className="text-lg font-semibold">
-                  {profile?.displayName || 'Your Profile'}
-                </h2>
-                <p className="text-sm text-gray-600">@{session.handle}</p>
+            <div className="flex items-start gap-4 mb-4">
+              {/* Avatar */}
+              {profile?.avatar && (
+                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                  <Image
+                    src={profile.avatar}
+                    alt={profile.displayName || session.handle}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2 mb-2">
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-lg font-semibold truncate">
+                      {profile?.honorific && profile.honorific !== 'none'
+                        ? `${profile.honorific}. ${profile?.displayName || session.handle}`
+                        : profile?.displayName || session.handle
+                      }
+                    </h2>
+                    <p className="text-sm text-gray-600">@{session.handle}</p>
+                  </div>
+                  <ShareProfileButton
+                    url={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${session.handle}`}
+                    handle={session.handle}
+                  />
+                </div>
+
+                {/* Bio */}
+                {profile?.description && (
+                  <p className="text-sm text-gray-700 mb-3 line-clamp-3">
+                    {profile.description}
+                  </p>
+                )}
               </div>
-              <ShareProfileButton
-                url={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${session.handle}`}
-                handle={session.handle}
-              />
             </div>
+
             <div className="flex gap-2">
               <Link
                 href={`/${session.handle}`}

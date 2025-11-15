@@ -1,7 +1,9 @@
 import { ProfileRepository } from '@/lib/data/repository';
 import ProfileView from '@/components/profile/ProfileView';
-import { getServerAgent, getPublicAgent } from '@/lib/auth/server-agent';
+import { getPublicAgent } from '@/lib/auth/server-agent';
+import { getAgent } from '@/lib/auth/atproto';
 import { getSession } from '@/lib/auth/session';
+import Link from 'next/link';
 
 interface PageProps {
   params: Promise<{
@@ -37,19 +39,39 @@ export default async function ProfilePage({ params }: PageProps) {
   }
 
   try {
-    // Use public agent for resolving handle (doesn't require auth)
+    // Check if user is authenticated
+    const session = await getSession();
+    const agent = session ? await getAgent() : null;
+
+    // If no authenticated session, require sign in to view profiles
+    if (!agent) {
+      return (
+        <main className="flex min-h-screen flex-col items-center justify-center p-6">
+          <div className="text-center max-w-md">
+            <h1 className="text-2xl font-bold mb-4">Sign In Required</h1>
+            <p className="text-gray-600 mb-6">
+              You need to sign in to view Lanyards profiles. This helps us access public Bluesky data on your behalf.
+            </p>
+            <Link
+              href="/auth"
+              className="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            >
+              Sign In
+            </Link>
+          </div>
+        </main>
+      );
+    }
+
+    // Resolve handle to DID
     const publicAgent = getPublicAgent();
     const resolved = await publicAgent.resolveHandle({ handle });
     const did = resolved.data.did;
 
     // Check if the current user is viewing their own profile
-    const session = await getSession();
     const isOwner = session?.did === did;
 
-    // Get authenticated agent for profile operations
-    const agent = await getServerAgent();
-
-    // Get Bluesky profile
+    // Get Bluesky profile (requires authentication)
     const bskyProfile = await agent.getProfile({ actor: did });
 
     // Get Lanyards profile
