@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
-    "lex:gen": "lex gen-api ./src/types/generated ./lexicons/**/*.json && node scripts/fix-generated-imports.js",
+    "lex:gen": "yes | lex gen-api ./src/types/generated ./lexicons/**/*.json && node scripts/fix-generated-imports.js",
     "lex:watch": "lex gen-api --watch ./src/types/generated ./lexicons/**/*.json"
   },
   "dependencies": {
