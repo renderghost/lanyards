@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "at.lanyard.link",
+  "id": "app.lanyards.link",
   "defs": {
     "main": {
       "type": "record",

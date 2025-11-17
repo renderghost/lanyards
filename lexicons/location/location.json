@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "at.lanyard.location",
+  "id": "app.lanyards.location",
   "defs": {
     "main": {
       "type": "object",

@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "at.lanyard.affiliation",
+  "id": "app.lanyards.affiliation",
   "defs": {
     "main": {
       "type": "record",
@@ -12,7 +12,7 @@
         "properties": {
           "organization": {
             "type": "ref",
-            "ref": "at.lanyard.organization#main",
+            "ref": "app.lanyards.organization#main",
             "description": "Reference to the affiliated organization"
           },
           "role": {

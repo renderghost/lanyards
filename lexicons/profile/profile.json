@@ -1,6 +1,6 @@
 {
   "lexicon": 1,
-  "id": "at.lanyard.profile",
+  "id": "app.lanyards.profile",
   "defs": {
     "main": {
       "type": "record",
@@ -45,7 +45,7 @@
           },
           "location": {
             "type": "ref",
-            "ref": "at.lanyard.location#main",
+            "ref": "app.lanyards.location#main",
             "description": "User's home location using ISO codes"
           },
           "createdAt": {
