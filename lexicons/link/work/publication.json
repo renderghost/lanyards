@@ -1,11 +1,10 @@
 {
   "lexicon": 1,
-  "id": "app.lanyards.publication",
+  "id": "app.lanyards.link.work.publication",
   "defs": {
     "main": {
       "type": "object",
-      "description": "A publication venue - a journal, conference proceedings, preprint server, or other venue where scholarly work is published. Examples: Nature, PLOS ONE, arXiv, NeurIPS Proceedings",
-      "required": ["name"],
+      "description": "A publication venue - embedded object representing a journal, conference proceedings, preprint server, or other venue where scholarly work is published",
       "properties": {
         "name": {
           "type": "string",
@@ -28,24 +27,10 @@
           "type": "string",
           "description": "International Standard Serial Number (ISSN) - format: 0028-0836"
         },
-        "publisher": {
-          "type": "ref",
-          "ref": "app.lanyards.organization#main",
-          "description": "Optional reference to the publishing organization"
-        },
         "website": {
           "type": "string",
           "format": "uri",
           "description": "Publication's primary website URL"
-        },
-        "subjects": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "maxLength": 100
-          },
-          "maxLength": 10,
-          "description": "Subject areas or disciplines covered by this publication"
         }
       }
     }

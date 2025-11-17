@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "app.lanyards.work",
+  "id": "app.lanyards.link.work",
   "defs": {
     "main": {
       "type": "record",
-      "description": "A scholarly contribution or research work identified by DOI - represents academic output like papers, posters, conference proceedings, etc.",
+      "description": "Link to a scholarly contribution or research work identified by DOI - represents academic output like papers, posters, conference proceedings, etc.",
       "key": "tid",
       "record": {
         "type": "object",
@@ -63,8 +63,8 @@
           },
           "publication": {
             "type": "ref",
-            "ref": "app.lanyards.publication#main",
-            "description": "Optional structured reference to publication venue record"
+            "ref": "app.lanyards.link.work.publication#main",
+            "description": "Optional structured reference to publication venue"
           },
           "event": {
             "type": "string",

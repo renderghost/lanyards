@@ -1,0 +1,74 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.link.media.video",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Link to video content - lectures, presentations, interviews, or media appearances",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["url", "platform", "createdAt"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the video"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "youtube",
+              "vimeo",
+              "twitch",
+              "tiktok",
+              "other"
+            ],
+            "description": "Video hosting platform"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Video title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Description of the video content"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "lecture",
+              "presentation",
+              "interview",
+              "tutorial",
+              "conference-talk",
+              "other"
+            ],
+            "description": "Type of video content"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Video duration in seconds"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Date the video was published"
+          },
+          "relatedWork": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional AT-URI reference to related work record"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this link was added"
+          }
+        }
+      }
+    }
+  }
+}

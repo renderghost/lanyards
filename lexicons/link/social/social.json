@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.link.social",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Link to a social media or academic profile - combines social networks and academic platforms (max 1 per platform)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["url", "platform", "createdAt"],
+        "properties": {
+          "platform": {
+            "type": "string",
+            "enum": [
+              "bluesky",
+              "twitter",
+              "linkedin",
+              "mastodon",
+              "researchgate",
+              "googlescholar",
+              "orcid",
+              "semble",
+              "other"
+            ],
+            "description": "Platform identifier"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Full URL to the profile"
+          },
+          "username": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Username or identifier on the platform (e.g., '@username' or 'username')"
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display name on the platform (optional)"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "description": "Whether the account is verified on the platform"
+          },
+          "isLocked": {
+            "type": "boolean",
+            "description": "Whether this link is locked (e.g., Bluesky profile derived from auth)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this link was created"
+          }
+        }
+      }
+    }
+  }
+}
