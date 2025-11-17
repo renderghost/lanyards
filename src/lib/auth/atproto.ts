@@ -1,5 +1,5 @@
 import { AtpAgent } from '@atproto/api';
-import { getSession } from './session';
+import { getSession, deleteSession } from './session';
 
 export async function getAgent(): Promise<AtpAgent | null> {
   const session = await getSession();
@@ -12,16 +12,25 @@ export async function getAgent(): Promise<AtpAgent | null> {
     service: 'https://bsky.social',
   });
 
-  // Resume session
-  await agent.resumeSession({
-    did: session.did,
-    handle: session.handle,
-    accessJwt: session.accessToken,
-    refreshJwt: session.refreshToken,
-    active: true,
-  });
+  try {
+    // Resume session
+    await agent.resumeSession({
+      did: session.did,
+      handle: session.handle,
+      accessJwt: session.accessToken,
+      refreshJwt: session.refreshToken,
+      active: true,
+    });
 
-  return agent;
+    return agent;
+  } catch (error: unknown) {
+    // If token is expired or invalid, clear the session
+    const err = error as { error?: string };
+    if (err.error === 'ExpiredToken' || err.error === 'InvalidToken') {
+      await deleteSession();
+    }
+    return null;
+  }
 }
 
 export async function getProfile(did: string) {
