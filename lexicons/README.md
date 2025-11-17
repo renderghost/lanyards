@@ -1,136 +1,217 @@
 # Lanyards Lexicons
 
-This directory contains the AT Protocol lexicon definitions for Lanyard.
+This directory contains the AT Protocol lexicon definitions for Lanyards.
 
 > [!NOTE]
 > Lanyards uses the AT Protocol Lexicon CLI [@atproto/lex-cli](https://www.npmjs.com/package/@atproto/lex-cli) to automatically generate TypeScript types from the lexicon JSON definitions.
 
 ## Namespace Structure
 
-All lexicons use the `at.lanyard.*` namespace in anticipation of the `lanyard.at` domain.
+All lexicons use the `app.lanyards.*` namespace for the `lanyards.app` domain.
+
+Lanyards is fundamentally a **link roll** for academics - everything is a link to external resources or information about the person managing those links.
 
 ```
-at.lanyard/
-├── researcher          - Core researcher profile (singleton record)
-├── work                - Scholarly contributions (DOI-based, multiple records)
-├── event               - Academic events (conferences, workshops, multiple records)
-├── link                - External profiles and links (unified, multiple records)
-├── publication         - Publication venues (journals, conferences, embedded object)
-├── organization        - Institutions and entities (embedded object)
-└── location            - Geographic locations (embedded object)
+lexicons/
+├── README.md
+├── actor/                         - Information about the person and their preferences
+│   ├── biography/                 - Biographical information about the person
+│   │   ├── affiliation.json       - Professional affiliations (multiple records)
+│   │   ├── honorific.json         - Academic title (Dr, Prof) (singleton)
+│   │   ├── identity.json          - Core identity synced from Bluesky (locked singleton)
+│   │   ├── location.json          - Home location (embedded object)
+│   │   ├── qualification.json     - Degrees and certifications (multiple records)
+│   │   └── skill.json             - Skills and expertise (multiple records)
+│   ├── preference/                - App preferences (placeholder for future)
+│   └── profile/                   - Profile display configuration
+│       ├── content.json           - Custom text blocks/headers (multiple records)
+│       ├── pinned.json            - Featured/pinned items (singleton)
+│       ├── theme.json             - Visual customization (singleton)
+│       └── visible.json           - Visibility settings (singleton)
+├── collection/                    - Named collections of links
+│   └── collection.json            - Organized groups of links with ordering
+└── link/                          - Links to external resources
+    ├── event/                     - Links to academic events
+    │   └── event.json             - Conferences, workshops, symposiums
+    ├── media/                     - Links to media content
+    │   ├── audio.json             - Audio (podcasts, interviews)
+    │   ├── code.json              - Code repositories and gists
+    │   └── video.json             - Videos (lectures, talks, interviews)
+    ├── social/                    - Social & academic profile links
+    │   └── social.json            - Unified social/academic platform links
+    ├── web/                       - Custom web links
+    │   └── web.json               - Personal websites, blogs, portfolios
+    └── work/                      - Links to research works
+        ├── publication.json       - Publication venue (embedded object)
+        └── work.json              - Scholarly work (DOI-based)
 ```
+
+## Core Concepts
+
+### 1. Actor (The Person)
+
+The **actor** namespace contains everything about the person themselves:
+
+#### actor/biography/ - Biographical Information
+
+- **identity.json** - Core identity fields synced from Bluesky (did, handle, displayName, avatar, description, banner) - **locked/read-only singleton**
+- **honorific.json** - Academic title (none, Dr, Prof) - **editable singleton**
+- **location.json** - Home location (country, city) - **embedded object**
+- **affiliation.json** - Current and past institutional affiliations with roles and dates - **multiple records**
+- **skill.json** - Technical skills, methodologies, and domain expertise - **multiple records**
+- **qualification.json** - Academic degrees, certifications, and credentials - **multiple records**
+
+#### actor/profile/ - Profile Display Configuration
+
+- **pinned.json** - Featured/prioritized links or collections (max 6 items) - **singleton**
+- **visible.json** - Visibility controls (which links/collections to hide) - **singleton**
+- **theme.json** - Visual customization (colors, fonts, layout density) - **singleton**
+- **content.json** - Custom text blocks and section headers for storytelling - **multiple records**
+
+#### actor/preference/ - App Preferences
+
+Placeholder directory for future app-level preferences (notifications, privacy, security).
+
+### 2. Link (External Resources)
+
+Everything in the **link** namespace is a link to something external:
+
+#### link/event/ - Academic Events
+
+- **event.json** - Links to conferences, workshops, symposiums, seminars where research is presented - **multiple records**
+
+#### link/work/ - Research Works
+
+- **work.json** - Scholarly publications identified by DOI (papers, posters, datasets) - **multiple records**
+- **publication.json** - Publication venue details (embedded object: journal name, ISSN, type)
+
+#### link/media/ - Media Content
+
+- **code.json** - Code repositories (GitHub, GitLab), gists, CodePen - **multiple records**
+- **video.json** - Videos (YouTube, Vimeo) - lectures, presentations, interviews - **multiple records**
+- **audio.json** - Audio content (Spotify, podcasts) - episodes, interviews, panels - **multiple records**
+
+#### link/social/ - Social & Academic Profiles
+
+- **social.json** - Unified collection for both social networks and academic platforms - **multiple records**
+  - Social: Bluesky, Twitter, LinkedIn, Mastodon
+  - Academic: ORCID, Google Scholar, ResearchGate, Semble
+  - **Constraint**: 1 link per platform
+
+#### link/web/ - Custom Web Links
+
+- **web.json** - Generic web links for personal websites, blogs, portfolios, etc. - **multiple records**
+  - **Constraint**: Max 3 per profile
+
+### 3. Collection (Organized Groups)
+
+The **collection** namespace allows organizing links into named groups:
+
+- **collection.json** - A titled collection with description, icon, and manually ordered array of link references - **multiple records**
+- Use cases: "My Publications", "2024 Conference Talks", "Teaching Resources"
 
 ## Lexicon Details
 
-### Records (Top-level collections)
+### Records vs Embedded Objects
 
-Records are stored as collections in the user's repository with `at-uri` identifiers.
+**Records** are stored as collections in the user's repository with unique `at-uri` identifiers. Each record can be created, updated, and deleted independently.
 
-> [!NOTE]
-> The following records are given as example. Referred to the lexicon themselves from more complete and up-to-date documentation.
+**Embedded Objects** are reusable components defined in lexicons but embedded within records rather than stored separately. Examples: location, publication venue.
 
-**`at.lanyard.researcher`**
-- **Type**: Record (singleton, key: `literal:self`)
-- **Description**: The researcher's core profile and identity
-- **Required Fields**: `did`, `handle`, `createdAt`
-- **Optional Fields**: `displayName`, `avatar`, `description` (synced from Bluesky), `honorifics`, `location`, `affiliations`, `updatedAt`
-- **Embeds**: `location` (at.lanyard.location), `affiliations[]` (affiliation object)
-- **Subdefs**: `affiliation` - professional relationships with organizations
+### Record Types (by key)
 
-**`at.lanyard.work`**
-- **Type**: Record (multiple, key: `tid`)
-- **Description**: Scholarly contributions identified by DOI
-- **Required Fields**: `doi`, `type`, `createdAt`
-- **Optional Fields**: `title`, `authors[]`, `publicationDate`, `venue`, `publication` (ref), `event` (at-uri ref)
-- **Work Types**: `abstract`, `poster`, `paper`, `conference-proceeding`, `journal-article`, `book-chapter`, `book`, `preprint`, `dataset`, `other`
-- **Note**: Metadata auto-fetched from CrossRef/DataCite via DOI
+- **Singleton Records** (`key: "literal:self"`) - Only one per user
+  - `actor.biography.identity`
+  - `actor.biography.honorific`
+  - `actor.profile.pinned`
+  - `actor.profile.visible`
+  - `actor.profile.theme`
 
-**`at.lanyard.event`**
-- **Type**: Record (multiple, key: `tid`)
-- **Description**: Academic events where research is presented or discussed
-- **Required Fields**: `name`, `type`, `startDate`, `createdAt`
-- **Optional Fields**: `endDate`, `location` (ref), `organizer` (ref), `relatedWorks[]` (at-uri refs), `url`
-- **Event Types**: `conference`, `symposium`, `workshop`, `seminar`, `lecture`, `poster-session`, `webinar`, `other`
-- **Embeds**: `location` (at.lanyard.location), `organizer` (at.lanyard.organization)
+- **Multiple Records** (`key: "tid"`) - Many per user
+  - `actor.biography.affiliation`
+  - `actor.biography.skill`
+  - `actor.biography.qualification`
+  - `actor.profile.content`
+  - `link.event.event`
+  - `link.work.work`
+  - `link.media.code`
+  - `link.media.video`
+  - `link.media.audio`
+  - `link.social.social`
+  - `link.web.web`
+  - `collection.collection`
 
-**`at.lanyard.link`**
-- **Type**: Record (multiple, key: `tid`)
-- **Description**: External profiles and custom web links (unified collection)
-- **Required Fields**: `url`, `type`, `createdAt`
-- **Optional Fields**: `platform`, `title`, `username`, `isLocked`
-- **Link Types**:
-  - `social` - Twitter, LinkedIn, Bluesky
-  - `academic` - ORCID, Google Scholar, ResearchGate, Semble
-  - `web` - Custom web links (max 3 per profile)
-- **Platforms**: `bluesky`, `twitter`, `linkedin`, `researchgate`, `googlescholar`, `orcid`, `semble`, `custom`
-- **Constraints**: 1 per social/academic platform, max 3 custom web links
+### Embedded Objects
 
-### Embedded Objects (Reusable components)
+**app.lanyards.actor.biography.location**
+- Fields: `country` (string), `city` (string)
+- Used by: affiliation, qualification, event
+- Simple country/city representation (moved away from ISO codes for simplicity)
 
-Embedded objects are not stored as separate records but are embedded within other records.
+**app.lanyards.link.work.publication**
+- Fields: `name`, `type`, `issn`, `website`
+- Used by: link.work.work
+- Represents publication venues (journals, conferences, preprints)
 
-**`at.lanyard.location`**
-- **Type**: Object (embedded)
-- **Description**: Geographic location using ISO standard codes
-- **Fields**: `country` (ISO 3166-1 alpha-2), `region` (ISO 3166-2), `city`, `isVirtual`
-- **Used By**: researcher, organization, event
-- **Examples**: `{country: "US", region: "US-CA", city: "San Francisco"}`, `{isVirtual: true}`
+## Data Flow
 
-**`at.lanyard.organization`**
-- **Type**: Object (embedded)
-- **Description**: Institutions, publishers, societies, funders, companies
-- **Required Fields**: `name`
-- **Optional Fields**: `type`, `ringgoldId`, `gridId`, `rorId`, `location` (ref), `website`, `logo` (blob)
-- **Organization Types**: `institution`, `publisher`, `society`, `funder`, `company`, `government`, `other`
-- **Used By**: researcher.affiliation, event.organizer, publication.publisher
-- **Identifiers**: Ringgold ID (academic institutions), GRID ID, ROR ID
+### Locked vs Editable Fields
 
-**`at.lanyard.publication`**
-- **Type**: Object (embedded)
-- **Description**: Publication venues (journals, conference proceedings, preprint servers)
-- **Required Fields**: `name`
-- **Optional Fields**: `type`, `issn`, `publisher` (ref), `website`, `subjects[]`
-- **Publication Types**: `journal`, `proceedings`, `preprint`, `repository`, `book-series`, `other`
-- **Used By**: work.publication
-- **Examples**: Nature, PLOS ONE, arXiv, NeurIPS Proceedings
+**Locked (from Bluesky)**:
+- `actor.biography.identity.*` - Synced from Bluesky profile, cannot be edited in Lanyards
+- Changes must be made on Bluesky and will sync automatically
 
-## Object Relationships
+**Editable (in Lanyards)**:
+- Everything else - `actor.biography.*`, `actor.profile.*`, `link.*`, `collection.*`
 
-```
-at.lanyard.researcher (record)
-  ├─ embeds → location (object)
-  └─ embeds → affiliations[] (objects)
-      └─ embed → organization (object)
-          └─ embed → location (object)
+### Profile Display Logic
 
-at.lanyard.work (record)
-  ├─ embeds → publication (object)
-  │   └─ embed → organization (object) [publisher]
-  └─ refs → event (at-uri) [optional]
-
-at.lanyard.event (record)
-  ├─ embeds → location (object)
-  ├─ embeds → organizer (organization object)
-  └─ refs → relatedWorks[] (at-uri)
-
-at.lanyard.link (record)
-  └─ (no references)
-```
+The public profile combines:
+1. **Identity** from `actor.biography.identity` (locked)
+2. **Biographical details** from `actor.biography.*` (editable)
+3. **Links** from `link.*` (all types)
+4. **Collections** from `collection.collection`
+5. **Display configuration** from `actor.profile.*`
+   - Pinned items appear first
+   - Hidden items are excluded
+   - Custom content blocks tell stories
+   - Theme applies visual styling
 
 ## Design Principles
 
-1. **Flat Namespace** - Simple top-level structure, no deep nesting
-2. **Embedded Objects** - Reusable components (location, organization, publication) embedded, not separate records
-3. **DOI-Centric** - Works primarily identified by DOI, metadata auto-fetched
-4. **Unified Links** - Single collection for social, academic, and custom links
-5. **AT Protocol Conventions** - Follows app.bsky.* patterns with records and embedded objects
-6. **Single Source of Truth** - Bluesky profile data is locked and synced
+1. **Hierarchical Naming** - Clear namespace hierarchy reflects conceptual organization
+2. **Link-Centric** - Everything is fundamentally about links to external resources
+3. **Actor-Centric** - Clear separation between person (actor) and content (links)
+4. **Embedded Objects** - Reusable components without creating separate records
+5. **DOI-Centric** - Research works identified by DOI with auto-fetched metadata
+6. **Configurable Display** - Rich profile customization through actor.profile.*
+7. **Single Source of Truth** - Bluesky profile data is authoritative and locked
+8. **Flexibility** - Collections and content blocks enable creative profile organization
+
+## File Organization
+
+Lexicon files are now organized by functional hierarchy:
+
+- **actor/** - Person-centric data
+  - **biography/** - Who they are (identity, credentials, affiliations)
+  - **profile/** - How they present themselves (theme, layout, featured content)
+  - **preference/** - How they use the app (future)
+
+- **link/** - External resource links
+  - **event/** - Academic events
+  - **work/** - Research works and publications
+  - **media/** - Code, video, audio content
+  - **social/** - Social and academic platform profiles
+  - **web/** - Custom web links
+
+- **collection/** - Organizational structures for grouping links
 
 ## Future Expansion
 
-The structure allows for growth:
-- `at.lanyard.education` - Academic degrees and credentials
-- `at.lanyard.grant` - Research funding records
-- `at.lanyard.patent` - Patent records
-- `at.lanyard.dataset` - Research datasets
-- `at.lanyard.teaching` - Teaching activities and courses
+Potential additions:
+- `actor.preference.*` - App-level preferences (notifications, privacy, security)
+- `actor.biography.award` - Awards and honors
+- `link.grant` - Research funding and grants
+- `link.patent` - Patent filings
+- `link.dataset` - Research datasets
+- `link.teaching` - Teaching materials and courses
