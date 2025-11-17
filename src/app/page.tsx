@@ -5,7 +5,7 @@ export default function Home() {
     <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-b from-white to-gray-50">
       <div className="max-w-2xl w-full text-center">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-          Lanyard
+          Lanyards
         </h1>
         <p className="text-xl text-gray-700 mb-2">
           Your Researcher Profile on the AT Protocol
@@ -45,7 +45,9 @@ export default function Home() {
             </p>
           </div>
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <h3 className="font-semibold text-lg mb-2">Comprehensive Profile</h3>
+            <h3 className="font-semibold text-lg mb-2">
+              Comprehensive Profile
+            </h3>
             <p className="text-gray-600 text-sm">
               Manage affiliations, publications, events, and social networks all
               in one place.
