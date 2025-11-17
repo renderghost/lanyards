@@ -1,0 +1,44 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.profile.content",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Custom text content blocks and headers for storytelling and organizing the public profile",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["type", "createdAt"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "header",
+              "text"
+            ],
+            "description": "Type of content block"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "The text content (markdown supported)"
+          },
+          "position": {
+            "type": "integer",
+            "description": "Display order position (lower numbers appear first)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this content block was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this content block was last updated"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.profile.theme",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Visual theme customization for the public profile - colors, fonts, and styling preferences",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["createdAt"],
+        "properties": {
+          "primaryColor": {
+            "type": "string",
+            "maxLength": 7,
+            "description": "Primary color in hex format (e.g., '#3B82F6')"
+          },
+          "accentColor": {
+            "type": "string",
+            "maxLength": 7,
+            "description": "Accent color in hex format"
+          },
+          "fontFamily": {
+            "type": "string",
+            "enum": [
+              "system",
+              "serif",
+              "sans-serif",
+              "monospace"
+            ],
+            "description": "Font family preference"
+          },
+          "layout": {
+            "type": "string",
+            "enum": [
+              "compact",
+              "comfortable",
+              "spacious"
+            ],
+            "description": "Layout density preference"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this record was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this record was last updated"
+          }
+        }
+      }
+    }
+  }
+}

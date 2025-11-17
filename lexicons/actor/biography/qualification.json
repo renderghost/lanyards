@@ -1,0 +1,60 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.biography.qualification",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "An academic degree, certification, or professional qualification",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["title", "institution", "createdAt"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Qualification title (e.g., 'PhD in Computer Science', 'Board Certification in Internal Medicine', 'Master of Arts in Philosophy')"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "phd",
+              "masters",
+              "bachelors",
+              "postdoc",
+              "certification",
+              "fellowship",
+              "other"
+            ],
+            "description": "Type of qualification"
+          },
+          "institution": {
+            "type": "string",
+            "maxLength": 300,
+            "description": "Institution that awarded the qualification"
+          },
+          "field": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Field of study or specialization"
+          },
+          "dateAwarded": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Date the qualification was awarded"
+          },
+          "location": {
+            "type": "ref",
+            "ref": "app.lanyards.actor.biography.location#main",
+            "description": "Location of the institution"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this qualification was added"
+          }
+        }
+      }
+    }
+  }
+}

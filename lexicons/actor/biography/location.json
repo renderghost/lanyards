@@ -1,0 +1,21 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.biography.location",
+  "defs": {
+    "main": {
+      "type": "object",
+      "description": "Geographic location - embedded object representing a researcher's home location",
+      "properties": {
+        "country": {
+          "type": "string",
+          "description": "Country name (e.g., 'United States', 'United Kingdom', 'Germany')"
+        },
+        "city": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "City name (optional)"
+        }
+      }
+    }
+  }
+}
