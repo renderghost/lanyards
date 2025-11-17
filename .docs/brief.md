@@ -1,5 +1,5 @@
 # Overview
-'Lanyard' is a dedicated profile for researchers, built on the AT profile.
+'Lanyards' is a dedicated profile for researchers, built on the AT profile.
 
 Researchers will use this as an alternative to the ORCID id.
 
