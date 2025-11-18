@@ -1,0 +1,78 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.link.media.audio",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Link to audio content - podcasts, interviews, lectures, or other audio appearances",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["url", "platform", "createdAt"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the audio content"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "spotify",
+              "apple-podcasts",
+              "soundcloud",
+              "anchor",
+              "other"
+            ],
+            "description": "Audio hosting platform"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Episode or audio title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000,
+            "description": "Description of the audio content"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "podcast-episode",
+              "interview",
+              "lecture",
+              "panel-discussion",
+              "other"
+            ],
+            "description": "Type of audio content"
+          },
+          "seriesName": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Name of the podcast or series (if applicable)"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Audio duration in seconds"
+          },
+          "publishedDate": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Date the audio was published"
+          },
+          "relatedWork": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "Optional AT-URI reference to related work record"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this link was added"
+          }
+        }
+      }
+    }
+  }
+}

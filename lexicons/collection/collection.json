@@ -1,0 +1,50 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.collection",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A named collection of links with manual ordering - used to group related content on the public profile",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["title", "items", "createdAt"],
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Collection title (e.g., 'My Publications', 'Conference Talks 2024', 'Teaching Resources')"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Description of what this collection contains"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "at-uri"
+            },
+            "description": "Ordered array of AT-URI references to links in this collection"
+          },
+          "icon": {
+            "type": "string",
+            "maxLength": 20,
+            "description": "Optional emoji or icon for the collection"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this collection was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this collection was last updated"
+          }
+        }
+      }
+    }
+  }
+}

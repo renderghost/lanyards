@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.biography.honorific",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Academic honorific or title",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["value", "createdAt"],
+        "properties": {
+          "value": {
+            "type": "string",
+            "enum": ["none", "Dr", "Prof"],
+            "description": "Academic honorific - one of: none, Dr, or Prof (tradition: use one or the other, never both)"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this record was created"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this record was last updated"
+          }
+        }
+      }
+    }
+  }
+}

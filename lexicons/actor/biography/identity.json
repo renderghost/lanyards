@@ -1,10 +1,10 @@
 {
   "lexicon": 1,
-  "id": "at.lanyard.profile",
+  "id": "app.lanyards.actor.biography.identity",
   "defs": {
     "main": {
       "type": "record",
-      "description": "A user's profile record - designed for academics to showcase their identity, affiliations, and professional presence",
+      "description": "Core identity information synced from Bluesky - these fields are locked and cannot be edited within Lanyards",
       "key": "literal:self",
       "record": {
         "type": "object",
@@ -22,7 +22,7 @@
           "displayName": {
             "type": "string",
             "maxLength": 64,
-            "description": "Display name (from Bluesky profile)"
+            "description": "Display name (from Bluesky profile, locked)"
           },
           "avatar": {
             "type": "string",
@@ -32,31 +32,21 @@
             "type": "string",
             "maxGraphemes": 256,
             "maxLength": 2560,
-            "description": "Profile description (from Bluesky profile, locked)"
+            "description": "Profile description/bio (from Bluesky profile, locked)"
           },
           "banner": {
             "type": "string",
             "description": "Banner image URL (from Bluesky profile, locked)"
           },
-          "honorific": {
-            "type": "string",
-            "enum": ["none", "Dr", "Prof"],
-            "description": "Academic honorific - one of: none, Dr, or Prof (tradition: use one or the other, never both)"
-          },
-          "location": {
-            "type": "ref",
-            "ref": "at.lanyard.location#main",
-            "description": "User's home location using ISO codes"
-          },
           "createdAt": {
             "type": "string",
             "format": "datetime",
-            "description": "Timestamp when the profile was created"
+            "description": "Timestamp when the identity record was created"
           },
           "updatedAt": {
             "type": "string",
             "format": "datetime",
-            "description": "Timestamp when the profile was last updated"
+            "description": "Timestamp when the identity was last synced from Bluesky"
           }
         }
       }

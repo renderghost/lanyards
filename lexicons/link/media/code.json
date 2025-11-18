@@ -1,0 +1,63 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.link.media.code",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Link to code repositories, gists, or other code-sharing platforms",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["url", "platform", "createdAt"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the code repository or gist"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "github",
+              "gitlab",
+              "bitbucket",
+              "codepen",
+              "gist",
+              "other"
+            ],
+            "description": "Code hosting platform"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Repository or project name"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Description of the code/project"
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 50,
+            "description": "Primary programming language (e.g., 'Python', 'JavaScript', 'R')"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 50
+            },
+            "maxLength": 10,
+            "description": "Tags or topics for the code"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this link was added"
+          }
+        }
+      }
+    }
+  }
+}

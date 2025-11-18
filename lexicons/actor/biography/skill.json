@@ -1,0 +1,52 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.biography.skill",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A skill, expertise area, or technical competency",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["name", "createdAt"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Skill name (e.g., 'Machine Learning', 'Python', 'CRISPR', 'Statistical Analysis')"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "technical",
+              "methodological",
+              "domain-expertise",
+              "language",
+              "other"
+            ],
+            "description": "Category of skill"
+          },
+          "proficiency": {
+            "type": "string",
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced",
+              "expert"
+            ],
+            "description": "Self-assessed proficiency level"
+          },
+          "yearsOfExperience": {
+            "type": "integer",
+            "description": "Years of experience with this skill"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this skill was added"
+          }
+        }
+      }
+    }
+  }
+}
