@@ -2,19 +2,18 @@
   "name": "at-lanyard",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "npm run lex:gen && next dev",
     "build": "npm run lex:gen && next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,md}\"",
     "lex:gen": "yes | lex gen-api ./src/types/generated ./lexicons/**/*.json && node scripts/fix-generated-imports.js",
     "lex:watch": "lex gen-api --watch ./src/types/generated ./lexicons/**/*.json"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
     "@atproto/api": "latest",
     "@atproto/common": "latest",
     "@atproto/identity": "latest",
@@ -22,27 +21,31 @@
     "@atproto/oauth-client-node": "latest",
     "@atproto/syntax": "latest",
     "@atproto/xrpc-server": "latest",
-    "zod": "latest",
-    "uuid": "latest",
+    "clsx": "latest",
     "cors": "latest",
     "dotenv": "latest",
+    "next": "latest",
     "qrcode": "latest",
-    "clsx": "latest",
-    "tailwind-merge": "latest"
+    "react": "latest",
+    "react-dom": "latest",
+    "tailwind-merge": "latest",
+    "uuid": "latest",
+    "zod": "latest"
   },
   "devDependencies": {
     "@atproto/lex-cli": "latest",
+    "@tailwindcss/postcss": "latest",
+    "@types/cors": "latest",
     "@types/node": "latest",
+    "@types/qrcode": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/cors": "latest",
-    "@types/qrcode": "latest",
-    "typescript": "latest",
     "eslint": "latest",
     "eslint-config-next": "latest",
+    "postcss": "latest",
     "prettier": "latest",
     "tailwindcss": "latest",
-    "@tailwindcss/postcss": "latest",
-    "postcss": "latest"
+    "typescript": "latest",
+    "typescript-eslint": "^8.47.0"
   }
 }
