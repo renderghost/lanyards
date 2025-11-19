@@ -14,8 +14,8 @@ export async function POST(request: NextRequest) {
     }
 
     // For form submissions, redirect to home page
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    return NextResponse.redirect(new URL('/', baseUrl));
+    const url = new URL('/', request.url);
+    return NextResponse.redirect(url);
   } catch (error) {
     console.error('Logout error:', error);
 
@@ -28,19 +28,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    return NextResponse.redirect(new URL('/', baseUrl));
+    const url = new URL('/', request.url);
+    return NextResponse.redirect(url);
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     await deleteSession();
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    return NextResponse.redirect(new URL('/', baseUrl));
+    const url = new URL('/', request.url);
+    return NextResponse.redirect(url);
   } catch (error) {
     console.error('Logout error:', error);
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    return NextResponse.redirect(new URL('/', baseUrl));
+    const url = new URL('/', request.url);
+    return NextResponse.redirect(url);
   }
 }
