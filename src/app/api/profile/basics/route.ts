@@ -14,10 +14,16 @@ export async function PUT(request: NextRequest) {
     const { honorific, location } = body;
 
     const repo = new ProfileRepository(agent);
-    await repo.updateProfile({
-      honorific,
-      location,
-    });
+
+    // Update honorific if provided
+    if (honorific !== undefined) {
+      await repo.setHonorific({ value: honorific });
+    }
+
+    // Update location if provided
+    if (location !== undefined) {
+      await repo.setLocation(location);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

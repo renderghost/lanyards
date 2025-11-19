@@ -1,5 +1,5 @@
 import { AtpAgent } from '@atproto/api';
-import { getSession, deleteSession } from './session';
+import { getSession } from './session';
 
 export async function getAgent(): Promise<AtpAgent | null> {
   const session = await getSession();
@@ -24,10 +24,17 @@ export async function getAgent(): Promise<AtpAgent | null> {
 
     return agent;
   } catch (error: unknown) {
-    // If token is expired or invalid, clear the session
-    const err = error as { error?: string };
-    if (err.error === 'ExpiredToken' || err.error === 'InvalidToken') {
-      await deleteSession();
+    // If token is expired or invalid, return null silently
+    // Session cleanup should be handled by auth routes or server actions
+    // Check for expected token errors
+    const err = error as { error?: string; message?: string };
+    const isExpiredToken = err.error === 'ExpiredToken' ||
+                           err.error === 'InvalidToken' ||
+                           err.message?.toLowerCase().includes('expired') ||
+                           err.message?.toLowerCase().includes('invalid');
+
+    if (!isExpiredToken) {
+      console.error('Failed to resume session:', error);
     }
     return null;
   }

@@ -19,7 +19,7 @@ import { AtpBaseClient } from '@/types/generated';
  * await agent.login({ identifier: 'user', password: 'pass' });
  *
  * const client = createLanyardClient(agent);
- * const result = await client.at.lanyard.profile.get({
+ * const result = await client.app.lanyards.actor.biography.identity.get({
  *   repo: agent.session.did,
  *   rkey: 'self'
  * });
@@ -49,7 +49,7 @@ export function createLanyardClient(agent: AtpAgent): AtpBaseClient {
  * @example
  * ```typescript
  * const client = createPublicLanyardClient('https://bsky.social');
- * const profile = await client.at.lanyard.profile.get({
+ * const identity = await client.app.lanyards.actor.biography.identity.get({
  *   repo: 'did:plc:abc123',
  *   rkey: 'self'
  * });

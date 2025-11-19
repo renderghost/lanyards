@@ -97,7 +97,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
         throw new Error(data.error || `Failed to ${mode} research`);
       }
 
-      router.push('/dashboard/research');
+      router.push('/dashboard/links/research');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -129,7 +129,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
         throw new Error(data.error || 'Failed to delete research');
       }
 
-      router.push('/dashboard/research');
+      router.push('/dashboard/links/research');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete research');

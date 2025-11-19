@@ -3,25 +3,41 @@
 import Image from 'next/image';
 import QRCodeButton from './QRCodeButton';
 import type {
-  Profile,
   Affiliation,
-  Link as WebLink,
-  Work,
-  Event,
+  Qualification,
+  Skill,
+  LinkSocial,
+  LinkWeb,
+  LinkWork,
+  LinkEvent,
 } from '@/types';
 
 interface ProfileViewProps {
-  profile: Profile;
-  affiliations: Affiliation[];
-  webLinks: WebLink[];
-  works: Work[];
-  events: Event[];
+  profile: {
+    did: string;
+    handle: string;
+    displayName?: string;
+    avatar?: string;
+    banner?: string;
+    description?: string;
+    honorific?: string;
+  };
+  affiliations: (Affiliation & { rkey: string; uri: string })[];
+  qualifications: (Qualification & { rkey: string; uri: string })[];
+  skills: (Skill & { rkey: string; uri: string })[];
+  socialLinks: (LinkSocial & { rkey: string })[];
+  webLinks: (LinkWeb & { rkey: string })[];
+  works: (LinkWork & { rkey: string })[];
+  events: (LinkEvent & { rkey: string })[];
   isOwner?: boolean;
 }
 
 export default function ProfileView({
   profile,
   affiliations,
+  qualifications,
+  skills,
+  socialLinks,
   webLinks,
   works,
   events,
@@ -30,9 +46,7 @@ export default function ProfileView({
   const primaryAffiliation = affiliations.find((a) => a.isPrimary);
   const currentAffiliations = affiliations.filter((a) => !a.endDate);
 
-  // Separate social and custom web links
-  const socialLinks = webLinks.filter((l) => l.type === 'social' || l.type === 'academic');
-  const customLinks = webLinks.filter((l) => l.type === 'web');
+  // Social links are now separate from web links
   const blueskyProfile = socialLinks.find((s) => s.platform === 'bluesky');
 
   // Format display name with honorific
@@ -42,6 +56,15 @@ export default function ProfileView({
       return `${profile.honorific}. ${name}`;
     }
     return name;
+  };
+
+  // Format date consistently to avoid hydration mismatches
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   return (
@@ -130,7 +153,7 @@ export default function ProfileView({
           {/* Current Affiliation */}
           {primaryAffiliation && (
             <div className="text-sm text-gray-600 mb-4">
-              <p className="font-medium">{primaryAffiliation.organization.name}</p>
+              <p className="font-medium">{primaryAffiliation.organizationName}</p>
               {primaryAffiliation.role && <p>{primaryAffiliation.role}</p>}
             </div>
           )}
@@ -138,10 +161,10 @@ export default function ProfileView({
           {/* Primary Action - Edit Profile or Follow on Bluesky */}
           {isOwner ? (
             <a
-              href="/dashboard/profile/edit"
+              href="/dashboard/about"
               className="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2"
             >
-              Edit Profile
+              Edit About
             </a>
           ) : blueskyProfile ? (
             <a
@@ -172,9 +195,9 @@ export default function ProfileView({
           <section className="bg-white rounded-lg p-4 shadow-sm">
             <h2 className="text-lg font-semibold mb-3">Connect</h2>
             <div className="space-y-2">
-              {socialLinks.map((social, idx) => (
+              {socialLinks.map((social) => (
                 <a
-                  key={idx}
+                  key={social.rkey}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -190,14 +213,14 @@ export default function ProfileView({
           </section>
         )}
 
-        {/* Custom Web Links */}
-        {customLinks.length > 0 && (
+        {/* Web Links */}
+        {webLinks.length > 0 && (
           <section className="bg-white rounded-lg p-4 shadow-sm">
             <h2 className="text-lg font-semibold mb-3">Links</h2>
             <div className="space-y-2">
-              {customLinks.map((link, idx) => (
+              {webLinks.map((link) => (
                 <a
-                  key={idx}
+                  key={link.rkey}
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -218,7 +241,7 @@ export default function ProfileView({
               {currentAffiliations.map((affiliation, idx) => (
                 <div key={idx}>
                   <p className="font-medium">
-                    {affiliation.organization.name}
+                    {affiliation.organizationName}
                   </p>
                   {affiliation.role && (
                     <p className="text-sm text-gray-600">{affiliation.role}</p>
@@ -276,9 +299,8 @@ export default function ProfileView({
                     {event.type}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {new Date(event.startDate).toLocaleDateString()}
-                    {event.endDate &&
-                      ` - ${new Date(event.endDate).toLocaleDateString()}`}
+                    {formatDate(event.startDate)}
+                    {event.endDate && ` - ${formatDate(event.endDate)}`}
                   </p>
                 </div>
               ))}

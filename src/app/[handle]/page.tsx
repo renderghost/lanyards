@@ -74,29 +74,17 @@ export default async function ProfilePage({ params }: PageProps) {
     // Get Bluesky profile (requires authentication)
     const bskyProfile = await agent.getProfile({ actor: did });
 
-    // Get Lanyards profile
+    // Get Lanyards profile data
     const repo = new ProfileRepository(agent);
-    const lanyardProfile = await repo.getProfile(did);
-
-    if (!lanyardProfile) {
-      return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-6">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Profile Not Found</h1>
-            <p className="text-gray-600 mb-6">
-              This user hasn&apos;t created a Lanyards profile yet.
-            </p>
-            <a href="/" className="text-blue-600 hover:underline">
-              Go to homepage
-            </a>
-          </div>
-        </main>
-      );
-    }
 
     // Get all profile data
-    const [affiliations, webLinks, works, events] = await Promise.all([
+    const [identity, honorific, affiliations, qualifications, skills, socialLinks, webLinks, works, events] = await Promise.all([
+      repo.getIdentity(did),
+      repo.getHonorific(did),
       repo.listAffiliations(did),
+      repo.listQualifications(did),
+      repo.listSkills(did),
+      repo.listSocialLinks(did),
       repo.listWebLinks(did),
       repo.listWorks(did),
       repo.listEvents(did),
@@ -105,13 +93,18 @@ export default async function ProfilePage({ params }: PageProps) {
     return (
       <ProfileView
         profile={{
-          ...lanyardProfile,
+          did,
+          handle,
           displayName: bskyProfile.data.displayName,
           avatar: bskyProfile.data.avatar,
           banner: bskyProfile.data.banner,
           description: bskyProfile.data.description,
+          honorific: honorific?.value,
         }}
         affiliations={affiliations}
+        qualifications={qualifications}
+        skills={skills}
+        socialLinks={socialLinks}
         webLinks={webLinks}
         works={works}
         events={events}

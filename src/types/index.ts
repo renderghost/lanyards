@@ -4,31 +4,71 @@
  */
 
 import type {
-  AtLanyardProfile,
-  AtLanyardAffiliation,
-  AtLanyardWork,
-  AtLanyardEvent,
-  AtLanyardLink,
-  AtLanyardOrganization,
-  AtLanyardPublication,
-  AtLanyardLocation,
+  AppLanyardsActorBiographyAffiliation,
+  AppLanyardsActorBiographyHonorific,
+  AppLanyardsActorBiographyIdentity,
+  AppLanyardsActorBiographyLocation,
+  AppLanyardsActorBiographyQualification,
+  AppLanyardsActorBiographySkill,
+  AppLanyardsActorProfileContent,
+  AppLanyardsActorProfilePinned,
+  AppLanyardsActorProfileTheme,
+  AppLanyardsActorProfileVisible,
+  AppLanyardsCollection,
+  AppLanyardsLinkEvent,
+  AppLanyardsLinkMediaAudio,
+  AppLanyardsLinkMediaCode,
+  AppLanyardsLinkMediaVideo,
+  AppLanyardsLinkSocial,
+  AppLanyardsLinkWeb,
+  AppLanyardsLinkWork,
+  AppLanyardsLinkWorkPublication,
 } from './generated';
 
-// Main record types
-export type Profile = AtLanyardProfile.Record;
-export type Affiliation = AtLanyardAffiliation.Record;
-export type Work = AtLanyardWork.Record;
-export type Event = AtLanyardEvent.Record;
-export type Link = AtLanyardLink.Record;
-export type Organization = AtLanyardOrganization.Main;
-export type Publication = AtLanyardPublication.Main;
-export type Location = AtLanyardLocation.Main;
+// Actor Biography Types
+export type Identity = AppLanyardsActorBiographyIdentity.Record;
+export type Honorific = AppLanyardsActorBiographyHonorific.Record;
+export type Affiliation = AppLanyardsActorBiographyAffiliation.Record;
+export type Qualification = AppLanyardsActorBiographyQualification.Record;
+export type Skill = AppLanyardsActorBiographySkill.Record;
+export type Location = AppLanyardsActorBiographyLocation.Main;
 
-// Convenience type aliases for enums and unions
-export type Honorific = 'none' | 'Dr' | 'Prof';
-export type WorkType = Work['type'];
-export type EventType = Event['type'];
-export type LinkType = Link['type'];
-export type LinkPlatform = NonNullable<Link['platform']>;
-export type OrganizationType = NonNullable<Organization['type']>;
+// Actor Profile Types
+export type ProfileContent = AppLanyardsActorProfileContent.Record;
+export type ProfilePinned = AppLanyardsActorProfilePinned.Record;
+export type ProfileTheme = AppLanyardsActorProfileTheme.Record;
+export type ProfileVisible = AppLanyardsActorProfileVisible.Record;
+
+// Link Types
+export type LinkEvent = AppLanyardsLinkEvent.Record;
+export type LinkWork = AppLanyardsLinkWork.Record;
+export type LinkSocial = AppLanyardsLinkSocial.Record;
+export type LinkWeb = AppLanyardsLinkWeb.Record;
+export type LinkMediaAudio = AppLanyardsLinkMediaAudio.Record;
+export type LinkMediaCode = AppLanyardsLinkMediaCode.Record;
+export type LinkMediaVideo = AppLanyardsLinkMediaVideo.Record;
+
+// Embedded Object Types
+export type Publication = AppLanyardsLinkWorkPublication.Main;
+
+// Collection Type
+export type Collection = AppLanyardsCollection.Record;
+
+// Convenience type aliases for enum values
+export type HonorificValue = Honorific['value'];
+export type OrganizationType = NonNullable<Affiliation['organizationType']>;
+export type QualificationType = NonNullable<Qualification['type']>;
+export type SkillCategory = NonNullable<Skill['category']>;
+export type SkillProficiency = NonNullable<Skill['proficiency']>;
+export type ContentBlockType = ProfileContent['type'];
+export type ThemeFontFamily = NonNullable<ProfileTheme['fontFamily']>;
+export type ThemeLayout = NonNullable<ProfileTheme['layout']>;
+export type EventType = LinkEvent['type'];
+export type WorkType = LinkWork['type'];
+export type SocialPlatform = LinkSocial['platform'];
+export type AudioPlatform = LinkMediaAudio['platform'];
+export type AudioType = NonNullable<LinkMediaAudio['type']>;
+export type CodePlatform = LinkMediaCode['platform'];
+export type VideoPlatform = LinkMediaVideo['platform'];
+export type VideoType = NonNullable<LinkMediaVideo['type']>;
 export type PublicationType = NonNullable<Publication['type']>;

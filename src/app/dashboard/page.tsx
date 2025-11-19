@@ -22,38 +22,42 @@ export default async function DashboardPage() {
   const repo = new ProfileRepository(agent);
 
   try {
-    // Get profile
-    let lanyardProfile = await repo.getProfile(session.did);
-
     // Get fresh Bluesky profile data
     const bskyProfile = await agent.getProfile({ actor: session.did });
 
-    // Create profile if it doesn't exist
-    if (!lanyardProfile) {
-      await repo.createProfile({
-        did: session.did,
-        handle: session.handle,
-        displayName: bskyProfile.data.displayName,
-        avatar: bskyProfile.data.avatar,
-        description: bskyProfile.data.description,
-      });
+    // Get identity and honorific data
+    const [identity, honorific] = await Promise.all([
+      repo.getIdentity(session.did),
+      repo.getHonorific(session.did),
+    ]);
 
-      lanyardProfile = await repo.getProfile(session.did);
-    }
-
-    // Merge fresh Bluesky data with Lanyard profile
+    // Merge Bluesky data with Lanyard identity data
     const profile = {
-      ...lanyardProfile,
+      did: session.did,
+      handle: session.handle,
       displayName: bskyProfile.data.displayName,
       avatar: bskyProfile.data.avatar,
       banner: bskyProfile.data.banner,
       description: bskyProfile.data.description,
+      honorific: honorific?.value,
     };
 
     // Get counts for each section
-    const [works, events, webLinks] = await Promise.all([
+    const [
+      affiliations,
+      qualifications,
+      skills,
+      works,
+      events,
+      socialLinks,
+      webLinks,
+    ] = await Promise.all([
+      repo.listAffiliations(session.did),
+      repo.listQualifications(session.did),
+      repo.listSkills(session.did),
       repo.listWorks(session.did),
       repo.listEvents(session.did),
+      repo.listSocialLinks(session.did),
       repo.listWebLinks(session.did),
     ]);
 
@@ -81,7 +85,7 @@ export default async function DashboardPage() {
             <div className="flex items-start gap-4 mb-4">
               {/* Avatar */}
               {profile?.avatar && (
-                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
+                <div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-200 shrink-0">
                   <Image
                     src={profile.avatar}
                     alt={profile.displayName || session.handle}
@@ -97,8 +101,7 @@ export default async function DashboardPage() {
                     <h2 className="text-lg font-semibold truncate">
                       {profile?.honorific && profile.honorific !== 'none'
                         ? `${profile.honorific}. ${profile?.displayName || session.handle}`
-                        : profile?.displayName || session.handle
-                      }
+                        : profile?.displayName || session.handle}
                     </h2>
                     <p className="text-sm text-gray-600">@{session.handle}</p>
                   </div>
@@ -125,97 +128,99 @@ export default async function DashboardPage() {
                 View Profile
               </Link>
               <Link
-                href="/dashboard/profile/edit"
+                href="/dashboard/about"
                 className="flex-1 text-center text-sm py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Edit Profile
+                Edit About
               </Link>
             </div>
           </div>
 
-          {/* Research Links */}
-          <Link
-            href="/dashboard/research"
-            className="block bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-semibold mb-1">Research Links</h3>
-                <p className="text-sm text-gray-600">
-                  {works.length} publication{works.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          {/* About Section */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h3 className="font-semibold mb-3">About</h3>
+            <div className="space-y-2">
+              <Link
+                href="/dashboard/about/affiliations"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🏛️</span>
+                  <span className="text-sm">Affiliations</span>
+                </div>
+                <span className="text-xs text-gray-500">{affiliations.length}</span>
+              </Link>
+              <Link
+                href="/dashboard/about/qualifications"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🎓</span>
+                  <span className="text-sm">Qualifications</span>
+                </div>
+                <span className="text-xs text-gray-500">
+                  {qualifications.length}
+                </span>
+              </Link>
+              <Link
+                href="/dashboard/about/skills"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">⚡</span>
+                  <span className="text-sm">Skills</span>
+                </div>
+                <span className="text-xs text-gray-500">{skills.length}</span>
+              </Link>
             </div>
-          </Link>
+          </div>
 
-          {/* Events */}
-          <Link
-            href="/dashboard/events"
-            className="block bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-semibold mb-1">Events</h3>
-                <p className="text-sm text-gray-600">
-                  {events.length} event{events.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          {/* Links Section */}
+          <div className="bg-white rounded-lg p-6 shadow-sm">
+            <h3 className="font-semibold mb-3">Links</h3>
+            <div className="space-y-2">
+              <Link
+                href="/dashboard/links/events"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </div>
-          </Link>
-
-          {/* WebLinks */}
-          <Link
-            href="/dashboard/links"
-            className="block bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
-          >
-            <div className="flex justify-between items-center">
-              <div>
-                <h3 className="font-semibold mb-1">WebLinks</h3>
-                <p className="text-sm text-gray-600">
-                  {webLinks.length} link{webLinks.length !== 1 ? 's' : ''}
-                </p>
-              </div>
-              <svg
-                className="w-5 h-5 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">📅</span>
+                  <span className="text-sm">Events</span>
+                </div>
+                <span className="text-xs text-gray-500">{events.length}</span>
+              </Link>
+              <Link
+                href="/dashboard/links/research"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">📚</span>
+                  <span className="text-sm">Research</span>
+                </div>
+                <span className="text-xs text-gray-500">{works.length}</span>
+              </Link>
+              <Link
+                href="/dashboard/links/socials"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">👥</span>
+                  <span className="text-sm">Socials</span>
+                </div>
+                <span className="text-xs text-gray-500">{socialLinks.length}</span>
+              </Link>
+              <Link
+                href="/dashboard/links/web"
+                className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">🌐</span>
+                  <span className="text-sm">Web</span>
+                </div>
+                <span className="text-xs text-gray-500">{webLinks.length}</span>
+              </Link>
             </div>
-          </Link>
+          </div>
         </div>
       </main>
     );
@@ -228,10 +233,7 @@ export default async function DashboardPage() {
           <p className="text-gray-600 mb-6">
             Unable to load your profile. Please try again later.
           </p>
-          <Link
-            href="/auth"
-            className="text-blue-600 hover:underline"
-          >
+          <Link href="/auth" className="text-blue-600 hover:underline">
             Return to Login
           </Link>
         </div>
