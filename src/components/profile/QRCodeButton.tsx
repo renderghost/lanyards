@@ -4,7 +4,7 @@ import { useState } from 'react';
 import QRCode from 'qrcode';
 
 interface QRCodeButtonProps {
-  url: string;
+  url?: string; // Optional: if not provided, will use current origin + handle
   handle: string;
 }
 
@@ -12,9 +12,12 @@ export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
+  // Construct the profile URL - use provided URL or build from current origin
+  const profileUrl = url || `${window.location.origin}/${handle}`;
+
   const generateQRCode = async () => {
     try {
-      const dataUrl = await QRCode.toDataURL(url, {
+      const dataUrl = await QRCode.toDataURL(profileUrl, {
         width: 300,
         margin: 2,
         color: {

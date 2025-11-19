@@ -187,10 +187,7 @@ export default function ProfileView({
 
             {/* QR Code Button */}
             <div>
-              <QRCodeButton
-                url={`${typeof window !== 'undefined' ? window.location.origin : ''}/${profile.handle}`}
-                handle={profile.handle}
-              />
+              <QRCodeButton handle={profile.handle} />
             </div>
           </div>
         </div>

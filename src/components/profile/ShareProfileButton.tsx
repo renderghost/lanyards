@@ -4,7 +4,7 @@ import { useState } from 'react';
 import QRCode from 'qrcode';
 
 interface ShareProfileButtonProps {
-  url: string;
+  url?: string; // Optional: if not provided, will use current origin + handle
   handle: string;
 }
 
@@ -16,9 +16,12 @@ export default function ShareProfileButton({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
+  // Construct the profile URL - use provided URL or build from current origin
+  const profileUrl = url || `${window.location.origin}/${handle}`;
+
   const handleShare = async () => {
     try {
-      const dataUrl = await QRCode.toDataURL(url, {
+      const dataUrl = await QRCode.toDataURL(profileUrl, {
         width: 300,
         margin: 2,
         color: {
@@ -35,7 +38,7 @@ export default function ShareProfileButton({
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(profileUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -97,7 +100,7 @@ export default function ShareProfileButton({
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={url}
+                  value={profileUrl}
                   readOnly
                   className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50"
                 />

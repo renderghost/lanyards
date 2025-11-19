@@ -105,10 +105,7 @@ export default async function DashboardPage() {
                     </h2>
                     <p className="text-sm text-gray-600">@{session.handle}</p>
                   </div>
-                  <ShareProfileButton
-                    url={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/${session.handle}`}
-                    handle={session.handle}
-                  />
+                  <ShareProfileButton handle={session.handle} />
                 </div>
 
                 {/* Bio */}
