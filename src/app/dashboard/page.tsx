@@ -66,13 +66,13 @@ export default async function DashboardPage() {
         {/* Header */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
-            <h1 className="text-xl font-bold">Lanyard</h1>
+            <h1 className="text-xl font-bold">Lanyards</h1>
             <form action="/api/auth/logout" method="POST">
               <button
                 type="submit"
                 className="text-sm text-gray-600 hover:text-gray-900"
               >
-                Logout
+                Sign Out
               </button>
             </form>
           </div>
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
                 href="/dashboard/about"
                 className="flex-1 text-center text-sm py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Edit About
+                Edit
               </Link>
             </div>
           </div>
@@ -148,7 +148,9 @@ export default async function DashboardPage() {
                   <span className="text-xl">🏛️</span>
                   <span className="text-sm">Affiliations</span>
                 </div>
-                <span className="text-xs text-gray-500">{affiliations.length}</span>
+                <span className="text-xs text-gray-500">
+                  {affiliations.length}
+                </span>
               </Link>
               <Link
                 href="/dashboard/about/qualifications"
@@ -207,7 +209,9 @@ export default async function DashboardPage() {
                   <span className="text-xl">👥</span>
                   <span className="text-sm">Socials</span>
                 </div>
-                <span className="text-xs text-gray-500">{socialLinks.length}</span>
+                <span className="text-xs text-gray-500">
+                  {socialLinks.length}
+                </span>
               </Link>
               <Link
                 href="/dashboard/links/web"

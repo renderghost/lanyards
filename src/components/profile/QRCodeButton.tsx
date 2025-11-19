@@ -47,9 +47,7 @@ export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
             className="bg-white rounded-lg p-6 max-w-sm w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold mb-4 text-center">
-              Share Profile
-            </h3>
+            <h3 className="text-lg font-semibold mb-4 text-center">Share</h3>
             <div className="flex justify-center mb-4">
               {qrCodeDataUrl && (
                 <img
