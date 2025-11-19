@@ -11,6 +11,7 @@ interface QRCodeButtonProps {
 export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
+  const [copied, setCopied] = useState(false);
 
   // Construct the profile URL - lazy evaluation to avoid SSR issues
   const getProfileUrl = () => url || `${window.location.origin}/${handle}`;
@@ -33,6 +34,16 @@ export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
     }
   };
 
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(getProfileUrl());
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Error copying to clipboard:', err);
+    }
+  };
+
   return (
     <>
       <button
@@ -51,22 +62,82 @@ export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
             className="bg-white rounded-lg p-6 max-w-sm w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-lg font-semibold mb-4 text-center">Share</h3>
+            <h3 className="text-lg font-semibold mb-4 text-center">
+              Share Profile
+            </h3>
+
+            {/* QR Code */}
             <div className="flex justify-center mb-4">
               {qrCodeDataUrl && (
                 <img
                   src={qrCodeDataUrl}
                   alt={`QR Code for ${handle}`}
-                  className="w-64 h-64"
+                  className="w-64 h-64 border border-gray-200 rounded-lg"
                 />
               )}
             </div>
-            <p className="text-sm text-gray-600 text-center mb-4">
-              Scan this QR code to visit this profile
+
+            {/* URL Display */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Profile URL
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={getProfileUrl()}
+                  readOnly
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50"
+                />
+                <button
+                  onClick={handleCopyLink}
+                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  {copied ? (
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              {copied && (
+                <p className="text-xs text-green-600 mt-1">
+                  Copied to clipboard!
+                </p>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-600 text-center mb-4">
+              Scan or share this QR code
             </p>
+
             <button
               onClick={() => setShowModal(false)}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full bg-gray-100 text-gray-900 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Close
             </button>
