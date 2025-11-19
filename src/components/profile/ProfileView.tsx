@@ -166,13 +166,13 @@ export default function ProfileView({
               </div>
             )}
 
-            {/* Primary Action - Edit Profile or Follow on Bluesky */}
+            {/* Primary Action - Go to Dashboard or Follow on Bluesky */}
             {isOwner ? (
               <a
-                href="/dashboard/about"
+                href="/dashboard"
                 className="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2"
               >
-                Edit About
+                Go to Dashboard
               </a>
             ) : blueskyProfile ? (
               <a

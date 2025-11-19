@@ -1,6 +1,6 @@
 import { ProfileRepository } from '@/lib/data/repository';
 import ProfileView from '@/components/profile/ProfileView';
-import { getPublicAgent } from '@/lib/auth/server-agent';
+import { getPublicAgent, getPublicPDSAgent } from '@/lib/auth/server-agent';
 import { getAgent } from '@/lib/auth/atproto';
 import { getSession } from '@/lib/auth/session';
 import Link from 'next/link';
@@ -41,41 +41,39 @@ export default async function ProfilePage({ params }: PageProps) {
   try {
     // Check if user is authenticated
     const session = await getSession();
-    const agent = session ? await getAgent() : null;
 
-    // If no authenticated session, require sign in to view profiles
-    if (!agent) {
-      return (
-        <main className="flex min-h-screen flex-col items-center justify-center p-6">
-          <div className="text-center max-w-md">
-            <h1 className="text-2xl font-bold mb-4">Sign In Required</h1>
-            <p className="text-gray-600 mb-6">
-              You need to sign in to view Lanyards profiles. This helps us access public Bluesky data on your behalf.
-            </p>
-            <Link
-              href="/auth"
-              className="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Sign In
-            </Link>
-          </div>
-        </main>
-      );
-    }
+    // Get authenticated agent if user is logged in
+    const userAgent = session ? await getAgent() : null;
 
-    // Resolve handle to DID
-    const publicAgent = getPublicAgent();
+    // Create public agent for Bluesky API
+    const publicAgent = getPublicAgent(); // For Bluesky API (getProfile)
+
+    // Resolve handle to DID using public Bluesky agent
     const resolved = await publicAgent.resolveHandle({ handle });
     const did = resolved.data.did;
 
     // Check if the current user is viewing their own profile
     const isOwner = session?.did === did;
 
-    // Get Bluesky profile (requires authentication)
-    const bskyProfile = await agent.getProfile({ actor: did });
+    // Get Bluesky profile (public data) - use public Bluesky agent
+    const bskyProfile = await publicAgent.getProfile({ actor: did });
 
-    // Get Lanyards profile data
-    const repo = new ProfileRepository(agent);
+    // Resolve the user's actual PDS from their DID document
+    // This is necessary because custom Lanyards records are stored on the user's PDS
+    const didDoc = await publicAgent.com.atproto.identity.resolveHandle({ handle });
+    const pdsEndpoint = didDoc.data.didDoc?.service?.find(
+      (s: any) => s.id === '#atproto_pds'
+    )?.serviceEndpoint;
+
+    // Create agent for the user's specific PDS
+    const { AtpAgent } = await import('@atproto/api');
+    const userPDSAgent = new AtpAgent({
+      service: pdsEndpoint || process.env.PDS_URL || 'https://bsky.social',
+    });
+
+    // For Lanyards data (AT Protocol records), use authenticated agent if available, otherwise user's PDS agent
+    const pdsAgent = userAgent || userPDSAgent;
+    const repo = new ProfileRepository(pdsAgent);
 
     // Get all profile data
     const [identity, honorific, location, affiliations, qualifications, skills, socialLinks, webLinks, works, events] = await Promise.all([
