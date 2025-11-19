@@ -13,9 +13,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
-    // For form submissions, redirect to home page
+    // For form submissions, redirect to home page using 303 See Other
+    // This ensures the browser follows with a GET request
     const url = new URL('/', request.url);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, 303);
   } catch (error) {
     console.error('Logout error:', error);
 
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
     }
 
     const url = new URL('/', request.url);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, 303);
   }
 }
 
@@ -37,10 +38,10 @@ export async function GET(request: NextRequest) {
   try {
     await deleteSession();
     const url = new URL('/', request.url);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, 303);
   } catch (error) {
     console.error('Logout error:', error);
     const url = new URL('/', request.url);
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(url, 303);
   }
 }
