@@ -58,17 +58,18 @@ export default async function ProfilePage({ params }: PageProps) {
     // Get Bluesky profile (public data) - use public Bluesky agent
     const bskyProfile = await publicAgent.getProfile({ actor: did });
 
-    // Resolve the user's actual PDS from their DID document
-    // This is necessary because custom Lanyards records are stored on the user's PDS
-    const didDoc = await publicAgent.com.atproto.identity.resolveHandle({ handle });
-    const pdsEndpoint = didDoc.data.didDoc?.service?.find(
+    // Fetch the DID document to find the user's PDS endpoint
+    // Custom Lanyards records are stored on each user's individual PDS
+    const didDocResponse = await fetch(`https://plc.directory/${did}`);
+    const didDoc = await didDocResponse.json();
+    const pdsEndpoint = didDoc.service?.find(
       (s: any) => s.id === '#atproto_pds'
     )?.serviceEndpoint;
 
     // Create agent for the user's specific PDS
     const { AtpAgent } = await import('@atproto/api');
     const userPDSAgent = new AtpAgent({
-      service: pdsEndpoint || process.env.PDS_URL || 'https://bsky.social',
+      service: pdsEndpoint || 'https://bsky.social',
     });
 
     // For Lanyards data (AT Protocol records), use authenticated agent if available, otherwise user's PDS agent
