@@ -2,9 +2,9 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gradient-to-b from-white to-gray-50">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-linear-to-b from-white to-gray-50">
       <div className="max-w-2xl w-full text-center">
-        <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+        <h1 className="text-5xl font-bold mb-4 bg-linear-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
           Lanyards
         </h1>
         <p className="text-xl text-gray-700 mb-2">

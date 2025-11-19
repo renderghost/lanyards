@@ -91,7 +91,7 @@ export default function EventForm({
         throw new Error(data.error || `Failed to ${mode} event`);
       }
 
-      router.push('/dashboard/events');
+      router.push('/dashboard/links/events');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -120,7 +120,7 @@ export default function EventForm({
         throw new Error(data.error || 'Failed to delete event');
       }
 
-      router.push('/dashboard/events');
+      router.push('/dashboard/links/events');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

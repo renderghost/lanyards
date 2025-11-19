@@ -1,21 +1,22 @@
-'use client';
-
-import ResearchForm from './ResearchForm';
+import { redirect } from 'next/navigation';
+import { getSession } from '@/lib/auth/session';
+import SocialLinkForm from '@/components/links/SocialLinkForm';
 import Link from 'next/link';
-import type { Work } from '@/types';
 
-interface EditResearchClientProps {
-  work: Work & { rkey: string };
-}
+export default async function CreateSocialLinkPage() {
+  const session = await getSession();
 
-export default function EditResearchClient({ work }: EditResearchClientProps) {
+  if (!session) {
+    redirect('/auth');
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <Link
-            href="/dashboard/links/research"
+            href="/dashboard/links/socials"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
           >
             <svg
@@ -33,16 +34,16 @@ export default function EditResearchClient({ work }: EditResearchClientProps) {
             </svg>
             Back
           </Link>
-          <h1 className="text-xl font-bold">Edit Research</h1>
+          <h1 className="text-xl font-bold">Add Social Link</h1>
           <p className="text-sm text-gray-600 mt-1">
-            Update research details
+            Add a social media or academic profile link
           </p>
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <ResearchForm mode="edit" initialData={work} />
+        <SocialLinkForm mode="create" />
       </div>
     </main>
   );

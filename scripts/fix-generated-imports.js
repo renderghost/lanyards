@@ -3,8 +3,12 @@
  * Removes .js extensions from imports since we're in a TypeScript environment
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const generatedDir = path.join(__dirname, '../src/types/generated');
 
@@ -15,7 +19,7 @@ function fixImportsInFile(filePath) {
   // Replace .js extensions in import/export statements
   const newContent = content.replace(
     /(from\s+['"])(.+?)\.js(['"])/g,
-    (match, p1, p2, p3) => {
+    (_match, p1, p2, p3) => {
       modified = true;
       return `${p1}${p2}${p3}`;
     }

@@ -94,7 +94,7 @@ export default function LinkForm({
         throw new Error(data.error || `Failed to ${mode} link`);
       }
 
-      router.push('/dashboard/links');
+      router.push('/dashboard/links/web');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -123,7 +123,7 @@ export default function LinkForm({
         throw new Error(data.error || 'Failed to delete link');
       }
 
-      router.push('/dashboard/links');
+      router.push('/dashboard/links/web');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
