@@ -16,11 +16,12 @@ export default function ShareProfileButton({
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
 
-  // Construct the profile URL - use provided URL or build from current origin
-  const profileUrl = url || `${window.location.origin}/${handle}`;
+  // Construct the profile URL - lazy evaluation to avoid SSR issues
+  const getProfileUrl = () => url || `${window.location.origin}/${handle}`;
 
   const handleShare = async () => {
     try {
+      const profileUrl = getProfileUrl();
       const dataUrl = await QRCode.toDataURL(profileUrl, {
         width: 300,
         margin: 2,
@@ -38,7 +39,7 @@ export default function ShareProfileButton({
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(profileUrl);
+      await navigator.clipboard.writeText(getProfileUrl());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -100,7 +101,7 @@ export default function ShareProfileButton({
               <div className="flex gap-2">
                 <input
                   type="text"
-                  value={profileUrl}
+                  value={getProfileUrl()}
                   readOnly
                   className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50"
                 />

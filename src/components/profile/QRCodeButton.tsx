@@ -12,11 +12,12 @@ export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
 
-  // Construct the profile URL - use provided URL or build from current origin
-  const profileUrl = url || `${window.location.origin}/${handle}`;
+  // Construct the profile URL - lazy evaluation to avoid SSR issues
+  const getProfileUrl = () => url || `${window.location.origin}/${handle}`;
 
   const generateQRCode = async () => {
     try {
+      const profileUrl = getProfileUrl();
       const dataUrl = await QRCode.toDataURL(profileUrl, {
         width: 300,
         margin: 2,
