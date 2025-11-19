@@ -2,10 +2,10 @@
 
 import ResearchForm from './ResearchForm';
 import Link from 'next/link';
-import type { Work } from '@/types';
+import type { LinkWork } from '@/types';
 
 interface EditResearchClientProps {
-  work: Work & { rkey: string };
+  work: LinkWork & { rkey: string };
 }
 
 export default function EditResearchClient({ work }: EditResearchClientProps) {
@@ -15,7 +15,7 @@ export default function EditResearchClient({ work }: EditResearchClientProps) {
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <Link
-            href="/dashboard/links/research"
+            href="/dashboard/research"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
           >
             <svg

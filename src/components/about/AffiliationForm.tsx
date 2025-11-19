@@ -31,7 +31,6 @@ export default function AffiliationForm({
     organizationName: affiliation?.organizationName || '',
     organizationType: (affiliation?.organizationType || 'institution') as OrganizationType,
     role: affiliation?.role || '',
-    department: affiliation?.department || '',
     startDate: affiliation?.startDate
       ? new Date(affiliation.startDate).toISOString().split('T')[0]
       : '',
@@ -54,7 +53,6 @@ export default function AffiliationForm({
         organizationName: formData.organizationName,
         organizationType: formData.organizationType,
         role: formData.role || undefined,
-        department: formData.department || undefined,
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
         isPrimary: formData.isPrimary,
@@ -176,22 +174,6 @@ export default function AffiliationForm({
             onChange={(e) => setFormData({ ...formData, role: e.target.value })}
             placeholder="e.g., Research Fellow, Professor"
             maxLength={100}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Department
-          </label>
-          <input
-            type="text"
-            value={formData.department}
-            onChange={(e) =>
-              setFormData({ ...formData, department: e.target.value })
-            }
-            placeholder="e.g., Department of Computer Science"
-            maxLength={200}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>

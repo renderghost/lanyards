@@ -2,11 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Event, EventType } from '@/types';
+import type { LinkEvent, EventType } from '@/types';
 
 interface EventFormProps {
   mode: 'create' | 'edit';
-  initialData?: Event & { rkey?: string };
+  initialData?: LinkEvent & { rkey?: string };
 }
 
 const EVENT_TYPES: { value: EventType; label: string }[] = [
@@ -91,7 +91,7 @@ export default function EventForm({
         throw new Error(data.error || `Failed to ${mode} event`);
       }
 
-      router.push('/dashboard/links/events');
+      router.push('/dashboard/events');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -120,7 +120,7 @@ export default function EventForm({
         throw new Error(data.error || 'Failed to delete event');
       }
 
-      router.push('/dashboard/links/events');
+      router.push('/dashboard/events');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');

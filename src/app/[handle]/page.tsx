@@ -78,9 +78,10 @@ export default async function ProfilePage({ params }: PageProps) {
     const repo = new ProfileRepository(agent);
 
     // Get all profile data
-    const [identity, honorific, affiliations, qualifications, skills, socialLinks, webLinks, works, events] = await Promise.all([
+    const [identity, honorific, location, affiliations, qualifications, skills, socialLinks, webLinks, works, events] = await Promise.all([
       repo.getIdentity(did),
       repo.getHonorific(did),
+      repo.getLocation(did),
       repo.listAffiliations(did),
       repo.listQualifications(did),
       repo.listSkills(did),
@@ -100,6 +101,10 @@ export default async function ProfilePage({ params }: PageProps) {
           banner: bskyProfile.data.banner,
           description: bskyProfile.data.description,
           honorific: honorific?.value,
+          location: location ? {
+            city: location.city,
+            country: location.country,
+          } : undefined,
         }}
         affiliations={affiliations}
         qualifications={qualifications}

@@ -113,11 +113,6 @@ export default async function AffiliationsPage() {
                         </span>
                       )}
                     </div>
-                    {affiliation.department && (
-                      <p className="text-sm text-gray-600 mb-1">
-                        {affiliation.department}
-                      </p>
-                    )}
                     {affiliation.role && (
                       <p className="text-sm text-gray-600 mb-2">
                         {affiliation.role}

@@ -141,9 +141,9 @@ export const WorksSection: React.FC<WorksSectionProps> = ({
                       {work.authors.join(', ')}
                     </p>
                   )}
-                  {(work.journal || work.publicationDate) && (
+                  {(work.venue || work.publicationDate) && (
                     <p className={styles.workMeta}>
-                      {[work.journal, work.publicationDate]
+                      {[work.venue, work.publicationDate]
                         .filter(Boolean)
                         .join(' · ')}
                     </p>

@@ -1,57 +1,199 @@
 /**
  * Type exports for Lanyards application
- * Re-exports generated AT Protocol lexicon types with convenient aliases
+ * Manually defined types based on AT Protocol lexicon schemas
+ *
+ * Note: The lex gen-api tool only generates full API clients for record types,
+ * but doesn't export individual type interfaces. We define these manually based
+ * on the lexicon schemas in src/types/generated/lexicons.ts
  */
 
-import type {
-  AppLanyardsActorBiographyAffiliation,
-  AppLanyardsActorBiographyHonorific,
-  AppLanyardsActorBiographyIdentity,
-  AppLanyardsActorBiographyLocation,
-  AppLanyardsActorBiographyQualification,
-  AppLanyardsActorBiographySkill,
-  AppLanyardsActorProfileContent,
-  AppLanyardsActorProfilePinned,
-  AppLanyardsActorProfileTheme,
-  AppLanyardsActorProfileVisible,
-  AppLanyardsCollection,
-  AppLanyardsLinkEvent,
-  AppLanyardsLinkMediaAudio,
-  AppLanyardsLinkMediaCode,
-  AppLanyardsLinkMediaVideo,
-  AppLanyardsLinkSocial,
-  AppLanyardsLinkWeb,
-  AppLanyardsLinkWork,
-  AppLanyardsLinkWorkPublication,
-} from './generated';
+import type { AppLanyardsCollection } from './generated';
 
-// Actor Biography Types
-export type Identity = AppLanyardsActorBiographyIdentity.Record;
-export type Honorific = AppLanyardsActorBiographyHonorific.Record;
-export type Affiliation = AppLanyardsActorBiographyAffiliation.Record;
-export type Qualification = AppLanyardsActorBiographyQualification.Record;
-export type Skill = AppLanyardsActorBiographySkill.Record;
-export type Location = AppLanyardsActorBiographyLocation.Main;
+// Actor Biography Types - defined based on lexicon schemas
+export interface Identity {
+  did: string;
+  handle: string;
+  displayName?: string;
+  avatar?: string;
+  description?: string;
+  banner?: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Honorific {
+  value: 'none' | 'Dr' | 'Prof';
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface Affiliation {
+  organizationName: string;
+  organizationType?: 'institution' | 'company' | 'government' | 'other';
+  role?: string;
+  startDate: string;
+  endDate?: string;
+  isPrimary?: boolean;
+  location?: {
+    city?: string;
+    country?: string;
+  };
+  website?: string;
+  createdAt: string;
+}
+
+export interface Qualification {
+  title: string;
+  type?: 'phd' | 'masters' | 'bachelors' | 'postdoc' | 'certification' | 'fellowship' | 'other';
+  institution: string;
+  field?: string;
+  dateAwarded?: string;
+  location?: {
+    city?: string;
+    country?: string;
+  };
+  createdAt: string;
+}
+
+export interface Skill {
+  name: string;
+  category?: 'technical' | 'methodological' | 'domain-expertise' | 'language' | 'other';
+  proficiency?: 'beginner' | 'intermediate' | 'advanced' | 'expert';
+  yearsOfExperience?: number;
+  createdAt: string;
+}
+
+export interface Location {
+  country?: string;
+  city?: string;
+}
 
 // Actor Profile Types
-export type ProfileContent = AppLanyardsActorProfileContent.Record;
-export type ProfilePinned = AppLanyardsActorProfilePinned.Record;
-export type ProfileTheme = AppLanyardsActorProfileTheme.Record;
-export type ProfileVisible = AppLanyardsActorProfileVisible.Record;
+export interface ProfileContent {
+  type: 'header' | 'text';
+  content?: string;
+  position?: number;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ProfilePinned {
+  items: string[]; // AT-URI references
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ProfileTheme {
+  primaryColor?: string;
+  accentColor?: string;
+  fontFamily?: 'system' | 'serif' | 'sans-serif' | 'monospace';
+  layout?: 'compact' | 'comfortable' | 'spacious';
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface ProfileVisible {
+  hiddenItems: string[]; // AT-URI references
+  createdAt: string;
+  updatedAt?: string;
+}
 
 // Link Types
-export type LinkEvent = AppLanyardsLinkEvent.Record;
-export type LinkWork = AppLanyardsLinkWork.Record;
-export type LinkSocial = AppLanyardsLinkSocial.Record;
-export type LinkWeb = AppLanyardsLinkWeb.Record;
-export type LinkMediaAudio = AppLanyardsLinkMediaAudio.Record;
-export type LinkMediaCode = AppLanyardsLinkMediaCode.Record;
-export type LinkMediaVideo = AppLanyardsLinkMediaVideo.Record;
+export interface LinkEvent {
+  name: string;
+  type: 'conference' | 'symposium' | 'workshop' | 'seminar' | 'lecture' | 'poster-session' | 'webinar' | 'other';
+  startDate: string;
+  endDate?: string;
+  location?: {
+    city?: string;
+    country?: string;
+  };
+  organizerName?: string;
+  relatedWorks?: string[]; // AT-URI references
+  url?: string;
+  createdAt: string;
+}
+
+export interface LinkWork {
+  doi: string;
+  type: 'abstract' | 'poster' | 'paper' | 'conference-proceeding' | 'journal-article' | 'book-chapter' | 'book' | 'preprint' | 'dataset' | 'other';
+  title?: string;
+  authors?: string[];
+  publicationDate?: string;
+  venue?: string;
+  abstract?: string;
+  url?: string;
+  publication?: {
+    name?: string;
+    type?: 'journal' | 'proceedings' | 'preprint' | 'repository' | 'book-series' | 'other';
+    issn?: string;
+    website?: string;
+  };
+  event?: string; // AT-URI reference
+  createdAt: string;
+}
+
+export interface LinkSocial {
+  platform: 'bluesky' | 'twitter' | 'linkedin' | 'mastodon' | 'researchgate' | 'googlescholar' | 'orcid' | 'semble' | 'other';
+  url: string;
+  username?: string;
+  displayName?: string;
+  isVerified?: boolean;
+  isLocked?: boolean;
+  createdAt: string;
+}
+
+export interface LinkWeb {
+  url: string;
+  title?: string;
+  description?: string;
+  createdAt: string;
+}
+
+export interface LinkMediaAudio {
+  url: string;
+  platform: 'spotify' | 'apple-podcasts' | 'soundcloud' | 'anchor' | 'other';
+  title?: string;
+  description?: string;
+  type?: 'podcast-episode' | 'interview' | 'lecture' | 'panel-discussion' | 'other';
+  seriesName?: string;
+  duration?: number;
+  publishedDate?: string;
+  relatedWork?: string; // AT-URI reference
+  createdAt: string;
+}
+
+export interface LinkMediaCode {
+  url: string;
+  platform: 'github' | 'gitlab' | 'bitbucket' | 'codepen' | 'gist' | 'other';
+  title?: string;
+  description?: string;
+  language?: string;
+  tags?: string[];
+  createdAt: string;
+}
+
+export interface LinkMediaVideo {
+  url: string;
+  platform: 'youtube' | 'vimeo' | 'twitch' | 'tiktok' | 'other';
+  title?: string;
+  description?: string;
+  type?: 'lecture' | 'presentation' | 'interview' | 'tutorial' | 'conference-talk' | 'other';
+  duration?: number;
+  publishedDate?: string;
+  relatedWork?: string; // AT-URI reference
+  createdAt: string;
+}
 
 // Embedded Object Types
-export type Publication = AppLanyardsLinkWorkPublication.Main;
+export interface Publication {
+  name?: string;
+  type?: 'journal' | 'proceedings' | 'preprint' | 'repository' | 'book-series' | 'other';
+  issn?: string;
+  website?: string;
+}
 
-// Collection Type
+// Collection Type - use the generated type
 export type Collection = AppLanyardsCollection.Record;
 
 // Convenience type aliases for enum values

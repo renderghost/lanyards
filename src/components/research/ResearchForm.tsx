@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Work, WorkType } from '@/types';
+import type { LinkWork, WorkType } from '@/types';
 
 interface ResearchFormProps {
   mode: 'create' | 'edit';
-  initialData?: Work & { rkey?: string };
+  initialData?: LinkWork & { rkey?: string };
 }
 
 const WORK_TYPES: { value: WorkType; label: string }[] = [
@@ -97,7 +97,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
         throw new Error(data.error || `Failed to ${mode} research`);
       }
 
-      router.push('/dashboard/links/research');
+      router.push('/dashboard/research');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -129,7 +129,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
         throw new Error(data.error || 'Failed to delete research');
       }
 
-      router.push('/dashboard/links/research');
+      router.push('/dashboard/research');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete research');

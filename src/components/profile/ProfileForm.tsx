@@ -3,13 +3,26 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import type { Profile, Honorific } from '@/types';
+import type { HonorificValue } from '@/types';
 
-interface ProfileFormProps {
-  profile: Profile;
+interface ProfileData {
+  honorific?: HonorificValue;
+  location?: {
+    city?: string;
+    country?: string;
+  };
+  displayName?: string;
+  avatar?: string;
+  banner?: string;
+  description?: string;
+  handle?: string;
 }
 
-const HONORIFIC_OPTIONS: { value: Honorific; label: string }[] = [
+interface ProfileFormProps {
+  profile: ProfileData;
+}
+
+const HONORIFIC_OPTIONS: { value: HonorificValue; label: string }[] = [
   { value: 'none', label: 'None' },
   { value: 'Dr', label: 'Dr.' },
   { value: 'Prof', label: 'Prof.' },
@@ -138,7 +151,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
               <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-white bg-gray-200">
                 <Image
                   src={profile.avatar}
-                  alt={profile.displayName || profile.handle}
+                  alt={profile.displayName || profile.handle || 'Profile avatar'}
                   fill
                   className="object-cover"
                 />
@@ -204,7 +217,7 @@ export default function ProfileForm({ profile }: ProfileFormProps) {
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        honorific: e.target.value as Honorific,
+                        honorific: e.target.value as HonorificValue,
                       })
                     }
                     className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"

@@ -180,7 +180,7 @@ export default async function DashboardPage() {
             <h3 className="font-semibold mb-3">Links</h3>
             <div className="space-y-2">
               <Link
-                href="/dashboard/links/events"
+                href="/dashboard/events"
                 className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
                 <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default async function DashboardPage() {
                 <span className="text-xs text-gray-500">{events.length}</span>
               </Link>
               <Link
-                href="/dashboard/links/research"
+                href="/dashboard/research"
                 className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
                 <div className="flex items-center gap-3">

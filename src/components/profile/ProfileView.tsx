@@ -21,6 +21,10 @@ interface ProfileViewProps {
     banner?: string;
     description?: string;
     honorific?: string;
+    location?: {
+      city?: string;
+      country?: string;
+    };
   };
   affiliations: (Affiliation & { rkey: string; uri: string })[];
   qualifications: (Qualification & { rkey: string; uri: string })[];
@@ -116,74 +120,78 @@ export default function ProfileView({
               </div>
             </div>
 
-          {/* Description */}
-          {profile.description && (
-            <p className="text-gray-700 mb-4 whitespace-pre-wrap">{profile.description}</p>
-          )}
+            {/* Description */}
+            {profile.description && (
+              <p className="text-gray-700 mb-4 whitespace-pre-wrap">
+                {profile.description}
+              </p>
+            )}
 
-          {/* Location */}
-          {profile.location && (
-            <div className="flex items-center gap-1 text-sm text-gray-600 mb-4">
-              <svg
-                className="w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+            {/* Location */}
+            {profile.location && (
+              <div className="flex items-center gap-1 text-sm text-gray-600 mb-4">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span>
+                  {profile.location.city && `${profile.location.city}, `}
+                  {profile.location.country}
+                </span>
+              </div>
+            )}
+
+            {/* Current Affiliation */}
+            {primaryAffiliation && (
+              <div className="text-sm text-gray-600 mb-4">
+                <p className="font-medium">
+                  {primaryAffiliation.organizationName}
+                </p>
+                {primaryAffiliation.role && <p>{primaryAffiliation.role}</p>}
+              </div>
+            )}
+
+            {/* Primary Action - Edit Profile or Follow on Bluesky */}
+            {isOwner ? (
+              <a
+                href="/dashboard/about"
+                className="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-              <span>
-                {profile.location.city && `${profile.location.city}, `}
-                {profile.location.country}
-              </span>
+                Edit About
+              </a>
+            ) : blueskyProfile ? (
+              <a
+                href={blueskyProfile.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2"
+              >
+                Follow on Bluesky
+              </a>
+            ) : null}
+
+            {/* QR Code Button */}
+            <div>
+              <QRCodeButton
+                url={`${typeof window !== 'undefined' ? window.location.origin : ''}/${profile.handle}`}
+                handle={profile.handle}
+              />
             </div>
-          )}
-
-          {/* Current Affiliation */}
-          {primaryAffiliation && (
-            <div className="text-sm text-gray-600 mb-4">
-              <p className="font-medium">{primaryAffiliation.organizationName}</p>
-              {primaryAffiliation.role && <p>{primaryAffiliation.role}</p>}
-            </div>
-          )}
-
-          {/* Primary Action - Edit Profile or Follow on Bluesky */}
-          {isOwner ? (
-            <a
-              href="/dashboard/about"
-              className="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2"
-            >
-              Edit About
-            </a>
-          ) : blueskyProfile ? (
-            <a
-              href={blueskyProfile.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full bg-blue-600 text-white text-center py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2"
-            >
-              Follow on Bluesky
-            </a>
-          ) : null}
-
-          {/* QR Code Button */}
-          <div>
-            <QRCodeButton
-              url={`${typeof window !== 'undefined' ? window.location.origin : ''}/${profile.handle}`}
-              handle={profile.handle}
-            />
-          </div>
           </div>
         </div>
       </div>
@@ -193,7 +201,7 @@ export default function ProfileView({
         {/* Social & Academic Links */}
         {socialLinks.length > 0 && (
           <section className="bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold mb-3">Connect</h2>
+            <h2 className="text-lg font-semibold mb-3">Profiles</h2>
             <div className="space-y-2">
               {socialLinks.map((social) => (
                 <a
@@ -240,9 +248,7 @@ export default function ProfileView({
             <div className="space-y-3">
               {currentAffiliations.map((affiliation, idx) => (
                 <div key={idx}>
-                  <p className="font-medium">
-                    {affiliation.organizationName}
-                  </p>
+                  <p className="font-medium">{affiliation.organizationName}</p>
                   {affiliation.role && (
                     <p className="text-sm text-gray-600">{affiliation.role}</p>
                   )}
@@ -255,15 +261,43 @@ export default function ProfileView({
           </section>
         )}
 
+        {/* Qualifications */}
+        {qualifications.length > 0 && (
+          <section className="bg-white rounded-lg p-4 shadow-sm">
+            <h2 className="text-lg font-semibold mb-3">Qualifications</h2>
+            <div className="space-y-3">
+              {qualifications.map((qualification, idx) => (
+                <div key={idx}>
+                  <p className="font-medium">{qualification.title}</p>
+                  <p className="text-sm text-gray-600">
+                    {qualification.institution}
+                  </p>
+                  {qualification.field && (
+                    <p className="text-sm text-gray-500">
+                      {qualification.field}
+                    </p>
+                  )}
+                  {qualification.dateAwarded && (
+                    <p className="text-xs text-gray-500">
+                      {new Date(qualification.dateAwarded).getFullYear()}
+                    </p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Research */}
         {works.length > 0 && (
           <section className="bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold mb-3">
-              Research
-            </h2>
+            <h2 className="text-lg font-semibold mb-3">Research</h2>
             <div className="space-y-4">
               {works.map((work, idx) => (
-                <div key={idx} className="border-b border-gray-100 last:border-0 pb-3">
+                <div
+                  key={idx}
+                  className="border-b border-gray-100 last:border-0 pb-3"
+                >
                   <p className="font-medium">{work.title || work.doi}</p>
                   {work.authors && work.authors.length > 0 && (
                     <p className="text-sm text-gray-600">
@@ -279,7 +313,7 @@ export default function ProfileView({
                     rel="noopener noreferrer"
                     className="text-xs text-blue-600 hover:underline"
                   >
-                    DOI: {work.doi}
+                    {work.doi}
                   </a>
                 </div>
               ))}
@@ -290,18 +324,36 @@ export default function ProfileView({
         {/* Events */}
         {events.length > 0 && (
           <section className="bg-white rounded-lg p-4 shadow-sm">
-            <h2 className="text-lg font-semibold mb-3">Academic Events</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg font-semibold mb-3">Events</h2>
+            <div className="space-y-4">
               {events.map((event, idx) => (
-                <div key={idx}>
+                <div
+                  key={idx}
+                  className="border-b border-gray-100 last:border-0 pb-3"
+                >
                   <p className="font-medium">{event.name}</p>
                   <p className="text-sm text-gray-600 capitalize">
                     {event.type}
                   </p>
+                  {event.organizerName && (
+                    <p className="text-sm text-gray-500">
+                      {event.organizerName}
+                    </p>
+                  )}
                   <p className="text-xs text-gray-500">
                     {formatDate(event.startDate)}
                     {event.endDate && ` - ${formatDate(event.endDate)}`}
                   </p>
+                  {event.url && (
+                    <a
+                      href={event.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-blue-600 hover:underline block mt-1 break-all"
+                    >
+                      {event.url}
+                    </a>
+                  )}
                 </div>
               ))}
             </div>

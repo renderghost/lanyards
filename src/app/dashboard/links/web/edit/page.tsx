@@ -38,11 +38,6 @@ export default async function EditLinkPage({
     redirect('/dashboard/links/web');
   }
 
-  if (link.isLocked) {
-    // Redirect if trying to edit a locked link
-    redirect('/dashboard/links/web');
-  }
-
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}

@@ -113,7 +113,7 @@ export default async function QualificationsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-medium text-gray-900">
-                        {qualification.name}
+                        {qualification.title}
                       </h3>
                       {qualification.type && (
                         <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded capitalize">
@@ -126,14 +126,14 @@ export default async function QualificationsPage() {
                         {qualification.institution}
                       </p>
                     )}
-                    {qualification.fieldOfStudy && (
+                    {qualification.field && (
                       <p className="text-sm text-gray-600 mb-2">
-                        {qualification.fieldOfStudy}
+                        {qualification.field}
                       </p>
                     )}
                     <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {qualification.yearAwarded && (
-                        <span>{qualification.yearAwarded}</span>
+                      {qualification.dateAwarded && (
+                        <span>{qualification.dateAwarded}</span>
                       )}
                     </div>
                   </div>

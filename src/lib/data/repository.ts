@@ -306,6 +306,25 @@ export class ProfileRepository {
     return rkey;
   }
 
+  async updateEvent(rkey: string, updates: Partial<LinkEvent>) {
+    const record = await this.agent.com.atproto.repo.getRecord({
+      repo: this.agent.session?.did || '',
+      collection: `${LEXICON_PREFIX}.link.event`,
+      rkey,
+    });
+
+    return this.agent.com.atproto.repo.putRecord({
+      repo: this.agent.session?.did || '',
+      collection: `${LEXICON_PREFIX}.link.event`,
+      rkey,
+      record: {
+        ...record.data.value,
+        ...updates,
+        $type: `${LEXICON_PREFIX}.link.event`,
+      },
+    });
+  }
+
   async deleteEvent(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
       repo: this.agent.session?.did || '',
@@ -339,6 +358,25 @@ export class ProfileRepository {
       },
     });
     return rkey;
+  }
+
+  async updateWork(rkey: string, updates: Partial<LinkWork>) {
+    const record = await this.agent.com.atproto.repo.getRecord({
+      repo: this.agent.session?.did || '',
+      collection: `${LEXICON_PREFIX}.link.work`,
+      rkey,
+    });
+
+    return this.agent.com.atproto.repo.putRecord({
+      repo: this.agent.session?.did || '',
+      collection: `${LEXICON_PREFIX}.link.work`,
+      rkey,
+      record: {
+        ...record.data.value,
+        ...updates,
+        $type: `${LEXICON_PREFIX}.link.work`,
+      },
+    });
   }
 
   async deleteWork(rkey: string) {

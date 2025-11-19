@@ -7,7 +7,7 @@ import {
   HONORIFIC_OPTIONS,
   EMPTY_STATE_TEXT,
 } from './BasicInfoSection.constants';
-import { Honorific } from '@/types';
+import { HonorificValue } from '@/types';
 
 export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
   honorifics = [],
@@ -19,9 +19,8 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
 
   // Form state
   const [selectedHonorifics, setSelectedHonorifics] =
-    useState<Honorific[]>(honorifics);
+    useState<HonorificValue[]>(honorifics);
   const [country, setCountry] = useState(location?.country || '');
-  const [region, setRegion] = useState(location?.region || '');
   const [city, setCity] = useState(location?.city || '');
 
   const hasData = honorifics.length > 0 || location;
@@ -30,7 +29,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     // Reset form to current values
     setSelectedHonorifics(honorifics);
     setCountry(location?.country || '');
-    setRegion(location?.region || '');
     setCity(location?.city || '');
     setIsEditing(true);
   };
@@ -48,7 +46,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
           country || city
             ? {
                 country,
-                region: region || undefined,
                 city: city || undefined,
               }
             : undefined,
@@ -63,7 +60,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
     }
   };
 
-  const toggleHonorific = (honorific: Honorific) => {
+  const toggleHonorific = (honorific: HonorificValue) => {
     setSelectedHonorifics((prev) =>
       prev.includes(honorific)
         ? prev.filter((h) => h !== honorific)
@@ -120,21 +117,6 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             />
           </div>
 
-          {/* Region */}
-          <div className={styles.fieldGroup}>
-            <label htmlFor="region" className={styles.label}>
-              Region/State (Optional)
-            </label>
-            <input
-              id="region"
-              type="text"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
-              placeholder="e.g., CA, NY"
-              className={styles.input}
-            />
-          </div>
-
           {/* City */}
           <div className={styles.fieldGroup}>
             <label htmlFor="city" className={styles.label}>
@@ -184,7 +166,7 @@ export const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
               {location && (
                 <p className={styles.infoItem}>
                   Location:{' '}
-                  {[location.city, location.region, location.country]
+                  {[location.city, location.country]
                     .filter(Boolean)
                     .join(', ')}
                 </p>
