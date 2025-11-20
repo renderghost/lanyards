@@ -1,8 +1,8 @@
 # Lanyards 🧑‍🚀
 
-> One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised.
+![cover image](docs/cover.png)
 
-**A dedicated profile for researchers, built on the AT Protocol.**
+**One link to make your research life easier to share!** Papers, talks, affiliations, socials, whatever... Easy, free, decentralised, and built on the AT Protocol.
 
 > [!NOTE]
 > The complete documentation is available on [docs.lanyards.app](https://docs.lanyards.app/)
