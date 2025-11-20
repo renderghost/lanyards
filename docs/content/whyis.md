@@ -1,7 +1,7 @@
 ---
 title: "Why are we building Lanyards?"
 description: "What is it? Why should researchers care about it?"
-url: /documentation/
+url: /why-lanyards/
 ---
 
 Every researcher I know\* faces the same problems.

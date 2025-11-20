@@ -1,7 +1,7 @@
 ---
 title: "Authentication"
 description: "Signing in to Lanyards"
-url: /documentation/
+url: /authentication/
 ---
 
 # Authentication

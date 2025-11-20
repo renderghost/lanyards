@@ -12,15 +12,21 @@ taxonomies:
 
 menu:
   main:
-    - name: Documentation
-      url: documentation/
+    - name: What is Lanyards?
+      url: /what-is-lanyards/
       weight: 1
-    - name: UX Guide
-      url: ux/
+    - name: Why Lanyards?
+      url: /why-lanyards/
       weight: 2
-    - name: Project Brief
-      url: brief/
+    - name: Contribute
+      url: /contribute/
       weight: 3
+    - name: Roadmap
+      url: /roadmap/
+      weight: 4
+    - name: Contact
+      url: /links/
+      weight: 5
 
 params:
   description: 'One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised. A dedicated profile for researchers, built on the AT Protocol.'
@@ -28,22 +34,22 @@ params:
   DateFormat: 'January 2006'
   defaultTheme: light
   hideFooter: false
-  disableThemeToggle: true
+  disableThemeToggle: false
   ShowShareButtons: false
-  ShowReadingTime: false
-  disableSpecial1stPost: true
-  disableAnchoredHeadings: true
-  ShowPostNavLinks: false
-  ShowBreadCrumbs: false
+  ShowReadingTime: true
+  disableSpecialistPost: false
+  disableAnchoredHeadings: false
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
-  ShowAllPagesInArchive: false
+  ShowAllPagesInArchive: true
   MainSections: ['documentation']
   ShowToc: true
-  disableScrollToTop: true
-  TocOpen: true
-  ShowWordCount: false
+  disableScrollToTop: false
+  TocOpen: false
+  ShowWordCount: true
   UseHugoToc: true
-  comments: false
+  comments: true
   math: false
   profileMode:
     enabled: true
@@ -52,19 +58,25 @@ params:
     imageUrl: ''
     imageWidth: 160
     imageHeight: 160
-    # buttons:
-    #   - name: What is Lanyards?
-    #     url: documentation/
-    #   - name: UX Guide
-    #     url: ux/
-    #   - name: Project Brief
-    #     url: brief/
+    buttons:
+      - name: What is Lanyards?
+        url: /what-is-lanyards/
+      - name: Why Lanyards?
+        url: /why-lanyards/
+      - name: Contribute
+        url: /contribute/
+      - name: Roadmap
+        url: /roadmap/
+      - name: Contact
+        url: /links/
 
   socialIcons:
     - name: GitHub
       url: https://github.com/renderghost/lanyards
     - name: Bluesky
       url: https://bsky.app/profile/lanyards.app
+    - name: Barry
+      url: https://bsky.app/profile/renderg.host
 
   assets:
     disableScrollBarStyle: true

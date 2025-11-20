@@ -1,14 +1,12 @@
 ---
 title: "What is Lanyards?"
 description: "An introduction to Lanyards - digital business cards for researchers"
-url: /documentation/
+url: /what-is-lanyards/
 ---
-
-# Lanyards: One Link for Your Research Life
 
 A single curated link for Academic Researchers that aggregates your complete scholarly presence—publications, talks, affiliations, and social profiles—without re-keying info or juggling multiple scattered accounts.
 
-# The Problem for Social Researchers
+## Problem
 
 Researchers face a visibility paradox: career progression demands comprehensive online presence, but maintaining it is administratively overwhelming.
 
@@ -22,7 +20,7 @@ ORCID profiles serves institutional needs brilliantly but doesn't capture how re
 
 There's no single place that represents your complete, current scholarly identity.
 
-# The Social Web Solution
+## A Social Solution
 
 Lanyards is your link in bio for research—one maintained URL that automatically pulls together everything that matters.
 
@@ -33,7 +31,7 @@ Lanyards is your link in bio for research—one maintained URL that automaticall
 - Your presentation, your control: Pin important work, organise by collections, hide what's not relevant
 - Built on AT Protocol: Decentralised, open, yours—no platform lock-in
 
-## The Benefits for Researchers
+### Benefits
 
 - Share one URL in all your email signatures, conference bios, grant applications, social profiles...
 - New connections and collaborators see the full scope of your work immediately
@@ -55,44 +53,3 @@ Better discovery of relevant work, including the informal contributions that dri
 
 Open, decentralised infrastructure that serves researchers rather than institutions
 
-# Why 'Lanyards'?
-
-
-
-## Integrations
-
-Manage honorifics, location, affiliations, and more
-
-Social Networks: Link to Twitter, LinkedIn, ResearchGate, Google Scholar, and Semble
-
-Scholarly Contributions: Add research using DOIs
-
-Academic Events: Track conference presentations and symposiums
-
-- Share your profile with QR code sharing
-
-Profile Management: Manage honorifics, location, affiliations, and more
-
-Social Networks: Link to Twitter, LinkedIn, ResearchGate, Google Scholar, and Semble
-
-Scholarly Contributions: Add research using DOIs
-
-Academic Events: Track conference presentations and symposiums
-
-# Important Links
-
-### View Demo
-
-Coming Soon!
-
-### Follow @lanyards.app on Bluesky
-
-[Lanyards — for Researchers 🧑‍🚀 (@lanyards.app)](https://bsky.app/profile/lanyards.app)
-
-### Browse the GitHub Code
-
-[GitHub - renderghost/lanyards: Lanyards is a dedicated profile for researchers, built on the AT Protocol](https://github.com/renderghost/lanyards/)
-
-### Background
-
-[Why I started building Lanyards - Marginalia](https://marginalia.leaflet.pub/3m5ns4innec2x)
