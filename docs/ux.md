@@ -1,3 +1,8 @@
+---
+layout: default
+title: UX Guide
+---
+
 The experience should be super simple, like creating a Linktree profile.
 
 # User Journey

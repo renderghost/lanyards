@@ -1,3 +1,8 @@
+---
+layout: default
+title: Project Brief
+---
+
 # Overview
 'Lanyards' is a dedicated profile for researchers, built on the AT profile.
 
