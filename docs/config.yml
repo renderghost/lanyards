@@ -1,0 +1,89 @@
+baseURL: 'https://docs.lanyards.app/'
+title: Lanyards
+theme: PaperMod
+
+enableInlineShortcodes: true
+enableRobotsTXT: true
+pagination:
+  pagerSize: 20
+
+taxonomies:
+  tag: tags
+
+menu:
+  main:
+    - name: Documentation
+      url: documentation/
+      weight: 1
+    - name: UX Guide
+      url: ux/
+      weight: 2
+    - name: Project Brief
+      url: brief/
+      weight: 3
+
+params:
+  description: 'One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised. A dedicated profile for researchers, built on the AT Protocol.'
+  author: Lanyards
+  DateFormat: 'January 2006'
+  defaultTheme: light
+  hideFooter: false
+  disableThemeToggle: true
+  ShowShareButtons: false
+  ShowReadingTime: false
+  disableSpecial1stPost: true
+  disableAnchoredHeadings: true
+  ShowPostNavLinks: false
+  ShowBreadCrumbs: false
+  ShowCodeCopyButtons: true
+  ShowAllPagesInArchive: false
+  MainSections: ['documentation']
+  ShowToc: true
+  disableScrollToTop: true
+  TocOpen: true
+  ShowWordCount: false
+  UseHugoToc: true
+  comments: false
+  math: false
+  profileMode:
+    enabled: true
+    title: Lanyards Documentation
+    subtitle: 'One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised. A dedicated profile for researchers, built on the AT Protocol.'
+    imageUrl: ''
+    imageWidth: 160
+    imageHeight: 160
+    # buttons:
+    #   - name: What is Lanyards?
+    #     url: documentation/
+    #   - name: UX Guide
+    #     url: ux/
+    #   - name: Project Brief
+    #     url: brief/
+
+  socialIcons:
+    - name: GitHub
+      url: https://github.com/renderghost/lanyards
+    - name: Bluesky
+      url: https://bsky.app/profile/lanyards.app
+
+  assets:
+    disableScrollBarStyle: true
+  cover:
+    hiddenInList: false
+    hiddenInSingle: true
+  label:
+    text: 'Lanyards'
+    icon: favicon.ico
+    iconHeight: 18
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    guessSyntax: true
+    style: autumn
+  tableOfContents:
+    endLevel: 2
+    ordered: false
+    startLevel: 2
