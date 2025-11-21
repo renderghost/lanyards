@@ -2,9 +2,7 @@
 
 ## THE GOLDEN RULE
 
-**The goal is production-quality code, not a prototype.**
-
-Every change should be something you'd be confident shipping. Quality over speed. Completeness over convenience.
+**The goal is production-quality code, not a prototype**. Every change should be something you'd be confident shipping. Quality over speed. Completeness over convenience.
 
 ---
 
