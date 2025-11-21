@@ -3,7 +3,7 @@ title: "What is Lanyards?"
 description: "An introduction to Lanyards - digital business cards for researchers"
 url: /what-is-lanyards/
 ---
-![cover image](../cover.png)
+![alt text](../public/cover.png)
 
 A single curated link for Academic Researchers that aggregates your complete scholarly presence—publications, talks, affiliations, and social profiles—without re-keying info or juggling multiple scattered accounts.
 
