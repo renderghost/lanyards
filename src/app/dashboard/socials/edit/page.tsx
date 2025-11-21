@@ -2,10 +2,10 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
-import LinkForm from '@/components/links/LinkForm';
+import SocialLinkForm from '@/components/links/SocialLinkForm';
 import Link from 'next/link';
 
-export default async function EditLinkPage({
+export default async function EditSocialLinkPage({
   searchParams,
 }: {
   searchParams: Promise<{ rkey?: string }>;
@@ -16,26 +16,25 @@ export default async function EditLinkPage({
     redirect('/auth');
   }
 
-  const params = await searchParams;
-
-  if (!params.rkey) {
-    redirect('/dashboard/links/web');
-  }
-
   const agent = await getAgent();
 
   if (!agent) {
     redirect('/auth');
   }
 
-  const repo = new ProfileRepository(agent);
-  const links = await repo.listWebLinks(session.did);
+  const params = await searchParams;
+  const { rkey } = params;
 
-  // Find the link with the matching rkey
-  const link = links.find((l) => l.rkey === params.rkey);
+  if (!rkey) {
+    redirect('/dashboard/socials');
+  }
+
+  const repo = new ProfileRepository(agent);
+  const links = await repo.listSocialLinks(session.did);
+  const link = links.find((l) => l.rkey === rkey);
 
   if (!link) {
-    redirect('/dashboard/links/web');
+    redirect('/dashboard/socials');
   }
 
   return (
@@ -44,7 +43,7 @@ export default async function EditLinkPage({
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <Link
-            href="/dashboard/links/web"
+            href="/dashboard/socials"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
           >
             <svg
@@ -62,14 +61,16 @@ export default async function EditLinkPage({
             </svg>
             Back
           </Link>
-          <h1 className="text-xl font-bold">Edit Link</h1>
-          <p className="text-sm text-gray-600 mt-1">Update link details</p>
+          <h1 className="text-xl font-bold">Edit Social Link</h1>
+          <p className="text-sm text-gray-600 mt-1">
+            Update your social media or academic profile link
+          </p>
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <LinkForm mode="edit" initialData={link} />
+        <SocialLinkForm mode="edit" link={link} rkey={rkey} />
       </div>
     </main>
   );

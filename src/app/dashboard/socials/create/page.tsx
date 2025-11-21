@@ -1,40 +1,13 @@
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
-import { getAgent } from '@/lib/auth/atproto';
-import { ProfileRepository } from '@/lib/data/repository';
 import SocialLinkForm from '@/components/links/SocialLinkForm';
 import Link from 'next/link';
 
-export default async function EditSocialLinkPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ rkey?: string }>;
-}) {
+export default async function CreateSocialLinkPage() {
   const session = await getSession();
 
   if (!session) {
     redirect('/auth');
-  }
-
-  const agent = await getAgent();
-
-  if (!agent) {
-    redirect('/auth');
-  }
-
-  const params = await searchParams;
-  const { rkey } = params;
-
-  if (!rkey) {
-    redirect('/dashboard/links/socials');
-  }
-
-  const repo = new ProfileRepository(agent);
-  const links = await repo.listSocialLinks(session.did);
-  const link = links.find((l) => l.rkey === rkey);
-
-  if (!link) {
-    redirect('/dashboard/links/socials');
   }
 
   return (
@@ -43,7 +16,7 @@ export default async function EditSocialLinkPage({
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <Link
-            href="/dashboard/links/socials"
+            href="/dashboard/socials"
             className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
           >
             <svg
@@ -61,16 +34,16 @@ export default async function EditSocialLinkPage({
             </svg>
             Back
           </Link>
-          <h1 className="text-xl font-bold">Edit Social Link</h1>
+          <h1 className="text-xl font-bold">Add Social Link</h1>
           <p className="text-sm text-gray-600 mt-1">
-            Update your social media or academic profile link
+            Add a social media or academic profile link
           </p>
         </div>
       </div>
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <SocialLinkForm mode="edit" link={link} rkey={rkey} />
+        <SocialLinkForm mode="create" />
       </div>
     </main>
   );

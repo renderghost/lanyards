@@ -64,7 +64,7 @@ export default function SocialLinkForm({
         throw new Error(data.error || 'Failed to save social link');
       }
 
-      router.push('/dashboard/links/socials');
+      router.push('/dashboard/socials');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -93,7 +93,7 @@ export default function SocialLinkForm({
         throw new Error('Failed to delete social link');
       }
 
-      router.push('/dashboard/links/socials');
+      router.push('/dashboard/socials');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -217,7 +217,7 @@ export default function SocialLinkForm({
 
         <button
           type="button"
-          onClick={() => router.push('/dashboard/links/socials')}
+          onClick={() => router.push('/dashboard/socials')}
           className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Cancel
