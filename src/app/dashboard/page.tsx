@@ -199,7 +199,7 @@ export default async function DashboardPage() {
                 <span className="text-xs text-gray-500">{works.length}</span>
               </Link>
               <Link
-                href="/dashboard/links/socials"
+                href="/dashboard/socials"
                 className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
                 <div className="flex items-center gap-3">
@@ -211,12 +211,12 @@ export default async function DashboardPage() {
                 </span>
               </Link>
               <Link
-                href="/dashboard/links/web"
+                href="/dashboard/links"
                 className="flex justify-between items-center py-2 hover:bg-gray-50 px-2 rounded -mx-2"
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xl">🌐</span>
-                  <span className="text-sm">Web</span>
+                  <span className="text-sm">Links</span>
                 </div>
                 <span className="text-xs text-gray-500">{webLinks.length}</span>
               </Link>

@@ -53,7 +53,7 @@ export default function LinkForm({
         throw new Error(data.error || `Failed to ${mode} link`);
       }
 
-      router.push('/dashboard/links/web');
+      router.push('/dashboard/links');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -82,7 +82,7 @@ export default function LinkForm({
         throw new Error(data.error || 'Failed to delete link');
       }
 
-      router.push('/dashboard/links/web');
+      router.push('/dashboard/links');
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -169,7 +169,7 @@ export default function LinkForm({
 
         <button
           type="button"
-          onClick={() => router.push('/dashboard/links/web')}
+          onClick={() => router.push('/dashboard/links')}
           className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
         >
           Cancel
