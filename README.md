@@ -1,6 +1,6 @@
 # Lanyards 🧑‍🚀
 
-![cover image](docs/cover.png)
+![cover image](docs/public/cover.png)
 
 **One link to make your research life easier to share!** Papers, talks, affiliations, socials, whatever... Easy, free, decentralised, and built on the AT Protocol.
 
