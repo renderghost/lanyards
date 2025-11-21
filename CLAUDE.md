@@ -1,23 +1,48 @@
 # Lanyards Development Guide
 
-## Project Overview
+## THE GOLDEN RULE
 
-Lanyards is a decentralized researcher profile platform built on the AT Protocol (Bluesky). It's an alternative to ORCID, allowing researchers to share their academic identity, publications, affiliations, and social links via their Bluesky handle.
+**The goal is production-quality code, not a prototype.**
 
-**Live docs**: https://docs.lanyards.app
+Every change should be something you'd be confident shipping. Quality over speed. Completeness over convenience.
 
-## Quick Reference
+---
 
-```bash
-# Development
-npm run dev          # Start dev server (runs lex:gen first)
-npm run lex:gen      # Generate types from lexicons
+## Instructions for Claude
 
-# Code quality
-npm run lint         # Check for issues
-npm run lint:fix     # Auto-fix issues
-npm run format       # Format with Prettier
-```
+### Issue Tracking
+Use GitHub Issues via the `gh` CLI for all task tracking:
+- **NEVER** use markdown files for to-do lists or tracking work
+- **ALWAYS** create issues for bugs and features before starting work
+- Reference issue numbers in commits and PRs
+
+### Git Workflow
+- **NEVER** commit without explicit user instruction
+- **NEVER** credit Claude in commit messages
+- **NEVER** push without explicit user instruction
+- **NEVER** use `--force` or destructive git commands
+- You may run `git status`, `git diff`, `git log` freely
+- You may stage files with `git add` when explicitly asked
+- Leave version control decisions to the user
+
+### Core Principles
+**1. No Stubs, No Shortcuts**
+- **NEVER** use placeholder implementations or `// TODO` comments
+- **NEVER** skip functionality because it seems complex
+- **NEVER** leave incomplete code paths
+- Every function must be fully implemented and working
+
+**2. Complete Before Moving On**
+- Finish the current task before starting another
+- If blocked, discuss with the user rather than working around it
+- Each increment of work must be complete and functional
+
+**3. Verify Your Work**
+- Run `npm run lint` after changes
+- Test locally with `npm run dev`
+- Check the browser - don't assume it works
+
+---
 
 ## Tech Stack
 
@@ -26,6 +51,8 @@ npm run format       # Format with Prettier
 - **Auth**: App Password (dev) / OAuth (production - not yet active)
 - **Protocol**: AT Protocol (`@atproto/*` packages)
 - **Data**: ProfileRepository pattern wrapping AtpAgent
+
+---
 
 ## Project Structure
 
@@ -48,8 +75,17 @@ lexicons/             # AT Protocol schemas (*.json)
 docs/                 # Hugo documentation site
 ```
 
-## Component Architecture
+---
 
+## Code Quality Standards
+
+### TypeScript
+- Strict mode is enabled - respect it
+- Use proper types, avoid `any` (warnings are configured)
+- Prefer type inference where obvious, explicit types for function signatures
+- Use `Result`-style error handling patterns where appropriate
+
+### Component Architecture
 **All components MUST follow this 4-file structure:**
 
 ```
@@ -60,26 +96,148 @@ ComponentName/
 └── ComponentName.constants.ts  # Hardcoded values (optional)
 ```
 
-**Styling rules:**
-- No margin utilities - use `gap` and `padding`
-- All text needs `leading-*` for line-height
-- Use `cn()` from `@/lib/utils` for dynamic classes
-- Design tokens: `bones-blue`, `bones-white`, `bones-black`, `bones-yellow`
+### Styling Rules
+- **No margin utilities** - use `gap` for spacing between siblings, `padding` for internal
+- **All text needs `leading-*`** - always specify line-height
+- **Use `cn()`** from `@/lib/utils` for conditional classes
+- **No inline styles** - Tailwind only
 
-## Code Conventions
-
+### Code Conventions
 - **Quotes**: Single quotes
 - **Semicolons**: Yes
 - **Trailing commas**: ES5 style
 - **Line width**: 80 characters
 - **Unused vars**: Prefix with `_`
 
+### Error Handling
+- Use try/catch in API routes with meaningful error responses
+- Return appropriate HTTP status codes
+- Never swallow errors silently
+- Log errors server-side for debugging
+
+---
+
+## Form Standards
+
+All forms must be accessible, usable, and provide clear feedback.
+
+### Input Selection by Data Type
+
+Choose the appropriate input for the data:
+
+| Data Type               | Input Component                      | Example                      |
+| ----------------------- | ------------------------------------ | ---------------------------- |
+| Free text (short)       | `<input type="text">`                | Name, title                  |
+| Free text (long)        | `<textarea>`                         | Bio, description             |
+| Closed list (large)     | Select with typeahead/autocomplete   | Country, institution         |
+| Closed list (small, ≤5) | Radio buttons                        | Honorific (Dr, Prof, Mr, Ms) |
+| Boolean                 | Checkbox or toggle                   | Visibility settings          |
+| Date                    | Date picker                          | Event date, graduation year  |
+| URL                     | `<input type="url">` with validation | Website, social link         |
+| Email                   | `<input type="email">`               | Contact email                |
+
+### Validation & Error Handling
+
+**Client-side:**
+- Validate on blur and on submit
+- Show inline errors immediately below the field
+- Use `aria-describedby` to link error messages to inputs
+- Disable submit button while submitting (prevent double-submit)
+
+**Server-side:**
+- Always validate again server-side (never trust client)
+- Return structured error responses with field-level details
+- Log validation failures for debugging
+
+**Error message format:**
+```typescript
+// Field-level errors
+{
+  success: false,
+  errors: {
+    fieldName: 'Specific, actionable message'
+  }
+}
+```
+
+### Feedback & Notifications
+
+**On success:**
+- Show toast confirmation: "Affiliation added" / "Profile updated" / "Item deleted"
+- Clear form or redirect as appropriate
+- Update UI state immediately (optimistic updates where safe)
+
+**On error:**
+- Show toast for system errors: "Failed to save. Please try again."
+- Show inline errors for validation failures
+- Preserve user input - never clear the form on error
+
+### Accessibility Requirements
+
+- All inputs must have visible `<label>` elements (not just placeholder)
+- Use `aria-required="true"` for required fields
+- Use `aria-invalid="true"` when field has error
+- Use `aria-describedby` to associate help text and error messages
+- Ensure 4.5:1 color contrast for all text
+- Forms must be fully keyboard navigable
+- Focus management: move focus to first error on failed submit
+- Loading states must be announced to screen readers
+
+### Form Component Structure
+
+```
+FormName/
+├── FormName.tsx           # Form logic, state, submission
+├── FormName.types.ts      # Props, form values, validation types
+├── FormName.styles.ts     # Tailwind classes
+├── FormName.constants.ts  # Default values, options lists
+└── FormName.validation.ts # Zod schema or validation functions
+```
+
+---
+
 ## Lexicon Workflow
 
-When modifying AT Protocol record schemas:
-1. Edit JSON files in `lexicons/`
-2. Run `npm run lex:gen`
-3. Update corresponding types in `src/types/index.ts` if needed
+Lexicons define content types for the AT Protocol. A lexicon is not complete until it has full end-to-end implementation.
+
+### Naming Convention
+
+Lexicons use hierarchical namespacing:
+```
+app.lanyards.<category>.<subcategory>.<type>
+```
+
+Examples:
+- `app.lanyards.actor.biography.affiliation`
+- `app.lanyards.actor.profile.content`
+- `app.lanyards.link.social`
+
+Choose names that are:
+- Descriptive and unambiguous
+- Scalable (can accommodate future related types)
+- Consistent with existing lexicon structure
+
+### End-to-End Implementation Checklist
+
+A lexicon is **not complete** until all of these exist:
+
+1. **Schema** - JSON file in `lexicons/` with proper naming
+2. **Types** - Run `npm run lex:gen`, update `src/types/index.ts` if needed
+3. **Repository** - CRUD methods in `src/lib/data/repository.ts`
+4. **API Routes** - Endpoints in `src/app/api/`
+5. **Dashboard Page** - Management UI in `src/app/dashboard/`
+6. **Form** - Create/edit form with proper validation (see Form Standards below)
+7. **Public Display** - Component for `src/app/[handle]/` profile view
+8. **Feedback** - Toast notifications for all CRUD operations
+
+### Implementation Order
+
+```
+Schema → Types → Repository → API → Form → Dashboard → Public Display
+```
+
+> [!IMORTANT]
+> Each layer **must** be complete and tested before moving to the next.
 
 ---
 
@@ -90,15 +248,15 @@ When modifying AT Protocol record schemas:
 When we discover a bug during development:
 
 ```bash
-# Create issue with appropriate labels
 gh issue create \
   --title "Bug: [Brief description]" \
   --body "## Description
 [What's happening]
 
 ## Steps to Reproduce
-1. ...
-2. ...
+1.
+2.
+3.
 
 ## Expected Behavior
 [What should happen]
@@ -108,25 +266,15 @@ gh issue create \
 
 ## Environment
 - Browser:
-- OS:
-- Node version: $(node -v)" \
+- Node: $(node -v)" \
   --label bug
 ```
-
-**Bug issue template checklist:**
-- [ ] Clear, descriptive title starting with "Bug:"
-- [ ] Steps to reproduce
-- [ ] Expected vs actual behavior
-- [ ] Environment details if relevant
-- [ ] Screenshots if UI-related
 
 ### For External Bug Reports
 
 Direct users to: https://github.com/barryprendergast/lanyards/issues/new
 
 ### Fixing Bugs from Issues
-
-**Standard workflow:**
 
 1. **Read the issue**
    ```bash
@@ -136,7 +284,6 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
 2. **Create a fix branch**
    ```bash
    git checkout -b fix/issue-<number>-<short-description>
-   # Example: fix/issue-42-profile-not-loading
    ```
 
 3. **Make the fix**
@@ -144,12 +291,12 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
    - Run `npm run lint:fix` before committing
    - Test locally with `npm run dev`
 
-4. **Commit with issue reference**
+4. **Commit with issue reference** (when user approves)
    ```bash
    git commit -m "Fix #<number>: [description]"
    ```
 
-5. **Push and create PR**
+5. **Push and create PR** (when user approves)
    ```bash
    git push -u origin fix/issue-<number>-<short-description>
    gh pr create \
@@ -164,13 +311,9 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
    Closes #<number>"
    ```
 
-6. **After merge, verify issue closes automatically**
-   - The "Closes #N" syntax auto-closes the issue
-   - If reporter provided contact, consider notifying them
+6. **After merge** - verify issue closes automatically via "Closes #N"
 
 ### Bug Labels
-
-Use these labels consistently:
 - `bug` - Confirmed bugs
 - `needs-triage` - Unconfirmed reports
 - `good-first-issue` - Simple fixes for new contributors
@@ -180,46 +323,60 @@ Use these labels consistently:
 
 ## Feature Workflow
 
-For new features (not bugs):
-
 1. Create issue with `enhancement` label first
 2. Branch naming: `feature/issue-<number>-<description>`
 3. Same PR workflow as bugs
 
 ---
 
-## Common Tasks
+## What To Do When Facing Complexity
 
-### Adding a new profile section
+**DON'T:**
+- Stub it out with `// TODO`
+- Skip it and move on
+- Say "we'll come back to it"
+- Implement a simplified version that doesn't match requirements
 
-1. Create lexicon in `lexicons/`
-2. Run `npm run lex:gen`
-3. Add types to `src/types/index.ts`
-4. Add repository methods in `src/lib/data/repository.ts`
-5. Create API routes in `src/app/api/`
-6. Create dashboard page in `src/app/dashboard/`
-7. Create display component for public profile
+**DO:**
+- Break the problem into smaller pieces
+- Identify and resolve dependencies first
+- Ask the user for guidance on approach
+- Propose a phased plan where each phase is complete
+- Discuss trade-offs before implementing
 
-### Adding a new social link type
+### Example: Adding a Complex New Feature
 
-1. Update `src/types/index.ts` - add to `SocialPlatform` type
-2. Update `src/components/links/` components
-3. Add icon if needed
+**WRONG:**
+```typescript
+export async function complexFeature() {
+  // TODO: implement this later
+  return null;
+}
+```
+
+**RIGHT:**
+1. Understand the full requirements
+2. Identify dependencies (types, API routes, components)
+3. Create the lexicon schema first if needed
+4. Implement the data layer (repository methods)
+5. Build the API routes
+6. Create the UI components
+7. Test each layer before moving to the next
 
 ---
 
-## Environment Setup
+## Quality Checklist
 
-Copy `.env.example` to `.env.local`:
+Before marking any task complete:
 
-```env
-AUTH_METHOD=app_password
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-PDS_URL=https://bsky.social
-```
+- [ ] All requirements from the issue are implemented
+- [ ] No `// TODO` or placeholder code
+- [ ] `npm run lint` passes with no errors
+- [ ] `npm run build` succeeds
+- [ ] Tested locally in browser
+- [ ] Component architecture followed (4-file structure)
+- [ ] Types are complete (no `any` unless unavoidable)
+- [ ] Error cases are handled
+- [ ] Code is formatted (`npm run format`)
 
-## Troubleshooting
-
-- **Type errors after lexicon changes**: Run `npm run lex:gen`
-- **Auth issues**: Check `AUTH_METHOD` in `.env.local`
-- **Build fails**: Run `npm run lint:fix` then `npm run build`
+---
