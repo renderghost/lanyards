@@ -8,11 +8,11 @@
   </url><url>
     <loc>http://localhost:1313/links/</loc>
   </url><url>
-    <loc>http://localhost:1313/</loc>
-  </url><url>
     <loc>http://localhost:1313/roadmap/</loc>
   </url><url>
     <loc>http://localhost:1313/tags/</loc>
+  </url><url>
+    <loc>http://localhost:1313/</loc>
   </url><url>
     <loc>http://localhost:1313/what-is-lanyards/</loc>
   </url><url>

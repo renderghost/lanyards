@@ -4,11 +4,7 @@ description: "What we're building now and next in Lanyards"
 url: /roadmap/
 ---
 
-> [!NOTE]
-> This document is under development
-
-> [!TIP]
-> This document is under development
+> This page is under development
 
 ## Account Creation
 

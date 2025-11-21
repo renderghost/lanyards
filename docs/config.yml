@@ -1,3 +1,5 @@
+# https://adityatelange.github.io/hugo-PaperMod/posts/papermod/papermod-features/
+
 baseURL: 'https://docs.lanyards.app/'
 title: Lanyards
 theme: PaperMod
@@ -29,39 +31,44 @@ menu:
       weight: 5
 
 params:
-  description: 'One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised. A dedicated profile for researchers, built on the AT Protocol.'
-  author: Lanyards
+  # defaultTheme: dark
+  # defaultTheme: light
+  author: '@renderg.host'
+  comments: true
   DateFormat: 'January 2006'
-  defaultTheme: light
-  hideFooter: false
-  disableThemeToggle: false
-  ShowShareButtons: false
-  ShowReadingTime: true
-  disableSpecialistPost: false
+  defaultTheme: auto
+  description: 'One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised. A dedicated profile for researchers, built on the AT Protocol.'
   disableAnchoredHeadings: false
-  ShowPostNavLinks: true
+  disableScrollToTop: false
+  disableSpecialistPost: false
+  disableThemeToggle: false
+  hideFooter: false
+  MainSections: ['documentation']
+  ShowAllPagesInArchive: true
   ShowBreadCrumbs: true
   ShowCodeCopyButtons: true
-  ShowAllPagesInArchive: true
-  MainSections: ['documentation']
-  ShowToc: true
-  disableScrollToTop: false
-  TocOpen: true
+  ShowPostNavLinks: true
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowToc: false
   ShowWordCount: true
+  TocOpen: false
   UseHugoToc: true
-  comments: true
   math: false
+  # homeInfoParams:
+  #   Title: Hi there wave
+  #   Content: Can be Info, links, about...
   profileMode:
     enabled: true
-    title: Lanyards Documentation
+    title: Welcome to Lanyards
     subtitle: 'One link to make your research life easier to share! Papers, talks, affiliations, socials, whatever... Easy, free, decentralised. A dedicated profile for researchers, built on the AT Protocol.'
-    imageUrl: ''
-    imageWidth: 160
-    imageHeight: 160
+    imageUrl: '/apple-touch-icon.png'
+    imageWidth: 90
+    imageHeight: 90
     buttons:
-      - name: What is Lanyards?
+      - name: What?
         url: /what-is-lanyards/
-      - name: Why Lanyards?
+      - name: Why?
         url: /why-lanyards/
       - name: Contribute
         url: /contribute/
@@ -69,7 +76,6 @@ params:
         url: /roadmap/
       - name: Contact
         url: /links/
-
   socialIcons:
     - name: GitHub
       url: https://github.com/renderghost/lanyards

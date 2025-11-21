@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" dir="auto">
 
-<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=64666&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script><meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <meta name="robots" content="noindex, nofollow">
 <title>Important Links | Lanyards</title>
 <meta name="keywords" content="">
 <meta name="description" content="Stuff you should know">
-<meta name="author" content="Lanyards">
-<link rel="canonical" href="http://localhost:64666/links/">
+<meta name="author" content="@renderg.host">
+<link rel="canonical" href="http://localhost:1313/links/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.ac30954b7ea20660ca1cb473400ecede9e601f17674446536180d3ca00f03328.css" integrity="sha256-rDCVS36iBmDKHLRzQA7O3p5gHxdnREZTYYDTygDwMyg=" rel="preload stylesheet" as="style">
-<link rel="icon" href="http://localhost:64666/favicon.ico">
-<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:64666/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:64666/favicon-32x32.png">
-<link rel="apple-touch-icon" href="http://localhost:64666/apple-touch-icon.png">
+<link rel="icon" href="http://localhost:1313/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="http://localhost:1313/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="http://localhost:1313/favicon-32x32.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/apple-touch-icon.png">
 <meta name="theme-color" content="#2e2e33">
 <meta name="msapplication-TileColor" content="#2e2e33">
-<link rel="alternate" hreflang="en" href="http://localhost:64666/links/">
+<link rel="alternate" hreflang="en" href="http://localhost:1313/links/">
 <noscript>
     <style>
         #theme-toggle,
@@ -26,7 +26,35 @@
         }
 
     </style>
-</noscript><meta property="og:url" content="http://localhost:64666/links/">
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-track {
+                background: 0 0;
+            }
+
+            .list:not(.dark)::-webkit-scrollbar-thumb {
+                border-color: var(--theme);
+            }
+        }
+
+    </style>
+</noscript><meta property="og:url" content="http://localhost:1313/links/">
   <meta property="og:site_name" content="Lanyards">
   <meta property="og:title" content="Important Links">
   <meta property="og:description" content="Stuff you should know">
@@ -46,7 +74,7 @@
       "@type": "ListItem",
       "position":  1 ,
       "name": "Important Links",
-      "item": "http://localhost:64666/links/"
+      "item": "http://localhost:1313/links/"
     }
   ]
 }
@@ -68,18 +96,18 @@
   "dateModified": "0001-01-01T00:00:00Z",
   "author":{
     "@type": "Person",
-    "name": "Lanyards"
+    "name": "@renderg.host"
   },
   "mainEntityOfPage": {
     "@type": "WebPage",
-    "@id": "http://localhost:64666/links/"
+    "@id": "http://localhost:1313/links/"
   },
   "publisher": {
     "@type": "Organization",
     "name": "Lanyards",
     "logo": {
       "@type": "ImageObject",
-      "url": "http://localhost:64666/favicon.ico"
+      "url": "http://localhost:1313/favicon.ico"
     }
   }
 }
@@ -96,6 +124,10 @@
 <script>
     if (localStorage.getItem("pref-theme") === "dark") {
         document.body.classList.add('dark');
+    } else if (localStorage.getItem("pref-theme") === "light") {
+        document.body.classList.remove('dark')
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.body.classList.add('dark');
     }
 
 </script>
@@ -103,8 +135,8 @@
 <header class="header">
     <nav class="nav">
         <div class="logo">
-            <a href="http://localhost:64666/" accesskey="h" title="Lanyards">
-                <img src="http://localhost:64666/favicon.ico" alt="" aria-label="logo"
+            <a href="http://localhost:1313/" accesskey="h" title="Lanyards">
+                <img src="http://localhost:1313/favicon.ico" alt="" aria-label="logo"
                     height="18"
                     width="18">Lanyards</a>
             <div class="logo-switches">
@@ -132,27 +164,27 @@
         </div>
         <ul id="menu">
             <li>
-                <a href="http://localhost:64666/what-is-lanyards/" title="What is Lanyards?">
+                <a href="http://localhost:1313/what-is-lanyards/" title="What is Lanyards?">
                     <span>What is Lanyards?</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:64666/why-lanyards/" title="Why Lanyards?">
+                <a href="http://localhost:1313/why-lanyards/" title="Why Lanyards?">
                     <span>Why Lanyards?</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:64666/contribute/" title="Contribute">
+                <a href="http://localhost:1313/contribute/" title="Contribute">
                     <span>Contribute</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:64666/roadmap/" title="Roadmap">
+                <a href="http://localhost:1313/roadmap/" title="Roadmap">
                     <span>Roadmap</span>
                 </a>
             </li>
             <li>
-                <a href="http://localhost:64666/links/" title="Contact">
+                <a href="http://localhost:1313/links/" title="Contact">
                     <span class="active">Contact</span>
                 </a>
             </li>
@@ -164,15 +196,14 @@
 
 <article class="post-single">
   <header class="post-header">
-    <div class="breadcrumbs"><a href="http://localhost:64666/">Home</a></div>
+    <div class="breadcrumbs"><a href="http://localhost:1313/">Home</a></div>
     <h1 class="post-title entry-hint-parent">
       Important Links
     </h1>
-    <div class="post-meta">1 min&nbsp;&middot;&nbsp;27 words&nbsp;&middot;&nbsp;Lanyards
+    <div class="post-meta">1 min&nbsp;&middot;&nbsp;27 words&nbsp;&middot;&nbsp;@renderg.host
 
 </div>
   </header> 
-
   <div class="post-content"><ul>
 <li>
 <p>Contribute to Lanyards code — <a href="https://github.com/renderghost/lanyards/" target="_blank">Github</a></p>

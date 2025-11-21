@@ -2,8 +2,15 @@
 title: "What is Lanyards?"
 description: "An introduction to Lanyards - digital business cards for researchers"
 url: /what-is-lanyards/
+cover:
+  image: "cover.png"
+  # can also paste direct link from external site
+  # ex. https://i.ibb.co/K0HVPBd/paper-mod-profilemode.png
+  alt: "<alt text>"
+  caption: "<text>"
+  relative: true # To use relative path for cover image, used in hugo Page-bundles
 ---
-![alt text](../public/cover.png)
+![coveralt text](cover.png)
 
 A single curated link for Academic Researchers that aggregates your complete scholarly presence—publications, talks, affiliations, and social profiles—without re-keying info or juggling multiple scattered accounts.
 
