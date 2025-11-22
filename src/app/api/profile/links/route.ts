@@ -32,11 +32,14 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { rkey, ...updates } = await request.json();
+    const { searchParams } = new URL(request.url);
+    const rkey = searchParams.get('rkey');
 
     if (!rkey) {
       return NextResponse.json({ error: 'rkey is required' }, { status: 400 });
     }
+
+    const updates = await request.json();
 
     const repo = new ProfileRepository(agent);
     await repo.updateWebLink(rkey, updates);
