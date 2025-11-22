@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Affiliation, OrganizationType } from '@/types';
+import CountrySelector from '@/components/CountrySelector/CountrySelector';
 
 interface AffiliationFormProps {
   mode: 'create' | 'edit';
@@ -230,14 +231,12 @@ export default function AffiliationForm({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Country
             </label>
-            <input
-              type="text"
+            <CountrySelector
               value={formData.country}
-              onChange={(e) =>
-                setFormData({ ...formData, country: e.target.value })
+              onChange={(value) =>
+                setFormData({ ...formData, country: value })
               }
-              placeholder="e.g., United States"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Select a country"
             />
           </div>
         </div>

@@ -35,9 +35,6 @@ export default function SocialLinkForm({
   const [formData, setFormData] = useState({
     platform: (link?.platform as SocialPlatform) || 'twitter',
     url: link?.url || '',
-    username: link?.username || '',
-    displayName: link?.displayName || '',
-    isVerified: link?.isVerified || false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -143,60 +140,6 @@ export default function SocialLinkForm({
           <p className="mt-1 text-sm text-gray-500">
             Full URL to your profile on this platform
           </p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Username
-          </label>
-          <input
-            type="text"
-            value={formData.username}
-            onChange={(e) =>
-              setFormData({ ...formData, username: e.target.value })
-            }
-            placeholder="@username or username"
-            maxLength={100}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            Your username or handle on this platform
-          </p>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Display Name
-          </label>
-          <input
-            type="text"
-            value={formData.displayName}
-            onChange={(e) =>
-              setFormData({ ...formData, displayName: e.target.value })
-            }
-            placeholder="Your Name"
-            maxLength={100}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            Your display name on this platform (optional)
-          </p>
-        </div>
-
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.isVerified}
-              onChange={(e) =>
-                setFormData({ ...formData, isVerified: e.target.checked })
-              }
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700">
-              This account is verified on the platform
-            </span>
-          </label>
         </div>
       </div>
 
