@@ -7,7 +7,6 @@ import { normalizeDOI } from '@/lib/data/doi';
 import { formatDateUS, formatDisplayURL } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ButtonGroup } from '@/components/ui/button-group';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -65,7 +64,6 @@ export default function ProfileView({
   events,
   isOwner = false,
 }: ProfileViewProps) {
-  const primaryAffiliation = affiliations.find((a) => a.isPrimary);
   const currentAffiliations = affiliations.filter((a) => !a.endDate);
 
   const blueskyProfile = socialLinks.find((s) => s.platform === 'bluesky');

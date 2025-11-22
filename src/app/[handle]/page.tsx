@@ -1,6 +1,6 @@
 import { ProfileRepository } from '@/lib/data/repository';
 import ProfileView from '@/components/profile/ProfileView';
-import { getPublicAgent, getPublicPDSAgent } from '@/lib/auth/server-agent';
+import { getPublicAgent } from '@/lib/auth/server-agent';
 import { getAgent } from '@/lib/auth/atproto';
 import { getSession } from '@/lib/auth/session';
 // import Link from 'next/link';
@@ -63,7 +63,7 @@ export default async function ProfilePage({ params }: PageProps) {
     const didDocResponse = await fetch(`https://plc.directory/${did}`);
     const didDoc = await didDocResponse.json();
     const pdsEndpoint = didDoc.service?.find(
-      (s: any) => s.id === '#atproto_pds'
+      (s: { id: string; serviceEndpoint: string }) => s.id === '#atproto_pds'
     )?.serviceEndpoint;
 
     // Create agent for the user's specific PDS
@@ -78,7 +78,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
     // Get all profile data
     const [
-      identity,
+      _identity,
       honorific,
       location,
       affiliations,

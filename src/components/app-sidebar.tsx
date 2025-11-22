@@ -106,12 +106,6 @@ export function AppSidebar({ profile, counts }: AppSidebarProps) {
     return pathname.startsWith(url);
   };
 
-  const displayName = profile?.displayName || profile?.handle || 'User';
-  const formattedName =
-    profile?.honorific && profile.honorific !== 'none'
-      ? `${profile.honorific}. ${displayName}`
-      : displayName;
-
   return (
     <Sidebar>
       <SidebarHeader>
