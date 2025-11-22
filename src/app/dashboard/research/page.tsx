@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
 import { formatWorkType } from '@/lib/utils';
+import { normalizeDOI } from '@/lib/data/doi';
 import Link from 'next/link';
 
 export default async function ResearchPage() {
@@ -123,17 +124,18 @@ export default async function ResearchPage() {
                       )}
                       {work.publicationDate && (
                         <span className="text-xs text-gray-500">
-                          Published: {new Date(work.publicationDate).getFullYear()}
+                          Published:{' '}
+                          {new Date(work.publicationDate).getFullYear()}
                         </span>
                       )}
                     </div>
                     <a
-                      href={`https://doi.org/${work.doi}`}
+                      href={`https://doi.org/${normalizeDOI(work.doi)}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-xs text-blue-600 hover:underline mt-2 inline-block"
                     >
-                      DOI: {work.doi}
+                      {normalizeDOI(work.doi)}
                     </a>
                   </div>
                   <Link
