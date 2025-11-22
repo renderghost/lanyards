@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { doi, type, bypassDuplicateCheck } = await request.json();
+    const { doi, bypassDuplicateCheck } = await request.json();
 
     const repo = new ProfileRepository(agent);
 
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     const work = {
       doi,
-      type,
+      type: metadata?.type || 'other',
       title: metadata?.title,
       authors: metadata?.authors,
       publicationDate: metadata?.publicationDate,
@@ -57,31 +57,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function PUT(request: NextRequest) {
-  try {
-    const agent = await getAgent();
-
-    if (!agent) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { rkey, type } = await request.json();
-
-    if (!rkey) {
-      return NextResponse.json({ error: 'rkey is required' }, { status: 400 });
-    }
-
-    const repo = new ProfileRepository(agent);
-    await repo.updateWork(rkey, { type });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Error updating work:', error);
-    return NextResponse.json(
-      { error: 'Failed to update work' },
-      { status: 500 }
-    );
-  }
+export async function PUT(_request: NextRequest) {
+  // Works are immutable - DOI and type come from CrossRef metadata
+  // This endpoint is kept for future extensibility
+  return NextResponse.json(
+    { error: 'Works cannot be updated. Delete and re-add instead.' },
+    { status: 400 }
+  );
 }
 
 export async function DELETE(request: NextRequest) {

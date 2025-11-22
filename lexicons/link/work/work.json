@@ -16,19 +16,8 @@
           },
           "type": {
             "type": "string",
-            "enum": [
-              "abstract",
-              "poster",
-              "paper",
-              "conference-proceeding",
-              "journal-article",
-              "book-chapter",
-              "book",
-              "preprint",
-              "dataset",
-              "other"
-            ],
-            "description": "Type of scholarly work"
+            "maxLength": 100,
+            "description": "Type of scholarly work (from CrossRef metadata)"
           },
           "title": {
             "type": "string",

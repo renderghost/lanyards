@@ -8,3 +8,15 @@ import { twMerge } from 'tailwind-merge';
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+/**
+ * Formats a work type string for human-readable display
+ * Converts hyphenated lowercase to Title Case
+ * Example: 'journal-article' → 'Journal Article'
+ */
+export function formatWorkType(type: string): string {
+  return type
+    .split('-')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
