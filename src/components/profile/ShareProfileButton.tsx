@@ -1,10 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import QRCode from 'qrcode';
+import { Share2, Check, Copy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface ShareProfileButtonProps {
-  url?: string; // Optional: if not provided, will use current origin + handle
+  url?: string;
   handle: string;
 }
 
@@ -12,34 +24,37 @@ export default function ShareProfileButton({
   url,
   handle,
 }: ShareProfileButtonProps) {
-  const [showModal, setShowModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [profileUrl, setProfileUrl] = useState('');
 
-  // Construct the profile URL - lazy evaluation to avoid SSR issues
-  const getProfileUrl = () => url || `${window.location.origin}/${handle}`;
+  useEffect(() => {
+    setProfileUrl(url || `${window.location.origin}/${handle}`);
+  }, [url, handle]);
 
-  const handleShare = async () => {
-    try {
-      const profileUrl = getProfileUrl();
-      const dataUrl = await QRCode.toDataURL(profileUrl, {
-        width: 300,
-        margin: 2,
-        color: {
-          dark: '#000000',
-          light: '#FFFFFF',
-        },
-      });
-      setQrCodeDataUrl(dataUrl);
-      setShowModal(true);
-    } catch (err) {
-      console.error('Error generating QR code:', err);
+  const handleOpenChange = async (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (isOpen && !qrCodeDataUrl && profileUrl) {
+      try {
+        const dataUrl = await QRCode.toDataURL(profileUrl, {
+          width: 300,
+          margin: 2,
+          color: {
+            dark: '#000000',
+            light: '#FFFFFF',
+          },
+        });
+        setQrCodeDataUrl(dataUrl);
+      } catch (err) {
+        console.error('Error generating QR code:', err);
+      }
     }
   };
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(getProfileUrl());
+      await navigator.clipboard.writeText(profileUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
@@ -48,118 +63,55 @@ export default function ShareProfileButton({
   };
 
   return (
-    <>
-      <button
-        onClick={handleShare}
-        className="flex items-center justify-center gap-2 px-4 py-2 text-sm bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 transition-colors"
-      >
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-          />
-        </svg>
-        Share
-      </button>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="secondary" size="sm">
+          <Share2 className="mr-2 h-4 w-4" />
+          Share
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Share Your Profile</DialogTitle>
+          <DialogDescription>
+            Share this QR code or link at conferences and events
+          </DialogDescription>
+        </DialogHeader>
 
-      {showModal && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          onClick={() => setShowModal(false)}
-        >
-          <div
-            className="bg-white rounded-lg p-6 max-w-sm w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-semibold mb-4 text-center">
-              Share Your Profile
-            </h3>
-
-            {/* QR Code */}
-            <div className="flex justify-center mb-4">
-              {qrCodeDataUrl && (
-                <img
-                  src={qrCodeDataUrl}
-                  alt={`QR Code for ${handle}`}
-                  className="w-64 h-64 border border-gray-200 rounded-lg"
-                />
-              )}
-            </div>
-
-            {/* URL Display */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Profile URL
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={getProfileUrl()}
-                  readOnly
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg bg-gray-50"
-                />
-                <button
-                  onClick={handleCopyLink}
-                  className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  {copied ? (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  ) : (
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                      />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {copied && (
-                <p className="text-xs text-green-600 mt-1">
-                  Copied to clipboard!
-                </p>
-              )}
-            </div>
-
-            <p className="text-xs text-gray-600 text-center mb-4">
-              Share this QR code or link at conferences and events
-            </p>
-
-            <button
-              onClick={() => setShowModal(false)}
-              className="w-full bg-gray-100 text-gray-900 py-2 px-4 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Close
-            </button>
-          </div>
+        {/* QR Code */}
+        <div className="flex justify-center py-4">
+          {qrCodeDataUrl && (
+            <img
+              src={qrCodeDataUrl}
+              alt={`QR Code for ${handle}`}
+              className="w-64 h-64 border rounded-lg"
+            />
+          )}
         </div>
-      )}
-    </>
+
+        {/* URL Display */}
+        <div className="space-y-2">
+          <Label htmlFor="profile-url">Profile URL</Label>
+          <div className="flex gap-2">
+            <Input
+              id="profile-url"
+              value={profileUrl}
+              readOnly
+              className="flex-1"
+            />
+            <Button size="icon" onClick={handleCopyLink}>
+              {copied ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          {copied && (
+            <p className="text-xs text-green-600">Copied to clipboard!</p>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

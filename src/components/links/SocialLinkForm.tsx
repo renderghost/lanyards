@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { LinkSocial, SocialPlatform } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AlertCircle } from 'lucide-react';
 
 interface SocialLinkFormProps {
   mode: 'create' | 'edit';
@@ -100,91 +113,95 @@ export default function SocialLinkForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-sm">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Platform *
-          </label>
-          <select
-            value={formData.platform}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                platform: e.target.value as SocialPlatform,
-              })
-            }
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {PLATFORMS.map((platform) => (
-              <option key={platform.value} value={platform.value}>
-                {platform.label}
-              </option>
-            ))}
-          </select>
-        </div>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="platform">Platform *</Label>
+              <Select
+                value={formData.platform}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    platform: value as SocialPlatform,
+                  })
+                }
+              >
+                <SelectTrigger id="platform">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PLATFORMS.map((platform) => (
+                    <SelectItem key={platform.value} value={platform.value}>
+                      {platform.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Profile URL *
-          </label>
-          <input
-            type="url"
-            value={formData.url}
-            onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-            placeholder="https://twitter.com/username"
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            Full URL to your profile on this platform
-          </p>
-        </div>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="url">Profile URL *</Label>
+              <Input
+                id="url"
+                type="url"
+                value={formData.url}
+                onChange={(e) =>
+                  setFormData({ ...formData, url: e.target.value })
+                }
+                placeholder="https://twitter.com/username"
+                required
+              />
+              <p className="text-sm text-muted-foreground">
+                Full URL to your profile on this platform
+              </p>
+            </div>
+          </div>
 
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      <div className="flex flex-col gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading ? 'Saving...' : mode === 'create' ? 'Add Link' : 'Save Changes'}
-        </button>
+          <div className="flex flex-col gap-3">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading
+                ? 'Saving...'
+                : mode === 'create'
+                  ? 'Add Link'
+                  : 'Save Changes'}
+            </Button>
 
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard/socials')}
-          className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/socials')}
+              className="w-full"
+            >
+              Cancel
+            </Button>
 
-        {mode === 'edit' && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={loading}
-            className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-              showDelete
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'border border-red-300 text-red-600 hover:bg-red-50'
-            }`}
-          >
-            {loading
-              ? 'Deleting...'
-              : showDelete
-                ? 'Click again to confirm deletion'
-                : 'Delete Link'}
-          </button>
-        )}
-      </div>
-    </form>
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant={showDelete ? 'destructive' : 'outline'}
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading
+                  ? 'Deleting...'
+                  : showDelete
+                    ? 'Click again to confirm deletion'
+                    : 'Delete Link'}
+              </Button>
+            )}
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

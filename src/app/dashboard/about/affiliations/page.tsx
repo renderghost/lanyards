@@ -1,151 +1,150 @@
-import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
 import Link from 'next/link';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Building2, Plus, Pencil } from 'lucide-react';
 
 export default async function AffiliationsPage() {
   const session = await getSession();
-
-  if (!session) {
-    redirect('/auth');
-  }
-
   const agent = await getAgent();
 
-  if (!agent) {
-    redirect('/auth');
+  if (!session || !agent) {
+    return null;
   }
 
   const repo = new ProfileRepository(agent);
   const affiliations = await repo.listAffiliations(session.did);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold">Affiliations</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Manage your institutional and organizational affiliations
-              </p>
-            </div>
-            <Link
-              href="/dashboard/about/affiliations/create"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
+    <>
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mr-2 data-[orientation=vertical]:h-4"
+        />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Affiliations</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto">
+          <Button asChild>
+            <Link href="/dashboard/about/affiliations/create">
+              <Plus className="mr-2 h-4 w-4" />
               Add Affiliation
             </Link>
-          </div>
+          </Button>
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="mx-auto w-full max-w-2xl">
+          <h1 className="text-xl font-semibold">Affiliations</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your institutional and organizational affiliations
+          </p>
+        </div>
+
         {affiliations.length === 0 ? (
-          // Zero-data state
-          <div className="bg-white rounded-lg p-8 shadow-sm text-center">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                />
-              </svg>
+          <Card className="mx-auto w-full max-w-2xl flex flex-col items-center justify-center p-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <Building2 className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">No affiliations yet</h2>
-            <p className="text-gray-600 text-sm mb-6">
-              Add your institutional affiliations, including universities,
-              research centers, or organizations you work with.
-            </p>
-            <Link
-              href="/dashboard/about/affiliations/create"
-              className="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Add Affiliation
-            </Link>
-          </div>
+            <CardHeader className="text-center p-0">
+              <CardTitle>No affiliations yet</CardTitle>
+              <CardDescription>
+                Add your institutional affiliations, including universities,
+                research centers, or organizations you work with.
+              </CardDescription>
+            </CardHeader>
+            <Button className="mt-6" asChild>
+              <Link href="/dashboard/about/affiliations/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Affiliation
+              </Link>
+            </Button>
+          </Card>
         ) : (
-          // Affiliations list
-          <div className="space-y-4">
+          <div className="mx-auto w-full max-w-2xl grid gap-4">
             {affiliations.map((affiliation) => (
-              <div
-                key={affiliation.uri}
-                className="bg-white rounded-lg p-4 shadow-sm"
-              >
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-medium text-gray-900">
-                        {affiliation.organizationName}
-                      </h3>
-                      {affiliation.isPrimary && (
-                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
-                          Primary
-                        </span>
+              <Card key={affiliation.uri}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/dashboard/about/affiliations/edit?rkey=${encodeURIComponent(affiliation.uri.split('/').pop() || '')}`}
+                          className="hover:underline"
+                        >
+                          <CardTitle className="text-base leading-tight">
+                            {affiliation.organizationName}
+                          </CardTitle>
+                        </Link>
+                        {affiliation.isPrimary && (
+                          <Badge>Primary</Badge>
+                        )}
+                      </div>
+                      {affiliation.role && (
+                        <div className="text-sm text-foreground">{affiliation.role}</div>
                       )}
                     </div>
-                    {affiliation.role && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        {affiliation.role}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {affiliation.startDate && (
-                        <span>
-                          {new Date(affiliation.startDate).getFullYear()}
-                          {affiliation.endDate
-                            ? ` - ${new Date(affiliation.endDate).getFullYear()}`
-                            : ' - Present'}
-                        </span>
-                      )}
-                      {affiliation.organizationType && (
-                        <span className="capitalize">
-                          • {affiliation.organizationType}
-                        </span>
-                      )}
-                    </div>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link
+                        href={`/dashboard/about/affiliations/edit?rkey=${encodeURIComponent(affiliation.uri.split('/').pop() || '')}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                    </Button>
                   </div>
-                  <Link
-                    href={`/dashboard/about/affiliations/edit?rkey=${encodeURIComponent(affiliation.uri.split('/').pop() || '')}`}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    Edit
-                  </Link>
-                </div>
-              </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex flex-wrap items-center gap-2 text-sm text-foreground">
+                    {affiliation.startDate && (
+                      <span>
+                        {new Date(affiliation.startDate).getFullYear()}
+                        {affiliation.endDate
+                          ? ` - ${new Date(affiliation.endDate).getFullYear()}`
+                          : ' - Present'}
+                      </span>
+                    )}
+                    {affiliation.organizationType && (
+                      <Badge variant="secondary" className="capitalize">
+                        {affiliation.organizationType}
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
       </div>
-    </main>
+    </>
   );
 }

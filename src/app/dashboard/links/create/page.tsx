@@ -1,50 +1,57 @@
-import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import LinkForm from '@/components/links/LinkForm';
-import Link from 'next/link';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 
 export default async function CreateLinkPage() {
   const session = await getSession();
 
   if (!session) {
-    redirect('/auth');
+    return null;
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <Link
-            href="/dashboard/links"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back
-          </Link>
-          <h1 className="text-xl font-bold">Add Link</h1>
-          <p className="text-sm text-gray-600 mt-1">
-            Add a social media, academic, or custom web link
+    <>
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mr-2 data-[orientation=vertical]:h-4"
+        />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/dashboard/links">Links</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Add Link</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+      </header>
+
+      <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="mx-auto w-full max-w-2xl">
+          <h1 className="text-xl font-semibold mb-1">Add Link</h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            Add a custom web link to your profile
           </p>
+          <LinkForm mode="create" />
         </div>
       </div>
-
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
-        <LinkForm mode="create" />
-      </div>
-    </main>
+    </>
   );
 }

@@ -4,6 +4,19 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CountrySelector from '@/components/CountrySelector';
 import type { LinkEvent, EventType } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AlertCircle } from 'lucide-react';
 
 interface EventFormProps {
   mode: 'create' | 'edit';
@@ -21,10 +34,7 @@ const EVENT_TYPES: { value: EventType; label: string }[] = [
   { value: 'other', label: 'Other' },
 ];
 
-export default function EventForm({
-  mode,
-  initialData,
-}: EventFormProps) {
+export default function EventForm({ mode, initialData }: EventFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,34 +60,35 @@ export default function EventForm({
     setError('');
 
     try {
-      const payload = mode === 'create'
-        ? {
-            name: formData.name,
-            type: formData.type,
-            startDate: new Date(formData.startDate).toISOString(),
-            endDate: formData.endDate
-              ? new Date(formData.endDate).toISOString()
-              : undefined,
-            location:
-              formData.city || formData.country
-                ? { city: formData.city, country: formData.country }
+      const payload =
+        mode === 'create'
+          ? {
+              name: formData.name,
+              type: formData.type,
+              startDate: new Date(formData.startDate).toISOString(),
+              endDate: formData.endDate
+                ? new Date(formData.endDate).toISOString()
                 : undefined,
-            url: formData.url || undefined,
-          }
-        : {
-            rkey: formData.rkey,
-            name: formData.name,
-            type: formData.type,
-            startDate: new Date(formData.startDate).toISOString(),
-            endDate: formData.endDate
-              ? new Date(formData.endDate).toISOString()
-              : undefined,
-            location:
-              formData.city || formData.country
-                ? { city: formData.city, country: formData.country }
+              location:
+                formData.city || formData.country
+                  ? { city: formData.city, country: formData.country }
+                  : undefined,
+              url: formData.url || undefined,
+            }
+          : {
+              rkey: formData.rkey,
+              name: formData.name,
+              type: formData.type,
+              startDate: new Date(formData.startDate).toISOString(),
+              endDate: formData.endDate
+                ? new Date(formData.endDate).toISOString()
                 : undefined,
-            url: formData.url || undefined,
-          };
+              location:
+                formData.city || formData.country
+                  ? { city: formData.city, country: formData.country }
+                  : undefined,
+              url: formData.url || undefined,
+            };
 
       const response = await fetch('/api/profile/events', {
         method: mode === 'create' ? 'POST' : 'PUT',
@@ -130,156 +141,151 @@ export default function EventForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-sm">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Event Name *
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            required
-            placeholder="e.g., NeurIPS 2024"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Event Name *</Label>
+              <Input
+                id="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                required
+                placeholder="e.g., NeurIPS 2024"
+              />
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type *
-          </label>
-          <select
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({ ...formData, type: e.target.value as EventType })
-            }
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select type...</option>
-            {EVENT_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="type">Type *</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, type: value as EventType })
+                }
+              >
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Select type..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {EVENT_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date *
-            </label>
-            <input
-              type="date"
-              value={formData.startDate}
-              onChange={(e) =>
-                setFormData({ ...formData, startDate: e.target.value })
-              }
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start Date *</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, startDate: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endDate: e.target.value })
+                  }
+                  min={formData.startDate}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData({ ...formData, city: e.target.value })
+                  }
+                  placeholder="e.g., San Francisco"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <CountrySelector
+                  value={formData.country}
+                  onChange={(value) =>
+                    setFormData({ ...formData, country: value })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="url">Website URL</Label>
+              <Input
+                id="url"
+                type="url"
+                value={formData.url}
+                onChange={(e) =>
+                  setFormData({ ...formData, url: e.target.value })
+                }
+                placeholder="https://example.com"
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={formData.endDate}
-              onChange={(e) =>
-                setFormData({ ...formData, endDate: e.target.value })
-              }
-              min={formData.startDate}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-3">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading
+                ? mode === 'create'
+                  ? 'Adding...'
+                  : 'Saving...'
+                : mode === 'create'
+                  ? 'Add Event'
+                  : 'Save Changes'}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/events')}
+              className="w-full"
+            >
+              Cancel
+            </Button>
+
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full text-destructive hover:text-destructive"
+              >
+                Delete Event
+              </Button>
+            )}
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              City
-            </label>
-            <input
-              type="text"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-              placeholder="e.g., San Francisco"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Country
-            </label>
-            <CountrySelector
-              value={formData.country}
-              onChange={(value) =>
-                setFormData({ ...formData, country: value })
-              }
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Website URL
-          </label>
-          <input
-            type="url"
-            value={formData.url}
-            onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-            placeholder="https://example.com"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-      </div>
-
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading
-            ? mode === 'create'
-              ? 'Adding...'
-              : 'Saving...'
-            : mode === 'create'
-            ? 'Add Event'
-            : 'Save Changes'}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard/events')}
-          className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-
-        {mode === 'edit' && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={loading}
-            className="w-full text-red-600 py-2 hover:text-red-700 disabled:text-gray-400"
-          >
-            Delete Event
-          </button>
-        )}
-      </div>
-    </form>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

@@ -5,6 +5,12 @@ import { useRouter } from 'next/navigation';
 import type { LinkWork } from '@/types';
 import { formatWorkType } from '@/lib/utils';
 import { normalizeDOI } from '@/lib/data/doi';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 interface ResearchFormProps {
   mode: 'create' | 'edit';
@@ -66,7 +72,10 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent, bypassDuplicateCheck = false) => {
+  const handleSubmit = async (
+    e: React.FormEvent,
+    bypassDuplicateCheck = false
+  ) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -86,7 +95,6 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle duplicate error specially
         if (data.error === 'DUPLICATE_DOI' && !bypassDuplicateCheck) {
           setShowDuplicateWarning(true);
           setError(data.message);
@@ -131,197 +139,233 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
       router.push('/dashboard/research');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete research');
+      setError(
+        err instanceof Error ? err.message : 'Failed to delete research'
+      );
       setLoading(false);
     }
   };
 
   return (
-    <form id="research-form" onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-sm">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            DOI *
-          </label>
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={formData.doi}
-              onChange={(e) =>
-                setFormData({ ...formData, doi: e.target.value })
-              }
-              onBlur={handleDOIBlur}
-              required
-              disabled={mode === 'edit'}
-              placeholder="10.1234/example or https://doi.org/10.1234/example"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
-            />
-            {mode === 'create' && (
-              <button
-                type="button"
-                onClick={handleResolveDOI}
-                disabled={!formData.doi || resolvingDOI}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:bg-gray-50 disabled:text-gray-400 transition-colors"
-              >
-                {resolvingDOI ? 'Resolving...' : 'Resolve'}
-              </button>
-            )}
-          </div>
-          <p className="mt-1 text-sm text-gray-500">
-            {mode === 'create'
-              ? 'Paste any DOI format - URLs will be automatically cleaned'
-              : 'DOI cannot be changed after creation'}
-          </p>
-        </div>
-
-        {resolvedMetadata && (
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm font-medium text-blue-900 mb-2">
-              DOI Resolved Successfully
-            </p>
-            {resolvedMetadata.title && (
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Title:</strong> {resolvedMetadata.title}
-              </p>
-            )}
-            {resolvedMetadata.authors && (
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Authors:</strong> {resolvedMetadata.authors.join(', ')}
-              </p>
-            )}
-            {resolvedMetadata.journal && (
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Venue:</strong> {resolvedMetadata.journal}
-              </p>
-            )}
-            {resolvedMetadata.publicationDate && (
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Published:</strong> {new Date(resolvedMetadata.publicationDate).getFullYear()}
-              </p>
-            )}
-            {resolvedMetadata.type && (
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Type:</strong> {formatWorkType(resolvedMetadata.type)}
-              </p>
-            )}
-            {resolvedMetadata.abstract && (
-              <p className="text-sm text-blue-800 mb-1">
-                <strong>Abstract:</strong> {resolvedMetadata.abstract.substring(0, 200)}{resolvedMetadata.abstract.length > 200 ? '...' : ''}
-              </p>
-            )}
-            {resolvedMetadata.url && (
-              <p className="text-sm text-blue-800">
-                <strong>URL:</strong>{' '}
-                <a
-                  href={resolvedMetadata.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-blue-900"
+    <form id="research-form" onSubmit={handleSubmit}>
+      <Card>
+        <CardContent className="pt-6 space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="doi">DOI *</Label>
+            <div className="flex gap-2">
+              <Input
+                id="doi"
+                type="text"
+                value={formData.doi}
+                onChange={(e) =>
+                  setFormData({ ...formData, doi: e.target.value })
+                }
+                onBlur={handleDOIBlur}
+                required
+                disabled={mode === 'edit'}
+                placeholder="10.1234/example or https://doi.org/10.1234/example"
+              />
+              {mode === 'create' && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={handleResolveDOI}
+                  disabled={!formData.doi || resolvingDOI}
                 >
-                  {resolvedMetadata.url}
-                </a>
-              </p>
-            )}
-          </div>
-        )}
-
-        {mode === 'edit' && initialData && (
-          <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <p className="text-sm font-medium text-gray-900 mb-2">
-              Work Metadata
+                  {resolvingDOI ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Resolving
+                    </>
+                  ) : (
+                    'Resolve'
+                  )}
+                </Button>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">
+              {mode === 'create'
+                ? 'Paste any DOI format - URLs will be automatically cleaned'
+                : 'DOI cannot be changed after creation'}
             </p>
-            {initialData.title && (
-              <p className="text-sm text-gray-800 mb-1">
-                <strong>Title:</strong> {initialData.title}
-              </p>
-            )}
-            {initialData.authors && initialData.authors.length > 0 && (
-              <p className="text-sm text-gray-800 mb-1">
-                <strong>Authors:</strong> {initialData.authors.join(', ')}
-              </p>
-            )}
-            {initialData.venue && (
-              <p className="text-sm text-gray-800 mb-1">
-                <strong>Venue:</strong> {initialData.venue}
-              </p>
-            )}
-            {initialData.publicationDate && (
-              <p className="text-sm text-gray-800 mb-1">
-                <strong>Published:</strong> {new Date(initialData.publicationDate).getFullYear()}
-              </p>
-            )}
-            {initialData.type && (
-              <p className="text-sm text-gray-800 mb-1">
-                <strong>Type:</strong> {formatWorkType(initialData.type)}
-              </p>
-            )}
-            {('abstract' in initialData && initialData.abstract && typeof initialData.abstract === 'string') ? (
-              <p className="text-sm text-gray-800 mb-1">
-                <strong>Abstract:</strong> {initialData.abstract.substring(0, 200)}{initialData.abstract.length > 200 ? '...' : ''}
-              </p>
-            ) : null}
-            {('url' in initialData && initialData.url && typeof initialData.url === 'string') ? (
-              <p className="text-sm text-gray-800">
-                <strong>URL:</strong>{' '}
-                <a
-                  href={initialData.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-gray-900"
-                >
-                  {initialData.url}
-                </a>
-              </p>
-            ) : null}
           </div>
-        )}
-      </div>
+
+          {resolvedMetadata && (
+            <Alert className="border-primary/50 bg-primary/5">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              <AlertDescription className="ml-2">
+                <p className="font-medium mb-2">DOI Resolved Successfully</p>
+                <div className="space-y-1 text-sm">
+                  {resolvedMetadata.title && (
+                    <p>
+                      <strong>Title:</strong> {resolvedMetadata.title}
+                    </p>
+                  )}
+                  {resolvedMetadata.authors && (
+                    <p>
+                      <strong>Authors:</strong>{' '}
+                      {resolvedMetadata.authors.join(', ')}
+                    </p>
+                  )}
+                  {resolvedMetadata.journal && (
+                    <p>
+                      <strong>Venue:</strong> {resolvedMetadata.journal}
+                    </p>
+                  )}
+                  {resolvedMetadata.publicationDate && (
+                    <p>
+                      <strong>Published:</strong>{' '}
+                      {new Date(resolvedMetadata.publicationDate).getFullYear()}
+                    </p>
+                  )}
+                  {resolvedMetadata.type && (
+                    <p>
+                      <strong>Type:</strong>{' '}
+                      {formatWorkType(resolvedMetadata.type)}
+                    </p>
+                  )}
+                  {resolvedMetadata.abstract && (
+                    <p>
+                      <strong>Abstract:</strong>{' '}
+                      {resolvedMetadata.abstract.substring(0, 200)}
+                      {resolvedMetadata.abstract.length > 200 ? '...' : ''}
+                    </p>
+                  )}
+                  {resolvedMetadata.url && (
+                    <p>
+                      <strong>URL:</strong>{' '}
+                      <a
+                        href={resolvedMetadata.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:text-primary"
+                      >
+                        {resolvedMetadata.url}
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {mode === 'edit' && initialData && (
+            <Alert>
+              <AlertDescription>
+                <p className="font-medium mb-2">Work Metadata</p>
+                <div className="space-y-1 text-sm">
+                  {initialData.title && (
+                    <p>
+                      <strong>Title:</strong> {initialData.title}
+                    </p>
+                  )}
+                  {initialData.authors && initialData.authors.length > 0 && (
+                    <p>
+                      <strong>Authors:</strong> {initialData.authors.join(', ')}
+                    </p>
+                  )}
+                  {initialData.venue && (
+                    <p>
+                      <strong>Venue:</strong> {initialData.venue}
+                    </p>
+                  )}
+                  {initialData.publicationDate && (
+                    <p>
+                      <strong>Published:</strong>{' '}
+                      {new Date(initialData.publicationDate).getFullYear()}
+                    </p>
+                  )}
+                  {initialData.type && (
+                    <p>
+                      <strong>Type:</strong> {formatWorkType(initialData.type)}
+                    </p>
+                  )}
+                  {'abstract' in initialData &&
+                    initialData.abstract &&
+                    typeof initialData.abstract === 'string' && (
+                      <p>
+                        <strong>Abstract:</strong>{' '}
+                        {initialData.abstract.substring(0, 200)}
+                        {initialData.abstract.length > 200 ? '...' : ''}
+                      </p>
+                    )}
+                  {'url' in initialData &&
+                    initialData.url &&
+                    typeof initialData.url === 'string' && (
+                      <p>
+                        <strong>URL:</strong>{' '}
+                        <a
+                          href={initialData.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:text-primary"
+                        >
+                          {initialData.url}
+                        </a>
+                      </p>
+                    )}
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
 
       {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-700 text-sm mb-2">{error}</p>
-          {showDuplicateWarning && (
-            <button
-              type="button"
-              onClick={handleAddDuplicate}
-              disabled={loading}
-              className="text-sm text-red-700 underline hover:text-red-800 disabled:opacity-50"
-            >
-              Add anyway
-            </button>
-          )}
-        </div>
+        <Alert variant="destructive" className="mt-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="ml-2">
+            <p>{error}</p>
+            {showDuplicateWarning && (
+              <Button
+                type="button"
+                variant="link"
+                size="sm"
+                onClick={handleAddDuplicate}
+                disabled={loading}
+                className="p-0 h-auto text-destructive-foreground underline"
+              >
+                Add anyway
+              </Button>
+            )}
+          </AlertDescription>
+        </Alert>
       )}
 
       <div className="flex flex-col gap-3 mt-6">
         {mode === 'create' && (
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-          >
-            {loading ? 'Adding...' : 'Add Research'}
-          </button>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Adding...
+              </>
+            ) : (
+              'Add Research'
+            )}
+          </Button>
         )}
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => router.push('/dashboard/research')}
           disabled={loading}
-          className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+          className="w-full"
         >
           {mode === 'edit' ? 'Back' : 'Cancel'}
-        </button>
+        </Button>
 
         {mode === 'edit' && (
-          <button
+          <Button
             type="button"
+            variant="ghost"
             onClick={handleDelete}
             disabled={loading}
-            className="w-full text-red-600 py-2 hover:text-red-700 disabled:text-gray-400"
+            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             Delete Research
-          </button>
+          </Button>
         )}
       </div>
     </form>
