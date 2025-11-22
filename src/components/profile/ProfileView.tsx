@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import QRCodeButton from './QRCodeButton';
+import { normalizeDOI } from '@/lib/data/doi';
 import type {
   Affiliation,
   Qualification,
@@ -302,12 +303,12 @@ export default function ProfileView({
                     <p className="text-sm text-gray-500">{work.venue}</p>
                   )}
                   <a
-                    href={`https://doi.org/${work.doi}`}
+                    href={`https://doi.org/${normalizeDOI(work.doi)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-blue-600 hover:underline"
                   >
-                    {work.doi}
+                    {normalizeDOI(work.doi)}
                   </a>
                 </div>
               ))}

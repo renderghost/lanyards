@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
-import { resolveDOI } from '@/lib/data/doi';
+import { resolveDOI, normalizeDOI } from '@/lib/data/doi';
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,14 +11,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { doi, bypassDuplicateCheck } = await request.json();
+    const { doi: rawDoi, bypassDuplicateCheck } = await request.json();
+
+    // Normalize DOI to plain format (e.g., "10.1234/example")
+    // This ensures we never store URLs, only the canonical DOI identifier
+    const doi = normalizeDOI(rawDoi);
 
     const repo = new ProfileRepository(agent);
 
     // Check for duplicates unless explicitly bypassed
     if (!bypassDuplicateCheck) {
       const existingWorks = await repo.listWorks(agent.session?.did || '');
-      const duplicate = existingWorks.find((w) => w.doi === doi);
+      // Compare normalized DOIs to catch duplicates even if entered in different formats
+      const duplicate = existingWorks.find((w) => normalizeDOI(w.doi) === doi);
 
       if (duplicate) {
         return NextResponse.json(
