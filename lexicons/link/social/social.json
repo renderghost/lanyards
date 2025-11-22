@@ -30,20 +30,6 @@
             "format": "uri",
             "description": "Full URL to the profile"
           },
-          "username": {
-            "type": "string",
-            "maxLength": 100,
-            "description": "Username or identifier on the platform (e.g., '@username' or 'username')"
-          },
-          "displayName": {
-            "type": "string",
-            "maxLength": 100,
-            "description": "Display name on the platform (optional)"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "description": "Whether the account is verified on the platform"
-          },
           "isLocked": {
             "type": "boolean",
             "description": "Whether this link is locked (e.g., Bluesky profile derived from auth)"

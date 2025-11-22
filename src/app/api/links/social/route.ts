@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { platform, url, username, displayName, isVerified } = body;
+    const { platform, url } = body;
 
     if (!platform || !url) {
       return NextResponse.json(
@@ -29,9 +29,6 @@ export async function POST(request: NextRequest) {
     const rkey = await repo.createSocialLink({
       platform,
       url,
-      username: username || undefined,
-      displayName: displayName || undefined,
-      isVerified: isVerified || false,
       isLocked: false,
     });
 
@@ -65,7 +62,7 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { platform, url, username, displayName, isVerified } = body;
+    const { platform, url } = body;
 
     if (!platform || !url) {
       return NextResponse.json(
@@ -78,9 +75,6 @@ export async function PUT(request: NextRequest) {
     await repo.updateSocialLink(rkey, {
       platform,
       url,
-      username: username || undefined,
-      displayName: displayName || undefined,
-      isVerified: isVerified || false,
     });
 
     return NextResponse.json({ success: true });

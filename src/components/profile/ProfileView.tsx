@@ -209,9 +209,6 @@ export default function ProfileView({
                   className="flex items-center gap-3 text-blue-600 hover:underline"
                 >
                   <span className="capitalize">{social.platform}</span>
-                  {social.username && (
-                    <span className="text-gray-500">@{social.username}</span>
-                  )}
                 </a>
               ))}
             </div>

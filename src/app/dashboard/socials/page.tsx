@@ -122,13 +122,8 @@ export default async function SocialsPage() {
                         <span className="text-2xl">{platform.icon}</span>
                         <div className="flex-1">
                           <h3 className="font-medium text-gray-900 leading-5">
-                            {social.displayName || platform.label}
+                            {platform.label}
                           </h3>
-                          {social.username && (
-                            <p className="text-sm text-gray-500 leading-5">
-                              @{social.username}
-                            </p>
-                          )}
                         </div>
                       </div>
                       <a

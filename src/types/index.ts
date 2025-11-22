@@ -136,9 +136,6 @@ export interface LinkWork {
 export interface LinkSocial {
   platform: 'bluesky' | 'twitter' | 'linkedin' | 'mastodon' | 'researchgate' | 'googlescholar' | 'orcid' | 'semble' | 'other';
   url: string;
-  username?: string;
-  displayName?: string;
-  isVerified?: boolean;
   isLocked?: boolean;
   createdAt: string;
 }
@@ -146,7 +143,6 @@ export interface LinkSocial {
 export interface LinkWeb {
   url: string;
   title?: string;
-  description?: string;
   createdAt: string;
 }
 

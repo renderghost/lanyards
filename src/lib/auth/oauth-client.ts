@@ -25,7 +25,7 @@ export type OAuthClient = {
   }>;
 };
 
-let oauthClient: OAuthClient | null = null;
+const oauthClient: OAuthClient | null = null;
 
 export async function getOAuthClient(): Promise<OAuthClient> {
   if (oauthClient) {

@@ -120,11 +120,6 @@ export default async function LinksPage() {
                       >
                         {link.url}
                       </a>
-                      {link.description && (
-                        <p className="text-sm text-gray-600 mt-2">
-                          {link.description}
-                        </p>
-                      )}
                     </div>
                     <Link
                       href={`/dashboard/links/edit?rkey=${encodeURIComponent(link.rkey)}`}
