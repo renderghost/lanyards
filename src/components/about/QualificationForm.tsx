@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Qualification, QualificationType } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AlertCircle } from 'lucide-react';
 
 interface QualificationFormProps {
   mode: 'create' | 'edit';
@@ -122,168 +135,161 @@ export default function QualificationForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-sm">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Qualification Title *
-          </label>
-          <input
-            type="text"
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="e.g., PhD in Computer Science"
-            required
-            maxLength={200}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="title">Qualification Title *</Label>
+              <Input
+                id="title"
+                type="text"
+                value={formData.title}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
+                placeholder="e.g., PhD in Computer Science"
+                required
+                maxLength={200}
+              />
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type
-          </label>
-          <select
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                type: e.target.value as QualificationType,
-              })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {QUALIFICATION_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="type">Type</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    type: value as QualificationType,
+                  })
+                }
+              >
+                <SelectTrigger id="type">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {QUALIFICATION_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Institution *
-          </label>
-          <input
-            type="text"
-            value={formData.institution}
-            onChange={(e) =>
-              setFormData({ ...formData, institution: e.target.value })
-            }
-            placeholder="e.g., Stanford University"
-            required
-            maxLength={300}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="institution">Institution *</Label>
+              <Input
+                id="institution"
+                type="text"
+                value={formData.institution}
+                onChange={(e) =>
+                  setFormData({ ...formData, institution: e.target.value })
+                }
+                placeholder="e.g., Stanford University"
+                required
+                maxLength={300}
+              />
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Field of Study
-          </label>
-          <input
-            type="text"
-            value={formData.field}
-            onChange={(e) => setFormData({ ...formData, field: e.target.value })}
-            placeholder="e.g., Artificial Intelligence, Molecular Biology"
-            maxLength={200}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="field">Field of Study</Label>
+              <Input
+                id="field"
+                type="text"
+                value={formData.field}
+                onChange={(e) =>
+                  setFormData({ ...formData, field: e.target.value })
+                }
+                placeholder="e.g., Artificial Intelligence, Molecular Biology"
+                maxLength={200}
+              />
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Date Awarded
-          </label>
-          <input
-            type="date"
-            value={formData.dateAwarded}
-            onChange={(e) =>
-              setFormData({ ...formData, dateAwarded: e.target.value })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="dateAwarded">Date Awarded</Label>
+              <Input
+                id="dateAwarded"
+                type="date"
+                value={formData.dateAwarded}
+                onChange={(e) =>
+                  setFormData({ ...formData, dateAwarded: e.target.value })
+                }
+              />
+            </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              City
-            </label>
-            <input
-              type="text"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-              placeholder="e.g., Cambridge"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData({ ...formData, city: e.target.value })
+                  }
+                  placeholder="e.g., Cambridge"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Input
+                  id="country"
+                  type="text"
+                  value={formData.country}
+                  onChange={(e) =>
+                    setFormData({ ...formData, country: e.target.value })
+                  }
+                  placeholder="e.g., United States"
+                />
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Country
-            </label>
-            <input
-              type="text"
-              value={formData.country}
-              onChange={(e) =>
-                setFormData({ ...formData, country: e.target.value })
-              }
-              placeholder="e.g., United States"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-3">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading
+                ? 'Saving...'
+                : mode === 'create'
+                  ? 'Add Qualification'
+                  : 'Save Changes'}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/about/qualifications')}
+              className="w-full"
+            >
+              Cancel
+            </Button>
+
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant={showDelete ? 'destructive' : 'outline'}
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading
+                  ? 'Deleting...'
+                  : showDelete
+                    ? 'Click again to confirm deletion'
+                    : 'Delete Qualification'}
+              </Button>
+            )}
           </div>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading
-            ? 'Saving...'
-            : mode === 'create'
-              ? 'Add Qualification'
-              : 'Save Changes'}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard/about/qualifications')}
-          className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-
-        {mode === 'edit' && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={loading}
-            className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-              showDelete
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'border border-red-300 text-red-600 hover:bg-red-50'
-            }`}
-          >
-            {loading
-              ? 'Deleting...'
-              : showDelete
-                ? 'Click again to confirm deletion'
-                : 'Delete Qualification'}
-          </button>
-        )}
-      </div>
-    </form>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

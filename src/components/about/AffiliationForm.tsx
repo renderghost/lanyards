@@ -4,6 +4,20 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Affiliation, OrganizationType } from '@/types';
 import CountrySelector from '@/components/CountrySelector/CountrySelector';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AlertCircle } from 'lucide-react';
 
 interface AffiliationFormProps {
   mode: 'create' | 'edit';
@@ -30,7 +44,8 @@ export default function AffiliationForm({
 
   const [formData, setFormData] = useState({
     organizationName: affiliation?.organizationName || '',
-    organizationType: (affiliation?.organizationType || 'institution') as OrganizationType,
+    organizationType: (affiliation?.organizationType ||
+      'institution') as OrganizationType,
     role: affiliation?.role || '',
     startDate: affiliation?.startDate
       ? new Date(affiliation.startDate).toISOString().split('T')[0]
@@ -55,7 +70,9 @@ export default function AffiliationForm({
         organizationType: formData.organizationType,
         role: formData.role || undefined,
         startDate: new Date(formData.startDate).toISOString(),
-        endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
+        endDate: formData.endDate
+          ? new Date(formData.endDate).toISOString()
+          : undefined,
         isPrimary: formData.isPrimary,
         website: formData.website || undefined,
         location:
@@ -124,201 +141,190 @@ export default function AffiliationForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-sm">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Organization Name *
-          </label>
-          <input
-            type="text"
-            value={formData.organizationName}
-            onChange={(e) =>
-              setFormData({ ...formData, organizationName: e.target.value })
-            }
-            placeholder="e.g., Stanford University"
-            required
-            maxLength={300}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="organizationName">Organization Name *</Label>
+              <Input
+                id="organizationName"
+                type="text"
+                value={formData.organizationName}
+                onChange={(e) =>
+                  setFormData({ ...formData, organizationName: e.target.value })
+                }
+                placeholder="e.g., Stanford University"
+                required
+                maxLength={300}
+              />
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Organization Type
-          </label>
-          <select
-            value={formData.organizationType}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                organizationType: e.target.value as OrganizationType,
-              })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {ORGANIZATION_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="organizationType">Organization Type</Label>
+              <Select
+                value={formData.organizationType}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    organizationType: value as OrganizationType,
+                  })
+                }
+              >
+                <SelectTrigger id="organizationType">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ORGANIZATION_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={type.value}>
+                      {type.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Role/Position
-          </label>
-          <input
-            type="text"
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-            placeholder="e.g., Research Fellow, Professor"
-            maxLength={100}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="role">Role/Position</Label>
+              <Input
+                id="role"
+                type="text"
+                value={formData.role}
+                onChange={(e) =>
+                  setFormData({ ...formData, role: e.target.value })
+                }
+                placeholder="e.g., Research Fellow, Professor"
+                maxLength={100}
+              />
+            </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Start Date *
-            </label>
-            <input
-              type="date"
-              value={formData.startDate}
-              onChange={(e) =>
-                setFormData({ ...formData, startDate: e.target.value })
-              }
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startDate">Start Date *</Label>
+                <Input
+                  id="startDate"
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, startDate: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endDate">End Date</Label>
+                <Input
+                  id="endDate"
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) =>
+                    setFormData({ ...formData, endDate: e.target.value })
+                  }
+                />
+                <p className="text-sm text-muted-foreground">
+                  Leave empty if current
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input
+                  id="city"
+                  type="text"
+                  value={formData.city}
+                  onChange={(e) =>
+                    setFormData({ ...formData, city: e.target.value })
+                  }
+                  placeholder="e.g., Cambridge"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <CountrySelector
+                  value={formData.country}
+                  onChange={(value) =>
+                    setFormData({ ...formData, country: value })
+                  }
+                  placeholder="Select a country"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                type="url"
+                value={formData.website}
+                onChange={(e) =>
+                  setFormData({ ...formData, website: e.target.value })
+                }
+                placeholder="https://example.edu"
+              />
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isPrimary"
+                checked={formData.isPrimary}
+                onCheckedChange={(checked) =>
+                  setFormData({ ...formData, isPrimary: checked === true })
+                }
+              />
+              <Label
+                htmlFor="isPrimary"
+                className="text-sm font-normal cursor-pointer"
+              >
+                This is my primary affiliation
+              </Label>
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              End Date
-            </label>
-            <input
-              type="date"
-              value={formData.endDate}
-              onChange={(e) =>
-                setFormData({ ...formData, endDate: e.target.value })
-              }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <p className="mt-1 text-sm text-gray-500">
-              Leave empty if current
-            </p>
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-3">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading
+                ? 'Saving...'
+                : mode === 'create'
+                  ? 'Add Affiliation'
+                  : 'Save Changes'}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/about/affiliations')}
+              className="w-full"
+            >
+              Cancel
+            </Button>
+
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant={showDelete ? 'destructive' : 'outline'}
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading
+                  ? 'Deleting...'
+                  : showDelete
+                    ? 'Click again to confirm deletion'
+                    : 'Delete Affiliation'}
+              </Button>
+            )}
           </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              City
-            </label>
-            <input
-              type="text"
-              value={formData.city}
-              onChange={(e) =>
-                setFormData({ ...formData, city: e.target.value })
-              }
-              placeholder="e.g., Cambridge"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Country
-            </label>
-            <CountrySelector
-              value={formData.country}
-              onChange={(value) =>
-                setFormData({ ...formData, country: value })
-              }
-              placeholder="Select a country"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Website
-          </label>
-          <input
-            type="url"
-            value={formData.website}
-            onChange={(e) =>
-              setFormData({ ...formData, website: e.target.value })
-            }
-            placeholder="https://example.edu"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-
-        <div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={formData.isPrimary}
-              onChange={(e) =>
-                setFormData({ ...formData, isPrimary: e.target.checked })
-              }
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-            />
-            <span className="text-sm text-gray-700">
-              This is my primary affiliation
-            </span>
-          </label>
-        </div>
-      </div>
-
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
-
-      <div className="flex flex-col gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading
-            ? 'Saving...'
-            : mode === 'create'
-              ? 'Add Affiliation'
-              : 'Save Changes'}
-        </button>
-
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard/about/affiliations')}
-          className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
-
-        {mode === 'edit' && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={loading}
-            className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-              showDelete
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'border border-red-300 text-red-600 hover:bg-red-50'
-            }`}
-          >
-            {loading
-              ? 'Deleting...'
-              : showDelete
-                ? 'Click again to confirm deletion'
-                : 'Delete Affiliation'}
-          </button>
-        )}
-      </div>
-    </form>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

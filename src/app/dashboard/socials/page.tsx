@@ -1,8 +1,26 @@
-import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
 import Link from 'next/link';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Users, Plus, Pencil, ExternalLink } from 'lucide-react';
+import { formatDisplayURL } from '@/lib/utils';
 
 const PLATFORM_DISPLAY: Record<string, { label: string; icon: string }> = {
   bluesky: { label: 'Bluesky', icon: '🦋' },
@@ -18,136 +36,117 @@ const PLATFORM_DISPLAY: Record<string, { label: string; icon: string }> = {
 
 export default async function SocialsPage() {
   const session = await getSession();
-
-  if (!session) {
-    redirect('/auth');
-  }
-
   const agent = await getAgent();
 
-  if (!agent) {
-    redirect('/auth');
+  if (!session || !agent) {
+    return null;
   }
 
   const repo = new ProfileRepository(agent);
   const socials = await repo.listSocialLinks(session.did);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2 leading-5"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold leading-7">Social Links</h1>
-              <p className="text-sm text-gray-600 mt-1 leading-5">
-                Manage your social media profiles
-              </p>
-            </div>
-            <Link
-              href="/dashboard/socials/create"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors leading-5"
-            >
+    <>
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mr-2 data-[orientation=vertical]:h-4"
+        />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Socials</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto">
+          <Button asChild>
+            <Link href="/dashboard/socials/create">
+              <Plus className="mr-2 h-4 w-4" />
               Add Social
             </Link>
-          </div>
+          </Button>
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="mx-auto w-full max-w-2xl">
+          <h1 className="text-xl font-semibold">Social Links</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your social media profiles
+          </p>
+        </div>
+
         {socials.length === 0 ? (
-          <div className="bg-white rounded-lg p-8 shadow-sm text-center">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-                />
-              </svg>
+          <Card className="mx-auto w-full max-w-2xl flex flex-col items-center justify-center p-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <Users className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold mb-2 leading-6">
-              No social links yet
-            </h2>
-            <p className="text-gray-600 text-sm mb-6 leading-5">
-              Add links to your Bluesky, Twitter, LinkedIn, ORCID, and other
-              social profiles.
-            </p>
-            <Link
-              href="/dashboard/socials/create"
-              className="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors leading-5"
-            >
-              Add Social Link
-            </Link>
-          </div>
+            <CardHeader className="text-center p-0">
+              <CardTitle>No social links yet</CardTitle>
+              <CardDescription>
+                Add links to your Bluesky, Twitter, LinkedIn, ORCID, and other
+                social profiles.
+              </CardDescription>
+            </CardHeader>
+            <Button className="mt-6" asChild>
+              <Link href="/dashboard/socials/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Social Link
+              </Link>
+            </Button>
+          </Card>
         ) : (
-          <div className="space-y-4">
+          <div className="mx-auto w-full max-w-2xl grid gap-4">
             {socials.map((social) => {
               const platform =
                 PLATFORM_DISPLAY[social.platform] || PLATFORM_DISPLAY.other;
               return (
-                <div
-                  key={social.rkey}
-                  className="bg-white rounded-lg p-4 shadow-sm"
-                >
-                  <div className="flex justify-between items-start gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
+                <Card key={social.rkey}>
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
                         <span className="text-2xl">{platform.icon}</span>
-                        <div className="flex-1">
-                          <h3 className="font-medium text-gray-900 leading-5">
-                            {platform.label}
-                          </h3>
+                        <div className="space-y-1 flex-1 min-w-0">
+                          <Link
+                            href={`/dashboard/socials/edit?rkey=${encodeURIComponent(social.rkey)}`}
+                            className="hover:underline"
+                          >
+                            <CardTitle className="text-base leading-tight">
+                              {platform.label}
+                            </CardTitle>
+                          </Link>
+                          <a
+                            href={social.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all"
+                          >
+                            <ExternalLink className="h-3 w-3 shrink-0" />
+                            {formatDisplayURL(social.url)}
+                          </a>
                         </div>
                       </div>
-                      <a
-                        href={social.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-blue-600 hover:underline break-all leading-5"
-                      >
-                        {social.url}
-                      </a>
+                      <Button variant="ghost" size="sm" asChild>
+                        <Link
+                          href={`/dashboard/socials/edit?rkey=${encodeURIComponent(social.rkey)}`}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Link>
+                      </Button>
                     </div>
-                    <Link
-                      href={`/dashboard/socials/edit?rkey=${encodeURIComponent(social.rkey)}`}
-                      className="text-sm text-gray-600 hover:text-gray-900 leading-5"
-                    >
-                      Edit
-                    </Link>
-                  </div>
-                </div>
+                  </CardHeader>
+                </Card>
               );
             })}
           </div>
         )}
       </div>
-    </main>
+    </>
   );
 }

@@ -3,7 +3,7 @@ import ProfileView from '@/components/profile/ProfileView';
 import { getPublicAgent, getPublicPDSAgent } from '@/lib/auth/server-agent';
 import { getAgent } from '@/lib/auth/atproto';
 import { getSession } from '@/lib/auth/session';
-import Link from 'next/link';
+// import Link from 'next/link';
 
 interface PageProps {
   params: Promise<{
@@ -77,7 +77,18 @@ export default async function ProfilePage({ params }: PageProps) {
     const repo = new ProfileRepository(pdsAgent);
 
     // Get all profile data
-    const [identity, honorific, location, affiliations, qualifications, skills, socialLinks, webLinks, works, events] = await Promise.all([
+    const [
+      identity,
+      honorific,
+      location,
+      affiliations,
+      qualifications,
+      skills,
+      socialLinks,
+      webLinks,
+      works,
+      events,
+    ] = await Promise.all([
       repo.getIdentity(did),
       repo.getHonorific(did),
       repo.getLocation(did),
@@ -100,15 +111,17 @@ export default async function ProfilePage({ params }: PageProps) {
           banner: bskyProfile.data.banner,
           description: bskyProfile.data.description,
           honorific: honorific?.value,
-          location: location ? {
-            city: location.city,
-            country: location.country,
-          } : undefined,
+          location: location
+            ? {
+                city: location.city,
+                country: location.country,
+              }
+            : undefined,
         }}
         affiliations={affiliations}
         qualifications={qualifications}
-        skills={skills}
         socialLinks={socialLinks}
+        skills={skills}
         webLinks={webLinks}
         works={works}
         events={events}

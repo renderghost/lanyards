@@ -1,154 +1,151 @@
-import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
 import Link from 'next/link';
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { GraduationCap, Plus, Pencil } from 'lucide-react';
 
 export default async function QualificationsPage() {
   const session = await getSession();
-
-  if (!session) {
-    redirect('/auth');
-  }
-
   const agent = await getAgent();
 
-  if (!agent) {
-    redirect('/auth');
+  if (!session || !agent) {
+    return null;
   }
 
   const repo = new ProfileRepository(agent);
   const qualifications = await repo.listQualifications(session.did);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-2xl mx-auto px-4 py-4">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-            Back
-          </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-xl font-bold">Qualifications</h1>
-              <p className="text-sm text-gray-600 mt-1">
-                Manage your degrees, certifications, and credentials
-              </p>
-            </div>
-            <Link
-              href="/dashboard/about/qualifications/create"
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
-            >
+    <>
+      <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <SidebarTrigger className="-ml-1" />
+        <Separator
+          orientation="vertical"
+          className="mr-2 data-[orientation=vertical]:h-4"
+        />
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden md:block" />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Qualifications</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <div className="ml-auto">
+          <Button asChild>
+            <Link href="/dashboard/about/qualifications/create">
+              <Plus className="mr-2 h-4 w-4" />
               Add Qualification
             </Link>
-          </div>
+          </Button>
         </div>
-      </div>
+      </header>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="mx-auto w-full max-w-2xl">
+          <h1 className="text-xl font-semibold">Qualifications</h1>
+          <p className="text-sm text-muted-foreground">
+            Manage your degrees, certifications, and credentials
+          </p>
+        </div>
+
         {qualifications.length === 0 ? (
-          // Zero-data state
-          <div className="bg-white rounded-lg p-8 shadow-sm text-center">
-            <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 14l9-5-9-5-9 5 9 5z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"
-                />
-              </svg>
+          <Card className="mx-auto w-full max-w-2xl flex flex-col items-center justify-center p-8">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <GraduationCap className="h-8 w-8 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">
-              No qualifications yet
-            </h2>
-            <p className="text-gray-600 text-sm mb-6">
-              Add your academic degrees, professional certifications, and other
-              credentials.
-            </p>
-            <Link
-              href="/dashboard/about/qualifications/create"
-              className="inline-block bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors"
-            >
-              Add Qualification
-            </Link>
-          </div>
+            <CardHeader className="text-center p-0">
+              <CardTitle>No qualifications yet</CardTitle>
+              <CardDescription>
+                Add your academic degrees, professional certifications, and
+                other credentials.
+              </CardDescription>
+            </CardHeader>
+            <Button className="mt-6" asChild>
+              <Link href="/dashboard/about/qualifications/create">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Qualification
+              </Link>
+            </Button>
+          </Card>
         ) : (
-          // Qualifications list
-          <div className="space-y-4">
+          <div className="mx-auto w-full max-w-2xl grid gap-4">
             {qualifications.map((qualification) => (
-              <div
-                key={qualification.uri}
-                className="bg-white rounded-lg p-4 shadow-sm"
-              >
-                <div className="flex justify-between items-start gap-3">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-medium text-gray-900">
-                        {qualification.title}
-                      </h3>
-                      {qualification.type && (
-                        <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded capitalize">
-                          {qualification.type}
-                        </span>
+              <Card key={qualification.uri}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/dashboard/about/qualifications/edit?rkey=${encodeURIComponent(qualification.uri.split('/').pop() || '')}`}
+                          className="hover:underline"
+                        >
+                          <CardTitle className="text-base leading-tight">
+                            {qualification.title}
+                          </CardTitle>
+                        </Link>
+                        {qualification.type && (
+                          <Badge variant="secondary" className="capitalize">
+                            {qualification.type}
+                          </Badge>
+                        )}
+                      </div>
+                      {qualification.institution && (
+                        <div className="text-sm text-foreground">
+                          {qualification.institution}
+                        </div>
                       )}
                     </div>
-                    {qualification.institution && (
-                      <p className="text-sm text-gray-600 mb-1">
-                        {qualification.institution}
-                      </p>
-                    )}
-                    {qualification.field && (
-                      <p className="text-sm text-gray-600 mb-2">
-                        {qualification.field}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
-                      {qualification.dateAwarded && (
-                        <span>{qualification.dateAwarded}</span>
-                      )}
-                    </div>
+                    <Button variant="ghost" size="sm" asChild>
+                      <Link
+                        href={`/dashboard/about/qualifications/edit?rkey=${encodeURIComponent(qualification.uri.split('/').pop() || '')}`}
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Link>
+                    </Button>
                   </div>
-                  <Link
-                    href={`/dashboard/about/qualifications/edit?rkey=${encodeURIComponent(qualification.uri.split('/').pop() || '')}`}
-                    className="text-sm text-gray-600 hover:text-gray-900"
-                  >
-                    Edit
-                  </Link>
-                </div>
-              </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {qualification.field && (
+                      <span className="text-sm text-foreground">
+                        {qualification.field}
+                      </span>
+                    )}
+                    {qualification.dateAwarded && (
+                      <span className="text-sm text-foreground">
+                        {qualification.dateAwarded}
+                      </span>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         )}
       </div>
-    </main>
+    </>
   );
 }

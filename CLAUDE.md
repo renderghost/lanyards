@@ -16,7 +16,6 @@ Use GitHub Issues via the `gh` CLI for all task tracking:
 
 ### Git Workflow
 - **NEVER** commit without explicit user instruction
-- **NEVER** credit Claude in commit messages
 - **NEVER** push without explicit user instruction
 - **NEVER** use `--force` or destructive git commands
 - You may run `git status`, `git diff`, `git log` freely

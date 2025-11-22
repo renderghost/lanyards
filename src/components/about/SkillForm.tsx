@@ -3,6 +3,19 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Skill, SkillCategory, SkillProficiency } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { AlertCircle } from 'lucide-react';
 
 interface SkillFormProps {
   mode: 'create' | 'edit';
@@ -110,131 +123,135 @@ export default function SkillForm({ mode, skill, rkey }: SkillFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 shadow-sm">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Skill Name *
-          </label>
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            placeholder="e.g., Machine Learning, Python, Statistical Analysis"
-            required
-            maxLength={100}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
+    <Card>
+      <CardContent className="pt-6">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Skill Name *</Label>
+              <Input
+                id="name"
+                type="text"
+                value={formData.name}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder="e.g., Machine Learning, Python, Statistical Analysis"
+                required
+                maxLength={100}
+              />
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Category
-          </label>
-          <select
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                category: e.target.value as SkillCategory,
-              })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {SKILL_CATEGORIES.map((category) => (
-              <option key={category.value} value={category.value}>
-                {category.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="category">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    category: value as SkillCategory,
+                  })
+                }
+              >
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SKILL_CATEGORIES.map((category) => (
+                    <SelectItem key={category.value} value={category.value}>
+                      {category.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Proficiency Level
-          </label>
-          <select
-            value={formData.proficiency}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                proficiency: e.target.value as SkillProficiency,
-              })
-            }
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            {PROFICIENCY_LEVELS.map((level) => (
-              <option key={level.value} value={level.value}>
-                {level.label}
-              </option>
-            ))}
-          </select>
-        </div>
+            <div className="space-y-2">
+              <Label htmlFor="proficiency">Proficiency Level</Label>
+              <Select
+                value={formData.proficiency}
+                onValueChange={(value) =>
+                  setFormData({
+                    ...formData,
+                    proficiency: value as SkillProficiency,
+                  })
+                }
+              >
+                <SelectTrigger id="proficiency">
+                  <SelectValue placeholder="Select proficiency" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROFICIENCY_LEVELS.map((level) => (
+                    <SelectItem key={level.value} value={level.value}>
+                      {level.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Years of Experience
-          </label>
-          <input
-            type="number"
-            min="0"
-            max="100"
-            value={formData.yearsOfExperience}
-            onChange={(e) =>
-              setFormData({ ...formData, yearsOfExperience: e.target.value })
-            }
-            placeholder="e.g., 5"
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-      </div>
+            <div className="space-y-2">
+              <Label htmlFor="yearsOfExperience">Years of Experience</Label>
+              <Input
+                id="yearsOfExperience"
+                type="number"
+                min="0"
+                max="100"
+                value={formData.yearsOfExperience}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    yearsOfExperience: e.target.value,
+                  })
+                }
+                placeholder="e.g., 5"
+              />
+            </div>
+          </div>
 
-      {error && (
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
-      )}
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      <div className="flex flex-col gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading
-            ? 'Saving...'
-            : mode === 'create'
-              ? 'Add Skill'
-              : 'Save Changes'}
-        </button>
+          <div className="flex flex-col gap-3">
+            <Button type="submit" disabled={loading} className="w-full">
+              {loading
+                ? 'Saving...'
+                : mode === 'create'
+                  ? 'Add Skill'
+                  : 'Save Changes'}
+            </Button>
 
-        <button
-          type="button"
-          onClick={() => router.push('/dashboard/about/skills')}
-          className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          Cancel
-        </button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/about/skills')}
+              className="w-full"
+            >
+              Cancel
+            </Button>
 
-        {mode === 'edit' && (
-          <button
-            type="button"
-            onClick={handleDelete}
-            disabled={loading}
-            className={`w-full py-3 px-6 rounded-lg font-medium transition-colors ${
-              showDelete
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'border border-red-300 text-red-600 hover:bg-red-50'
-            }`}
-          >
-            {loading
-              ? 'Deleting...'
-              : showDelete
-                ? 'Click again to confirm deletion'
-                : 'Delete Skill'}
-          </button>
-        )}
-      </div>
-    </form>
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant={showDelete ? 'destructive' : 'outline'}
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full"
+              >
+                {loading
+                  ? 'Deleting...'
+                  : showDelete
+                    ? 'Click again to confirm deletion'
+                    : 'Delete Skill'}
+              </Button>
+            )}
+          </div>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

@@ -2,13 +2,16 @@
 
 import { useState } from 'react';
 import QRCode from 'qrcode';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface QRCodeButtonProps {
   url?: string; // Optional: if not provided, will use current origin + handle
   handle: string;
+  className?: string;
 }
 
-export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
+export default function QRCodeButton({ url, handle, className }: QRCodeButtonProps) {
   const [showModal, setShowModal] = useState(false);
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState('');
   const [copied, setCopied] = useState(false);
@@ -46,12 +49,13 @@ export default function QRCodeButton({ url, handle }: QRCodeButtonProps) {
 
   return (
     <>
-      <button
+      <Button
+        variant="outline"
         onClick={generateQRCode}
-        className="w-full bg-gray-100 text-gray-900 py-3 px-6 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+        className={cn('w-full', className)}
       >
         View as QR Code
-      </button>
+      </Button>
 
       {showModal && (
         <div
