@@ -199,9 +199,14 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
                 <strong>Published:</strong> {new Date(resolvedMetadata.publicationDate).getFullYear()}
               </p>
             )}
+            {resolvedMetadata.type && (
+              <p className="text-sm text-blue-800 mb-1">
+                <strong>Type:</strong> {resolvedMetadata.type}
+              </p>
+            )}
             {resolvedMetadata.abstract && (
               <p className="text-sm text-blue-800 mb-1">
-                <strong>Abstract:</strong> {resolvedMetadata.abstract.substring(0, 200)}...
+                <strong>Abstract:</strong> {resolvedMetadata.abstract.substring(0, 200)}{resolvedMetadata.abstract.length > 200 ? '...' : ''}
               </p>
             )}
             {resolvedMetadata.url && (
