@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { LinkWork } from '@/types';
 import { formatWorkType } from '@/lib/utils';
+import { normalizeDOI } from '@/lib/data/doi';
 
 interface ResearchFormProps {
   mode: 'create' | 'edit';
@@ -30,6 +31,15 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
     doi: initialData?.doi || '',
     rkey: initialData?.rkey,
   });
+
+  const handleDOIBlur = () => {
+    if (formData.doi) {
+      const normalized = normalizeDOI(formData.doi);
+      if (normalized !== formData.doi) {
+        setFormData({ ...formData, doi: normalized });
+      }
+    }
+  };
 
   const handleResolveDOI = async () => {
     if (!formData.doi) return;
@@ -140,9 +150,10 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
               onChange={(e) =>
                 setFormData({ ...formData, doi: e.target.value })
               }
+              onBlur={handleDOIBlur}
               required
               disabled={mode === 'edit'}
-              placeholder="10.1234/example"
+              placeholder="10.1234/example or https://doi.org/10.1234/example"
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
             />
             {mode === 'create' && (
@@ -158,7 +169,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
           </div>
           <p className="mt-1 text-sm text-gray-500">
             {mode === 'create'
-              ? 'Metadata will be automatically fetched from the DOI'
+              ? 'Paste any DOI format - URLs will be automatically cleaned'
               : 'DOI cannot be changed after creation'}
           </p>
         </div>
