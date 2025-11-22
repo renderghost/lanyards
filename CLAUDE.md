@@ -286,15 +286,21 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
 
 3. **Make the fix**
    - Follow component architecture
-   - Run `npm run lint:fix` before committing
+   - Run `npm run lint:fix`
    - Test locally with `npm run dev`
 
-4. **Commit with issue reference** (when user approves)
+4. **User verification** (REQUIRED before any commit)
+   - Present the fix to the user
+   - User reviews and tests the implementation
+   - User explicitly confirms the fix works as expected
+   - **NEVER commit until user has verified**
+
+5. **Commit with issue reference** (only after user verification)
    ```bash
    git commit -m "Fix #<number>: [description]"
    ```
 
-5. **Push and create PR** (when user approves)
+6. **Push and create PR** (when user approves)
    ```bash
    git push -u origin fix/issue-<number>-<short-description>
    gh pr create \
@@ -309,7 +315,7 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
    Closes #<number>"
    ```
 
-6. **After merge** - verify issue closes automatically via "Closes #N"
+7. **After merge** - verify issue closes automatically via "Closes #N"
 
 ### Bug Labels
 - `bug` - Confirmed bugs
@@ -321,9 +327,21 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
 
 ## Feature Workflow
 
-1. Create issue with `enhancement` label first
-2. Branch naming: `feature/issue-<number>-<description>`
-3. Same PR workflow as bugs
+1. **Create issue** with `enhancement` label first
+2. **Create feature branch**
+   ```bash
+   git checkout -b feature/issue-<number>-<description>
+   ```
+3. **Implement the feature**
+   - Follow component architecture
+   - Run `npm run lint:fix`
+   - Test locally with `npm run dev`
+4. **User verification** (REQUIRED before any commit)
+   - Present the implementation to the user
+   - User reviews and tests the feature
+   - User explicitly confirms it works as expected
+   - **NEVER commit until user has verified**
+5. **Commit, push, and create PR** (same as bug workflow)
 
 ---
 
