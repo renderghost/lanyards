@@ -116,7 +116,7 @@ export interface LinkEvent {
 
 export interface LinkWork {
   doi: string;
-  type: 'abstract' | 'poster' | 'paper' | 'conference-proceeding' | 'journal-article' | 'book-chapter' | 'book' | 'preprint' | 'dataset' | 'other';
+  type: string;
   title?: string;
   authors?: string[];
   publicationDate?: string;

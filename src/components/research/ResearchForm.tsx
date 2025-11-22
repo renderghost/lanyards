@@ -1,42 +1,33 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import type { LinkWork, WorkType } from '@/types';
+import type { LinkWork } from '@/types';
+import { formatWorkType } from '@/lib/utils';
 
 interface ResearchFormProps {
   mode: 'create' | 'edit';
   initialData?: LinkWork & { rkey?: string };
 }
 
-const WORK_TYPES: { value: WorkType; label: string }[] = [
-  { value: 'abstract', label: 'Abstract' },
-  { value: 'poster', label: 'Poster' },
-  { value: 'paper', label: 'Paper' },
-  { value: 'conference-proceeding', label: 'Conference Proceeding' },
-  { value: 'journal-article', label: 'Journal Article' },
-  { value: 'book-chapter', label: 'Book Chapter' },
-  { value: 'book', label: 'Book' },
-  { value: 'preprint', label: 'Preprint' },
-  { value: 'dataset', label: 'Dataset' },
-  { value: 'other', label: 'Other' },
-];
-
 export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [resolvingDOI, setResolvingDOI] = useState(false);
   const [error, setError] = useState('');
-  const [resolvedMetadata, setResolvedMetadata] = useState<any>(null);
+  const [resolvedMetadata, setResolvedMetadata] = useState<{
+    title?: string;
+    authors?: string[];
+    journal?: string;
+    publicationDate?: string;
+    type?: string;
+    abstract?: string;
+    url?: string;
+  } | null>(null);
   const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
 
-  const [formData, setFormData] = useState<{
-    doi: string;
-    type: WorkType | '';
-    rkey?: string;
-  }>({
+  const [formData, setFormData] = useState({
     doi: initialData?.doi || '',
-    type: initialData?.type || '',
     rkey: initialData?.rkey,
   });
 
@@ -72,12 +63,10 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
     setShowDuplicateWarning(false);
 
     try {
-      const payload = mode === 'create'
-        ? { doi: formData.doi, type: formData.type, bypassDuplicateCheck }
-        : { rkey: formData.rkey, type: formData.type };
+      const payload = { doi: formData.doi, bypassDuplicateCheck };
 
       const response = await fetch('/api/profile/works', {
-        method: mode === 'create' ? 'POST' : 'PUT',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -201,7 +190,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
             )}
             {resolvedMetadata.type && (
               <p className="text-sm text-blue-800 mb-1">
-                <strong>Type:</strong> {resolvedMetadata.type}
+                <strong>Type:</strong> {formatWorkType(resolvedMetadata.type)}
               </p>
             )}
             {resolvedMetadata.abstract && (
@@ -250,6 +239,11 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
                 <strong>Published:</strong> {new Date(initialData.publicationDate).getFullYear()}
               </p>
             )}
+            {initialData.type && (
+              <p className="text-sm text-gray-800 mb-1">
+                <strong>Type:</strong> {formatWorkType(initialData.type)}
+              </p>
+            )}
             {('abstract' in initialData && initialData.abstract && typeof initialData.abstract === 'string') ? (
               <p className="text-sm text-gray-800 mb-1">
                 <strong>Abstract:</strong> {initialData.abstract.substring(0, 200)}{initialData.abstract.length > 200 ? '...' : ''}
@@ -270,27 +264,6 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
             ) : null}
           </div>
         )}
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type *
-          </label>
-          <select
-            value={formData.type}
-            onChange={(e) =>
-              setFormData({ ...formData, type: e.target.value as WorkType })
-            }
-            required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Select type...</option>
-            {WORK_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       {error && (
@@ -310,19 +283,15 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
       )}
 
       <div className="flex flex-col gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-        >
-          {loading
-            ? mode === 'create'
-              ? 'Adding...'
-              : 'Saving...'
-            : mode === 'create'
-            ? 'Add Research'
-            : 'Save Changes'}
-        </button>
+        {mode === 'create' && (
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? 'Adding...' : 'Add Research'}
+          </button>
+        )}
 
         <button
           type="button"
@@ -330,7 +299,7 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
           disabled={loading}
           className="w-full py-3 px-6 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
         >
-          Cancel
+          {mode === 'edit' ? 'Back' : 'Cancel'}
         </button>
 
         {mode === 'edit' && (

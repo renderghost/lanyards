@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
+import { formatWorkType } from '@/lib/utils';
 import Link from 'next/link';
 
 export default async function ResearchPage() {
@@ -112,8 +113,8 @@ export default async function ResearchPage() {
                       </p>
                     )}
                     <div className="flex flex-wrap gap-2 items-center">
-                      <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded capitalize">
-                        {work.type.replace(/-/g, ' ')}
+                      <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                        {formatWorkType(work.type)}
                       </span>
                       {work.venue && (
                         <span className="text-xs text-gray-600">
