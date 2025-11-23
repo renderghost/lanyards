@@ -36,13 +36,13 @@ export default async function EditProfilePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <Link
             href="/dashboard"
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900 mb-2"
+            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-2 leading-tight"
           >
             <svg
               className="w-4 h-4 mr-1"
@@ -61,14 +61,14 @@ export default async function EditProfilePage() {
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold">Edit Profile</h1>
-              <p className="text-sm text-gray-600 mt-1">
+              <h1 className="text-xl font-bold leading-tight">Edit Profile</h1>
+              <p className="text-sm text-muted-foreground mt-1 leading-relaxed">
                 Update your researcher profile information
               </p>
             </div>
             <Link
               href={`/${profile.handle}`}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-foreground bg-card border border-border rounded-lg hover:bg-muted transition-colors"
             >
               View Profile
             </Link>

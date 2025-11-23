@@ -108,7 +108,7 @@ export default function ShareProfileButton({
             </Button>
           </div>
           {copied && (
-            <p className="text-xs text-green-600">Copied to clipboard!</p>
+            <p className="text-xs text-primary leading-tight">Copied to clipboard!</p>
           )}
         </div>
       </DialogContent>

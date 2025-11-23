@@ -26,11 +26,11 @@ export default async function ProfilePage({ params }: PageProps) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Invalid Handle</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-2xl font-bold mb-4 leading-tight">Invalid Handle</h1>
+          <p className="text-muted-foreground mb-6 leading-relaxed">
             The handle provided is not valid.
           </p>
-          <a href="/" className="text-blue-600 hover:underline">
+          <a href="/" className="text-primary hover:underline">
             Go to homepage
           </a>
         </div>
@@ -133,11 +133,11 @@ export default async function ProfilePage({ params }: PageProps) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-6">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Error Loading Profile</h1>
-          <p className="text-gray-600 mb-6">
+          <h1 className="text-2xl font-bold mb-4 leading-tight">Error Loading Profile</h1>
+          <p className="text-muted-foreground mb-6 leading-relaxed">
             Unable to load this profile. Please try again later.
           </p>
-          <a href="/" className="text-blue-600 hover:underline">
+          <a href="/" className="text-primary hover:underline">
             Go to homepage
           </a>
         </div>
