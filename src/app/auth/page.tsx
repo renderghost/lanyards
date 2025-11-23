@@ -1,42 +1,53 @@
 import LoginForm from '@/components/auth/LoginForm';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import Link from 'next/link';
 
 export default function AuthPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2">Lanyards</h1>
-          <p className="text-gray-600">
-            Sign in with your Bluesky app password
-          </p>
-        </div>
+    <main className="flex min-h-screen flex-col items-center justify-center p-6">
+      <div className="flex w-full max-w-md flex-col gap-6">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl leading-8">
+              Sign in to Lanyards
+            </CardTitle>
+            <CardDescription className="leading-5">
+              Use your Bluesky app password to continue
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <LoginForm />
+          </CardContent>
+        </Card>
 
-        <div className="bg-white p-8 rounded-xl shadow-sm">
-          <LoginForm />
-        </div>
-
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="flex flex-col gap-2 text-center text-sm leading-5 text-muted-foreground">
           <p>
             Don&apos;t have a Bluesky account?{' '}
-            <a
+            <Link
               href="https://bsky.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-primary underline-offset-4 hover:underline"
             >
               Create one here
-            </a>
+            </Link>
           </p>
-          <p className="mt-2">
+          <p>
             Need an app password?{' '}
-            <a
+            <Link
               href="https://bsky.app/settings/app-passwords"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-primary underline-offset-4 hover:underline"
             >
               Generate one in settings
-            </a>
+            </Link>
           </p>
         </div>
       </div>
