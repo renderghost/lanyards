@@ -1,6 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState('');
@@ -40,99 +46,102 @@ export default function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
-      <div>
-        <label
-          htmlFor="identifier"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          Username or Handle
-        </label>
-        <input
-          type="text"
-          id="identifier"
-          value={identifier}
-          onChange={(e) => setIdentifier(e.target.value)}
-          placeholder="username.bsky.social or username"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-          disabled={loading}
-          autoComplete="username"
-        />
-        <p className="mt-1 text-sm text-gray-500">
-          Enter your Bluesky handle or username
-        </p>
-      </div>
-
-      <div>
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          App Password
-        </label>
-        <input
-          type="password"
-          id="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="xxxx-xxxx-xxxx-xxxx"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          required
-          disabled={loading}
-          autoComplete="current-password"
-        />
-        <p className="mt-1 text-sm text-gray-500">
-          Get your app password from{' '}
-          <a
-            href="https://bsky.app/settings/app-passwords"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="identifier" className="leading-5">
+            Username or Handle
+          </Label>
+          <Input
+            type="text"
+            id="identifier"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="username.bsky.social"
+            required
+            disabled={loading}
+            autoComplete="username"
+            aria-describedby="identifier-help"
+          />
+          <p
+            id="identifier-help"
+            className="text-sm leading-5 text-muted-foreground"
           >
-            Bluesky settings
-          </a>
-        </p>
-      </div>
+            Enter your Bluesky handle or username
+          </p>
+        </div>
 
-      <div>
-        <label
-          htmlFor="pdsUrl"
-          className="block text-sm font-medium text-gray-700 mb-2"
-        >
-          PDS Server (optional)
-        </label>
-        <input
-          type="url"
-          id="pdsUrl"
-          value={pdsUrl}
-          onChange={(e) => setPdsUrl(e.target.value)}
-          placeholder="https://bsky.social"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          disabled={loading}
-        />
-        <p className="mt-1 text-sm text-gray-500">
-          Defaults to bsky.social - only change if using a custom PDS
-        </p>
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="password" className="leading-5">
+            App Password
+          </Label>
+          <Input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="xxxx-xxxx-xxxx-xxxx"
+            required
+            disabled={loading}
+            autoComplete="current-password"
+            aria-describedby="password-help"
+          />
+          <p
+            id="password-help"
+            className="text-sm leading-5 text-muted-foreground"
+          >
+            Get your app password from{' '}
+            <Link
+              href="https://bsky.app/settings/app-passwords"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary underline-offset-4 hover:underline"
+            >
+              Bluesky settings
+            </Link>
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="pdsUrl" className="leading-5">
+            PDS Server (optional)
+          </Label>
+          <Input
+            type="url"
+            id="pdsUrl"
+            value={pdsUrl}
+            onChange={(e) => setPdsUrl(e.target.value)}
+            placeholder="https://bsky.social"
+            disabled={loading}
+            aria-describedby="pds-help"
+          />
+          <p id="pds-help" className="text-sm leading-5 text-muted-foreground">
+            Defaults to bsky.social - only change if using a custom PDS
+          </p>
+        </div>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-          {error}
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription className="leading-5">{error}</AlertDescription>
+        </Alert>
       )}
 
-      <button
+      <Button
         type="submit"
         disabled={loading || !identifier || !password}
-        className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+        className="w-full"
       >
-        {loading ? 'Signing in...' : 'Sign in'}
-      </button>
-
-      <p className="text-xs text-gray-500 text-center">
-        Sign in to access your Lanyards profile
-      </p>
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Signing in...
+          </>
+        ) : (
+          'Sign in'
+        )}
+      </Button>
     </form>
   );
 }
