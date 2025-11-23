@@ -118,7 +118,14 @@ export function AppSidebar({ profile, counts }: AppSidebarProps) {
                   alt="Lanyards"
                   width={32}
                   height={32}
-                  className="rounded-lg"
+                  className="block rounded-lg dark:hidden"
+                />
+                <Image
+                  src="/logo-dark.svg"
+                  alt="Lanyards"
+                  width={32}
+                  height={32}
+                  className="hidden rounded-lg dark:block"
                 />
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-bold leading-none">Lanyards</span>
