@@ -3,39 +3,91 @@
 
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
+/* =============================================================================
+   CORE COLOR TOKENS
+   Foundational color palette using Tailwind naming convention.
+   These are the source of truth - semantic tokens reference these.
+   ============================================================================= */
+
 :root {
-  --background: hsl(250 40.0000% 98.0392%);
-  --foreground: hsl(250 32.5843% 17.4510%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(250 38.7755% 9.6078%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(250 38.7755% 9.6078%);
-  --primary: hsl(250 74.9020% 50%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(250 13.0435% 90.9804%);
-  --secondary-foreground: hsl(250 19.1176% 26.6667%);
-  --muted: hsl(250 9.8592% 86.0784%);
-  --muted-foreground: hsl(250 16.3934% 23.9216%);
-  --accent: hsl(250 100% 93.9216%);
-  --accent-foreground: hsl(250 18.8406% 27.0588%);
-  --destructive: hsl(350 87.5000% 74.9020%);
-  --destructive-foreground: hsl(250 38.7755% 9.6078%);
-  --border: hsl(250 16.0622% 62.1569%);
-  --input: hsl(250 9.8592% 86.0784%);
-  --ring: hsl(250.0524 74.9020% 50%);
-  --chart-1: hsl(250 83.5294% 66.6667%);
-  --chart-2: hsl(250 75.3555% 58.6275%);
-  --chart-3: hsl(250 57.9365% 50.5882%);
-  --chart-4: hsl(250 54.5024% 41.3725%);
-  --chart-5: hsl(250 47.4286% 34.3137%);
-  --sidebar: hsl(250 22.5806% 93.9216%);
-  --sidebar-foreground: hsl(250 38.7755% 9.6078%);
-  --sidebar-primary: hsl(250 74.9020% 50%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(250 20.0000% 97.0588%);
-  --sidebar-accent-foreground: hsl(250 38.7755% 9.6078%);
-  --sidebar-border: hsl(250 16.0622% 62.1569%);
-  --sidebar-ring: hsl(250 74.9020% 50%);
+  /* Mono - Neutrals */
+  --color-mono-white: hsl(0 0% 100%);
+  --color-mono-black: hsl(0 0% 0%);
+
+  /* Purple Muted - Low saturation (10-40%), sorted by luminance light→dark
+     Use for: backgrounds, text, borders, neutral elements */
+  --color-purple-muted-50: oklch(0.958 0.009 292.95);
+  --color-purple-muted-100: oklch(0.924 0.016 293.82);
+  --color-purple-muted-200: oklch(0.846 0.032 293.73);
+  --color-purple-muted-300: oklch(0.772 0.045 292.49);
+  --color-purple-muted-400: oklch(0.694 0.061 292.38);
+  --color-purple-muted-500: oklch(0.618 0.071 292.02);
+  --color-purple-muted-600: oklch(0.539 0.079 291.62);
+  --color-purple-muted-700: oklch(0.438 0.083 290.67);
+  --color-purple-muted-800: oklch(0.341 0.069 291.51);
+  --color-purple-muted-900: oklch(0.238 0.049 291.04);
+  --color-purple-muted-950: oklch(0.19 0.042 290.64);
+
+  /* Purple Vivid - High saturation (75-100%), sorted by luminance light→dark
+     Use for: links, buttons, accents, interactive elements */
+  --color-purple-vivid-50: oklch(0.96 0.019 289.4);
+  --color-purple-vivid-100: oklch(0.897 0.05 290.33);
+  --color-purple-vivid-200: oklch(0.762 0.118 288.81);
+  --color-purple-vivid-300: oklch(0.646 0.176 286.77);
+  --color-purple-vivid-400: oklch(0.532 0.228 282.17);
+  --color-purple-vivid-500: oklch(0.451 0.258 275.99);
+  --color-purple-vivid-600: oklch(0.382 0.224 274.42);
+  --color-purple-vivid-700: oklch(0.312 0.184 273.59);
+  --color-purple-vivid-800: oklch(0.238 0.138 273.57);
+  --color-purple-vivid-900: oklch(0.157 0.086 275.83);
+  --color-purple-vivid-950: oklch(0.11 0.059 278.79);
+
+  /* Red - Destructive actions */
+  --color-red-muted-400: hsl(350 88% 75%);
+
+  /* Yellow - Focus ring in dark mode */
+  --color-yellow-vivid-500: hsl(65 100% 50%);
+  --yell: hsl(65 100% 50%);
+}
+
+/* =============================================================================
+   LIGHT MODE SEMANTIC TOKENS
+   Map semantic names to core tokens for light theme.
+   ============================================================================= */
+
+:root {
+  --background: var(--color-purple-muted-50);
+  --foreground: var(--color-purple-muted-950);
+  --card: var(--color-mono-white);
+  --card-foreground: var(--color-purple-muted-1000);
+  --popover: var(--color-mono-white);
+  --popover-foreground: var(--color-purple-muted-1000);
+  --primary: var(--color-purple-vivid-800);
+  --primary-foreground: var(--color-mono-white);
+  --secondary: var(--color-purple-muted-300);
+  --secondary-foreground: var(--color-purple-muted-900);
+  --muted: var(--color-purple-muted-400);
+  --muted-foreground: var(--color-purple-muted-950);
+  --accent: var(--color-purple-vivid-50);
+  --accent-foreground: var(--color-purple-muted-900);
+  --destructive: var(--color-red-400);
+  --destructive-foreground: var(--color-purple-muted-1000);
+  --border: var(--color-purple-muted-700);
+  --input: var(--color-purple-muted-400);
+  --ring: var(--color-purple-vivid-800);
+  --chart-1: var(--color-purple-vivid-500);
+  --chart-2: var(--color-purple-vivid-600);
+  --chart-3: var(--color-purple-vivid-700);
+  --chart-4: var(--color-purple-vivid-900);
+  --chart-5: var(--color-purple-vivid-950);
+  --sidebar: var(--color-purple-muted-200);
+  --sidebar-foreground: var(--color-purple-muted-1000);
+  --sidebar-primary: var(--color-purple-vivid-800);
+  --sidebar-primary-foreground: var(--color-mono-white);
+  --sidebar-accent: var(--color-purple-muted-100);
+  --sidebar-accent-foreground: var(--color-purple-muted-1000);
+  --sidebar-border: var(--color-purple-muted-700);
+  --sidebar-ring: var(--color-purple-vivid-800);
   --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
   --font-serif: 'DM Serif Text', ui-serif, serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;
@@ -45,7 +97,7 @@
   --shadow-blur: 0px;
   --shadow-spread: 0px;
   --shadow-opacity: 0;
-  --shadow-color: hsl(0 0% 0%);
+  --shadow-color: var(--color-mono-black);
   --shadow-2xs: 0px 0px 0px 0px hsl(0 0% 0% / 0);
   --shadow-xs: 0px 0px 0px 0px hsl(0 0% 0% / 0);
   --shadow-sm: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
@@ -58,58 +110,63 @@
   --spacing: 0.25rem;
 }
 
+/* =============================================================================
+   DARK MODE SEMANTIC TOKENS
+   Map semantic names to core tokens for dark theme.
+   ============================================================================= */
+
 @media (prefers-color-scheme: dark) {
   :root {
-  --background: hsl(250 46% 10%);
-  --foreground: hsl(250 61% 90%);
-  --card: hsl(250 33.3333% 16%);
-  --card-foreground: hsl(250 61% 90%);
-  --popover: hsl(250 33.3333% 16%);
-  --popover-foreground: hsl(250 30% 90.9804%);
-  --primary: hsl(250 88.8889% 76%);
-  --primary-foreground: hsl(250 46% 10%);
-  --secondary: hsl(250 24% 24%);
-  --secondary-foreground: hsl(250 80% 90%);
-  --muted: hsl(250 40% 13.9216%);
-  --muted-foreground: hsl(250 12% 65.0980%);
-  --accent: hsl(250 18.8406% 27.0588%);
-  --accent-foreground: hsl(250 12.1951% 83.9216%);
-  --destructive: hsl(350 86.7769% 76.2745%);
-  --destructive-foreground: hsl(249.4737 38.7755% 9.6078%);
-  --border: hsl(250.0000 13.7931% 34.1176%);
-  --input: hsl(250.0000 13.7931% 34.1176%);
-  --ring: hsl(64.9412 100% 50%);
-  --chart-1: hsl(250 89.4737% 73.9216%);
-  --chart-2: hsl(250 83.5294% 66.6667%);
-  --chart-3: hsl(250 75.3555% 58.6275%);
-  --chart-4: hsl(250 57.9365% 50.5882%);
-  --chart-5: hsl(250 54.5024% 41.3725%);
-  --sidebar: hsl(250 33.3333% 16%);
-  --sidebar-foreground: hsl(250 30% 90.9804%);
-  --sidebar-primary: hsl(250 88.8889% 76%);
-  --sidebar-primary-foreground: hsl(250 46% 10%);
-  --sidebar-accent: hsl(250 18.8406% 27.0588%);
-  --sidebar-accent-foreground: hsl(250 12.1951% 83.9216%);
-  --sidebar-border: hsl(250 13.7931% 34.1176%);
-  --sidebar-ring: hsl(64.9412 100% 50%);
-  --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
-  --font-serif: 'DM Serif Text', ui-serif, serif;
-  --font-mono: 'DM Mono', ui-monospace, monospace;
-  --radius: 0.375rem;
-  --shadow-x: 0px;
-  --shadow-y: 0px;
-  --shadow-blur: 0px;
-  --shadow-spread: 0px;
-  --shadow-opacity: 0;
-  --shadow-color: hsl(0 0% 0%);
-  --shadow-2xs: 0px 0px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-xs: 0px 0px 0px 0px hsl(0 0% 0% / 0);
-  --shadow-sm: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
-  --shadow-md: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 2px 4px -1px hsl(0 0% 0% / 0);
-  --shadow-lg: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 4px 6px -1px hsl(0 0% 0% / 0);
-  --shadow-xl: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 8px 10px -1px hsl(0 0% 0% / 0);
-  --shadow-2xl: 0px 0px 0px 0px hsl(0 0% 0% / 0);
+    --background: var(--color-purple-vivid-950);
+    --foreground: var(--color-purple-vivid-50);
+    --card: var(--color-purple-muted-950);
+    --card-foreground: var(--color-purple-vivid-50);
+    --popover: var(--color-purple-vivid-950);
+    --popover-foreground: var(--color-purple-vivid-50);
+    --primary: var(--color-purple-vivid-500);
+    --primary-foreground: var(--color-purple-vivid-50);
+    --secondary: var(--color-purple-muted-700);
+    --secondary-foreground: var(--color-purple-vivid-50);
+    --muted: var(--color-purple-muted-800);
+    --muted-foreground: var(--color-purple-muted-400);
+    --accent: var(--color-purple-muted-900);
+    --accent-foreground: var(--color-purple-muted-500);
+    --destructive: var(--color-red-muted-400);
+    --destructive-foreground: var(--color-purple-muted-900);
+    --border: var(--color-purple-muted-800);
+    --input: var(--color-purple-muted-700);
+    --ring: var(--color-yellow-500);
+    --chart-1: var(--color-purple-vivid-400);
+    --chart-2: var(--color-purple-vivid-500);
+    --chart-3: var(--color-purple-vivid-600);
+    --chart-4: var(--color-purple-vivid-700);
+    --chart-5: var(--color-purple-vivid-900);
+    --sidebar: var(--color-purple-vivid-950);
+    --sidebar-foreground: var(--color-purple-muted-100);
+    --sidebar-primary: var(--color-purple-vivid-500);
+    --sidebar-primary-foreground: var(--color-purple-muted-1000);
+    --sidebar-accent: var(--color-purple-muted-900);
+    --sidebar-accent-foreground: var(--color-purple-muted-500);
+    --sidebar-border: var(--color-purple-muted-800);
+    --sidebar-ring: var(--color-yellow-500);
+    --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
+    --font-serif: 'DM Serif Text', ui-serif, serif;
+    --font-mono: 'DM Mono', ui-monospace, monospace;
+    --radius: 0.375rem;
+    --shadow-x: 0px;
+    --shadow-y: 0px;
+    --shadow-blur: 0px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0;
+    --shadow-color: var(--color-mono-black);
+    --shadow-2xs: 0px 0px 0px 0px hsl(0 0% 0% / 0);
+    --shadow-xs: 0px 0px 0px 0px hsl(0 0% 0% / 0);
+    --shadow-sm: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
+    --shadow: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 1px 2px -1px hsl(0 0% 0% / 0);
+    --shadow-md: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 2px 4px -1px hsl(0 0% 0% / 0);
+    --shadow-lg: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 4px 6px -1px hsl(0 0% 0% / 0);
+    --shadow-xl: 0px 0px 0px 0px hsl(0 0% 0% / 0), 0px 8px 10px -1px hsl(0 0% 0% / 0);
+    --shadow-2xl: 0px 0px 0px 0px hsl(0 0% 0% / 0);
   }
 }
 
