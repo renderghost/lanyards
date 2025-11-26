@@ -59,35 +59,37 @@
   --background: var(--color-purple-muted-50);
   --foreground: var(--color-purple-muted-950);
   --card: var(--color-mono-white);
-  --card-foreground: var(--color-purple-muted-1000);
+  --card-foreground: var(--color-purple-muted-900);
   --popover: var(--color-mono-white);
-  --popover-foreground: var(--color-purple-muted-1000);
+  --popover-foreground: var(--color-purple-muted-900);
   --primary: var(--color-purple-vivid-800);
   --primary-foreground: var(--color-mono-white);
-  --secondary: var(--color-purple-muted-300);
+  --secondary: var(--color-purple-muted-200);
   --secondary-foreground: var(--color-purple-muted-900);
-  --muted: var(--color-purple-muted-400);
+  --muted: var(--color-purple-muted-200);
   --muted-foreground: var(--color-purple-muted-950);
   --accent: var(--color-purple-vivid-50);
   --accent-foreground: var(--color-purple-muted-900);
   --destructive: var(--color-red-400);
-  --destructive-foreground: var(--color-purple-muted-1000);
+  --destructive-foreground: var(--color-purple-muted-900);
   --border: var(--color-purple-muted-700);
   --input: var(--color-purple-muted-400);
-  --ring: var(--color-purple-vivid-800);
+  --ring: var(--color-purple-vivid-500);
   --chart-1: var(--color-purple-vivid-500);
   --chart-2: var(--color-purple-vivid-600);
   --chart-3: var(--color-purple-vivid-700);
   --chart-4: var(--color-purple-vivid-900);
   --chart-5: var(--color-purple-vivid-950);
-  --sidebar: var(--color-purple-muted-200);
-  --sidebar-foreground: var(--color-purple-muted-1000);
+  --sidebar: var(--color-purple-muted-50);
+  --sidebar-foreground: var(--color-purple-muted-900);
   --sidebar-primary: var(--color-purple-vivid-800);
   --sidebar-primary-foreground: var(--color-mono-white);
   --sidebar-accent: var(--color-purple-muted-100);
-  --sidebar-accent-foreground: var(--color-purple-muted-1000);
+  --sidebar-accent-foreground: var(--color-purple-muted-900);
   --sidebar-border: var(--color-purple-muted-700);
-  --sidebar-ring: var(--color-purple-vivid-800);
+  --sidebar-ring: var(--color-purple-vivid-500);
+  --link-hover: var(--color-purple-vivid-500);
+  --focus-ring: var(--color-purple-vivid-500);
   --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
   --font-serif: 'DM Serif Text', ui-serif, serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;
@@ -135,7 +137,7 @@
     --destructive-foreground: var(--color-purple-muted-900);
     --border: var(--color-purple-muted-800);
     --input: var(--color-purple-muted-700);
-    --ring: var(--color-yellow-500);
+    --ring: var(--color-yellow-vivid-500);
     --chart-1: var(--color-purple-vivid-400);
     --chart-2: var(--color-purple-vivid-500);
     --chart-3: var(--color-purple-vivid-600);
@@ -144,11 +146,13 @@
     --sidebar: var(--color-purple-vivid-950);
     --sidebar-foreground: var(--color-purple-muted-100);
     --sidebar-primary: var(--color-purple-vivid-500);
-    --sidebar-primary-foreground: var(--color-purple-muted-1000);
+    --sidebar-primary-foreground: var(--color-purple-muted-900);
     --sidebar-accent: var(--color-purple-muted-900);
-    --sidebar-accent-foreground: var(--color-purple-muted-500);
+    --sidebar-accent-foreground: var(--color-yellow-vivid-500);
     --sidebar-border: var(--color-purple-muted-800);
-    --sidebar-ring: var(--color-yellow-500);
+    --sidebar-ring: var(--color-yellow-vivid-500);
+    --link-hover: var(--color-yellow-vivid-500);
+    --focus-ring: var(--color-yellow-vivid-500);
     --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
     --font-serif: 'DM Serif Text', ui-serif, serif;
     --font-mono: 'DM Mono', ui-monospace, monospace;
@@ -203,6 +207,8 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-link-hover: var(--link-hover);
+  --color-focus-ring: var(--focus-ring);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
@@ -240,5 +246,37 @@
     letter-spacing: var(--tracking-normal);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Unified focus state for all focusable elements */
+  *:focus-visible {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  /* Unified link styling */
+  a:not([data-slot="button"]):not([data-sidebar]) {
+    color: var(--foreground);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+  }
+
+  a:not([data-slot="button"]):not([data-sidebar]):hover,
+  a:not([data-slot="button"]):not([data-sidebar]):focus {
+    color: var(--link-hover);
+  }
+
+  /* Sidebar link styling */
+  a[data-sidebar]:hover,
+  a[data-sidebar]:focus {
+    color: var(--color-purple-vivid-500);
+  }
+
+  /* Placeholder text styling */
+  ::placeholder {
+    color: var(--color-purple-muted-500);
+    opacity: 1;
   }
 }

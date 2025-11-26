@@ -100,7 +100,6 @@ export default async function SkillsPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/dashboard/about/skills/edit?rkey=${encodeURIComponent(skill.uri.split('/').pop() || '')}`}
-                          className="hover:underline"
                         >
                           <CardTitle className="text-base leading-tight">
                             {skill.name}

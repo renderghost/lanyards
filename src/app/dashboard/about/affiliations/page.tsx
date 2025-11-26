@@ -100,7 +100,6 @@ export default async function AffiliationsPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/dashboard/about/affiliations/edit?rkey=${encodeURIComponent(affiliation.uri.split('/').pop() || '')}`}
-                          className="hover:underline"
                         >
                           <CardTitle className="text-base leading-tight">
                             {affiliation.organizationName}

@@ -106,7 +106,6 @@ export default async function EventsPage() {
                         <div className="flex items-center gap-2">
                           <Link
                             href={`/dashboard/events/edit?rkey=${encodeURIComponent(event.rkey)}`}
-                            className="hover:underline"
                           >
                             <CardTitle className="text-base leading-tight">
                               {event.name}
@@ -152,7 +151,7 @@ export default async function EventsPage() {
                         href={event.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-foreground hover:underline mt-2"
+                        className="inline-flex items-center gap-1 text-sm mt-2 leading-normal"
                       >
                         <ExternalLink className="h-3 w-3 shrink-0" />
                         {formatDisplayURL(event.url)}
