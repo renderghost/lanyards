@@ -392,14 +392,13 @@ export default function ProfileView({
                   <p className="text-sm text-foreground leading-normal">
                     {qualification.institution}
                   </p>
-                  {qualification.field && (
-                    <p className="text-sm text-foreground leading-normal">
-                      {qualification.field}
-                    </p>
-                  )}
-                  {qualification.dateAwarded && (
-                    <p className="text-sm text-foreground leading-normal">
-                      {new Date(qualification.dateAwarded).getFullYear()}
+                  {(qualification.field || qualification.yearAwarded) && (
+                    <p className="text-sm text-foreground leading-normal flex items-center gap-x-2">
+                      {qualification.field && <span>{qualification.field}</span>}
+                      {qualification.field && qualification.yearAwarded && (
+                        <span>•</span>
+                      )}
+                      {qualification.yearAwarded && <span>{qualification.yearAwarded}</span>}
                     </p>
                   )}
                 </div>
