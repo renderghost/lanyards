@@ -68,6 +68,19 @@ export default function ProfileView({
 
   const blueskyProfile = socialLinks.find((s) => s.platform === 'bluesky');
 
+  // Always include Bluesky profile from authenticated user
+  const blueskyLink = {
+    platform: 'bluesky' as const,
+    url: `https://bsky.app/profile/${profile.handle}`,
+    rkey: 'auto-bluesky', // Special key for auto-generated entry
+  };
+
+  // Combine auto Bluesky with other social links, removing any manual Bluesky entries
+  const allSocialLinks = [
+    blueskyLink,
+    ...socialLinks.filter((s) => s.platform !== 'bluesky'),
+  ];
+
   const getDisplayName = () => {
     const name = profile.displayName || profile.handle;
     if (profile.honorific && profile.honorific !== 'none') {
@@ -179,35 +192,8 @@ export default function ProfileView({
           </CardContent>
         </Card>
 
-        {/* Affiliations */}
-        {currentAffiliations.length > 0 && (
-          <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Building2 className="h-5 w-5" />
-                Affiliations
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {currentAffiliations.map((affiliation, idx) => (
-                <div key={idx} className="space-y-1">
-                  <p className="font-black leading-normal">{affiliation.organizationName}</p>
-                  {affiliation.role && (
-                    <p className="text-sm text-foreground leading-normal">
-                      {affiliation.role}
-                    </p>
-                  )}
-                  <p className="text-sm text-foreground leading-normal">
-                    {new Date(affiliation.startDate).getFullYear()} - Present
-                  </p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Social & Academic Links */}
-        {socialLinks.length > 0 && (
+        {/* Social Profiles */}
+        {allSocialLinks.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
@@ -216,25 +202,27 @@ export default function ProfileView({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {socialLinks.map((social) => {
-                const displayName = social.platform === 'orcid'
-                  ? 'ORCID'
-                  : social.platform.charAt(0).toUpperCase() + social.platform.slice(1);
-                return (
-                  <div key={social.rkey} className="space-y-1">
-                    <p className="font-black leading-normal">{displayName}</p>
-                    <a
-                      href={social.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
-                    >
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                      {formatDisplayURL(social.url)}
-                    </a>
-                  </div>
-                );
-              })}
+              {allSocialLinks
+                .sort((a, b) => a.platform.localeCompare(b.platform))
+                .map((social) => {
+                  const displayName = social.platform === 'orcid'
+                    ? 'ORCID'
+                    : social.platform.charAt(0).toUpperCase() + social.platform.slice(1);
+                  return (
+                    <div key={social.rkey} className="space-y-1">
+                      <p className="font-black leading-normal">{displayName}</p>
+                      <a
+                        href={social.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        {formatDisplayURL(social.url)}
+                      </a>
+                    </div>
+                  );
+                })}
             </CardContent>
           </Card>
         )}
@@ -361,28 +349,27 @@ export default function ProfileView({
           </Card>
         )}
 
-        {/* Web Links */}
-        {webLinks.length > 0 && (
+        {/* Affiliations */}
+        {currentAffiliations.length > 0 && (
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
-                <LinkIcon className="h-5 w-5" />
-                Other Links
+                <Building2 className="h-5 w-5" />
+                Affiliations
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              {webLinks.map((link) => (
-                <div key={link.rkey} className="space-y-1">
-                  {link.title && <p className="font-black leading-normal">{link.title}</p>}
-                  <a
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
-                  >
-                    <ExternalLink className="h-3 w-3 shrink-0" />
-                    {formatDisplayURL(link.url)}
-                  </a>
+            <CardContent className="space-y-4">
+              {currentAffiliations.map((affiliation, idx) => (
+                <div key={idx} className="space-y-1">
+                  <p className="font-black leading-normal">{affiliation.organizationName}</p>
+                  {affiliation.role && (
+                    <p className="text-sm text-foreground leading-normal">
+                      {affiliation.role}
+                    </p>
+                  )}
+                  <p className="text-sm text-foreground leading-normal">
+                    {new Date(affiliation.startDate).getFullYear()} - Present
+                  </p>
                 </div>
               ))}
             </CardContent>
@@ -415,6 +402,34 @@ export default function ProfileView({
                       {new Date(qualification.dateAwarded).getFullYear()}
                     </p>
                   )}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Other Links */}
+        {webLinks.length > 0 && (
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <LinkIcon className="h-5 w-5" />
+                Other Links
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {webLinks.map((link) => (
+                <div key={link.rkey} className="space-y-1">
+                  {link.title && <p className="font-black leading-normal">{link.title}</p>}
+                  <a
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
+                  >
+                    <ExternalLink className="h-3 w-3 shrink-0" />
+                    {formatDisplayURL(link.url)}
+                  </a>
                 </div>
               ))}
             </CardContent>
