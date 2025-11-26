@@ -15,6 +15,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import CountrySelector from '@/components/CountrySelector/CountrySelector';
 import { AlertCircle } from 'lucide-react';
 
 interface QualificationFormProps {
@@ -41,16 +52,14 @@ export default function QualificationForm({
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [showDelete, setShowDelete] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const [formData, setFormData] = useState({
     title: qualification?.title || '',
     type: (qualification?.type || 'bachelors') as QualificationType,
     institution: qualification?.institution || '',
     field: qualification?.field || '',
-    dateAwarded: qualification?.dateAwarded
-      ? new Date(qualification.dateAwarded).toISOString().split('T')[0]
-      : '',
+    yearAwarded: qualification?.yearAwarded?.toString() || '',
     city: qualification?.location?.city || '',
     country: qualification?.location?.country || '',
   });
@@ -66,9 +75,7 @@ export default function QualificationForm({
         type: formData.type,
         institution: formData.institution,
         field: formData.field || undefined,
-        dateAwarded: formData.dateAwarded
-          ? new Date(formData.dateAwarded).toISOString()
-          : undefined,
+        yearAwarded: parseInt(formData.yearAwarded, 10),
         location:
           formData.city || formData.country
             ? {
@@ -105,11 +112,6 @@ export default function QualificationForm({
   };
 
   const handleDelete = async () => {
-    if (!showDelete) {
-      setShowDelete(true);
-      return;
-    }
-
     setLoading(true);
     setError('');
 
@@ -130,166 +132,190 @@ export default function QualificationForm({
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setLoading(false);
-      setShowDelete(false);
+      setShowDeleteDialog(false);
     }
   };
 
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="title">Qualification Title *</Label>
-              <Input
-                id="title"
-                type="text"
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                placeholder="e.g., PhD in Computer Science"
-                required
-                maxLength={200}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="type">Type</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(value) =>
-                  setFormData({
-                    ...formData,
-                    type: value as QualificationType,
-                  })
-                }
-              >
-                <SelectTrigger id="type">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {QUALIFICATION_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="institution">Institution *</Label>
-              <Input
-                id="institution"
-                type="text"
-                value={formData.institution}
-                onChange={(e) =>
-                  setFormData({ ...formData, institution: e.target.value })
-                }
-                placeholder="e.g., Stanford University"
-                required
-                maxLength={300}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="field">Field of Study</Label>
-              <Input
-                id="field"
-                type="text"
-                value={formData.field}
-                onChange={(e) =>
-                  setFormData({ ...formData, field: e.target.value })
-                }
-                placeholder="e.g., Artificial Intelligence, Molecular Biology"
-                maxLength={200}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="dateAwarded">Date Awarded</Label>
-              <Input
-                id="dateAwarded"
-                type="date"
-                value={formData.dateAwarded}
-                onChange={(e) =>
-                  setFormData({ ...formData, dateAwarded: e.target.value })
-                }
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+    <>
+      <Card>
+        <CardContent className="pt-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="title">Qualification Title *</Label>
                 <Input
-                  id="city"
+                  id="title"
                   type="text"
-                  value={formData.city}
+                  value={formData.title}
                   onChange={(e) =>
-                    setFormData({ ...formData, city: e.target.value })
+                    setFormData({ ...formData, title: e.target.value })
                   }
-                  placeholder="e.g., Cambridge"
+                  placeholder="e.g., PhD in Computer Science"
+                  required
+                  maxLength={200}
                 />
               </div>
+
               <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
-                <Input
-                  id="country"
-                  type="text"
-                  value={formData.country}
-                  onChange={(e) =>
-                    setFormData({ ...formData, country: e.target.value })
+                <Label htmlFor="type">Type *</Label>
+                <Select
+                  value={formData.type}
+                  onValueChange={(value) =>
+                    setFormData({
+                      ...formData,
+                      type: value as QualificationType,
+                    })
                   }
-                  placeholder="e.g., United States"
+                  required
+                >
+                  <SelectTrigger id="type">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {QUALIFICATION_TYPES.map((type) => (
+                      <SelectItem key={type.value} value={type.value}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="institution">Institution *</Label>
+                <Input
+                  id="institution"
+                  type="text"
+                  value={formData.institution}
+                  onChange={(e) =>
+                    setFormData({ ...formData, institution: e.target.value })
+                  }
+                  placeholder="e.g., Stanford University"
+                  required
+                  maxLength={300}
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="field">Field of Study</Label>
+                <Input
+                  id="field"
+                  type="text"
+                  value={formData.field}
+                  onChange={(e) =>
+                    setFormData({ ...formData, field: e.target.value })
+                  }
+                  placeholder="e.g., Artificial Intelligence, Molecular Biology"
+                  maxLength={200}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="yearAwarded">Date Awarded *</Label>
+                <Input
+                  id="yearAwarded"
+                  type="number"
+                  value={formData.yearAwarded}
+                  onChange={(e) =>
+                    setFormData({ ...formData, yearAwarded: e.target.value })
+                  }
+                  placeholder="e.g., 2020"
+                  required
+                  min="1900"
+                  max="2100"
+                  maxLength={4}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input
+                    id="city"
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) =>
+                      setFormData({ ...formData, city: e.target.value })
+                    }
+                    placeholder="e.g., Cambridge"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">Country</Label>
+                  <CountrySelector
+                    id="country"
+                    value={formData.country}
+                    onChange={(value) =>
+                      setFormData({ ...formData, country: value })
+                    }
+                    placeholder="Select country..."
+                  />
+                </div>
+              </div>
             </div>
-          </div>
 
-          {error && (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
-          <div className="flex flex-col gap-3">
-            <Button type="submit" disabled={loading} className="w-full">
-              {loading
-                ? 'Saving...'
-                : mode === 'create'
-                  ? 'Add Qualification'
-                  : 'Save Changes'}
-            </Button>
+            <div className="flex flex-col gap-3">
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading
+                  ? 'Saving...'
+                  : mode === 'create'
+                    ? 'Add Qualification'
+                    : 'Save Changes'}
+              </Button>
 
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => router.push('/dashboard/about/qualifications')}
-              className="w-full"
-            >
-              Cancel
-            </Button>
-
-            {mode === 'edit' && (
               <Button
                 type="button"
-                variant={showDelete ? 'destructive' : 'outline'}
-                onClick={handleDelete}
-                disabled={loading}
+                variant="outline"
+                onClick={() => router.push('/dashboard/about/qualifications')}
                 className="w-full"
               >
-                {loading
-                  ? 'Deleting...'
-                  : showDelete
-                    ? 'Click again to confirm deletion'
-                    : 'Delete Qualification'}
+                Cancel
               </Button>
-            )}
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+
+              {mode === 'edit' && (
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => setShowDeleteDialog(true)}
+                  disabled={loading}
+                  className="w-full"
+                >
+                  Delete Qualification
+                </Button>
+              )}
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+
+      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Qualification</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this qualification? This action
+              cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {loading ? 'Deleting...' : 'Delete'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }

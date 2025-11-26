@@ -44,10 +44,10 @@ export interface Affiliation {
 
 export interface Qualification {
   title: string;
-  type?: 'phd' | 'masters' | 'bachelors' | 'postdoc' | 'certification' | 'fellowship' | 'other';
+  type: 'phd' | 'masters' | 'bachelors' | 'postdoc' | 'certification' | 'fellowship' | 'other';
   institution: string;
   field?: string;
-  dateAwarded?: string;
+  yearAwarded: number;
   location?: {
     city?: string;
     country?: string;

@@ -16,11 +16,11 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, type, institution, field, dateAwarded, location } = body;
+    const { title, type, institution, field, yearAwarded, location } = body;
 
-    if (!title || !institution) {
+    if (!title || !type || !institution || !yearAwarded) {
       return NextResponse.json(
-        { error: 'Title and institution are required' },
+        { error: 'Title, type, institution, and year awarded are required' },
         { status: 400 }
       );
     }
@@ -28,10 +28,10 @@ export async function POST(request: NextRequest) {
     const repo = new ProfileRepository(agent);
     const rkey = await repo.createQualification({
       title,
-      type: type || 'other',
+      type,
       institution,
       field,
-      dateAwarded,
+      yearAwarded,
       location,
     });
 
@@ -68,11 +68,11 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, type, institution, field, dateAwarded, location } = body;
+    const { title, type, institution, field, yearAwarded, location } = body;
 
-    if (!title || !institution) {
+    if (!title || !type || !institution || !yearAwarded) {
       return NextResponse.json(
-        { error: 'Title and institution are required' },
+        { error: 'Title, type, institution, and year awarded are required' },
         { status: 400 }
       );
     }
@@ -80,10 +80,10 @@ export async function PUT(request: NextRequest) {
     const repo = new ProfileRepository(agent);
     await repo.updateQualification(rkey, {
       title,
-      type: type || 'other',
+      type,
       institution,
       field,
-      dateAwarded,
+      yearAwarded,
       location,
     });
 

@@ -127,17 +127,12 @@ export default async function QualificationsPage() {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    {qualification.field && (
-                      <span className="text-sm text-foreground">
-                        {qualification.field}
-                      </span>
+                  <div className="flex flex-wrap items-center gap-x-2 text-sm text-foreground">
+                    {qualification.field && <span>{qualification.field}</span>}
+                    {qualification.field && qualification.yearAwarded && (
+                      <span>•</span>
                     )}
-                    {qualification.dateAwarded && (
-                      <span className="text-sm text-foreground">
-                        {qualification.dateAwarded}
-                      </span>
-                    )}
+                    {qualification.yearAwarded && <span>{qualification.yearAwarded}</span>}
                   </div>
                 </CardContent>
               </Card>

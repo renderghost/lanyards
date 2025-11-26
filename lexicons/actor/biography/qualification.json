@@ -8,7 +8,7 @@
       "key": "tid",
       "record": {
         "type": "object",
-        "required": ["title", "institution", "createdAt"],
+        "required": ["title", "type", "institution", "yearAwarded", "createdAt"],
         "properties": {
           "title": {
             "type": "string",
@@ -38,10 +38,11 @@
             "maxLength": 200,
             "description": "Field of study or specialization"
           },
-          "dateAwarded": {
-            "type": "string",
-            "format": "datetime",
-            "description": "Date the qualification was awarded"
+          "yearAwarded": {
+            "type": "integer",
+            "minimum": 1900,
+            "maximum": 2100,
+            "description": "Year the qualification was awarded (YYYY format)"
           },
           "location": {
             "type": "ref",
