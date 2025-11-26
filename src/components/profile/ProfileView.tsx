@@ -106,7 +106,7 @@ export default function ProfileView({
 
           <CardContent className="pb-6">
             {/* Avatar and Basic Info */}
-            <div className="flex items-start gap-4 mb-4">
+            <div className="flex flex-col gap-3 mb-4">
               <div className={profile.banner ? '-mt-12' : 'pt-6'}>
                 <Avatar className="h-24 w-24 border-4 border-background">
                   <AvatarImage src={profile.avatar} alt={getDisplayName()} />
@@ -115,25 +115,23 @@ export default function ProfileView({
                   </AvatarFallback>
                 </Avatar>
               </div>
-              <div
-                className={`flex-1 min-w-0 ${profile.banner ? 'pt-4' : 'pt-6'}`}
-              >
-                <h1 className="text-2xl font-black truncate">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-black leading-normal">
                   {getDisplayName()}
                 </h1>
                 <a
                   href={`https://bsky.app/profile/${profile.handle}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary hover:underline"
+                  className="block text-muted-foreground hover:text-primary hover:underline leading-normal"
                 >
                   @{profile.handle}
                 </a>
                 {profile.location &&
                   (profile.location.city || profile.location.country) && (
-                    <div className="flex items-center gap-1 text-sm text-foreground mb-4">
+                    <div className="flex items-center gap-1 text-sm text-foreground">
                       <MapPin className="h-4 w-4" />
-                      <span>
+                      <span className="leading-normal">
                         {profile.location.city && `${profile.location.city}, `}
                         {profile.location.country}
                       </span>
@@ -141,18 +139,6 @@ export default function ProfileView({
                   )}
               </div>
             </div>
-
-            {/* Location */}
-            {profile.location &&
-              (profile.location.city || profile.location.country) && (
-                <div className="flex items-center gap-1 text-sm text-foreground mb-4">
-                  <MapPin className="h-4 w-4" />
-                  <span>
-                    {profile.location.city && `${profile.location.city}, `}
-                    {profile.location.country}
-                  </span>
-                </div>
-              )}
 
             {/* Description */}
             {profile.description && (
