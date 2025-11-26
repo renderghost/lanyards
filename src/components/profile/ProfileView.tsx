@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import QRCodeButton from './QRCodeButton';
 import { normalizeDOI } from '@/lib/data/doi';
-import { formatDateUS, formatDisplayURL } from '@/lib/utils';
+import { formatDateUS, formatDisplayURL, formatWorkType } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -116,7 +116,7 @@ export default function ProfileView({
                 </Avatar>
               </div>
               <div className="space-y-1">
-                <h1 className="text-2xl font-bold leading-tight">
+                <h1 className="text-2xl font-black leading-normal">
                   {getDisplayName()}
                 </h1>
                 <a
@@ -191,13 +191,13 @@ export default function ProfileView({
             <CardContent className="space-y-4">
               {currentAffiliations.map((affiliation, idx) => (
                 <div key={idx} className="space-y-1">
-                  <p className="font-medium">{affiliation.organizationName}</p>
+                  <p className="font-black leading-normal">{affiliation.organizationName}</p>
                   {affiliation.role && (
-                    <p className="text-sm text-foreground">
+                    <p className="text-sm text-foreground leading-normal">
                       {affiliation.role}
                     </p>
                   )}
-                  <p className="text-sm text-foreground">
+                  <p className="text-sm text-foreground leading-normal">
                     {new Date(affiliation.startDate).getFullYear()} - Present
                   </p>
                 </div>
@@ -216,20 +216,25 @@ export default function ProfileView({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              {socialLinks.map((social) => (
-                <div key={social.rkey} className="space-y-1">
-                  <p className="font-medium capitalize">{social.platform}</p>
-                  <a
-                    href={social.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all"
-                  >
-                    <ExternalLink className="h-3 w-3 shrink-0" />
-                    {formatDisplayURL(social.url)}
-                  </a>
-                </div>
-              ))}
+              {socialLinks.map((social) => {
+                const displayName = social.platform === 'orcid'
+                  ? 'ORCID'
+                  : social.platform.charAt(0).toUpperCase() + social.platform.slice(1);
+                return (
+                  <div key={social.rkey} className="space-y-1">
+                    <p className="font-black leading-normal">{displayName}</p>
+                    <a
+                      href={social.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
+                    >
+                      <ExternalLink className="h-3 w-3 shrink-0" />
+                      {formatDisplayURL(social.url)}
+                    </a>
+                  </div>
+                );
+              })}
             </CardContent>
           </Card>
         )}
@@ -252,23 +257,37 @@ export default function ProfileView({
                     href={`https://doi.org/${normalizeDOI(work.doi)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium hover:underline"
+                    className="font-black hover:underline leading-normal"
                   >
                     {work.title || work.doi}
                   </a>
                   {work.authors && work.authors.length > 0 && (
-                    <p className="text-sm text-foreground">
+                    <p className="text-sm text-foreground leading-normal">
                       {work.authors.join(', ')}
                     </p>
                   )}
-                  {work.venue && (
-                    <p className="text-sm text-foreground">{work.venue}</p>
-                  )}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {work.type && (
+                      <Badge variant="secondary">
+                        {formatWorkType(work.type)}
+                      </Badge>
+                    )}
+                    {work.venue && (
+                      <span className="text-sm text-foreground leading-normal">
+                        {work.venue}
+                      </span>
+                    )}
+                    {work.publicationDate && (
+                      <span className="text-sm text-foreground leading-normal">
+                        {new Date(work.publicationDate).getFullYear()}
+                      </span>
+                    )}
+                  </div>
                   <a
                     href={`https://doi.org/${normalizeDOI(work.doi)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline"
+                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline leading-normal"
                   >
                     <ExternalLink className="h-3 w-3" />
                     doi.org/{normalizeDOI(work.doi)}
@@ -303,12 +322,12 @@ export default function ProfileView({
                           href={event.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-medium hover:underline"
+                          className="font-black hover:underline leading-normal"
                         >
                           {event.name}
                         </a>
                       ) : (
-                        <p className="font-medium">{event.name}</p>
+                        <p className="font-black leading-normal">{event.name}</p>
                       )}
                       {isUpcoming && <Badge variant="default">Upcoming</Badge>}
                     </div>
@@ -354,12 +373,12 @@ export default function ProfileView({
             <CardContent className="space-y-3">
               {webLinks.map((link) => (
                 <div key={link.rkey} className="space-y-1">
-                  {link.title && <p className="font-medium">{link.title}</p>}
+                  {link.title && <p className="font-black leading-normal">{link.title}</p>}
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all"
+                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
                   >
                     <ExternalLink className="h-3 w-3 shrink-0" />
                     {formatDisplayURL(link.url)}
@@ -382,17 +401,17 @@ export default function ProfileView({
             <CardContent className="space-y-4">
               {qualifications.map((qualification, idx) => (
                 <div key={idx} className="space-y-1">
-                  <p className="font-medium">{qualification.title}</p>
-                  <p className="text-sm text-foreground">
+                  <p className="font-black leading-normal">{qualification.title}</p>
+                  <p className="text-sm text-foreground leading-normal">
                     {qualification.institution}
                   </p>
                   {qualification.field && (
-                    <p className="text-sm text-foreground">
+                    <p className="text-sm text-foreground leading-normal">
                       {qualification.field}
                     </p>
                   )}
                   {qualification.dateAwarded && (
-                    <p className="text-sm text-foreground">
+                    <p className="text-sm text-foreground leading-normal">
                       {new Date(qualification.dateAwarded).getFullYear()}
                     </p>
                   )}
