@@ -33,7 +33,7 @@ export default function AuthPage() {
               href="https://bsky.app"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary underline-offset-4 hover:underline"
+              className="leading-normal"
             >
               Create one here
             </Link>
@@ -44,7 +44,7 @@ export default function AuthPage() {
               href="https://bsky.app/settings/app-passwords"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary underline-offset-4 hover:underline"
+              className="leading-normal"
             >
               Generate one in settings
             </Link>

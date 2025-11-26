@@ -100,7 +100,6 @@ export default async function QualificationsPage() {
                       <div className="flex items-center gap-2">
                         <Link
                           href={`/dashboard/about/qualifications/edit?rkey=${encodeURIComponent(qualification.uri.split('/').pop() || '')}`}
-                          className="hover:underline"
                         >
                           <CardTitle className="text-base leading-tight">
                             {qualification.title}

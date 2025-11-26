@@ -100,7 +100,6 @@ export default async function LinksPage() {
                       <div className="space-y-1 flex-1 min-w-0">
                         <Link
                           href={`/dashboard/links/edit?rkey=${encodeURIComponent(link.rkey)}`}
-                          className="hover:underline"
                         >
                           <CardTitle className="text-base leading-tight">
                             {link.title || 'Web Link'}
@@ -110,7 +109,7 @@ export default async function LinksPage() {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all"
+                          className="inline-flex items-center gap-1 text-sm break-all leading-normal"
                         >
                           <ExternalLink className="h-3 w-3 shrink-0" />
                           {formatDisplayURL(link.url)}

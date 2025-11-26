@@ -136,7 +136,7 @@ export default function ProfileView({
                   href={`https://bsky.app/profile/${profile.handle}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-muted-foreground hover:text-primary hover:underline leading-normal"
+                  className="block leading-normal"
                 >
                   @{profile.handle}
                 </a>
@@ -215,7 +215,7 @@ export default function ProfileView({
                         href={social.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
+                        className="inline-flex items-center gap-1 text-sm break-all leading-normal"
                       >
                         <ExternalLink className="h-3 w-3 shrink-0" />
                         {formatDisplayURL(social.url)}
@@ -245,7 +245,7 @@ export default function ProfileView({
                     href={`https://doi.org/${normalizeDOI(work.doi)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-black hover:underline leading-normal"
+                    className="font-black leading-normal"
                   >
                     {work.title || work.doi}
                   </a>
@@ -275,7 +275,7 @@ export default function ProfileView({
                     href={`https://doi.org/${normalizeDOI(work.doi)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline leading-normal"
+                    className="inline-flex items-center gap-1 text-sm leading-normal"
                   >
                     <ExternalLink className="h-3 w-3" />
                     doi.org/{normalizeDOI(work.doi)}
@@ -310,7 +310,7 @@ export default function ProfileView({
                           href={event.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-black hover:underline leading-normal"
+                          className="font-black leading-normal"
                         >
                           {event.name}
                         </a>
@@ -336,7 +336,7 @@ export default function ProfileView({
                         href={event.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all"
+                        className="inline-flex items-center gap-1 text-sm break-all leading-normal"
                       >
                         <ExternalLink className="h-3 w-3 shrink-0" />
                         {formatDisplayURL(event.url)}
@@ -425,7 +425,7 @@ export default function ProfileView({
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all leading-normal"
+                    className="inline-flex items-center gap-1 text-sm break-all leading-normal"
                   >
                     <ExternalLink className="h-3 w-3 shrink-0" />
                     {formatDisplayURL(link.url)}

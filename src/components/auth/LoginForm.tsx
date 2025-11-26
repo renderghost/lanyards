@@ -95,7 +95,7 @@ export default function LoginForm() {
               href="https://bsky.app/settings/app-passwords"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary underline-offset-4 hover:underline"
+              className="leading-normal"
             >
               Bluesky settings
             </Link>

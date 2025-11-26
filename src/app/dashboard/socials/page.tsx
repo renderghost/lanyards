@@ -115,7 +115,6 @@ export default async function SocialsPage() {
                         <div className="space-y-1 flex-1 min-w-0">
                           <Link
                             href={`/dashboard/socials/edit?rkey=${encodeURIComponent(social.rkey)}`}
-                            className="hover:underline"
                           >
                             <CardTitle className="text-base leading-tight">
                               {platform.label}
@@ -125,7 +124,7 @@ export default async function SocialsPage() {
                             href={social.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-sm text-foreground hover:underline break-all"
+                            className="inline-flex items-center gap-1 text-sm break-all leading-normal"
                           >
                             <ExternalLink className="h-3 w-3 shrink-0" />
                             {formatDisplayURL(social.url)}

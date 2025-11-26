@@ -77,13 +77,7 @@ export default async function DashboardPage() {
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col gap-4 p-4">
-        <div className="mx-auto w-full max-w-2xl">
-          <h1 className="text-xl font-semibold">Profile</h1>
-          <p className="text-sm text-muted-foreground">
-            Update your profile information
-          </p>
-        </div>
+      <div className="flex flex-1 flex-col p-4">
         <div className="mx-auto w-full max-w-2xl">
           <ProfileForm profile={profile} />
         </div>

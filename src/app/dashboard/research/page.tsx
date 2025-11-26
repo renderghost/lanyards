@@ -101,7 +101,6 @@ export default async function ResearchPage() {
                     <div className="space-y-1 flex-1 min-w-0">
                       <Link
                         href={`/dashboard/research/edit?rkey=${encodeURIComponent(work.rkey)}`}
-                        className="hover:underline"
                       >
                         <CardTitle className="text-base leading-tight">
                           {work.title || work.doi}
@@ -142,7 +141,7 @@ export default async function ResearchPage() {
                     href={`https://doi.org/${normalizeDOI(work.doi)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-foreground hover:underline"
+                    className="inline-flex items-center gap-1 text-sm leading-normal"
                   >
                     <ExternalLink className="h-3 w-3" />
                     doi.org/{normalizeDOI(work.doi)}
