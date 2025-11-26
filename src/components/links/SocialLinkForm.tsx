@@ -50,10 +50,46 @@ export default function SocialLinkForm({
     url: link?.url || '',
   });
 
+  const getPlaceholderURL = (platform: SocialPlatform): string => {
+    const placeholders: Record<SocialPlatform, string> = {
+      bluesky: 'https://bsky.app/profile/username.bsky.social',
+      twitter: 'https://twitter.com/username',
+      linkedin: 'https://linkedin.com/in/username',
+      mastodon: 'https://mastodon.social/@username',
+      researchgate: 'https://researchgate.net/profile/Name',
+      googlescholar: 'https://scholar.google.com/citations?user=ID',
+      orcid: 'https://orcid.org/0000-0000-0000-0000',
+      semble: 'https://semble.so/profile/username',
+      other: 'https://example.com/profile',
+    };
+    return placeholders[platform] || placeholders.other;
+  };
+
+  const getHelpText = (platform: SocialPlatform): string => {
+    if (platform === 'orcid') {
+      return 'Full ORCID URL (e.g., https://orcid.org/0000-0003-3674-627X)';
+    }
+    return 'Full URL to your profile on this platform';
+  };
+
+  const validateORCID = (url: string): boolean => {
+    // ORCID URLs must be in format: https://orcid.org/0000-0000-0000-0000
+    // where each 0 can be any digit, and last digit can be 0-9 or X
+    const orcidPattern = /^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+    return orcidPattern.test(url);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validate ORCID URL format
+    if (formData.platform === 'orcid' && !validateORCID(formData.url)) {
+      setError('Invalid ORCID URL format. Must be: https://orcid.org/0000-0000-0000-0000 (where 0s are digits, last can be X)');
+      setLoading(false);
+      return;
+    }
 
     try {
       const endpoint =
@@ -150,11 +186,11 @@ export default function SocialLinkForm({
                 onChange={(e) =>
                   setFormData({ ...formData, url: e.target.value })
                 }
-                placeholder="https://twitter.com/username"
+                placeholder={getPlaceholderURL(formData.platform)}
                 required
               />
-              <p className="text-sm text-muted-foreground">
-                Full URL to your profile on this platform
+              <p className="text-sm text-muted-foreground leading-normal">
+                {getHelpText(formData.platform)}
               </p>
             </div>
           </div>

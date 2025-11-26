@@ -3,6 +3,13 @@ import { getSession } from '@/lib/auth/session';
 import { getAgent } from '@/lib/auth/atproto';
 import { ProfileRepository } from '@/lib/data/repository';
 
+function validateORCID(url: string): boolean {
+  // ORCID URLs must be in format: https://orcid.org/0000-0000-0000-0000
+  // where each 0 can be any digit, and last digit can be 0-9 or X
+  const orcidPattern = /^https:\/\/orcid\.org\/\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/;
+  return orcidPattern.test(url);
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getSession();
@@ -21,6 +28,14 @@ export async function POST(request: NextRequest) {
     if (!platform || !url) {
       return NextResponse.json(
         { error: 'Platform and URL are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate ORCID URL format
+    if (platform === 'orcid' && !validateORCID(url)) {
+      return NextResponse.json(
+        { error: 'Invalid ORCID URL format. Must be: https://orcid.org/0000-0000-0000-0000' },
         { status: 400 }
       );
     }
@@ -67,6 +82,14 @@ export async function PUT(request: NextRequest) {
     if (!platform || !url) {
       return NextResponse.json(
         { error: 'Platform and URL are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate ORCID URL format
+    if (platform === 'orcid' && !validateORCID(url)) {
+      return NextResponse.json(
+        { error: 'Invalid ORCID URL format. Must be: https://orcid.org/0000-0000-0000-0000' },
         { status: 400 }
       );
     }
