@@ -54,7 +54,7 @@ export default function QRCodeButton({ url, handle, className }: QRCodeButtonPro
         onClick={generateQRCode}
         className={cn('w-full', className)}
       >
-        View as QR Code
+        Share Lanyard
       </Button>
 
       {showModal && (
@@ -67,7 +67,7 @@ export default function QRCodeButton({ url, handle, className }: QRCodeButtonPro
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-lg font-semibold mb-4 text-center leading-snug">
-              Share Profile
+              Share Lanyard
             </h3>
 
             {/* QR Code */}

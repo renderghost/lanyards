@@ -46,7 +46,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               href={`/${handle}`}
               className={cn(styles.actionButton, styles.viewProfileButton)}
             >
-              View Public Profile
+              View Lanyard
             </Link>
             <Link
               href={`/${handle}/qr`}

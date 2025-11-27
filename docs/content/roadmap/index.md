@@ -26,7 +26,7 @@ url: /roadmap/
 
 ---
 
-## Share Profile
+## Share Lanyard
 
 - Scan QR Codes ✅
 - Add to Address Book (Support [.vcf](https://en.wikipedia.org/wiki/VCard) contact cards) ☑️
