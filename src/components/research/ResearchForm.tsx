@@ -149,9 +149,9 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
   return (
     <form id="research-form" onSubmit={handleSubmit}>
       <Card>
-        <CardContent className="pt-6 space-y-4">
+        <CardContent className="p-6 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="doi">DOI *</Label>
+            <Label htmlFor="doi">Add DOI</Label>
             <div className="flex gap-2">
               <Input
                 id="doi"
@@ -191,62 +191,58 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
           </div>
 
           {resolvedMetadata && (
-            <Alert className="border-primary/50 bg-primary/5">
-              <CheckCircle2 className="h-4 w-4 text-primary" />
+            <Alert className="doi-success-alert">
+              <CheckCircle2 className="h-4 w-4" />
               <AlertDescription className="ml-2">
-                <p className="font-medium mb-2">DOI Resolved Successfully</p>
-                <div className="space-y-1 text-sm">
-                  {resolvedMetadata.title && (
-                    <p>
-                      <strong>Title:</strong> {resolvedMetadata.title}
-                    </p>
-                  )}
-                  {resolvedMetadata.authors && (
-                    <p>
-                      <strong>Authors:</strong>{' '}
-                      {resolvedMetadata.authors.join(', ')}
-                    </p>
-                  )}
-                  {resolvedMetadata.journal && (
-                    <p>
-                      <strong>Venue:</strong> {resolvedMetadata.journal}
-                    </p>
-                  )}
-                  {resolvedMetadata.publicationDate && (
-                    <p>
-                      <strong>Published:</strong>{' '}
-                      {new Date(resolvedMetadata.publicationDate).getFullYear()}
-                    </p>
-                  )}
-                  {resolvedMetadata.type && (
-                    <p>
-                      <strong>Type:</strong>{' '}
-                      {formatWorkType(resolvedMetadata.type)}
-                    </p>
-                  )}
-                  {resolvedMetadata.abstract && (
-                    <p>
-                      <strong>Abstract:</strong>{' '}
-                      {resolvedMetadata.abstract.substring(0, 200)}
-                      {resolvedMetadata.abstract.length > 200 ? '...' : ''}
-                    </p>
-                  )}
-                  {resolvedMetadata.url && (
-                    <p>
-                      <strong>URL:</strong>{' '}
-                      <a
-                        href={resolvedMetadata.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-primary"
-                      >
-                        {resolvedMetadata.url}
-                      </a>
-                    </p>
-                  )}
-                </div>
+                <p className="font-bold mb-1 leading-normal">DOI Resolved Successfully</p>
               </AlertDescription>
             </Alert>
+          )}
+
+          {resolvedMetadata && (
+            <div className="space-y-1 text-sm">
+              {resolvedMetadata.title && (
+                <p className="leading-normal">
+                  <strong>Title:</strong> {resolvedMetadata.title}
+                </p>
+              )}
+              {resolvedMetadata.authors && (
+                <p className="leading-normal">
+                  <strong>Authors:</strong>{' '}
+                  {resolvedMetadata.authors.join(', ')}
+                </p>
+              )}
+              {resolvedMetadata.journal && (
+                <p className="leading-normal">
+                  <strong>Venue:</strong> {resolvedMetadata.journal}
+                </p>
+              )}
+              {resolvedMetadata.publicationDate && (
+                <p className="leading-normal">
+                  <strong>Published:</strong>{' '}
+                  {new Date(resolvedMetadata.publicationDate).getFullYear()}
+                </p>
+              )}
+              {resolvedMetadata.type && (
+                <p className="leading-normal">
+                  <strong>Type:</strong>{' '}
+                  {formatWorkType(resolvedMetadata.type)}
+                </p>
+              )}
+              {resolvedMetadata.url && (
+                <p className="leading-normal">
+                  <strong>URL:</strong>{' '}
+                  <a
+                    href={resolvedMetadata.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    {resolvedMetadata.url}
+                  </a>
+                </p>
+              )}
+            </div>
           )}
 
           {mode === 'edit' && initialData && (
@@ -308,66 +304,66 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
               </AlertDescription>
             </Alert>
           )}
-        </CardContent>
-      </Card>
 
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="ml-2">
-            <p>{error}</p>
-            {showDuplicateWarning && (
-              <Button
-                type="button"
-                variant="link"
-                size="sm"
-                onClick={handleAddDuplicate}
-                disabled={loading}
-                className="p-0 h-auto text-destructive-foreground underline"
-              >
-                Add anyway
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="ml-2">
+                <p>{error}</p>
+                {showDuplicateWarning && (
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={handleAddDuplicate}
+                    disabled={loading}
+                    className="p-0 h-auto text-destructive-foreground underline"
+                  >
+                    Add anyway
+                  </Button>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-3 pt-2">
+            {mode === 'create' && (
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  'Add Research'
+                )}
               </Button>
             )}
-          </AlertDescription>
-        </Alert>
-      )}
 
-      <div className="flex flex-col gap-3 mt-6">
-        {mode === 'create' && (
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
-              </>
-            ) : (
-              'Add Research'
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/research')}
+              disabled={loading}
+              className="w-full"
+            >
+              {mode === 'edit' ? 'Back' : 'Cancel'}
+            </Button>
+
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                Delete Research
+              </Button>
             )}
-          </Button>
-        )}
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/dashboard/research')}
-          disabled={loading}
-          className="w-full"
-        >
-          {mode === 'edit' ? 'Back' : 'Cancel'}
-        </Button>
-
-        {mode === 'edit' && (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleDelete}
-            disabled={loading}
-            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            Delete Research
-          </Button>
-        )}
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </form>
   );
 }

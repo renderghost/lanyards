@@ -305,4 +305,27 @@
       color: var(--color-yellow-vivid-500);
     }
   }
+
+  /* DOI Success Alert styling */
+  .doi-success-alert {
+    background-color: var(--color-purple-vivid-500);
+    color: var(--color-purple-vivid-500);
+    border-color: var(--color-purple-vivid-500);
+  }
+
+  .doi-success-alert * {
+    color: var(--color-purple-vivid-500);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .doi-success-alert {
+      background: var(--color-yellow-vivid-500);
+      color: var(--color-yellow-vivid-500);
+      border-color: var(--color-yellow-vivid-500);
+    }
+
+    .doi-success-alert * {
+      color: var(--color-yellow-vivid-500);
+    }
+  }
 }
