@@ -148,19 +148,10 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
 
   return (
     <form id="research-form" onSubmit={handleSubmit}>
-      {resolvedMetadata && (
-        <Alert className="doi-success-alert mb-4">
-          <CheckCircle2 className="h-4 w-4" />
-          <AlertDescription className="ml-2">
-            <p className="font-bold mb-1 leading-normal">DOI Resolved Successfully</p>
-          </AlertDescription>
-        </Alert>
-      )}
-
       <Card>
-        <CardContent className="pt-6 space-y-4">
+        <CardContent className="p-6 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="doi">DOI *</Label>
+            <Label htmlFor="doi">Add DOI</Label>
             <div className="flex gap-2">
               <Input
                 id="doi"
@@ -198,6 +189,15 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
                 : 'DOI cannot be changed after creation'}
             </p>
           </div>
+
+          {resolvedMetadata && (
+            <Alert className="doi-success-alert">
+              <CheckCircle2 className="h-4 w-4" />
+              <AlertDescription className="ml-2">
+                <p className="font-bold mb-1 leading-normal">DOI Resolved Successfully</p>
+              </AlertDescription>
+            </Alert>
+          )}
 
           {resolvedMetadata && (
             <div className="space-y-1 text-sm">
@@ -304,66 +304,66 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
               </AlertDescription>
             </Alert>
           )}
-        </CardContent>
-      </Card>
 
-      {error && (
-        <Alert variant="destructive" className="mt-4">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription className="ml-2">
-            <p>{error}</p>
-            {showDuplicateWarning && (
-              <Button
-                type="button"
-                variant="link"
-                size="sm"
-                onClick={handleAddDuplicate}
-                disabled={loading}
-                className="p-0 h-auto text-destructive-foreground underline"
-              >
-                Add anyway
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription className="ml-2">
+                <p>{error}</p>
+                {showDuplicateWarning && (
+                  <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    onClick={handleAddDuplicate}
+                    disabled={loading}
+                    className="p-0 h-auto text-destructive-foreground underline"
+                  >
+                    Add anyway
+                  </Button>
+                )}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          <div className="flex flex-col gap-3 pt-2">
+            {mode === 'create' && (
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  'Add Research'
+                )}
               </Button>
             )}
-          </AlertDescription>
-        </Alert>
-      )}
 
-      <div className="flex flex-col gap-3 mt-6">
-        {mode === 'create' && (
-          <Button type="submit" disabled={loading} className="w-full">
-            {loading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Adding...
-              </>
-            ) : (
-              'Add Research'
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.push('/dashboard/research')}
+              disabled={loading}
+              className="w-full"
+            >
+              {mode === 'edit' ? 'Back' : 'Cancel'}
+            </Button>
+
+            {mode === 'edit' && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleDelete}
+                disabled={loading}
+                className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+              >
+                Delete Research
+              </Button>
             )}
-          </Button>
-        )}
-
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push('/dashboard/research')}
-          disabled={loading}
-          className="w-full"
-        >
-          {mode === 'edit' ? 'Back' : 'Cancel'}
-        </Button>
-
-        {mode === 'edit' && (
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={handleDelete}
-            disabled={loading}
-            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            Delete Research
-          </Button>
-        )}
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </form>
   );
 }
