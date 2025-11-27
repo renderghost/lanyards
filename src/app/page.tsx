@@ -42,16 +42,12 @@ export default function Home() {
 
           {/* Main Heading */}
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-            Your research identity,
-            <br />
-            one link
+            Welcome to Lanyards
           </h1>
 
           {/* Subheading */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            A single curated link for academic researchers that aggregates your
-            complete scholarly presence—publications, talks, affiliations, and
-            social profiles.
+            The curated link for academic researchers that collects your complete scholarly presence—publications, talks, affiliations, and social profiles.
           </p>
 
           {/* CTA Buttons */}
