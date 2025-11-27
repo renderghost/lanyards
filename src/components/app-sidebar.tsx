@@ -16,6 +16,7 @@ import {
   Sparkles,
   Users,
   Zap,
+  AtSign,
 } from 'lucide-react';
 
 import {
@@ -107,9 +108,15 @@ const supportItems = [
     external: true,
   },
   {
-    title: 'Support',
+    title: 'Signal Group',
     url: 'https://signal.group/#CjQKII7UrdZwfftsYT2F7w0zKkFaudDblsBRc2eLpgpP3m-CEhAhjk2AnC2hvLLOFYBrcBe-',
     icon: MessageCircleHeart,
+    external: true,
+  },
+  {
+    title: 'Connect on Bluesky',
+    url: 'https://bsky.app/profile/lanyards.app',
+    icon: AtSign,
     external: true,
   },
 ];
@@ -243,7 +250,7 @@ export function AppSidebar({ profile, counts }: AppSidebarProps) {
 
         {/* Support Section */}
         <SidebarGroup>
-          <SidebarGroupLabel>Support</SidebarGroupLabel>
+          <SidebarGroupLabel>BETA Support</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {supportItems.map((item) => (
