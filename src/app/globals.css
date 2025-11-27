@@ -90,6 +90,7 @@
   --sidebar-ring: var(--color-purple-vivid-500);
   --link-hover: var(--color-purple-vivid-500);
   --focus-ring: var(--color-purple-vivid-500);
+  --homepage-icon-color: var(--color-purple-vivid-500);
   --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
   --font-serif: 'DM Serif Text', ui-serif, serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;
@@ -153,6 +154,7 @@
     --sidebar-ring: var(--color-yellow-vivid-500);
     --link-hover: var(--color-yellow-vivid-500);
     --focus-ring: var(--color-yellow-vivid-500);
+    --homepage-icon-color: var(--color-yellow-vivid-500);
     --font-sans: 'DM Sans', ui-sans-serif, sans-serif, system-ui;
     --font-serif: 'DM Serif Text', ui-serif, serif;
     --font-mono: 'DM Mono', ui-monospace, monospace;
@@ -290,6 +292,17 @@
     .beta-badge {
       background-color: var(--color-yellow-vivid-500);
       color: var(--color-purple-muted-900);
+    }
+  }
+
+  /* Homepage icon color */
+  .homepage-icon-wrapper {
+    color: var(--color-purple-vivid-500);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .homepage-icon-wrapper {
+      color: var(--color-yellow-vivid-500);
     }
   }
 }
