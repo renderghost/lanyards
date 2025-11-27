@@ -361,7 +361,12 @@ export default function ProfileView({
             <CardContent className="space-y-4">
               {currentAffiliations.map((affiliation, idx) => (
                 <div key={idx} className="space-y-1">
-                  <p className="font-black leading-normal">{affiliation.organizationName}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-black leading-normal">{affiliation.organizationName}</p>
+                    {affiliation.isPrimary && (
+                      <Badge variant="default">Primary</Badge>
+                    )}
+                  </div>
                   {affiliation.role && (
                     <p className="text-sm text-foreground leading-normal">
                       {affiliation.role}
