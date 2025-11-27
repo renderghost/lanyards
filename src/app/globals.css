@@ -279,4 +279,17 @@
     color: var(--color-purple-muted-500);
     opacity: 1;
   }
+
+  /* BETA badge styling */
+  .beta-badge {
+    background-color: var(--color-red-muted-400);
+    color: var(--color-purple-muted-900);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .beta-badge {
+      background-color: var(--color-yellow-vivid-500);
+      color: var(--color-purple-muted-900);
+    }
+  }
 }
