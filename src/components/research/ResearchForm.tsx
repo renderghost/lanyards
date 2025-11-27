@@ -148,6 +148,15 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
 
   return (
     <form id="research-form" onSubmit={handleSubmit}>
+      {resolvedMetadata && (
+        <Alert className="doi-success-alert mb-4">
+          <CheckCircle2 className="h-4 w-4" />
+          <AlertDescription className="ml-2">
+            <p className="font-bold mb-1 leading-normal">DOI Resolved Successfully</p>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card>
         <CardContent className="pt-6 space-y-4">
           <div className="space-y-2">
@@ -191,62 +200,49 @@ export default function ResearchForm({ mode, initialData }: ResearchFormProps) {
           </div>
 
           {resolvedMetadata && (
-            <Alert className="border-primary/50 bg-primary/5">
-              <CheckCircle2 className="h-4 w-4 text-primary" />
-              <AlertDescription className="ml-2">
-                <p className="font-medium mb-2">DOI Resolved Successfully</p>
-                <div className="space-y-1 text-sm">
-                  {resolvedMetadata.title && (
-                    <p>
-                      <strong>Title:</strong> {resolvedMetadata.title}
-                    </p>
-                  )}
-                  {resolvedMetadata.authors && (
-                    <p>
-                      <strong>Authors:</strong>{' '}
-                      {resolvedMetadata.authors.join(', ')}
-                    </p>
-                  )}
-                  {resolvedMetadata.journal && (
-                    <p>
-                      <strong>Venue:</strong> {resolvedMetadata.journal}
-                    </p>
-                  )}
-                  {resolvedMetadata.publicationDate && (
-                    <p>
-                      <strong>Published:</strong>{' '}
-                      {new Date(resolvedMetadata.publicationDate).getFullYear()}
-                    </p>
-                  )}
-                  {resolvedMetadata.type && (
-                    <p>
-                      <strong>Type:</strong>{' '}
-                      {formatWorkType(resolvedMetadata.type)}
-                    </p>
-                  )}
-                  {resolvedMetadata.abstract && (
-                    <p>
-                      <strong>Abstract:</strong>{' '}
-                      {resolvedMetadata.abstract.substring(0, 200)}
-                      {resolvedMetadata.abstract.length > 200 ? '...' : ''}
-                    </p>
-                  )}
-                  {resolvedMetadata.url && (
-                    <p>
-                      <strong>URL:</strong>{' '}
-                      <a
-                        href={resolvedMetadata.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline hover:text-primary"
-                      >
-                        {resolvedMetadata.url}
-                      </a>
-                    </p>
-                  )}
-                </div>
-              </AlertDescription>
-            </Alert>
+            <div className="space-y-1 text-sm">
+              {resolvedMetadata.title && (
+                <p className="leading-normal">
+                  <strong>Title:</strong> {resolvedMetadata.title}
+                </p>
+              )}
+              {resolvedMetadata.authors && (
+                <p className="leading-normal">
+                  <strong>Authors:</strong>{' '}
+                  {resolvedMetadata.authors.join(', ')}
+                </p>
+              )}
+              {resolvedMetadata.journal && (
+                <p className="leading-normal">
+                  <strong>Venue:</strong> {resolvedMetadata.journal}
+                </p>
+              )}
+              {resolvedMetadata.publicationDate && (
+                <p className="leading-normal">
+                  <strong>Published:</strong>{' '}
+                  {new Date(resolvedMetadata.publicationDate).getFullYear()}
+                </p>
+              )}
+              {resolvedMetadata.type && (
+                <p className="leading-normal">
+                  <strong>Type:</strong>{' '}
+                  {formatWorkType(resolvedMetadata.type)}
+                </p>
+              )}
+              {resolvedMetadata.url && (
+                <p className="leading-normal">
+                  <strong>URL:</strong>{' '}
+                  <a
+                    href={resolvedMetadata.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline"
+                  >
+                    {resolvedMetadata.url}
+                  </a>
+                </p>
+              )}
+            </div>
           )}
 
           {mode === 'edit' && initialData && (

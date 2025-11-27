@@ -305,4 +305,19 @@
       color: var(--color-yellow-vivid-500);
     }
   }
+
+  /* DOI Success Alert styling */
+  .doi-success-alert {
+    background-color: var(--color-purple-vivid-500);
+    color: var(--color-mono-white);
+    border-color: var(--color-purple-vivid-500);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .doi-success-alert {
+      background-color: var(--color-yellow-vivid-500);
+      color: var(--color-purple-vivid-950);
+      border-color: var(--color-yellow-vivid-500);
+    }
+  }
 }
