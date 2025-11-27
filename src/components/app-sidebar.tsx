@@ -4,15 +4,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  Building2,
-  GraduationCap,
-  Zap,
-  Calendar,
   BookOpen,
-  Sparkles,
-  Globe,
-  ContactRound,
+  Building2,
+  Calendar,
+  IdCardLanyard,
+  GraduationCap,
+  Info,
+  Link2,
   LogOut,
+  MessageCircleHeart,
+  Sparkles,
+  Users,
+  Zap,
 } from 'lucide-react';
 
 import {
@@ -85,14 +88,29 @@ const linksItems = [
   {
     title: 'Socials',
     url: '/dashboard/socials',
-    icon: ContactRound,
+    icon: Users,
     countKey: 'socialLinks' as const,
   },
   {
     title: 'Links',
     url: '/dashboard/links',
-    icon: Globe,
+    icon: Link2,
     countKey: 'webLinks' as const,
+  },
+];
+
+const supportItems = [
+  {
+    title: 'Documentation',
+    url: 'https://docs.lanyards.app/',
+    icon: Info,
+    external: true,
+  },
+  {
+    title: 'Support',
+    url: 'https://signal.group/#CjQKII7UrdZwfftsYT2F7w0zKkFaudDblsBRc2eLpgpP3m-CEhAhjk2AnC2hvLLOFYBrcBe-',
+    icon: MessageCircleHeart,
+    external: true,
   },
 ];
 
@@ -128,11 +146,14 @@ export function AppSidebar({ profile, counts }: AppSidebarProps) {
                   className="hidden rounded-lg dark:block"
                 />
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-bold leading-none">Lanyards</span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-foreground">Lanyards</span>
+                    <Badge variant="secondary" className="w-fit beta-badge">
+                      BETA
+                    </Badge>
+                  </div>
                   <span className="text-xs text-muted-foreground leading-none">
-                    {/* {profile?.handle ? `@${profile.handle}` : 'Dashboard'} */}
                     {profile?.handle ? `Linking Researchers` : 'Dashboard'}
-                    {/* Linking Researchers */}
                   </span>
                 </div>
               </Link>
@@ -153,6 +174,16 @@ export function AppSidebar({ profile, counts }: AppSidebarProps) {
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            {profile?.handle && (
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <Link href={`/${profile.handle}`} target="_blank">
+                    <IdCardLanyard />
+                    <span>View Lanyard</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroup>
 
@@ -209,20 +240,29 @@ export function AppSidebar({ profile, counts }: AppSidebarProps) {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Support Section */}
+        <SidebarGroup>
+          <SidebarGroupLabel>Support</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {supportItems.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                  <SidebarMenuButton asChild>
+                    <Link href={item.url} target="_blank" rel="noopener noreferrer">
+                      <item.icon />
+                      <span>{item.title}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>
         <SidebarMenu>
-          {profile?.handle && (
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild>
-                <Link href={`/${profile.handle}`} target="_blank">
-                  <Globe />
-                  <span>View Public Profile</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          )}
           <SidebarMenuItem>
             <form action="/api/auth/logout" method="POST" className="w-full">
               <SidebarMenuButton type="submit" className="w-full">
