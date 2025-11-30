@@ -9,17 +9,17 @@ type Session = { did: string };
 
 const password = process.env.COOKIE_SECRET || 'complex_password_at_least_32_characters_long';
 
+if (process.env.NODE_ENV === 'production' && !process.env.COOKIE_SECRET) {
+  console.error('⚠️ CRITICAL SECURITY WARNING: COOKIE_SECRET is not set in production! Using insecure default.');
+}
+
 export async function getSessionAgent(db: Database): Promise<Agent | null> {
   const cookieStore = await cookies();
   const encryptedSession = cookieStore.get('sid');
 
   console.log('[getSessionAgent] Looking for session cookie');
   console.log('[getSessionAgent] Cookie found?', !!encryptedSession);
-  console.log('[getSessionAgent] Cookie value length:', encryptedSession?.value?.length || 0);
-
-  // Log all cookies for debugging
-  const allCookies = await cookieStore.getAll();
-  console.log('[getSessionAgent] All cookies:', allCookies.map(c => ({ name: c.name, valueLength: c.value?.length })));
+  // Removed verbose cookie logging
 
   if (!encryptedSession?.value) {
     console.log('[getSessionAgent] No session cookie found');

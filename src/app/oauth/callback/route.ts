@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
   try {
     console.log('[OAuth] Callback started');
     const params = new URLSearchParams(request.nextUrl.searchParams);
-    console.log('Callback params:', Object.fromEntries(params.entries()));
+    // Removed sensitive param logging
 
     const db = await getDb();
     console.log('Database initialized');
@@ -40,12 +40,17 @@ export async function GET(request: NextRequest) {
 
     console.log('Cookie set, redirecting to dashboard');
 
-    // Use NextResponse.redirect() to ensure cookie is set before redirect
-    // Always use 127.0.0.1 for consistency (required by RFC 8252)
-    const url = new URL(request.url);
-    const protocol = url.protocol;
-    const port = url.port || '3000';
-    const redirectUrl = `${protocol}//127.0.0.1:${port}/dashboard`;
+    // Determine redirect URL: Use PUBLIC_URL for prod, or fallback to 127.0.0.1 for local dev
+    let redirectBase = process.env.PUBLIC_URL;
+    if (!redirectBase) {
+      const url = new URL(request.url);
+      const protocol = url.protocol;
+      const port = url.port || '3000';
+      // Force 127.0.0.1 for local development to ensure cookie domain consistency (RFC 8252)
+      redirectBase = `${protocol}//127.0.0.1:${port}`;
+    }
+
+    const redirectUrl = `${redirectBase}/dashboard`;
 
     console.log('Redirecting to:', redirectUrl);
     return NextResponse.redirect(redirectUrl);
