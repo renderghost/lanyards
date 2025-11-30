@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
 import { sealData } from 'iron-session';
 
@@ -15,7 +14,8 @@ export async function GET(request: NextRequest) {
     const db = await getDb();
     console.log('Database initialized');
 
-    const oauthClient = await createOAuthClient(db);
+    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    const oauthClient = await createOAuthClient(db, baseUrl);
     console.log('OAuth client created');
 
     const { session } = await oauthClient.callback(params);
@@ -40,20 +40,23 @@ export async function GET(request: NextRequest) {
 
     console.log('Cookie set, redirecting to dashboard');
 
-    // Now redirect using Next.js redirect() - cookie is already set
-    redirect('/dashboard');
-  } catch (err) {
-    // Re-throw NEXT_REDIRECT - it's used internally by Next.js
-    if (err instanceof Error && err.message === 'NEXT_REDIRECT') {
-      throw err;
-    }
+    // Use NextResponse.redirect() to ensure cookie is set before redirect
+    // Always use 127.0.0.1 for consistency (required by RFC 8252)
+    const url = new URL(request.url);
+    const protocol = url.protocol;
+    const port = url.port || '3000';
+    const redirectUrl = `${protocol}//127.0.0.1:${port}/dashboard`;
 
+    console.log('Redirecting to:', redirectUrl);
+    return NextResponse.redirect(redirectUrl);
+  } catch (err) {
     console.error('OAuth callback failed:', err);
     console.error('Error details:', {
       message: err instanceof Error ? err.message : 'Unknown error',
       stack: err instanceof Error ? err.stack : undefined,
     });
-    // Force redirect to 127.0.0.1 on error as well
+
+    // Redirect to auth page on error
     const url = new URL(request.url);
     const protocol = url.protocol;
     const port = url.port || '3000';

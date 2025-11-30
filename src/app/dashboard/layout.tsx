@@ -10,15 +10,21 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  console.log('[DashboardLayout] Starting layout render');
   const session = await getSession();
+  console.log('[DashboardLayout] Got session?', !!session);
 
   if (!session) {
+    console.log('[DashboardLayout] No session, redirecting to /auth');
     redirect('/auth');
   }
 
+  console.log('[DashboardLayout] Getting agent...');
   const agent = await getAgent();
+  console.log('[DashboardLayout] Got agent?', !!agent);
 
   if (!agent) {
+    console.log('[DashboardLayout] No agent, redirecting to /auth');
     redirect('/auth');
   }
 

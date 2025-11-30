@@ -30,7 +30,8 @@ export async function POST(request: NextRequest) {
     }
 
     const db = await getDb();
-    const oauthClient = await createOAuthClient(db);
+    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    const oauthClient = await createOAuthClient(db, baseUrl);
 
     const url = await oauthClient.authorize(handle, {
       scope: 'atproto transition:generic',
