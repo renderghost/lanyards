@@ -1,5 +1,9 @@
 import type { NextConfig } from 'next';
 
+// Note: OAuth configuration is now handled server-side via @atproto/oauth-client-node
+// For local development, access the app via http://127.0.0.1:3000 (NOT localhost)
+// See src/lib/oauth/client.ts for OAuth configuration
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
@@ -10,7 +14,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Externalize packages to avoid bundling test files and node-specific code
   serverExternalPackages: [
     'pino',
     'thread-stream',
@@ -21,7 +24,6 @@ const nextConfig: NextConfig = {
     'multiformats',
   ],
   typescript: {
-    // Type checking is enabled, but ignore build errors for external packages
     ignoreBuildErrors: false,
   },
 };

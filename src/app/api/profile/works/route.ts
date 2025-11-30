@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAgent } from '@/lib/auth/atproto';
+import { getSession } from '@/lib/auth/session';
 import { ProfileRepository } from '@/lib/data/repository';
 import { resolveDOI, normalizeDOI } from '@/lib/data/doi';
 
 export async function POST(request: NextRequest) {
   try {
     const agent = await getAgent();
+    const session = await getSession();
 
-    if (!agent) {
+    if (!agent || !session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -21,7 +23,7 @@ export async function POST(request: NextRequest) {
 
     // Check for duplicates unless explicitly bypassed
     if (!bypassDuplicateCheck) {
-      const existingWorks = await repo.listWorks(agent.session?.did || '');
+      const existingWorks = await repo.listWorks(session.did);
       // Compare normalized DOIs to catch duplicates even if entered in different formats
       const duplicate = existingWorks.find((w) => normalizeDOI(w.doi) === doi);
 

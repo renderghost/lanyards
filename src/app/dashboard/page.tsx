@@ -15,17 +15,24 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 
 export default async function DashboardPage() {
+  console.log('[DashboardPage] Starting...');
   const session = await getSession();
+  console.log('[DashboardPage] Got session?', !!session);
 
   if (!session) {
+    console.log('[DashboardPage] No session, redirecting to /auth');
     redirect('/auth');
   }
 
   const agent = await getAgent();
+  console.log('[DashboardPage] Got agent?', !!agent);
 
   if (!agent) {
+    console.log('[DashboardPage] No agent, redirecting to /auth');
     redirect('/auth');
   }
+
+  console.log('[DashboardPage] Proceeding with dashboard render');
 
   const repo = new ProfileRepository(agent);
 

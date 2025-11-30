@@ -1,6 +1,6 @@
 /**
  * Factory for creating Lanyard API clients with authentication
- * Bridges AtpAgent session management with XrpcClient
+ * Bridges Agent/AtpAgent session management with XrpcClient
  */
 
 import { AtpAgent } from '@atproto/api';
@@ -8,6 +8,9 @@ import { AtpBaseClient } from '@/types/generated';
 
 /**
  * Creates a Lanyard API client from an authenticated AtpAgent
+ *
+ * Note: This function is designed for AtpAgent. For OAuth-based agents,
+ * use the ProfileRepository directly which works with both Agent and AtpAgent.
  *
  * @param agent - Authenticated AtpAgent with active session
  * @returns Configured AtpBaseClient ready to make authenticated requests

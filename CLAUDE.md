@@ -45,9 +45,29 @@ Use GitHub Issues via the `gh` CLI for all task tracking:
 
 - **Framework**: Next.js (App Router) + TypeScript
 - **Styling**: Tailwind CSS (no inline styles)
-- **Auth**: App Password (dev) / OAuth (production - not yet active)
+- **Auth**: AT Protocol OAuth (`@atcute/oauth-browser-client`)
 - **Protocol**: AT Protocol (`@atproto/*` packages)
 - **Data**: ProfileRepository pattern wrapping AtpAgent
+
+---
+
+## ⚠️ CRITICAL OAuth Configuration Rules
+
+**NEVER USE `localhost` - ALWAYS USE `127.0.0.1`**
+
+RFC 8252 REQUIRES loopback IP addresses, NOT hostnames:
+- ✅ `http://127.0.0.1:3000/oauth/callback`
+- ❌ `http://localhost:3000/oauth/callback`
+
+AT Protocol OAuth will reject `localhost` with "invalid_request" error.
+
+**Development Configuration:**
+- `SERVER_HOST = '127.0.0.1'` in `next.config.ts`
+- Fallback redirect_uri must use `127.0.0.1` in `src/lib/oauth/config.ts`
+- Access the app via `http://127.0.0.1:3000` (NOT localhost)
+
+**Production Configuration:**
+- Use full HTTPS URLs from `.env` (e.g., `https://lanyards.app/oauth/callback`)
 
 ---
 
@@ -62,7 +82,8 @@ src/
 │   └── dashboard/    # Protected routes
 ├── components/       # React components (strict 4-file structure)
 ├── lib/
-│   ├── auth/         # Authentication logic
+│   ├── auth/         # Legacy session compatibility layer
+│   ├── oauth/        # OAuth client and session management
 │   ├── data/         # ProfileRepository, DOI resolution
 │   └── utils.ts      # Utilities including cn()
 └── types/            # TypeScript definitions

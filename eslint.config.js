@@ -12,6 +12,7 @@ export default tseslint.config(
       'dist/**',
       'build/**',
       'src/types/generated/**',
+      'docs/**',
     ],
   },
 
