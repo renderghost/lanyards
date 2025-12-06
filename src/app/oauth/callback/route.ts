@@ -40,16 +40,8 @@ export async function GET(request: NextRequest) {
 
     console.log('Cookie set, redirecting to dashboard');
 
-    // Determine redirect URL: Use PUBLIC_URL for prod, or fallback to 127.0.0.1 for local dev
-    let redirectBase = process.env.PUBLIC_URL;
-    if (!redirectBase) {
-      const url = new URL(request.url);
-      const protocol = url.protocol;
-      const port = url.port || '3000';
-      // Force 127.0.0.1 for local development to ensure cookie domain consistency (RFC 8252)
-      redirectBase = `${protocol}//127.0.0.1:${port}`;
-    }
-
+    // Determine redirect URL: Use PUBLIC_URL if set, otherwise use request URL
+    const redirectBase = process.env.PUBLIC_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
     const redirectUrl = `${redirectBase}/dashboard`;
 
     console.log('Redirecting to:', redirectUrl);
@@ -62,9 +54,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Redirect to auth page on error
-    const url = new URL(request.url);
-    const protocol = url.protocol;
-    const port = url.port || '3000';
-    return NextResponse.redirect(`${protocol}//127.0.0.1:${port}/auth?error=auth`);
+    const redirectBase = process.env.PUBLIC_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    return NextResponse.redirect(`${redirectBase}/auth?error=auth`);
   }
 }
