@@ -3,7 +3,6 @@ import {
   Migration,
   MigrationProvider,
   Migrator,
-  SqliteDialect,
   PostgresDialect,
 } from 'kysely';
 import { Pool as NeonPool } from '@neondatabase/serverless';
@@ -56,30 +55,17 @@ migrations['001'] = {
 
 // APIs
 
-export const createDb = async (location?: string): Promise<Database> => {
-  // Use Postgres on Vercel (when POSTGRES_URL is set)
-  // Use SQLite for local development
-  if (process.env.POSTGRES_URL) {
-    console.log('[createDb] Using Postgres (Neon)');
-    return new Kysely<DatabaseSchema>({
-      dialect: new PostgresDialect({
-        pool: new NeonPool({
-          connectionString: process.env.POSTGRES_URL,
-        }),
-      }),
-    });
+export const createDb = (): Database => {
+  if (!process.env.POSTGRES_URL) {
+    throw new Error('POSTGRES_URL environment variable is required');
   }
 
-  // Local development with SQLite - use dynamic import
-  console.log('[createDb] Using SQLite for local development');
-  const dbPath = location || 'data/lanyards.db';
-
-  // Dynamic import to avoid bundling better-sqlite3 on Vercel
-  const SqliteDb = (await import('better-sqlite3')).default;
-
+  console.log('[createDb] Using Postgres (Neon)');
   return new Kysely<DatabaseSchema>({
-    dialect: new SqliteDialect({
-      database: new SqliteDb(dbPath),
+    dialect: new PostgresDialect({
+      pool: new NeonPool({
+        connectionString: process.env.POSTGRES_URL,
+      }),
     }),
   });
 };
