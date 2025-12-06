@@ -5,7 +5,7 @@ import { Agent } from '@atproto/api';
 import type { Database } from '@/lib/db';
 import { createOAuthClient } from './client';
 
-type Session = { did: string };
+type Session = { did: string; handle?: string };
 
 const password = process.env.COOKIE_SECRET || 'complex_password_at_least_32_characters_long';
 
@@ -73,6 +73,23 @@ export async function getSessionAgent(db: Database): Promise<Agent | null> {
     console.error('[getSessionAgent] Error message:', err instanceof Error ? err.message : String(err));
     // Cannot clear cookie here - this function is called from Server Components
     // Cookie clearing must happen in a Route Handler or Server Action
+    return null;
+  }
+}
+
+export async function getSessionData(): Promise<Session | null> {
+  const cookieStore = await cookies();
+  const encryptedSession = cookieStore.get('sid');
+
+  if (!encryptedSession?.value) {
+    return null;
+  }
+
+  try {
+    const session = await unsealData<Session>(encryptedSession.value, { password });
+    return session;
+  } catch (err) {
+    console.error('[getSessionData] Failed to read session:', err);
     return null;
   }
 }

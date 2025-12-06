@@ -26,12 +26,19 @@ export async function GET(request: NextRequest) {
     const { session } = await oauthClient.callback(params);
     console.log('OAuth callback succeeded, DID:', session.did);
 
-    // Seal the session data
-    const sessionData = { did: session.did };
+    // Get the user's handle from their profile
+    const agent = new (await import('@atproto/api')).Agent(session);
+    const profile = await agent.getProfile({ actor: session.did });
+    const handle = profile.data.handle;
+
+    console.log('Resolved handle:', handle);
+
+    // Seal the session data with both DID and handle
+    const sessionData = { did: session.did, handle };
     const password = process.env.COOKIE_SECRET || 'complex_password_at_least_32_characters_long';
     const sealed = await sealData(sessionData, { password });
 
-    console.log('Session sealed for DID:', session.did);
+    console.log('Session sealed for DID:', session.did, 'handle:', handle);
 
     // Set the cookie using cookies() API
     const cookieStore = await cookies();

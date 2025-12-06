@@ -6,7 +6,7 @@
  */
 
 import {
-  getSessionDid,
+  getSessionData,
   deleteSession as deleteOAuthSession,
 } from '@/lib/oauth/session';
 
@@ -20,17 +20,17 @@ export interface Session {
 
 export async function getSession(): Promise<Session | null> {
   console.log('[getSession] Starting...');
-  const did = await getSessionDid();
-  console.log('[getSession] Got DID:', did);
+  const sessionData = await getSessionData();
+  console.log('[getSession] Got session data:', sessionData);
 
-  if (!did) {
+  if (!sessionData?.did) {
     console.log('[getSession] No DID, returning null');
     return null;
   }
 
   const session = {
-    did,
-    handle: did,
+    did: sessionData.did,
+    handle: sessionData.handle || sessionData.did,
     accessToken: '',
     refreshToken: '',
     expiresAt: Date.now() + 60 * 60 * 24 * 30 * 1000,
@@ -44,8 +44,8 @@ export async function deleteSession(): Promise<void> {
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const did = await getSessionDid();
-  return did !== null;
+  const sessionData = await getSessionData();
+  return sessionData?.did !== null && sessionData?.did !== undefined;
 }
 
 export async function createSession(_session: Session): Promise<void> {
