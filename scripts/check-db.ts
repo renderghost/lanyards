@@ -1,11 +1,10 @@
 import { createDb } from '../src/lib/db';
-import path from 'path';
 
 async function main() {
-  const dbPath = path.join(process.cwd(), 'data', 'lanyards.db');
-  console.log('Checking database at:', dbPath);
+  console.log('Checking Postgres database...');
+  console.log('POSTGRES_URL:', process.env.POSTGRES_URL ? 'Set' : 'Not set');
 
-  const db = createDb(dbPath);
+  const db = createDb();
 
   console.log('\n--- Auth Sessions ---');
   const sessions = await db.selectFrom('auth_session').selectAll().execute();
