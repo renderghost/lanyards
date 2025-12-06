@@ -1,17 +1,19 @@
 import path from 'path';
+import fs from 'fs';
 import { createDb, migrateToLatest, type Database } from './db';
 
 let dbInstance: Database | null = null;
 
 export async function getDb(): Promise<Database> {
   if (!dbInstance) {
-    // Vercel's filesystem is read-only except /tmp
-    const dbPath = process.env.VERCEL
-      ? '/tmp/lanyards.db'
-      : path.join(process.cwd(), 'data', 'lanyards.db');
+    // For local SQLite, ensure data directory exists
+    if (!process.env.POSTGRES_URL) {
+      const dataDir = path.join(process.cwd(), 'data');
+      fs.mkdirSync(dataDir, { recursive: true });
+    }
 
-    console.log('[getDb] Initializing database at:', dbPath);
-    dbInstance = createDb(dbPath);
+    // createDb handles environment detection (Postgres vs SQLite)
+    dbInstance = createDb();
     await migrateToLatest(dbInstance);
   }
   return dbInstance;
