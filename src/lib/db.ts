@@ -7,7 +7,6 @@ import {
   PostgresDialect,
 } from 'kysely';
 import { Pool as NeonPool } from '@neondatabase/serverless';
-import SqliteDb from 'better-sqlite3';
 
 // Types
 
@@ -57,7 +56,7 @@ migrations['001'] = {
 
 // APIs
 
-export const createDb = (location?: string): Database => {
+export const createDb = async (location?: string): Promise<Database> => {
   // Use Postgres on Vercel (when POSTGRES_URL is set)
   // Use SQLite for local development
   if (process.env.POSTGRES_URL) {
@@ -71,9 +70,13 @@ export const createDb = (location?: string): Database => {
     });
   }
 
-  // Local development with SQLite
+  // Local development with SQLite - use dynamic import
   console.log('[createDb] Using SQLite for local development');
   const dbPath = location || 'data/lanyards.db';
+
+  // Dynamic import to avoid bundling better-sqlite3 on Vercel
+  const SqliteDb = (await import('better-sqlite3')).default;
+
   return new Kysely<DatabaseSchema>({
     dialect: new SqliteDialect({
       database: new SqliteDb(dbPath),

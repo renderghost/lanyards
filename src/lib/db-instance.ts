@@ -13,7 +13,7 @@ export async function getDb(): Promise<Database> {
     }
 
     // createDb handles environment detection (Postgres vs SQLite)
-    dbInstance = createDb();
+    dbInstance = await createDb();
     await migrateToLatest(dbInstance);
   }
   return dbInstance;
