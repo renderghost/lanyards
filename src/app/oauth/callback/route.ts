@@ -4,6 +4,7 @@ import { sealData } from 'iron-session';
 
 import { getDb } from '@/lib/db-instance';
 import { createOAuthClient } from '@/lib/oauth/client';
+import { normalizeLocalhostTo127 } from '@/lib/oauth/normalize-url';
 
 export async function GET(request: NextRequest) {
   try {
@@ -14,13 +15,10 @@ export async function GET(request: NextRequest) {
     const db = await getDb();
     console.log('Database initialized');
 
-    let baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
     // Normalize localhost to 127.0.0.1 for RFC 8252 compliance
-    baseUrl = baseUrl.replace('://localhost:', '://127.0.0.1:');
-    baseUrl = baseUrl.replace('://localhost/', '://127.0.0.1/');
-    if (baseUrl.endsWith('://localhost')) {
-      baseUrl = baseUrl.replace('://localhost', '://127.0.0.1');
-    }
+    const baseUrl = normalizeLocalhostTo127(
+      `${request.nextUrl.protocol}//${request.nextUrl.host}`
+    );
 
     const oauthClient = await createOAuthClient(db, baseUrl);
     console.log('OAuth client created');
@@ -60,12 +58,9 @@ export async function GET(request: NextRequest) {
     });
 
     // Redirect to auth page on error (normalize localhost to 127.0.0.1)
-    let redirectBase = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-    redirectBase = redirectBase.replace('://localhost:', '://127.0.0.1:');
-    redirectBase = redirectBase.replace('://localhost/', '://127.0.0.1/');
-    if (redirectBase.endsWith('://localhost')) {
-      redirectBase = redirectBase.replace('://localhost', '://127.0.0.1');
-    }
+    const redirectBase = normalizeLocalhostTo127(
+      `${request.nextUrl.protocol}//${request.nextUrl.host}`
+    );
     return NextResponse.redirect(`${redirectBase}/auth?error=auth`);
   }
 }
