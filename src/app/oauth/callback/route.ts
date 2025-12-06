@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
     const db = await getDb();
     console.log('Database initialized');
 
-    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    let baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    // Normalize localhost to 127.0.0.1 for RFC 8252 compliance
+    baseUrl = baseUrl.replace('://localhost:', '://127.0.0.1:');
+    baseUrl = baseUrl.replace('://localhost/', '://127.0.0.1/');
+    if (baseUrl.endsWith('://localhost')) {
+      baseUrl = baseUrl.replace('://localhost', '://127.0.0.1');
+    }
+
     const oauthClient = await createOAuthClient(db, baseUrl);
     console.log('OAuth client created');
 
@@ -40,9 +47,8 @@ export async function GET(request: NextRequest) {
 
     console.log('Cookie set, redirecting to dashboard');
 
-    // Derive redirect URL from request
-    const redirectBase = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
-    const redirectUrl = `${redirectBase}/dashboard`;
+    // Derive redirect URL from request (already normalized in baseUrl above)
+    const redirectUrl = `${baseUrl}/dashboard`;
 
     console.log('Redirecting to:', redirectUrl);
     return NextResponse.redirect(redirectUrl);
@@ -53,8 +59,13 @@ export async function GET(request: NextRequest) {
       stack: err instanceof Error ? err.stack : undefined,
     });
 
-    // Redirect to auth page on error
-    const redirectBase = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    // Redirect to auth page on error (normalize localhost to 127.0.0.1)
+    let redirectBase = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    redirectBase = redirectBase.replace('://localhost:', '://127.0.0.1:');
+    redirectBase = redirectBase.replace('://localhost/', '://127.0.0.1/');
+    if (redirectBase.endsWith('://localhost')) {
+      redirectBase = redirectBase.replace('://localhost', '://127.0.0.1');
+    }
     return NextResponse.redirect(`${redirectBase}/auth?error=auth`);
   }
 }

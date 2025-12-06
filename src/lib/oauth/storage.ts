@@ -27,7 +27,7 @@ export class StateStore implements NodeSavedStateStore {
     await this.db
       .insertInto('auth_state')
       .values({ key, state })
-      .onConflict((oc) => oc.doUpdateSet({ state }))
+      .onConflict((oc) => oc.column('key').doUpdateSet({ state }))
       .execute();
   }
 
@@ -59,7 +59,7 @@ export class SessionStore implements NodeSavedSessionStore {
     await this.db
       .insertInto('auth_session')
       .values({ key, session })
-      .onConflict((oc) => oc.doUpdateSet({ session }))
+      .onConflict((oc) => oc.column('key').doUpdateSet({ session }))
       .execute();
   }
 

@@ -5,7 +5,14 @@ import { SessionStore, StateStore } from './storage';
 
 export const createOAuthClient = async (db: Database, baseUrl?: string) => {
   // Use baseUrl from request, fallback to local development
-  const effectiveBaseUrl = baseUrl || 'http://127.0.0.1:3000';
+  let effectiveBaseUrl = baseUrl || 'http://127.0.0.1:3000';
+
+  // Normalize localhost to 127.0.0.1 for RFC 8252 compliance
+  effectiveBaseUrl = effectiveBaseUrl.replace('://localhost:', '://127.0.0.1:');
+  effectiveBaseUrl = effectiveBaseUrl.replace('://localhost/', '://127.0.0.1/');
+  if (effectiveBaseUrl.endsWith('://localhost')) {
+    effectiveBaseUrl = effectiveBaseUrl.replace('://localhost', '://127.0.0.1');
+  }
 
   console.log(`[createOAuthClient] Using base URL: ${effectiveBaseUrl}`);
 
