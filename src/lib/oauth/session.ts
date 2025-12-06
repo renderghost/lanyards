@@ -71,8 +71,8 @@ export async function getSessionAgent(db: Database): Promise<Agent | null> {
     console.error('[getSessionAgent] Session restore failed:', err);
     console.error('[getSessionAgent] Error type:', err instanceof Error ? err.constructor.name : typeof err);
     console.error('[getSessionAgent] Error message:', err instanceof Error ? err.message : String(err));
-    // Clear invalid cookie
-    cookieStore.delete('sid');
+    // Cannot clear cookie here - this function is called from Server Components
+    // Cookie clearing must happen in a Route Handler or Server Action
     return null;
   }
 }
