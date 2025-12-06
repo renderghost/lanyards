@@ -5,7 +5,11 @@ let dbInstance: Database | null = null;
 
 export async function getDb(): Promise<Database> {
   if (!dbInstance) {
-    const dbPath = path.join(process.cwd(), 'data', 'lanyards.db');
+    // Vercel's filesystem is read-only except /tmp
+    const dbPath = process.env.VERCEL
+      ? '/tmp/lanyards.db'
+      : path.join(process.cwd(), 'data', 'lanyards.db');
+
     console.log('[getDb] Initializing database at:', dbPath);
     dbInstance = createDb(dbPath);
     await migrateToLatest(dbInstance);
