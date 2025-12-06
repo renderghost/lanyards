@@ -40,8 +40,8 @@ export async function GET(request: NextRequest) {
 
     console.log('Cookie set, redirecting to dashboard');
 
-    // Determine redirect URL: Use PUBLIC_URL if set, otherwise use request URL
-    const redirectBase = process.env.PUBLIC_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    // Derive redirect URL from request
+    const redirectBase = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
     const redirectUrl = `${redirectBase}/dashboard`;
 
     console.log('Redirecting to:', redirectUrl);
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Redirect to auth page on error
-    const redirectBase = process.env.PUBLIC_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`;
+    const redirectBase = `${request.nextUrl.protocol}//${request.nextUrl.host}`;
     return NextResponse.redirect(`${redirectBase}/auth?error=auth`);
   }
 }

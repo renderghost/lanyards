@@ -61,13 +61,12 @@ RFC 8252 REQUIRES loopback IP addresses, NOT hostnames:
 
 AT Protocol OAuth will reject `localhost` with "invalid_request" error.
 
-**Development Configuration:**
+**OAuth Client Configuration:**
+- Local development (`http://127.0.0.1`): Uses RFC 8252 loopback client format
+- Production/Staging (`https://`): Uses metadata URL format
+- Base URL is automatically derived from request - no environment variable needed
 - `SERVER_HOST = '127.0.0.1'` in `next.config.ts`
-- Fallback redirect_uri must use `127.0.0.1` in `src/lib/oauth/config.ts`
 - Access the app via `http://127.0.0.1:3000` (NOT localhost)
-
-**Production Configuration:**
-- Use full HTTPS URLs from `.env` (e.g., `https://lanyards.app/oauth/callback`)
 
 ---
 
