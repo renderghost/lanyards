@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
+  console.log('[oauth-client-metadata] Route hit! Request URL:', request.url);
+
   // Use PUBLIC_URL if set (production), otherwise derive from request (Vercel previews, local dev)
   const publicUrl = process.env.PUBLIC_URL;
   let baseUrl: string;
@@ -12,6 +14,8 @@ export async function GET(request: NextRequest) {
     const url = new URL(request.url);
     baseUrl = `${url.protocol}//${url.host}`;
   }
+
+  console.log('[oauth-client-metadata] Using baseUrl:', baseUrl);
 
   return NextResponse.json({
     client_id: `${baseUrl}/oauth-client-metadata.json`,
