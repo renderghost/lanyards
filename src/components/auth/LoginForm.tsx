@@ -1,17 +1,18 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export default function LoginForm() {
   const [identifier, setIdentifier] = useState('');
-  const [password, setPassword] = useState('');
-  const [pdsUrl, setPdsUrl] = useState('https://bsky.social');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -21,24 +22,31 @@ export default function LoginForm() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('/api/oauth/initiate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ identifier, password, pdsUrl }),
+        body: JSON.stringify({ handle: identifier }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to login');
+        throw new Error(data.error || 'Failed to initiate login');
       }
 
-      // Redirect to dashboard on successful login
-      if (data.redirect) {
-        window.location.href = data.redirect;
-      }
+      await sleep(200);
+
+      window.location.assign(data.redirectUrl);
+
+      await new Promise((_resolve, reject) => {
+        const listener = () => {
+          reject(new Error('User aborted the login request'));
+        };
+
+        window.addEventListener('pageshow', listener, { once: true });
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
       setLoading(false);
@@ -50,7 +58,7 @@ export default function LoginForm() {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2">
           <Label htmlFor="identifier" className="leading-5">
-            Username or Handle
+            Bluesky Handle
           </Label>
           <Input
             type="text"
@@ -67,56 +75,7 @@ export default function LoginForm() {
             id="identifier-help"
             className="text-sm leading-5 text-muted-foreground"
           >
-            Enter your Bluesky handle or username
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password" className="leading-5">
-            App Password
-          </Label>
-          <Input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="xxxx-xxxx-xxxx-xxxx"
-            required
-            disabled={loading}
-            autoComplete="current-password"
-            aria-describedby="password-help"
-          />
-          <p
-            id="password-help"
-            className="text-sm leading-5 text-muted-foreground"
-          >
-            Get your app password from{' '}
-            <Link
-              href="https://bsky.app/settings/app-passwords"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="leading-normal"
-            >
-              Bluesky settings
-            </Link>
-          </p>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="pdsUrl" className="leading-5">
-            PDS Server (optional)
-          </Label>
-          <Input
-            type="url"
-            id="pdsUrl"
-            value={pdsUrl}
-            onChange={(e) => setPdsUrl(e.target.value)}
-            placeholder="https://bsky.social"
-            disabled={loading}
-            aria-describedby="pds-help"
-          />
-          <p id="pds-help" className="text-sm leading-5 text-muted-foreground">
-            Defaults to bsky.social - only change if using a custom PDS
+            Enter your Bluesky handle to sign in
           </p>
         </div>
       </div>
@@ -130,7 +89,7 @@ export default function LoginForm() {
 
       <Button
         type="submit"
-        disabled={loading || !identifier || !password}
+        disabled={loading || !identifier}
         className="w-full"
       >
         {loading ? (
@@ -139,7 +98,7 @@ export default function LoginForm() {
             Signing in...
           </>
         ) : (
-          'Sign in'
+          'Sign in with Bluesky'
         )}
       </Button>
     </form>

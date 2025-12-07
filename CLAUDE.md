@@ -45,9 +45,28 @@ Use GitHub Issues via the `gh` CLI for all task tracking:
 
 - **Framework**: Next.js (App Router) + TypeScript
 - **Styling**: Tailwind CSS (no inline styles)
-- **Auth**: App Password (dev) / OAuth (production - not yet active)
+- **Auth**: AT Protocol OAuth (`@atcute/oauth-browser-client`)
 - **Protocol**: AT Protocol (`@atproto/*` packages)
 - **Data**: ProfileRepository pattern wrapping AtpAgent
+
+---
+
+## ⚠️ CRITICAL OAuth Configuration Rules
+
+**NEVER USE `localhost` - ALWAYS USE `127.0.0.1`**
+
+RFC 8252 REQUIRES loopback IP addresses, NOT hostnames:
+- ✅ `http://127.0.0.1:3000/oauth/callback`
+- ❌ `http://localhost:3000/oauth/callback`
+
+AT Protocol OAuth will reject `localhost` with "invalid_request" error.
+
+**OAuth Client Configuration:**
+- Local development (`http://127.0.0.1`): Uses RFC 8252 loopback client format
+- Production/Staging (`https://`): Uses metadata URL format
+- Base URL is automatically derived from request - no environment variable needed
+- `SERVER_HOST = '127.0.0.1'` in `next.config.ts`
+- Access the app via `http://127.0.0.1:3000` (NOT localhost)
 
 ---
 
@@ -62,7 +81,8 @@ src/
 │   └── dashboard/    # Protected routes
 ├── components/       # React components (strict 4-file structure)
 ├── lib/
-│   ├── auth/         # Authentication logic
+│   ├── auth/         # Legacy session compatibility layer
+│   ├── oauth/        # OAuth client and session management
 │   ├── data/         # ProfileRepository, DOI resolution
 │   └── utils.ts      # Utilities including cn()
 └── types/            # TypeScript definitions

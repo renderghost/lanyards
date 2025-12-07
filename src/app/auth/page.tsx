@@ -18,7 +18,7 @@ export default function AuthPage() {
               Sign in to Lanyards
             </CardTitle>
             <CardDescription className="leading-5">
-              Use your Bluesky app password to continue
+              Sign in with your Bluesky account
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -36,17 +36,6 @@ export default function AuthPage() {
               className="leading-normal"
             >
               Create one here
-            </Link>
-          </p>
-          <p>
-            Need an app password?{' '}
-            <Link
-              href="https://bsky.app/settings/app-passwords"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="leading-normal"
-            >
-              Generate one in settings
             </Link>
           </p>
         </div>

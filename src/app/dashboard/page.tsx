@@ -15,17 +15,29 @@ import { SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 
 export default async function DashboardPage() {
+  console.log('[DashboardPage] ====== Starting Dashboard Page Render ======');
+  console.log('[DashboardPage] Timestamp:', new Date().toISOString());
+
   const session = await getSession();
+  console.log('[DashboardPage] Got session?', !!session);
+  console.log('[DashboardPage] Session DID:', session?.did);
 
   if (!session) {
+    console.log('[DashboardPage] ❌ No session found, redirecting to /auth');
     redirect('/auth');
   }
 
+  console.log('[DashboardPage] ✅ Session validated, getting agent...');
   const agent = await getAgent();
+  console.log('[DashboardPage] Got agent?', !!agent);
 
   if (!agent) {
+    console.log('[DashboardPage] ❌ No agent available, redirecting to /auth');
+    console.log('[DashboardPage] This usually means OAuth session restore failed');
     redirect('/auth');
   }
+
+  console.log('[DashboardPage] ✅ Agent validated, proceeding with dashboard render');
 
   const repo = new ProfileRepository(agent);
 

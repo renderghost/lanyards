@@ -1,4 +1,14 @@
-import { cookies } from 'next/headers';
+/**
+ * Legacy Session Management - OAuth Compatibility Layer
+ *
+ * This module provides backward compatibility for code that uses the old
+ * session interface. It proxies to the new OAuth session management.
+ */
+
+import {
+  getSessionData,
+  deleteSession as deleteOAuthSession,
+} from '@/lib/oauth/session';
 
 export interface Session {
   did: string;
@@ -8,53 +18,38 @@ export interface Session {
   expiresAt: number;
 }
 
-const SESSION_COOKIE_NAME = 'lanyard_session';
-const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
-
-export async function createSession(session: Session): Promise<void> {
-  const cookieStore = await cookies();
-
-  cookieStore.set(SESSION_COOKIE_NAME, JSON.stringify(session), {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SESSION_MAX_AGE,
-    path: '/',
-  });
-}
-
 export async function getSession(): Promise<Session | null> {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME);
+  console.log('[getSession] Starting...');
+  const sessionData = await getSessionData();
+  console.log('[getSession] Got session data:', sessionData);
 
-  if (!sessionCookie) {
+  if (!sessionData?.did) {
+    console.log('[getSession] No DID, returning null');
     return null;
   }
 
-  try {
-    return JSON.parse(sessionCookie.value) as Session;
-  } catch {
-    return null;
-  }
+  const session = {
+    did: sessionData.did,
+    handle: sessionData.handle || sessionData.did,
+    accessToken: '',
+    refreshToken: '',
+    expiresAt: Date.now() + 60 * 60 * 24 * 30 * 1000,
+  };
+  console.log('[getSession] Returning session:', session);
+  return session;
 }
 
 export async function deleteSession(): Promise<void> {
-  const cookieStore = await cookies();
-  cookieStore.delete(SESSION_COOKIE_NAME);
+  await deleteOAuthSession();
 }
 
 export async function isAuthenticated(): Promise<boolean> {
-  const session = await getSession();
+  const sessionData = await getSessionData();
+  return sessionData?.did !== null && sessionData?.did !== undefined;
+}
 
-  if (!session) {
-    return false;
-  }
-
-  // Check if token is expired
-  if (session.expiresAt < Date.now()) {
-    await deleteSession();
-    return false;
-  }
-
-  return true;
+export async function createSession(_session: Session): Promise<void> {
+  throw new Error(
+    'createSession is deprecated. Use OAuth flow for authentication.'
+  );
 }

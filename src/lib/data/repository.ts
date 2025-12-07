@@ -3,7 +3,7 @@
  * This provides an abstraction layer for CRUD operations on AT Protocol records
  */
 
-import { AtpAgent } from '@atproto/api';
+import { Agent, AtpAgent } from '@atproto/api';
 import { TID } from '@atproto/common';
 import type {
   Identity,
@@ -28,7 +28,15 @@ import type {
 const LEXICON_PREFIX = 'app.lanyards';
 
 export class ProfileRepository {
-  constructor(private agent: AtpAgent) {}
+  constructor(private agent: Agent | AtpAgent) {}
+
+  /**
+   * Get the DID from the agent's session
+   * Works with both Agent (OAuth) and AtpAgent
+   */
+  private getAgentDid(): string {
+    return this.getAgentDid();
+  }
 
   // Identity operations (singleton, key: "self")
   async getIdentity(did: string): Promise<Identity | null> {
@@ -46,7 +54,7 @@ export class ProfileRepository {
 
   async createIdentity(identity: Omit<Identity, 'createdAt'>) {
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.identity`,
       rkey: 'self',
       record: {
@@ -58,13 +66,13 @@ export class ProfileRepository {
   }
 
   async updateIdentity(updates: Partial<Identity>) {
-    const current = await this.getIdentity(this.agent.session?.did || '');
+    const current = await this.getIdentity(this.getAgentDid());
     if (!current) {
       throw new Error('Identity not found');
     }
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.identity`,
       rkey: 'self',
       record: {
@@ -92,7 +100,7 @@ export class ProfileRepository {
 
   async setHonorific(honorific: Omit<Honorific, 'createdAt' | 'updatedAt'>) {
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.honorific`,
       rkey: 'self',
       record: {
@@ -124,7 +132,7 @@ export class ProfileRepository {
   ): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.affiliation`,
       rkey,
       record: {
@@ -138,13 +146,13 @@ export class ProfileRepository {
 
   async updateAffiliation(rkey: string, updates: Partial<Affiliation>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.affiliation`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.affiliation`,
       rkey,
       record: {
@@ -157,7 +165,7 @@ export class ProfileRepository {
 
   async deleteAffiliation(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.affiliation`,
       rkey,
     });
@@ -183,7 +191,7 @@ export class ProfileRepository {
   ): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.qualification`,
       rkey,
       record: {
@@ -197,13 +205,13 @@ export class ProfileRepository {
 
   async updateQualification(rkey: string, updates: Partial<Qualification>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.qualification`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.qualification`,
       rkey,
       record: {
@@ -216,7 +224,7 @@ export class ProfileRepository {
 
   async deleteQualification(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.qualification`,
       rkey,
     });
@@ -240,7 +248,7 @@ export class ProfileRepository {
   async createSkill(skill: Omit<Skill, 'createdAt'>): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.skill`,
       rkey,
       record: {
@@ -254,13 +262,13 @@ export class ProfileRepository {
 
   async updateSkill(rkey: string, updates: Partial<Skill>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.skill`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.skill`,
       rkey,
       record: {
@@ -273,7 +281,7 @@ export class ProfileRepository {
 
   async deleteSkill(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.skill`,
       rkey,
     });
@@ -294,7 +302,7 @@ export class ProfileRepository {
   async createEvent(event: Omit<LinkEvent, 'createdAt'>): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.event`,
       rkey,
       record: {
@@ -308,13 +316,13 @@ export class ProfileRepository {
 
   async updateEvent(rkey: string, updates: Partial<LinkEvent>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.event`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.event`,
       rkey,
       record: {
@@ -327,7 +335,7 @@ export class ProfileRepository {
 
   async deleteEvent(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.event`,
       rkey,
     });
@@ -348,7 +356,7 @@ export class ProfileRepository {
   async createWork(work: Omit<LinkWork, 'createdAt'>): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.work`,
       rkey,
       record: {
@@ -362,13 +370,13 @@ export class ProfileRepository {
 
   async updateWork(rkey: string, updates: Partial<LinkWork>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.work`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.work`,
       rkey,
       record: {
@@ -381,7 +389,7 @@ export class ProfileRepository {
 
   async deleteWork(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.work`,
       rkey,
     });
@@ -406,7 +414,7 @@ export class ProfileRepository {
   ): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.social`,
       rkey,
       record: {
@@ -420,13 +428,13 @@ export class ProfileRepository {
 
   async updateSocialLink(rkey: string, updates: Partial<LinkSocial>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.social`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.social`,
       rkey,
       record: {
@@ -439,7 +447,7 @@ export class ProfileRepository {
 
   async deleteSocialLink(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.social`,
       rkey,
     });
@@ -460,7 +468,7 @@ export class ProfileRepository {
   async createWebLink(link: Omit<LinkWeb, 'createdAt'>): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.web`,
       rkey,
       record: {
@@ -474,13 +482,13 @@ export class ProfileRepository {
 
   async updateWebLink(rkey: string, updates: Partial<LinkWeb>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.web`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.web`,
       rkey,
       record: {
@@ -493,7 +501,7 @@ export class ProfileRepository {
 
   async deleteWebLink(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.link.web`,
       rkey,
     });
@@ -515,7 +523,7 @@ export class ProfileRepository {
 
   async setLocation(location: { city?: string; country?: string }) {
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.actor.biography.location`,
       rkey: 'self',
       record: {
@@ -543,7 +551,7 @@ export class ProfileRepository {
   ): Promise<string> {
     const rkey = TID.nextStr();
     await this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.collection`,
       rkey,
       record: {
@@ -557,13 +565,13 @@ export class ProfileRepository {
 
   async updateCollection(rkey: string, updates: Partial<Collection>) {
     const record = await this.agent.com.atproto.repo.getRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.collection`,
       rkey,
     });
 
     return this.agent.com.atproto.repo.putRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.collection`,
       rkey,
       record: {
@@ -577,7 +585,7 @@ export class ProfileRepository {
 
   async deleteCollection(rkey: string) {
     return this.agent.com.atproto.repo.deleteRecord({
-      repo: this.agent.session?.did || '',
+      repo: this.getAgentDid(),
       collection: `${LEXICON_PREFIX}.collection`,
       rkey,
     });
