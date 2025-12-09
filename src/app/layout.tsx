@@ -23,18 +23,19 @@ const dmMono = DM_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Lanyards - Researcher Profiles on AT Protocol',
+  metadataBase: new URL('https://lanyards.app'),
+  title: 'Lanyards - Linking Researchers #LinkInBio',
   description:
-    'A dedicated profile for researchers, built on the AT Protocol. An alternative to ORCID.',
+    'Make your research easy to discover with just one link. Connect all your papers, talks, affiliations, socials, whatever...',
   openGraph: {
-    title: 'Lanyards - Researcher Profiles on AT Protocol',
+    title: 'Lanyards - Linking Researchers #LinkInBio',
     description:
-      'A dedicated profile for researchers, built on the AT Protocol. An alternative to ORCID.',
+      'Make your research easy to discover with just one link. Connect all your papers, talks, affiliations, socials, whatever...',
     url: 'https://lanyards.app',
     siteName: 'Lanyards',
     images: [
       {
-        url: '/og/default.png',
+        url: '/og/og-default.png',
         width: 1200,
         height: 630,
         alt: 'Lanyards - Researcher Profiles',
@@ -42,13 +43,6 @@ export const metadata: Metadata = {
     ],
     locale: 'en_US',
     type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Lanyards - Researcher Profiles on AT Protocol',
-    description:
-      'A dedicated profile for researchers, built on the AT Protocol. An alternative to ORCID.',
-    images: ['/og/twitter.png'],
   },
 };
 
