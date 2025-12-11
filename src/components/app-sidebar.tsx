@@ -103,7 +103,7 @@ const linksItems = [
 const supportItems = [
   {
     title: 'Documentation',
-    url: 'https://docs.lanyards.app/',
+    url: 'https://github.com/renderghost/lanyards/wiki/',
     icon: Info,
     external: true,
   },
