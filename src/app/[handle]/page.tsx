@@ -117,6 +117,9 @@ export default async function ProfilePage({ params }: PageProps) {
                 country: location.country,
               }
             : undefined,
+          followersCount: bskyProfile.data.followersCount,
+          followsCount: bskyProfile.data.followsCount,
+          postsCount: bskyProfile.data.postsCount,
         }}
         affiliations={affiliations}
         qualifications={qualifications}

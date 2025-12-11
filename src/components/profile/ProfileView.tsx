@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import QRCodeButton from './QRCodeButton';
+import BlueskyStats from './BlueskyStats/BlueskyStats';
 import { normalizeDOI } from '@/lib/data/doi';
 import { formatDateUS, formatDisplayURL, formatWorkType } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,6 +43,9 @@ interface ProfileViewProps {
       city?: string;
       country?: string;
     };
+    followersCount?: number;
+    followsCount?: number;
+    postsCount?: number;
   };
   affiliations: (Affiliation & { rkey: string; uri: string })[];
   qualifications: (Qualification & { rkey: string; uri: string })[];
@@ -140,9 +144,15 @@ export default function ProfileView({
                 >
                   @{profile.handle}
                 </a>
+                <BlueskyStats
+                  handle={profile.handle}
+                  followersCount={profile.followersCount}
+                  followsCount={profile.followsCount}
+                  postsCount={profile.postsCount}
+                />
                 {profile.location &&
                   (profile.location.city || profile.location.country) && (
-                    <div className="flex items-center gap-1 text-sm text-foreground">
+                    <div className="flex items-center gap-1 text-foreground">
                       <MapPin className="h-4 w-4" />
                       <span className="leading-normal">
                         {profile.location.city && `${profile.location.city}, `}
