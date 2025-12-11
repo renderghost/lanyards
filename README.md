@@ -1,11 +1,9 @@
 # Lanyards 🧑‍🚀
 
-![cover image](docs/public/cover.png)
-
 **One link to make your research life easier to share!** Papers, talks, affiliations, socials, whatever... Easy, free, decentralised, and built on the AT Protocol.
 
 > [!NOTE]
-> The complete documentation is available on [docs.lanyards.app](https://docs.lanyards.app/)
+> The complete documentation is available on the [GitHub Wiki](https://github.com/renderghost/lanyards/wiki)
 
 ## Features
 
