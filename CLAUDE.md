@@ -35,6 +35,13 @@ All work is tracked in GitHub Issues. Use the `gh` CLI or the GitHub MCP tools, 
 - **Only the repository owner approves and merges PRs.** NEVER approve, merge, enable auto-merge, dismiss reviews or bypass branch protection.
 - Address review feedback with new commits on the same branch
 
+### Asking Questions
+- **ALWAYS** resolve open questions with a multiple-choice quiz (e.g. the AskUserQuestion tool), not open-ended prose
+- Group up to 4 related questions per round. When triaging a list of items, ask one question per item.
+- Put the recommended option first and mark it "(Rec.)". Give each option a one-line trade-off.
+- Make every question self-contained, because the user may see only the question dialog
+- Ask open-ended questions only when no sensible options exist
+
 ### Core Principles
 **1. No Stubs, No Shortcuts**
 - **NEVER** use placeholder implementations or `// TODO` comments
