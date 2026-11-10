@@ -1,0 +1,539 @@
+{
+  "last-modified-date": {
+    "value": 1653413908337
+  },
+  "group": [
+    {
+      "last-modified-date": {
+        "value": 1494016313835
+      },
+      "external-ids": {
+        "external-id": [
+          {
+            "external-id-type": "doi",
+            "external-id-value": "10.5555/12345680",
+            "external-id-normalized": {
+              "value": "10.5555/12345680",
+              "transient": true
+            },
+            "external-id-normalized-error": null,
+            "external-id-url": null,
+            "external-id-relationship": "self"
+          }
+        ]
+      },
+      "work-summary": [
+        {
+          "put-code": 9543020,
+          "created-date": {
+            "value": 1375526492206
+          },
+          "last-modified-date": {
+            "value": 1494016313835
+          },
+          "source": {
+            "source-orcid": null,
+            "source-client-id": {
+              "uri": "https://orcid.org/client/0000-0002-3054-1567",
+              "path": "0000-0002-3054-1567",
+              "host": "orcid.org"
+            },
+            "source-name": {
+              "value": "Crossref Metadata Search"
+            },
+            "assertion-origin-orcid": {
+              "uri": "https://orcid.org/0000-0002-1825-0097",
+              "path": "0000-0002-1825-0097",
+              "host": "orcid.org"
+            },
+            "assertion-origin-client-id": null,
+            "assertion-origin-name": {
+              "value": "Josiah Carberry"
+            }
+          },
+          "title": {
+            "title": {
+              "value": "A Methodology for the Emulation of Architecture"
+            },
+            "subtitle": {
+              "value": "Journal of Psychoceramics"
+            },
+            "translated-title": null
+          },
+          "external-ids": {
+            "external-id": [
+              {
+                "external-id-type": "issn",
+                "external-id-value": "0264-3561",
+                "external-id-normalized": {
+                  "value": "0264-3561",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "part-of"
+              },
+              {
+                "external-id-type": "doi",
+                "external-id-value": "10.5555/12345680",
+                "external-id-normalized": {
+                  "value": "10.5555/12345680",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "self"
+              }
+            ]
+          },
+          "url": null,
+          "type": "journal-article",
+          "publication-date": {
+            "year": {
+              "value": "2012"
+            },
+            "month": null,
+            "day": null
+          },
+          "journal-title": null,
+          "visibility": "public",
+          "path": "/0000-0002-1825-0097/work/9543020",
+          "display-index": "2"
+        },
+        {
+          "put-code": 18777963,
+          "created-date": {
+            "value": 1375497097656
+          },
+          "last-modified-date": {
+            "value": 1494016313835
+          },
+          "source": {
+            "source-orcid": {
+              "uri": "https://orcid.org/0000-0002-1825-0097",
+              "path": "0000-0002-1825-0097",
+              "host": "orcid.org"
+            },
+            "source-client-id": null,
+            "source-name": {
+              "value": "Josiah Carberry"
+            },
+            "assertion-origin-orcid": null,
+            "assertion-origin-client-id": null,
+            "assertion-origin-name": null
+          },
+          "title": {
+            "title": {
+              "value": "A Methodology for the Emulation of Architecture"
+            },
+            "subtitle": {
+              "value": "Journal of Psychoceramics"
+            },
+            "translated-title": null
+          },
+          "external-ids": {
+            "external-id": [
+              {
+                "external-id-type": "doi",
+                "external-id-value": "10.5555/12345680",
+                "external-id-normalized": {
+                  "value": "10.5555/12345680",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "self"
+              }
+            ]
+          },
+          "url": null,
+          "type": "journal-article",
+          "publication-date": {
+            "year": {
+              "value": "2012"
+            },
+            "month": null,
+            "day": null
+          },
+          "journal-title": null,
+          "visibility": "public",
+          "path": "/0000-0002-1825-0097/work/18777963",
+          "display-index": "1"
+        }
+      ]
+    },
+    {
+      "last-modified-date": {
+        "value": 1494016313836
+      },
+      "external-ids": {
+        "external-id": [
+          {
+            "external-id-type": "doi",
+            "external-id-value": "10.5555/666655554444",
+            "external-id-normalized": {
+              "value": "10.5555/666655554444",
+              "transient": true
+            },
+            "external-id-normalized-error": null,
+            "external-id-url": null,
+            "external-id-relationship": "self"
+          }
+        ]
+      },
+      "work-summary": [
+        {
+          "put-code": 4562455,
+          "created-date": {
+            "value": 1361131256556
+          },
+          "last-modified-date": {
+            "value": 1494016313836
+          },
+          "source": {
+            "source-orcid": {
+              "uri": "https://orcid.org/0000-0002-1825-0097",
+              "path": "0000-0002-1825-0097",
+              "host": "orcid.org"
+            },
+            "source-client-id": null,
+            "source-name": {
+              "value": "Josiah Carberry"
+            },
+            "assertion-origin-orcid": null,
+            "assertion-origin-client-id": null,
+            "assertion-origin-name": null
+          },
+          "title": {
+            "title": {
+              "value": "The Memory Bus Considered Harmful"
+            },
+            "subtitle": {
+              "value": "Journal of Psychoceramics"
+            },
+            "translated-title": null
+          },
+          "external-ids": {
+            "external-id": [
+              {
+                "external-id-type": "issn",
+                "external-id-value": "0264-3561",
+                "external-id-normalized": {
+                  "value": "0264-3561",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "part-of"
+              },
+              {
+                "external-id-type": "doi",
+                "external-id-value": "10.5555/666655554444",
+                "external-id-normalized": {
+                  "value": "10.5555/666655554444",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "self"
+              }
+            ]
+          },
+          "url": null,
+          "type": "journal-article",
+          "publication-date": {
+            "year": {
+              "value": "2012"
+            },
+            "month": null,
+            "day": null
+          },
+          "journal-title": null,
+          "visibility": "public",
+          "path": "/0000-0002-1825-0097/work/4562455",
+          "display-index": "0"
+        }
+      ]
+    },
+    {
+      "last-modified-date": {
+        "value": 1494016313836
+      },
+      "external-ids": {
+        "external-id": [
+          {
+            "external-id-type": "doi",
+            "external-id-value": "10.5555/987654321",
+            "external-id-normalized": {
+              "value": "10.5555/987654321",
+              "transient": true
+            },
+            "external-id-normalized-error": null,
+            "external-id-url": null,
+            "external-id-relationship": "self"
+          }
+        ]
+      },
+      "work-summary": [
+        {
+          "put-code": 4562454,
+          "created-date": {
+            "value": 1361131256545
+          },
+          "last-modified-date": {
+            "value": 1494016313836
+          },
+          "source": {
+            "source-orcid": {
+              "uri": "https://orcid.org/0000-0002-1825-0097",
+              "path": "0000-0002-1825-0097",
+              "host": "orcid.org"
+            },
+            "source-client-id": null,
+            "source-name": {
+              "value": "Josiah Carberry"
+            },
+            "assertion-origin-orcid": null,
+            "assertion-origin-client-id": null,
+            "assertion-origin-name": null
+          },
+          "title": {
+            "title": {
+              "value": "The Impact of Interactive Epistemologies on Cryptography"
+            },
+            "subtitle": {
+              "value": "Journal of Psychoceramics"
+            },
+            "translated-title": null
+          },
+          "external-ids": {
+            "external-id": [
+              {
+                "external-id-type": "issn",
+                "external-id-value": "0264-3561",
+                "external-id-normalized": {
+                  "value": "0264-3561",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "part-of"
+              },
+              {
+                "external-id-type": "doi",
+                "external-id-value": "10.5555/987654321",
+                "external-id-normalized": {
+                  "value": "10.5555/987654321",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "self"
+              }
+            ]
+          },
+          "url": null,
+          "type": "journal-article",
+          "publication-date": {
+            "year": {
+              "value": "2011"
+            },
+            "month": null,
+            "day": null
+          },
+          "journal-title": null,
+          "visibility": "public",
+          "path": "/0000-0002-1825-0097/work/4562454",
+          "display-index": "0"
+        }
+      ]
+    },
+    {
+      "last-modified-date": {
+        "value": 1494016313836
+      },
+      "external-ids": {
+        "external-id": [
+          {
+            "external-id-type": "doi",
+            "external-id-value": "10.5555/12345679",
+            "external-id-normalized": {
+              "value": "10.5555/12345679",
+              "transient": true
+            },
+            "external-id-normalized-error": null,
+            "external-id-url": null,
+            "external-id-relationship": "self"
+          }
+        ]
+      },
+      "work-summary": [
+        {
+          "put-code": 4562453,
+          "created-date": {
+            "value": 1361131256538
+          },
+          "last-modified-date": {
+            "value": 1494016313836
+          },
+          "source": {
+            "source-orcid": {
+              "uri": "https://orcid.org/0000-0002-1825-0097",
+              "path": "0000-0002-1825-0097",
+              "host": "orcid.org"
+            },
+            "source-client-id": null,
+            "source-name": {
+              "value": "Josiah Carberry"
+            },
+            "assertion-origin-orcid": null,
+            "assertion-origin-client-id": null,
+            "assertion-origin-name": null
+          },
+          "title": {
+            "title": {
+              "value": "Developing Thin Clients Using Amphibious Epistemologies"
+            },
+            "subtitle": {
+              "value": "Journal of Psychoceramics"
+            },
+            "translated-title": null
+          },
+          "external-ids": {
+            "external-id": [
+              {
+                "external-id-type": "issn",
+                "external-id-value": "0264-3561",
+                "external-id-normalized": {
+                  "value": "0264-3561",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "part-of"
+              },
+              {
+                "external-id-type": "doi",
+                "external-id-value": "10.5555/12345679",
+                "external-id-normalized": {
+                  "value": "10.5555/12345679",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "self"
+              }
+            ]
+          },
+          "url": null,
+          "type": "journal-article",
+          "publication-date": {
+            "year": {
+              "value": "2008"
+            },
+            "month": null,
+            "day": null
+          },
+          "journal-title": null,
+          "visibility": "public",
+          "path": "/0000-0002-1825-0097/work/4562453",
+          "display-index": "0"
+        }
+      ]
+    },
+    {
+      "last-modified-date": {
+        "value": 1494016313835
+      },
+      "external-ids": {
+        "external-id": [
+          {
+            "external-id-type": "doi",
+            "external-id-value": "10.5555/12345678",
+            "external-id-normalized": {
+              "value": "10.5555/12345678",
+              "transient": true
+            },
+            "external-id-normalized-error": null,
+            "external-id-url": null,
+            "external-id-relationship": "self"
+          }
+        ]
+      },
+      "work-summary": [
+        {
+          "put-code": 4562456,
+          "created-date": {
+            "value": 1361131256560
+          },
+          "last-modified-date": {
+            "value": 1494016313835
+          },
+          "source": {
+            "source-orcid": {
+              "uri": "https://orcid.org/0000-0002-1825-0097",
+              "path": "0000-0002-1825-0097",
+              "host": "orcid.org"
+            },
+            "source-client-id": null,
+            "source-name": {
+              "value": "Josiah Carberry"
+            },
+            "assertion-origin-orcid": null,
+            "assertion-origin-client-id": null,
+            "assertion-origin-name": null
+          },
+          "title": {
+            "title": {
+              "value": "Toward a Unified Theory of High-Energy Metaphysics: Silly String Theory"
+            },
+            "subtitle": {
+              "value": "Journal of Psychoceramics"
+            },
+            "translated-title": null
+          },
+          "external-ids": {
+            "external-id": [
+              {
+                "external-id-type": "issn",
+                "external-id-value": "0264-3561",
+                "external-id-normalized": {
+                  "value": "0264-3561",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "part-of"
+              },
+              {
+                "external-id-type": "doi",
+                "external-id-value": "10.5555/12345678",
+                "external-id-normalized": {
+                  "value": "10.5555/12345678",
+                  "transient": true
+                },
+                "external-id-normalized-error": null,
+                "external-id-url": null,
+                "external-id-relationship": "self"
+              }
+            ]
+          },
+          "url": null,
+          "type": "journal-article",
+          "publication-date": {
+            "year": {
+              "value": "2008"
+            },
+            "month": null,
+            "day": null
+          },
+          "journal-title": null,
+          "visibility": "public",
+          "path": "/0000-0002-1825-0097/work/4562456",
+          "display-index": "0"
+        }
+      ]
+    }
+  ],
+  "path": "/0000-0002-1825-0097/works"
+}
