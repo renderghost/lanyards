@@ -7,8 +7,15 @@ import {
 import type { Did } from '@atcute/lexicons';
 
 import { requestJson } from '@/lib/sources/request';
-import { err, ok, type Result, type SourceName } from '@/lib/sources/result';
+import {
+  err,
+  ok,
+  type Result,
+  type SourceErrorKind,
+  type SourceName,
+} from '@/lib/sources/result';
 
+import { REQUEST_TIMEOUT_MS } from './endpoints';
 import { didDocumentResolver } from './identity';
 
 export type RawRecord = { uri: string; cid: string; value: unknown };
@@ -18,7 +25,60 @@ const PAGE_SIZE = 100;
 
 const pdsCache = new Map<string, { pds: string; expires: number }>();
 
-/** Finds the PDS that hosts `did`, remembering it for an hour. */
+type Lookup = { ok: true; pds: string } | { ok: false; kind: SourceErrorKind };
+
+/** Lookups in progress, so parallel callers share one DID resolution. */
+const inFlight = new Map<string, Promise<Lookup>>();
+
+/** Resolves the DID document under its own timeout. Never rejects. */
+async function lookUp(did: Did): Promise<Lookup> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const doc = await didDocumentResolver.resolve(did as never, {
+      signal: controller.signal,
+    });
+    const pds = getPdsEndpoint(doc);
+    if (!pds) return { ok: false, kind: 'notFound' };
+    pdsCache.set(did, { pds, expires: Date.now() + PDS_TTL_MS });
+    return { ok: true, pds };
+  } catch (error) {
+    const missing =
+      error instanceof DocumentNotFoundError ||
+      error instanceof ImproperDidError ||
+      error instanceof UnsupportedDidMethodError;
+    if (missing) return { ok: false, kind: 'notFound' };
+    return {
+      ok: false,
+      kind: controller.signal.aborted ? 'timeout' : 'network',
+    };
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Waits for `lookup`, or settles with undefined once `signal` aborts. */
+function unlessAborted(
+  lookup: Promise<Lookup>,
+  signal?: AbortSignal
+): Promise<Lookup | undefined> {
+  if (!signal) return lookup;
+  if (signal.aborted) return Promise.resolve(undefined);
+  return new Promise((resolve) => {
+    const abort = () => resolve(undefined);
+    signal.addEventListener('abort', abort, { once: true });
+    void lookup.then((outcome) => {
+      signal.removeEventListener('abort', abort);
+      resolve(outcome);
+    });
+  });
+}
+
+/**
+ * Finds the PDS that hosts `did`, remembering it for an hour. Parallel
+ * callers share one lookup; a caller that aborts gives up on its own, and
+ * a failed lookup isn't remembered.
+ */
 export async function resolvePds(
   did: Did,
   options: { source: SourceName; signal?: AbortSignal }
@@ -26,21 +86,14 @@ export async function resolvePds(
   const cached = pdsCache.get(did);
   if (cached && cached.expires > Date.now()) return ok(cached.pds);
 
-  try {
-    const doc = await didDocumentResolver.resolve(did as never, {
-      signal: options.signal,
-    });
-    const pds = getPdsEndpoint(doc);
-    if (!pds) return err(options.source, 'notFound');
-    pdsCache.set(did, { pds, expires: Date.now() + PDS_TTL_MS });
-    return ok(pds);
-  } catch (error) {
-    const missing =
-      error instanceof DocumentNotFoundError ||
-      error instanceof ImproperDidError ||
-      error instanceof UnsupportedDidMethodError;
-    return err(options.source, missing ? 'notFound' : 'network');
+  let lookup = inFlight.get(did);
+  if (!lookup) {
+    lookup = lookUp(did).finally(() => inFlight.delete(did));
+    inFlight.set(did, lookup);
   }
+  const outcome = await unlessAborted(lookup, options.signal);
+  if (!outcome) return err(options.source, 'timeout');
+  return outcome.ok ? ok(outcome.pds) : err(options.source, outcome.kind);
 }
 
 const isRecord = (value: unknown): value is RawRecord =>

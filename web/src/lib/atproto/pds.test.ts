@@ -1,5 +1,5 @@
 import type { Did } from '@atcute/lexicons';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -43,6 +43,83 @@ describe('resolvePds', () => {
     });
     expect(requests).toBe(1);
     server.events.removeAllListeners();
+  });
+
+  it('shares one lookup between parallel callers', async () => {
+    const did = didFor('parallelcalls');
+    let requests = 0;
+    server.events.on('request:start', ({ request }) => {
+      if (decodeURIComponent(request.url).includes(did)) requests += 1;
+    });
+    mockDidDocument(did, PDS);
+    const results = await Promise.all(
+      (['semble', 'tangled', 'standardSite', 'lanyards', 'sifa'] as const).map(
+        (source) => resolvePds(did, { source })
+      )
+    );
+    expect(results).toEqual(Array(5).fill({ ok: true, value: PDS }));
+    expect(requests).toBe(1);
+    server.events.removeAllListeners();
+  });
+
+  it('labels a shared failure with each caller’s own source', async () => {
+    const did = didFor('sharedfailure');
+    server.use(
+      http.get(`https://plc.directory/${did}`, () =>
+        HttpResponse.json({ message: 'DID not registered' }, { status: 404 })
+      )
+    );
+    const [semble, tangled] = await Promise.all([
+      resolvePds(did, { source: 'semble' }),
+      resolvePds(did, { source: 'tangled' }),
+    ]);
+    expect(!semble.ok && semble.error.source).toBe('semble');
+    expect(!tangled.ok && tangled.error.source).toBe('tangled');
+  });
+
+  it('does not remember a failed lookup', async () => {
+    const did = didFor('retryafterfail');
+    mockDidDocument(did, PDS);
+    server.use(
+      http.get(`https://plc.directory/${did}`, () => HttpResponse.error(), {
+        once: true,
+      })
+    );
+    const first = await resolvePds(did, { source: 'semble' });
+    expect(!first.ok && first.error.kind).toBe('network');
+    await expect(resolvePds(did, { source: 'semble' })).resolves.toEqual({
+      ok: true,
+      value: PDS,
+    });
+  });
+
+  it('lets one caller give up without failing the others', async () => {
+    const did = didFor('onecallerquits');
+    server.use(
+      http.get(`https://plc.directory/${did}`, async () => {
+        await delay(50);
+        return HttpResponse.json({
+          id: did,
+          service: [
+            {
+              id: '#atproto_pds',
+              type: 'AtprotoPersonalDataServer',
+              serviceEndpoint: PDS,
+            },
+          ],
+        });
+      })
+    );
+    const controller = new AbortController();
+    const quitting = resolvePds(did, {
+      source: 'semble',
+      signal: controller.signal,
+    });
+    const staying = resolvePds(did, { source: 'tangled' });
+    controller.abort();
+    const quit = await quitting;
+    expect(!quit.ok && quit.error.kind).toBe('timeout');
+    await expect(staying).resolves.toEqual({ ok: true, value: PDS });
   });
 
   it('reports an unknown DID as not found for the calling source', async () => {
