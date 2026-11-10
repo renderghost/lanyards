@@ -1,0 +1,61 @@
+{
+  "records": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.document/3mdocone",
+      "cid": "bafyreifixture3mdoconeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.document",
+        "site": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.publication/3mpubone",
+        "path": "/first-post",
+        "title": "First post",
+        "description": "Notes on starting out.",
+        "publishedAt": "2026-10-01T09:00:00.000Z",
+        "updatedAt": "2026-10-02T09:00:00.000Z",
+        "tags": [],
+        "langs": ["en"]
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.document/3mdocloose",
+      "cid": "bafyreifixture3mdoclooseaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.document",
+        "site": "https://loose.example",
+        "path": "/@alice.test/notes",
+        "title": "A loose note",
+        "publishedAt": "2026-10-05T09:00:00.000Z",
+        "langs": ["en"]
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.document/3mdocnopath",
+      "cid": "bafyreifixture3mdocnopathaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.document",
+        "site": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.publication/3mpubone",
+        "title": "Post without a path",
+        "publishedAt": "2026-09-01T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.document/3mdocunsafe",
+      "cid": "bafyreifixture3mdocunsafeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.document",
+        "site": "javascript:alert(1)",
+        "path": "/x",
+        "title": "Unsafe site",
+        "publishedAt": "2026-10-06T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.document/3mdocinvalid",
+      "cid": "bafyreifixture3mdocinvalidaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.document",
+        "site": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.publication/3mpubone",
+        "publishedAt": "2026-10-07T09:00:00.000Z"
+      }
+    }
+  ]
+}

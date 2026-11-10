@@ -1,0 +1,42 @@
+{
+  "items": [
+    {
+      "cid": "bafyreimanoneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "uri": "at://did:plc:fixturerepooneaaaaaaaaaa/org.tangled.repo.manifest/self",
+      "value": {
+        "$type": "org.tangled.repo.manifest",
+        "contributionPolicy": "anyone",
+        "createdAt": "2026-03-01T09:00:00.000000Z",
+        "declaration": {
+          "name": "lanyard-tools",
+          "owner": "did:plc:fixturealiceaaaaaaaaaaaa"
+        },
+        "description": "Tools for conference lanyards",
+        "spindle": "did:web:spindle.tangled.network",
+        "x-tngl-editor": "did:plc:fixturealiceaaaaaaaaaaaa"
+      }
+    },
+    {
+      "cid": "bafyreimantwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "uri": "at://did:plc:fixturerepotwoaaaaaaaaaa/org.tangled.repo.manifest/self",
+      "value": {
+        "$type": "org.tangled.repo.manifest",
+        "contributionPolicy": "anyone",
+        "createdAt": "2026-06-01T09:00:00.000000Z",
+        "declaration": {
+          "name": "notes",
+          "owner": "did:plc:fixturealiceaaaaaaaaaaaa"
+        }
+      }
+    },
+    {
+      "cid": "bafyreimanbadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "uri": "at://did:plc:fixturerepotwoaaaaaaaaaa/org.tangled.repo.manifest/self",
+      "value": {
+        "$type": "org.tangled.repo.manifest",
+        "createdAt": "2026-07-01T09:00:00.000000Z"
+      }
+    }
+  ],
+  "total": 3
+}

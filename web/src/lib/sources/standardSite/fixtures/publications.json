@@ -1,0 +1,25 @@
+{
+  "records": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.publication/3mpubone",
+      "cid": "bafyreifixture3mpuboneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.publication",
+        "url": "https://ada.leaflet.pub/",
+        "name": "Ada's notes",
+        "description": "Writing about protocols",
+        "preferences": {
+          "showInDiscover": true
+        }
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.publication/blento.self",
+      "cid": "bafyreifixtureblentoselfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "site.standard.publication",
+        "url": "https://blento.example"
+      }
+    }
+  ]
+}

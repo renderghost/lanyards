@@ -91,3 +91,17 @@ export function validateRecord(
     ? { ok: true, value: result.value }
     : { ok: false, message: result.message };
 }
+
+/**
+ * Keeps the records that pass their lexicon, as `{ uri, value }`. Invalid
+ * records are dropped one by one, never failing the whole list.
+ */
+export function validRecords<T>(
+  nsid: KnownRecordNsid,
+  records: readonly { uri: string; value: unknown }[]
+): { uri: string; value: T }[] {
+  return records.flatMap((record) => {
+    const result = validateRecord(nsid, record.value);
+    return result.ok ? [{ uri: record.uri, value: result.value as T }] : [];
+  });
+}

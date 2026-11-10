@@ -1,0 +1,22 @@
+{
+  "records": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/org.tangled.repo.declaration/lanyard-tools",
+      "cid": "bafyreifixturelanyardtoolsaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "org.tangled.repo.declaration",
+        "repo": "did:plc:fixturerepooneaaaaaaaaaa",
+        "createdAt": "2026-03-01T09:00:00.000000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/org.tangled.repo.declaration/notes",
+      "cid": "bafyreifixturenotesaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "org.tangled.repo.declaration",
+        "repo": "did:plc:fixturerepotwoaaaaaaaaaa",
+        "createdAt": "2026-06-01T09:00:00.000000Z"
+      }
+    }
+  ]
+}
