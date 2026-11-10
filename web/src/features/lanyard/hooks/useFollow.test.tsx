@@ -114,6 +114,69 @@ describe('useFollow', () => {
     );
   });
 
+  it('rechecks with the server after a failed follow that went through', async () => {
+    let checks = 0;
+    server.use(
+      http.get(`${VIEWER_PDS}/xrpc/app.bsky.graph.getRelationships`, () => {
+        checks += 1;
+        return HttpResponse.json({
+          actor: BEA.did,
+          relationships: [
+            {
+              $type: 'app.bsky.graph.defs#relationship',
+              did: ADA.did,
+              ...(checks > 1
+                ? {
+                    following: `at://${BEA.did}/app.bsky.graph.follow/3mlanded`,
+                  }
+                : {}),
+            },
+          ],
+        });
+      }),
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.createRecord`, () =>
+        HttpResponse.json({ error: 'UpstreamTimeout' }, { status: 504 })
+      )
+    );
+    const { result } = render();
+    await waitFor(() => expect(result.current.state).toBe('notFollowing'));
+    act(() => result.current.follow());
+    await waitFor(() => expect(result.current.pending).toBe(false));
+    expect(result.current.state).toBe('following');
+    expect(notify.error).toHaveBeenCalledWith(
+      'Failed to follow. Please try again.'
+    );
+  });
+
+  it('rechecks with the server after a failed unfollow that went through', async () => {
+    let checks = 0;
+    server.use(
+      http.get(`${VIEWER_PDS}/xrpc/app.bsky.graph.getRelationships`, () => {
+        checks += 1;
+        return HttpResponse.json({
+          actor: BEA.did,
+          relationships: [
+            {
+              $type: 'app.bsky.graph.defs#relationship',
+              did: ADA.did,
+              ...(checks > 1
+                ? {}
+                : { following: `at://${BEA.did}/app.bsky.graph.follow/3mold` }),
+            },
+          ],
+        });
+      }),
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.deleteRecord`, () =>
+        HttpResponse.json({ error: 'UpstreamTimeout' }, { status: 504 })
+      )
+    );
+    const { result } = render();
+    await waitFor(() => expect(result.current.state).toBe('following'));
+    act(() => result.current.unfollow());
+    await waitFor(() => expect(result.current.pending).toBe(false));
+    expect(result.current.state).toBe('notFollowing');
+  });
+
   it('asks for permission instead of writing when the session lacks it', async () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did, 'atproto'));
     let writes = 0;

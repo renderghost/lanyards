@@ -33,8 +33,9 @@ export type UseFollow = {
 
 /**
  * Follow and unfollow on Bluesky from a lanyard. Never writes without
- * permission, and never follows while the current relationship is unknown,
- * so it can't create a duplicate follow.
+ * permission, never follows while the current relationship is unknown,
+ * and re-reads it after a failed write, so it can't create a duplicate
+ * follow.
  */
 export function useFollow(subject: Did, handle: string): UseFollow {
   const { t } = useLingui();
@@ -70,6 +71,10 @@ export function useFollow(subject: Did, handle: string): UseFollow {
 
   const update = (next: Relationship) =>
     queryClient.setQueryData(options.queryKey, next);
+  // A failed write may still have gone through, so read the relationship
+  // again rather than guess. Pending holds until the server has answered.
+  const recheck = () =>
+    queryClient.resetQueries({ queryKey: options.queryKey });
 
   function follow() {
     if (!signedIn || !canFollow || !current || current.followUri || pending) {
@@ -87,8 +92,8 @@ export function useFollow(subject: Did, handle: string): UseFollow {
         track('follow_created');
       })
       .catch(() => {
-        update(current);
         notify.error(t`Failed to follow. Please try again.`);
+        return recheck();
       })
       .finally(() => setPending(false));
   }
@@ -105,8 +110,8 @@ export function useFollow(subject: Did, handle: string): UseFollow {
         track('follow_deleted');
       })
       .catch(() => {
-        update(current);
         notify.error(t`Failed to unfollow. Please try again.`);
+        return recheck();
       })
       .finally(() => setPending(false));
   }
