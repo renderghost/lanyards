@@ -44,3 +44,11 @@ next-env.d.ts
 # mine
 .claude
 .docs
+# web app
+/web/node_modules
+/web/dist
+/web/dev-dist
+/web/src/routeTree.gen.ts
+/web/playwright-report
+/web/test-results
+/.superpowers

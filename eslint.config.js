@@ -13,6 +13,7 @@ export default tseslint.config(
       'build/**',
       'src/types/generated/**',
       'docs/**',
+      'web/**',
     ],
   },
 

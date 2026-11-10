@@ -1,0 +1,49 @@
+/* =============================================================================
+   BRAND TOKENS
+   Ported from the legacy app (src/app/globals.css). Base semantic colours for
+   light and dark mode. Accent colours live in accents.css.
+   Contrast is enforced by src/design/accents.test.ts.
+   ============================================================================= */
+
+:root {
+  /* Purple muted: low saturation, light → dark */
+  --color-purple-muted-50: oklch(0.958 0.009 292.95);
+  --color-purple-muted-100: oklch(0.924 0.016 293.82);
+  --color-purple-muted-200: oklch(0.846 0.032 293.73);
+  --color-purple-muted-300: oklch(0.772 0.045 292.49);
+  --color-purple-muted-400: oklch(0.694 0.061 292.38);
+  --color-purple-muted-500: oklch(0.618 0.071 292.02);
+  --color-purple-muted-600: oklch(0.539 0.079 291.62);
+  --color-purple-muted-700: oklch(0.438 0.083 290.67);
+  --color-purple-muted-800: oklch(0.341 0.069 291.51);
+  --color-purple-muted-900: oklch(0.238 0.049 291.04);
+  --color-purple-muted-950: oklch(0.19 0.042 290.64);
+
+  /* Purple vivid: high saturation, light → dark (500 is #4020DF) */
+  --color-purple-vivid-50: oklch(0.96 0.019 289.4);
+  --color-purple-vivid-500: oklch(0.451 0.258 275.99);
+  --color-purple-vivid-950: oklch(0.11 0.059 278.79);
+
+  --color-yellow-vivid-500: hsl(65 100% 50%);
+}
+
+:root {
+  --background: oklch(0.958 0.009 292.95);
+  --foreground: oklch(0.19 0.042 290.64);
+  --muted-foreground: oklch(0.438 0.083 290.67);
+  --surface: oklch(1 0 0);
+  --border: oklch(0.438 0.083 290.67);
+  --focus-ring: oklch(0.451 0.258 275.99);
+  --radius: 0.375rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: oklch(0.11 0.059 278.79);
+    --foreground: oklch(0.96 0.019 289.4);
+    --muted-foreground: oklch(0.694 0.061 292.38);
+    --surface: oklch(0.19 0.042 290.64);
+    --border: oklch(0.539 0.079 291.62);
+    --focus-ring: hsl(65 100% 50%);
+  }
+}
