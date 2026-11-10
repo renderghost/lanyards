@@ -7,8 +7,9 @@ import {
   XrpcHandleResolver,
 } from '@atcute/identity-resolver';
 
-/** Bluesky's public AppView: unauthenticated reads with CORS enabled. */
-export const PUBLIC_APPVIEW = 'https://public.api.bsky.app';
+import { PUBLIC_APPVIEW } from './endpoints';
+
+export { PUBLIC_APPVIEW };
 
 /**
  * Resolves handles and DIDs. Browsers have no DNS access, so handles are

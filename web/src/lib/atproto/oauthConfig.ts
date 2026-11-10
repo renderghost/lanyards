@@ -3,8 +3,23 @@
  * Pure: no browser or Node APIs, so both contexts can import it.
  */
 
-/** Identity only. Later slices add granular repo scopes. */
-export const OAUTH_SCOPE = 'atproto';
+/**
+ * Granular permissions requested at sign-in: identity, the Lanyards
+ * permission set, follows, and the authenticated Bluesky AppView reads.
+ * The strings must match the client metadata byte for byte.
+ */
+export const GRANULAR_SCOPE = [
+  'atproto',
+  'include:app.lanyards.authFull',
+  'repo:app.bsky.graph.follow?action=create&action=delete',
+  'rpc?lxm=app.bsky.actor.getPreferences&lxm=app.bsky.graph.getBlocks&lxm=app.bsky.graph.getKnownFollowers&lxm=app.bsky.graph.getMutes&lxm=app.bsky.graph.getRelationships&aud=did:web:api.bsky.app%23bsky_appview',
+].join(' ');
+
+/** For servers that reject the granular scopes. */
+export const FALLBACK_SCOPE = 'atproto transition:generic';
+
+/** Everything the client may request, declared in its metadata. */
+export const CLIENT_SCOPE = `${GRANULAR_SCOPE} transition:generic`;
 
 /** Where new accounts are created when someone has no AT Protocol account. */
 export const SIGN_UP_PDS = 'https://bsky.social';

@@ -21,10 +21,12 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 
+import { BSKY_APPVIEW_AUD } from './endpoints';
 import { identityResolver } from './identity';
 import {
   DID_STORAGE_KEY,
-  OAUTH_SCOPE,
+  FALLBACK_SCOPE,
+  GRANULAR_SCOPE,
   safeReturnTo,
   SIGN_UP_PDS,
 } from './oauthConfig';
@@ -54,7 +56,12 @@ export class OAuthCallbackError extends Error {
 export type SessionHandle = {
   did: Did;
   agent: OAuthUserAgent;
+  /** Calls the user's own PDS. */
   rpc: Client;
+  /** Calls the Bluesky AppView through the user's PDS (service proxy). */
+  appview: Client;
+  /** The scope the authorisation server actually granted. */
+  scope: string;
 };
 
 export type RestoreResult =
@@ -94,14 +101,34 @@ export function configureAuth(): void {
   });
 }
 
+type AuthorizationOptions = Omit<
+  Parameters<typeof createAuthorizationUrl>[0],
+  'scope'
+>;
+
+/**
+ * Requests the granular scopes, falling back once to transition:generic
+ * when the authorisation server refuses them (for example a PDS without
+ * permission-set support, or a permission set it cannot resolve yet).
+ */
+async function authorizationUrl(options: AuthorizationOptions): Promise<URL> {
+  try {
+    return await createAuthorizationUrl({ ...options, scope: GRANULAR_SCOPE });
+  } catch (error) {
+    if (!(error instanceof OAuthResponseError)) throw error;
+    if (error.error !== 'invalid_scope') throw error;
+    track('oauth_scope_fallback');
+    return createAuthorizationUrl({ ...options, scope: FALLBACK_SCOPE });
+  }
+}
+
 export async function startSignIn(
   identifier: string,
   returnTo: string
 ): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
-  const url = await createAuthorizationUrl({
+  const url = await authorizationUrl({
     target: { type: 'account', identifier: identifier as ActorIdentifier },
-    scope: OAUTH_SCOPE,
     state,
   });
   track('sign_in_started');
@@ -110,9 +137,8 @@ export async function startSignIn(
 
 export async function startSignUp(returnTo: string): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
-  const url = await createAuthorizationUrl({
+  const url = await authorizationUrl({
     target: { type: 'pds', serviceUrl: SIGN_UP_PDS },
-    scope: OAUTH_SCOPE,
     prompt: 'create',
     state,
   });
@@ -252,7 +278,13 @@ function toHandle(
   session: Awaited<ReturnType<typeof getSession>>
 ): SessionHandle {
   const agent = new OAuthUserAgent(session);
-  return { did, agent, rpc: new Client({ handler: agent }) };
+  return {
+    did,
+    agent,
+    rpc: new Client({ handler: agent }),
+    appview: new Client({ handler: agent, proxy: BSKY_APPVIEW_AUD }),
+    scope: session.token.scope,
+  };
 }
 
 async function redirect(url: URL): Promise<void> {
