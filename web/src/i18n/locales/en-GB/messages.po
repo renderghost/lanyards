@@ -99,7 +99,7 @@ msgstr "Couldn't start account creation. Please try again."
 msgid "Couldn't start creating an account. Please try again."
 msgstr "Couldn't start creating an account. Please try again."
 
-#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:32
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:40
 #: src/features/auth/components/SignInForm/SignInForm.tsx:69
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
@@ -128,11 +128,11 @@ msgstr "Enter your handle"
 msgid "Enter your handle, not your email — for example alice.bsky.social"
 msgstr "Enter your handle, not your email — for example alice.bsky.social"
 
-#: src/features/lanyard/hooks/useFollow.ts:91
+#: src/features/lanyard/hooks/useFollow.ts:95
 msgid "Failed to follow. Please try again."
 msgstr "Failed to follow. Please try again."
 
-#: src/features/lanyard/hooks/useFollow.ts:109
+#: src/features/lanyard/hooks/useFollow.ts:113
 msgid "Failed to unfollow. Please try again."
 msgstr "Failed to unfollow. Please try again."
 
@@ -144,7 +144,7 @@ msgstr "Follow"
 msgid "Follow on Bluesky"
 msgstr "Follow on Bluesky"
 
-#: src/features/lanyard/hooks/useFollow.ts:86
+#: src/features/lanyard/hooks/useFollow.ts:91
 msgid "Followed @{handle}"
 msgstr "Followed @{handle}"
 
@@ -184,7 +184,7 @@ msgstr "For example alice.bsky.social"
 msgid "Full-time roles"
 msgstr "Full-time roles"
 
-#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:48
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:61
 msgid "Give permission"
 msgstr "Give permission"
 
@@ -222,7 +222,7 @@ msgstr "Lanyard unavailable"
 msgid "Lanyards"
 msgstr "Lanyards"
 
-#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:42
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:55
 msgid "Lanyards needs your permission"
 msgstr "Lanyards needs your permission"
 
@@ -434,7 +434,7 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
-#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:45
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:58
 msgid "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 msgstr "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 
@@ -451,7 +451,7 @@ msgstr "Tutorial"
 msgid "Twitch"
 msgstr "Twitch"
 
-#: src/features/lanyard/hooks/useFollow.ts:104
+#: src/features/lanyard/hooks/useFollow.ts:109
 msgid "Unfollowed @{handle}"
 msgstr "Unfollowed @{handle}"
 
