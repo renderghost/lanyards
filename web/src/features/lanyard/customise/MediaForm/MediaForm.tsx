@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
-import { type FormEvent, useRef, useState } from 'react';
+import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { SelectField } from '@/components/SelectField/SelectField';
@@ -11,6 +11,7 @@ import {
   TYPE_LABELS,
 } from '@/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants';
 import { track } from '@/lib/analytics/analytics';
+import { leavingForSubmit } from '@/lib/forms';
 import { cn } from '@/lib/utils';
 
 import { useKeptRecordWriter } from '../../hooks/useKeptRecords';
@@ -64,11 +65,13 @@ export function MediaForm({ disabled = false, className }: MediaFormProps) {
 
   const change = (field: keyof MediaValues) => (value: string) =>
     setValues((current) => ({ ...current, [field]: value }));
-  const check = (field: keyof MediaErrors) => () =>
+  const check = (field: keyof MediaErrors) => (event: FocusEvent<Element>) => {
+    if (leavingForSubmit(event)) return;
     setErrors((current) => ({
       ...current,
       [field]: validateMedia(values)[field],
     }));
+  };
 
   function chooseKind(next: MediaKind) {
     setKind(next);

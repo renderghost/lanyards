@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -45,6 +45,15 @@ describe('WebLinkForm', () => {
     await userEvent.tab();
     expect(address()).toHaveAttribute('aria-invalid', 'true');
     expect(address()).toHaveAccessibleDescription(SCHEME);
+  });
+
+  it('leaves checking to the submit when you leave the field for Add link', async () => {
+    // Showing the error on that blur would move Add link before the click
+    // lands, so the click (and the submit) would be lost.
+    renderWithClient(<WebLinkForm />);
+    await userEvent.type(address(), 'ftp://x');
+    fireEvent.blur(address(), { relatedTarget: add() });
+    expect(address()).not.toHaveAttribute('aria-invalid');
   });
 
   it('keeps what you typed and moves to the first problem on submit', async () => {

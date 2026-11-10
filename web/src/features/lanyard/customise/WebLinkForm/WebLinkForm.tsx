@@ -1,10 +1,11 @@
 import { useLingui } from '@lingui/react/macro';
-import { type FormEvent, useRef, useState } from 'react';
+import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { TextField } from '@/components/TextField/TextField';
 import { notify } from '@/components/Toaster/notify';
 import { track } from '@/lib/analytics/analytics';
+import { leavingForSubmit } from '@/lib/forms';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
 
@@ -38,11 +39,14 @@ export function WebLinkForm({ disabled = false, className }: WebLinkFormProps) {
 
   const change = (field: keyof WebLinkValues) => (value: string) =>
     setValues((current) => ({ ...current, [field]: value }));
-  const check = (field: keyof WebLinkValues) => () =>
-    setErrors((current) => ({
-      ...current,
-      [field]: validateWebLink(values)[field],
-    }));
+  const check =
+    (field: keyof WebLinkValues) => (event: FocusEvent<Element>) => {
+      if (leavingForSubmit(event)) return;
+      setErrors((current) => ({
+        ...current,
+        [field]: validateWebLink(values)[field],
+      }));
+    };
 
   async function submit(event: FormEvent) {
     event.preventDefault();

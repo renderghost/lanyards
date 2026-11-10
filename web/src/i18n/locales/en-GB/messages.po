@@ -39,11 +39,11 @@ msgstr "Accent colour"
 msgid "Account unavailable"
 msgstr "Account unavailable"
 
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:105
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:109
 msgid "Add link"
 msgstr "Add link"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:193
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:196
 msgid "Add media"
 msgstr "Add media"
 
@@ -67,11 +67,11 @@ msgstr "Anchor"
 msgid "Apple Podcasts"
 msgstr "Apple Podcasts"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:45
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:46
 msgid "Audio"
 msgstr "Audio"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:102
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:105
 msgid "Audio added"
 msgstr "Audio added"
 
@@ -115,8 +115,8 @@ msgstr "Check the spelling, or search for them."
 msgid "Checking your ORCID iD…"
 msgstr "Checking your ORCID iD…"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:53
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:149
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:54
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:152
 msgid "Choose a platform"
 msgstr "Choose a platform"
 
@@ -217,7 +217,7 @@ msgstr "Delete"
 msgid "Delete {name}"
 msgstr "Delete {name}"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:169
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:172
 msgid "Description"
 msgstr "Description"
 
@@ -245,13 +245,13 @@ msgstr "Education"
 msgid "Ember"
 msgstr "Ember"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:50
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:33
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:51
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:34
 msgid "Enter a web address"
 msgstr "Enter a web address"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:51
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:34
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:52
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:35
 msgid "Enter a web address starting with https:// or http://"
 msgstr "Enter a web address starting with https:// or http://"
 
@@ -268,9 +268,9 @@ msgid "Failed to follow. Please try again."
 msgstr "Failed to follow. Please try again."
 
 #: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:63
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:105
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:108
 #: src/features/lanyard/customise/MediaList/MediaList.tsx:37
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:66
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:70
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:35
 #: src/features/lanyard/hooks/useLanyardConfig.ts:107
 msgid "Failed to save. Please try again."
@@ -368,15 +368,15 @@ msgstr "Interview"
 msgid "Items to show"
 msgstr "Items to show"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:56
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:57
 msgid "Keep the description to 1,000 characters or fewer"
 msgstr "Keep the description to 1,000 characters or fewer"
 
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:36
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:37
 msgid "Keep the title to 100 characters or fewer"
 msgstr "Keep the title to 100 characters or fewer"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:54
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:55
 msgid "Keep the title to 200 characters or fewer"
 msgstr "Keep the title to 200 characters or fewer"
 
@@ -384,7 +384,7 @@ msgstr "Keep the title to 200 characters or fewer"
 msgid "Keynote"
 msgstr "Keynote"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:178
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:181
 msgid "Kind of content"
 msgstr "Kind of content"
 
@@ -418,7 +418,7 @@ msgstr "Lanyards needs your permission"
 msgid "Lecture"
 msgstr "Lecture"
 
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:63
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:67
 msgid "Link added"
 msgstr "Link added"
 
@@ -495,7 +495,7 @@ msgstr "None"
 msgid "Not found"
 msgstr "Not found"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:180
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:183
 msgid "Not specified"
 msgstr "Not specified"
 
@@ -557,7 +557,7 @@ msgstr "Part-time roles"
 msgid "Picked up {name}, at position {position} of {total}."
 msgstr "Picked up {name}, at position {position} of {total}."
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:146
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:149
 msgid "Platform"
 msgstr "Platform"
 
@@ -772,8 +772,8 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:159
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:90
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:162
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:94
 msgid "Title"
 msgstr "Title"
 
@@ -798,7 +798,7 @@ msgstr "Tutorial"
 msgid "Twitch"
 msgstr "Twitch"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:114
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:117
 msgid "Type of media"
 msgstr "Type of media"
 
@@ -818,11 +818,11 @@ msgstr "Verified. Your publications now show the ORCID tick."
 msgid "Verify your ORCID iD"
 msgstr "Verify your ORCID iD"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:46
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:47
 msgid "Video"
 msgstr "Video"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:102
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:105
 msgid "Video added"
 msgstr "Video added"
 
@@ -874,8 +874,8 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:133
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:76
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:136
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:80
 msgid "Web address"
 msgstr "Web address"
 
