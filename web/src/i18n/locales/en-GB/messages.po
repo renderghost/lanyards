@@ -7,9 +7,25 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en-GB\n"
 
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:31
+msgid "{others, plural, one {# other} other {# others}}"
+msgstr "{others, plural, one {# other} other {# others}}"
+
 #: src/hooks/usePwaUpdatePrompt.ts:21
 msgid "A new version of Lanyards is available"
 msgstr "A new version of Lanyards is available"
+
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:24
+msgid "Account unavailable"
+msgstr "Account unavailable"
+
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:35
+msgid "Bluesky isn't answering right now. Check your connection and try again."
+msgstr "Bluesky isn't answering right now. Check your connection and try again."
+
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:38
+msgid "Check the spelling, or search for them."
+msgstr "Check the spelling, or search for them."
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:80
 msgid "Couldn't start creating an account. Please try again."
@@ -31,6 +47,30 @@ msgstr "Enter your handle"
 msgid "Enter your handle, not your email — for example alice.bsky.social"
 msgstr "Enter your handle, not your email — for example alice.bsky.social"
 
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:29
+msgid "Followed by {first} and {others}+ others you follow"
+msgstr "Followed by {first} and {others}+ others you follow"
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:34
+msgid "Followed by {first} and {rest} you follow"
+msgstr "Followed by {first} and {rest} you follow"
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:37
+msgid "Followed by {first} and {second}, who you follow"
+msgstr "Followed by {first} and {second}, who you follow"
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:28
+msgid "Followed by {first}, {second} and {others}+ others you follow"
+msgstr "Followed by {first}, {second} and {others}+ others you follow"
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:33
+msgid "Followed by {first}, {second} and {rest} you follow"
+msgstr "Followed by {first}, {second} and {rest} you follow"
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:38
+msgid "Followed by {first}, who you follow"
+msgstr "Followed by {first}, who you follow"
+
 #: src/features/auth/components/SignInForm/SignInForm.tsx:89
 msgid "For example alice.bsky.social"
 msgstr "For example alice.bsky.social"
@@ -39,9 +79,21 @@ msgstr "For example alice.bsky.social"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:35
+msgid "Lanyard"
+msgstr "Lanyard"
+
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:25
+msgid "Lanyard unavailable"
+msgstr "Lanyard unavailable"
+
 #: src/components/Logo/Logo.tsx:16
 msgid "Lanyards"
 msgstr "Lanyards"
+
+#: src/features/lanyard/components/LanyardSkeleton/LanyardSkeleton.tsx:14
+msgid "Loading lanyard…"
+msgstr "Loading lanyard…"
 
 #: src/features/account/components/AccountCard/AccountCard.tsx:39
 msgid "Loading your profile…"
@@ -52,6 +104,11 @@ msgstr "Loading your profile…"
 msgid "Loading…"
 msgstr "Loading…"
 
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:19
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:22
+msgid "Not found"
+msgstr "Not found"
+
 #: src/components/NotFound/NotFound.tsx:12
 msgid "Page not found"
 msgstr "Page not found"
@@ -61,12 +118,25 @@ msgstr "Page not found"
 msgid "Reload"
 msgstr "Reload"
 
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:43
+msgid "Search for someone"
+msgstr "Search for someone"
+
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:47
+msgid "Show lanyard"
+msgstr "Show lanyard"
+
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:14
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:24
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:63
 msgid "Sign in"
 msgstr "Sign in"
+
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:58
+msgid "Sign in to see this lanyard"
+msgstr "Sign in to see this lanyard"
 
 #: src/features/account/components/AccountCard/AccountCard.tsx:43
 msgid "Sign out"
@@ -97,17 +167,38 @@ msgstr "Something went wrong"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:30
+msgid "This account isn't available"
+msgstr "This account isn't available"
+
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:70
+msgid "This lanyard isn't available to you."
+msgstr "This lanyard isn't available to you."
+
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:60
+msgid "This person has chosen to show their lanyard only to people who are signed in."
+msgstr "This person has chosen to show their lanyard only to people who are signed in."
+
 #: src/features/auth/components/CallbackStatus/CallbackStatus.constants.ts:8
 msgid "This sign-in link has expired or was already used."
 msgstr "This sign-in link has expired or was already used."
 
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:29
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:37
 msgid "Try again"
 msgstr "Try again"
+
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:33
+msgid "We couldn't find @{handle}"
+msgstr "We couldn't find @{handle}"
 
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:12
 msgid "We couldn't find that handle — check the spelling"
 msgstr "We couldn't find that handle — check the spelling"
+
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:34
+msgid "We couldn't find that lanyard"
+msgstr "We couldn't find that lanyard"
 
 #: src/components/NotFound/NotFound.tsx:15
 msgid "We couldn't find that page"
@@ -117,9 +208,21 @@ msgstr "We couldn't find that page"
 msgid "We couldn't finish signing you in."
 msgstr "We couldn't finish signing you in."
 
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:33
+msgid "We couldn't load this lanyard"
+msgstr "We couldn't load this lanyard"
+
 #: src/features/account/components/AccountCard/AccountCard.tsx:38
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:43
+msgid "What you share"
+msgstr "What you share"
+
+#: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:44
+msgid "You follow each other"
+msgstr "You follow each other"
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:100
 msgid "You're offline. Connect to sign in."

@@ -1,4 +1,8 @@
-import { createRootRouteWithContext, Outlet } from '@tanstack/react-router';
+import {
+  createRootRouteWithContext,
+  Outlet,
+  redirect,
+} from '@tanstack/react-router';
 
 import type { RouterContext } from '@/app/routerContext';
 import { AppError } from '@/components/AppError/AppError';
@@ -8,7 +12,18 @@ import { OfflineBanner } from '@/components/OfflineBanner/OfflineBanner';
 import { useFocusOnNavigation } from '@/hooks/useFocusOnNavigation';
 import { usePwaUpdatePrompt } from '@/hooks/usePwaUpdatePrompt';
 
+const ENCODED_AT = '/%40';
+
 export const Route = createRootRouteWithContext<RouterContext>()({
+  beforeLoad: ({ location }) => {
+    // Some apps percent-encode the @ in shared lanyard links.
+    if (location.pathname.toLowerCase().startsWith(ENCODED_AT)) {
+      const handle = decodeURIComponent(
+        location.pathname.slice(ENCODED_AT.length)
+      );
+      throw redirect({ href: `/@${handle}${location.searchStr}` });
+    }
+  },
   component: RootLayout,
   errorComponent: ({ error }) => <AppError error={error} />,
   notFoundComponent: () => <NotFound />,
