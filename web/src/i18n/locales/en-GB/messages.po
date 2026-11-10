@@ -31,33 +31,91 @@ msgstr "Enter your handle, not your email — for example alice.bsky.social"
 msgid "For example alice.bsky.social"
 msgstr "For example alice.bsky.social"
 
+#: src/components/NotFound/NotFound.tsx:15
+msgid "Go to the home page"
+msgstr "Go to the home page"
+
 #: src/components/Logo/Logo.tsx:16
 msgid "Lanyards"
 msgstr "Lanyards"
 
+#: src/features/account/components/AccountCard/AccountCard.tsx:39
+msgid "Loading your profile…"
+msgstr "Loading your profile…"
+
 #: src/features/auth/components/LandingPage/LandingPage.tsx:37
+#: src/routes/settings.tsx:27
 msgid "Loading…"
 msgstr "Loading…"
+
+#: src/components/AppError/AppError.tsx:20
+msgid "Reload"
+msgstr "Reload"
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:94
 msgid "Sign in"
 msgstr "Sign in"
 
+#: src/features/account/components/AccountCard/AccountCard.tsx:43
+msgid "Sign out"
+msgstr "Sign out"
+
+#: src/features/auth/components/CallbackStatus/CallbackStatus.constants.ts:7
+msgid "Sign-in was cancelled."
+msgstr "Sign-in was cancelled."
+
 #: src/features/auth/session/SessionProvider.tsx:65
 msgid "Signed out"
 msgstr "Signed out"
+
+#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:15
+msgid "Signing you in…"
+msgstr "Signing you in…"
+
+#: src/components/AppError/AppError.tsx:19
+msgid "Something went wrong"
+msgstr "Something went wrong"
 
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:11
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
+#: src/features/auth/components/CallbackStatus/CallbackStatus.constants.ts:8
+msgid "This sign-in link has expired or was already used."
+msgstr "This sign-in link has expired or was already used."
+
+#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:27
+msgid "Try again"
+msgstr "Try again"
+
+#: src/components/NotFound/NotFound.tsx:13
+msgid "We couldn't find that page"
+msgstr "We couldn't find that page"
+
+#: src/features/auth/components/CallbackStatus/CallbackStatus.constants.ts:9
+msgid "We couldn't finish signing you in."
+msgstr "We couldn't finish signing you in."
+
+#: src/features/account/components/AccountCard/AccountCard.tsx:38
+msgid "We couldn't load your profile."
+msgstr "We couldn't load your profile."
+
 #: src/features/auth/components/SignInForm/SignInForm.tsx:89
 msgid "You're offline. Connect to sign in."
 msgstr "You're offline. Connect to sign in."
 
+#: src/components/OfflineBanner/OfflineBanner.tsx:15
+msgid "You're offline. Some things won't work until you reconnect."
+msgstr "You're offline. Some things won't work until you reconnect."
+
 #: src/features/auth/session/SessionProvider.tsx:36
 msgid "You've been signed out. Please sign in again."
 msgstr "You've been signed out. Please sign in again."
+
+#: src/components/AppHeader/AppHeader.tsx:26
+#: src/routes/settings.tsx:35
+msgid "Your account"
+msgstr "Your account"
 
 #: src/features/auth/components/LandingPage/LandingPage.tsx:33
 msgid "Your conference lanyard, from your AT Protocol account"
