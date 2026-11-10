@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
+import { track } from '@/lib/analytics/analytics';
 import { restoreSession, signOut } from '@/lib/atproto/session';
 import { renderWithProviders } from '@/test/render';
 
@@ -12,6 +13,11 @@ import { useSession } from './useSession';
 vi.mock('@/lib/atproto/session', () => ({
   restoreSession: vi.fn(),
   signOut: vi.fn(),
+}));
+
+vi.mock('@/lib/analytics/analytics', () => ({
+  track: vi.fn(),
+  captureError: vi.fn(),
 }));
 
 vi.mock('@/components/Toaster/notify', () => ({
@@ -64,6 +70,7 @@ describe('SessionProvider', () => {
     expect(notify.info).toHaveBeenCalledWith(
       "You've been signed out. Please sign in again."
     );
+    expect(track).toHaveBeenCalledWith('session_expired');
   });
 
   it('stays quiet when nobody had signed in', async () => {
@@ -85,6 +92,7 @@ describe('SessionProvider', () => {
     expect(await screen.findByText('status: signedOut')).toBeInTheDocument();
     expect(signOut).toHaveBeenCalledWith(session);
     expect(notify.success).toHaveBeenCalledWith('Signed out');
+    expect(track).toHaveBeenCalledWith('signed_out');
   });
 
   it('refresh() picks up a session stored after sign-in', async () => {

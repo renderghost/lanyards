@@ -8,6 +8,8 @@ import {
 import type { Did } from '@atcute/lexicons';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { track } from '@/lib/analytics/analytics';
+
 import { DID_STORAGE_KEY } from './oauthConfig';
 import {
   completeSignIn,
@@ -19,6 +21,11 @@ import {
 } from './session';
 
 const agentSignOut = vi.fn();
+
+vi.mock('@/lib/analytics/analytics', () => ({
+  track: vi.fn(),
+  captureError: vi.fn(),
+}));
 
 vi.mock('@atcute/oauth-browser-client', async (importOriginal) => {
   const actual =
@@ -70,6 +77,7 @@ describe('startSignIn', () => {
       state: { returnTo: '/' },
     });
     expect(assign).toHaveBeenCalledWith(url);
+    expect(track).toHaveBeenCalledWith('sign_in_started');
   });
 });
 
@@ -85,6 +93,7 @@ describe('startSignUp', () => {
       prompt: 'create',
       state: { returnTo: '/settings' },
     });
+    expect(track).toHaveBeenCalledWith('sign_up_started');
   });
 });
 
@@ -93,6 +102,7 @@ describe('completeSignIn', () => {
     await expect(completeSignIn('#error=access_denied')).rejects.toMatchObject({
       code: 'denied',
     });
+    expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'denied' });
   });
 
   it('reports a callback without parameters as missing', async () => {
@@ -109,6 +119,7 @@ describe('completeSignIn', () => {
     );
     expect(error).toBeInstanceOf(OAuthCallbackError);
     expect(error).toMatchObject({ code: 'failed' });
+    expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'failed' });
   });
 
   it('stores the DID and returns the requested path', async () => {
@@ -121,6 +132,7 @@ describe('completeSignIn', () => {
       returnTo: '/settings',
     });
     expect(localStorage.getItem(DID_STORAGE_KEY)).toBe(DID);
+    expect(track).toHaveBeenCalledWith('sign_in_completed');
   });
 
   it('never returns an unsafe path from the state', async () => {

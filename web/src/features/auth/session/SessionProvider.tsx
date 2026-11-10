@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { notify } from '@/components/Toaster/notify';
+import { track } from '@/lib/analytics/analytics';
 import {
   type RestoreResult,
   restoreSession,
@@ -31,6 +32,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
     (result: RestoreResult) => {
       setState(toState(result));
       if (result.status === 'expired') {
+        track('session_expired');
         notify.info(t`You've been signed out. Please sign in again.`);
       }
     },
@@ -59,6 +61,7 @@ export function SessionProvider({ children }: SessionProviderProps) {
     generation.current++;
     await endSession(state.session);
     setState({ status: 'signedOut' });
+    track('signed_out');
     notify.success(t`Signed out`);
   }, [state, t]);
 

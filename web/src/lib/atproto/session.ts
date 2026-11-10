@@ -10,6 +10,8 @@ import {
   TokenRefreshError,
 } from '@atcute/oauth-browser-client';
 
+import { track } from '@/lib/analytics/analytics';
+
 import { identityResolver } from './identity';
 import {
   DID_STORAGE_KEY,
@@ -66,6 +68,7 @@ export async function startSignIn(
     scope: OAUTH_SCOPE,
     state,
   });
+  track('sign_in_started');
   await redirect(url);
 }
 
@@ -77,11 +80,27 @@ export async function startSignUp(returnTo: string): Promise<void> {
     prompt: 'create',
     state,
   });
+  track('sign_up_started');
   await redirect(url);
 }
 
 /** Finishes sign-in from the callback URL's hash fragment. */
 export async function completeSignIn(
+  hash: string
+): Promise<{ did: Did; returnTo: string }> {
+  try {
+    const result = await finishSignIn(hash);
+    track('sign_in_completed');
+    return result;
+  } catch (error) {
+    if (error instanceof OAuthCallbackError) {
+      track('sign_in_failed', { reason: error.code });
+    }
+    throw error;
+  }
+}
+
+async function finishSignIn(
   hash: string
 ): Promise<{ did: Did; returnTo: string }> {
   const params = new URLSearchParams(hash.replace(/^#/, ''));
