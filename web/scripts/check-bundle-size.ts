@@ -15,13 +15,17 @@ const manifest = JSON.parse(
 
 const kb = (bytes: number) => `${(bytes / 1024).toFixed(1)} KB`;
 let total = 0;
-for (const file of initialJsFiles(manifest)) {
+// The public lanyard route must fit too (spec §2: initial JS for the
+// public lanyard route ≤ 200 KB gzipped).
+const LANYARD_ROUTES = ['routes/@{$handle}.tsx'];
+
+for (const file of initialJsFiles(manifest, LANYARD_ROUTES)) {
   const size = gzipSize(readFileSync(resolve(dist, file)));
   total += size;
   console.log(`${kb(size).padStart(10)}  ${file}`);
 }
 console.log(
-  `${kb(total).padStart(10)}  initial JS, gzipped (budget ${kb(INITIAL_JS_BUDGET_BYTES)})`
+  `${kb(total).padStart(10)}  initial JS for the lanyard route, gzipped (budget ${kb(INITIAL_JS_BUDGET_BYTES)})`
 );
 
 if (total > INITIAL_JS_BUDGET_BYTES) {

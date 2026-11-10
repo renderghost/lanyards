@@ -21,6 +21,7 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 
+import { readE2eSession } from './e2eSession';
 import { BSKY_APPVIEW_AUD } from './endpoints';
 import { identityResolver } from './identity';
 import {
@@ -224,6 +225,10 @@ async function finishSignIn(
  * storage reads as signed out.
  */
 export async function restoreSession(): Promise<RestoreResult> {
+  if (import.meta.env.VITE_E2E === 'true') {
+    const seeded = readE2eSession();
+    if (seeded) return { status: 'restored', session: seeded };
+  }
   const stored = readStoredDid();
   if (!stored) return { status: 'none' };
   const did = stored as Did;

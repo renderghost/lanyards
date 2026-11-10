@@ -364,3 +364,29 @@ describe('signOut', () => {
     expect(localStorage.getItem(DID_STORAGE_KEY)).toBeNull();
   });
 });
+
+describe('restoreSession in end-to-end builds', () => {
+  const e2eSession = JSON.stringify({ did: DID, scope: 'atproto' });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    localStorage.clear();
+  });
+
+  it('uses the seeded test session only when built for e2e', async () => {
+    vi.stubEnv('VITE_E2E', 'true');
+    localStorage.setItem('lanyards:e2e-session', e2eSession);
+    const result = await restoreSession();
+    expect(result.status).toBe('restored');
+    if (result.status === 'restored') {
+      expect(result.session.did).toBe(DID);
+      expect(result.session.scope).toBe('atproto');
+    }
+    expect(getSession).not.toHaveBeenCalled();
+  });
+
+  it('ignores a seeded test session in a normal build', async () => {
+    localStorage.setItem('lanyards:e2e-session', e2eSession);
+    await expect(restoreSession()).resolves.toEqual({ status: 'none' });
+  });
+});

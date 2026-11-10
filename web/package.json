@@ -9,7 +9,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsr generate && vite build",
-    "build:e2e": "PUBLIC_BASE_URL=http://127.0.0.1:4173 npm run build",
+    "build:e2e": "VITE_E2E=true PUBLIC_BASE_URL=http://127.0.0.1:4173 npm run build",
     "preview": "vite preview",
     "typecheck": "tsr generate && tsc --noEmit",
     "lint": "eslint .",
@@ -22,7 +22,8 @@
     "lex:pull": "lex-cli pull",
     "lex:gen": "lex-cli generate",
     "lex:check": "lex-cli generate && git diff --exit-code -- src/lexicons && git ls-files --others --exclude-standard -- src/lexicons | (! grep .)",
-    "lex:verify": "tsx scripts/verify-lexicons.ts"
+    "lex:verify": "tsx scripts/verify-lexicons.ts",
+    "check:prod": "PUBLIC_BASE_URL=https://ci.lanyards.invalid npm run build && tsx scripts/check-no-e2e.ts"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.4",

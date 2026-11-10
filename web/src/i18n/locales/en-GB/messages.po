@@ -19,7 +19,7 @@ msgstr "{others, plural, one {# other} other {# others}}"
 msgid "A new version of Lanyards is available"
 msgstr "A new version of Lanyards is available"
 
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:24
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:33
 msgid "Account unavailable"
 msgstr "Account unavailable"
 
@@ -43,7 +43,7 @@ msgstr "Blog posts"
 msgid "Bluesky"
 msgstr "Bluesky"
 
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:35
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:50
 msgid "Bluesky isn't answering right now. Check your connection and try again."
 msgstr "Bluesky isn't answering right now. Check your connection and try again."
 
@@ -208,7 +208,7 @@ msgstr "Languages"
 msgid "Lanyard"
 msgstr "Lanyard"
 
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:25
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:34
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
@@ -251,7 +251,7 @@ msgid "Mentoring others"
 msgstr "Mentoring others"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:19
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:22
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:31
 msgid "Not found"
 msgstr "Not found"
 
@@ -403,7 +403,7 @@ msgstr "Tangled"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:30
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:45
 msgid "This account isn't available"
 msgstr "This account isn't available"
 
@@ -432,7 +432,7 @@ msgid "To follow people and save your lanyard, Lanyards needs permission to writ
 msgstr "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:37
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:37
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:52
 msgid "Try again"
 msgstr "Try again"
 
@@ -480,7 +480,7 @@ msgstr "We couldn't find that page"
 msgid "We couldn't finish signing you in."
 msgstr "We couldn't finish signing you in."
 
-#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:33
+#: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:48
 msgid "We couldn't load this lanyard"
 msgstr "We couldn't load this lanyard"
 

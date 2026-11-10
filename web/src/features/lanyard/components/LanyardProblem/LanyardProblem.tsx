@@ -1,12 +1,21 @@
 import { useLingui } from '@lingui/react/macro';
+import { lazy, Suspense } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
-import { LanyardNotFound } from '../LanyardNotFound/LanyardNotFound';
 import { LanyardNotice } from '../LanyardNotice/LanyardNotice';
+import { LanyardSkeleton } from '../LanyardSkeleton/LanyardSkeleton';
 import * as styles from './LanyardProblem.styles';
 import type { LanyardProblemProps } from './LanyardProblem.types';
+
+// Only missing lanyards need the search, so its combobox stays out of the
+// lanyard route's initial JavaScript.
+const LanyardNotFound = lazy(() =>
+  import('../LanyardNotFound/LanyardNotFound').then((module) => ({
+    default: module.LanyardNotFound,
+  }))
+);
 
 /** Why a lanyard can't be shown: missing, unavailable, or Bluesky is down. */
 export function LanyardProblem({
@@ -25,7 +34,13 @@ export function LanyardProblem({
         : t`Lanyard unavailable`
   );
 
-  if (error.kind === 'notFound') return <LanyardNotFound handle={handle} />;
+  if (error.kind === 'notFound') {
+    return (
+      <Suspense fallback={<LanyardSkeleton />}>
+        <LanyardNotFound handle={handle} />
+      </Suspense>
+    );
+  }
   if (unavailable) {
     return <LanyardNotice heading={t`This account isn't available`} />;
   }
