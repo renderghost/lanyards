@@ -1,0 +1,91 @@
+{
+  "config": {
+    "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.actor.lanyard/self",
+    "cid": "bafyreifixtureselfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "value": {
+      "$type": "app.lanyards.actor.lanyard",
+      "accent": "teal",
+      "showJob": false,
+      "blocks": [
+        {
+          "type": "talks",
+          "visible": true,
+          "limit": 5
+        },
+        {
+          "type": "links",
+          "visible": true
+        },
+        {
+          "type": "publications",
+          "visible": true
+        },
+        {
+          "type": "events",
+          "visible": true
+        }
+      ],
+      "hidden": ["https://ada.example/"],
+      "createdAt": "2026-11-01T09:00:00.000Z"
+    }
+  },
+  "honorific": {
+    "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.actor.biography.honorific/self",
+    "cid": "bafyreifixtureselfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "value": {
+      "$type": "app.lanyards.actor.biography.honorific",
+      "value": "Dr",
+      "createdAt": "2025-11-20T09:00:00.000Z"
+    }
+  },
+  "webLinks": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/3mwebone",
+      "cid": "bafyreifixture3mweboneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "app.lanyards.link.web",
+        "url": "https://ada.example/cv",
+        "title": "CV",
+        "createdAt": "2025-11-20T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/3mwebbad",
+      "cid": "bafyreifixture3mwebbadaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "app.lanyards.link.web",
+        "url": "not a url",
+        "createdAt": "2025-11-20T09:00:00.000Z"
+      }
+    }
+  ],
+  "audio": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.media.audio/3maudio",
+      "cid": "bafyreifixture3maudioaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "app.lanyards.link.media.audio",
+        "url": "https://podcasts.example/episode-12",
+        "platform": "apple-podcasts",
+        "title": "Talking protocols",
+        "type": "interview",
+        "createdAt": "2025-11-21T09:00:00.000Z"
+      }
+    }
+  ],
+  "video": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.media.video/3mvideo",
+      "cid": "bafyreifixture3mvideoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "app.lanyards.link.media.video",
+        "url": "https://youtube.com/watch?v=fixture",
+        "platform": "youtube",
+        "title": "Keynote recording",
+        "type": "conference-talk",
+        "publishedDate": "2025-06-12T09:00:00.000Z",
+        "createdAt": "2025-11-22T09:00:00.000Z"
+      }
+    }
+  ]
+}
