@@ -1,11 +1,11 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { TYPEAHEAD_URL } from '@/test/fixtures';
 import { server } from '@/test/msw';
-import { renderRoute } from '@/test/router';
+import { renderRoute, waitForRoute } from '@/test/router';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 
@@ -40,24 +40,18 @@ describe('landing page', () => {
   it('sends a signed-in visitor to their account', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/');
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/settings')
-    );
+    await waitForRoute(router, '/settings');
   });
 
   it('honours a safe return path for signed-in visitors', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/?returnTo=%2Fsettings%3Ftab%3Ddata');
-    await waitFor(() =>
-      expect(router.state.location.href).toBe('/settings?tab=data')
-    );
+    await waitForRoute(router, '/settings?tab=data');
   });
 
   it('ignores an unsafe return path', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/?returnTo=%2F%2Fevil.com');
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/settings')
-    );
+    await waitForRoute(router, '/settings');
   });
 });

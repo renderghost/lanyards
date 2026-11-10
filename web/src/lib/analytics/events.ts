@@ -5,6 +5,10 @@ export type AnalyticsEvent =
   | 'sign_in_completed'
   | 'sign_in_failed'
   | 'sign_up_started'
+  | 'oauth_scope_fallback'
+  | 'lanyard_viewed'
+  | 'follow_created'
+  | 'follow_deleted'
   | 'signed_out'
   | 'session_expired'
   | 'pwa_update_applied';

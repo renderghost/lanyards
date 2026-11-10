@@ -1,0 +1,71 @@
+{
+  "records": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardone",
+      "cid": "bafyreifixture3mcardoneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.card",
+        "type": "URL",
+        "url": "https://protocol.example/spec",
+        "content": {
+          "$type": "network.cosmik.card#urlContent",
+          "url": "https://protocol.example/spec",
+          "metadata": {
+            "$type": "network.cosmik.card#urlMetadata",
+            "title": "The protocol spec",
+            "siteName": "Protocol Example",
+            "imageUrl": "https://protocol.example/og.png"
+          }
+        },
+        "createdAt": "2026-09-02T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardtwo",
+      "cid": "bafyreifixture3mcardtwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.card",
+        "type": "URL",
+        "content": {
+          "$type": "network.cosmik.card#urlContent",
+          "url": "https://blog.example/post",
+          "metadata": {
+            "$type": "network.cosmik.card#urlMetadata",
+            "title": "A blog post"
+          }
+        },
+        "createdAt": "2026-09-03T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardnote",
+      "cid": "bafyreifixture3mcardnoteaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.card",
+        "type": "NOTE",
+        "content": {
+          "$type": "network.cosmik.card#noteContent",
+          "text": "Just a note"
+        },
+        "createdAt": "2026-09-04T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardunsafe",
+      "cid": "bafyreifixture3mcardunsafeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.card",
+        "type": "URL",
+        "content": {
+          "$type": "network.cosmik.card#urlContent",
+          "url": "javascript:alert(1)",
+          "metadata": {
+            "$type": "network.cosmik.card#urlMetadata",
+            "title": "Unsafe"
+          }
+        },
+        "createdAt": "2026-09-05T09:00:00.000Z"
+      }
+    }
+  ]
+}

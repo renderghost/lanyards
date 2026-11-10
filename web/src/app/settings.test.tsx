@@ -1,11 +1,11 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { ALICE, TYPEAHEAD_URL } from '@/test/fixtures';
 import { server } from '@/test/msw';
-import { renderRoute } from '@/test/router';
+import { renderRoute, waitForRoute } from '@/test/router';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 
@@ -27,9 +27,7 @@ describe('/settings', () => {
       refresh: vi.fn(),
     });
     const { router } = renderRoute('/settings');
-    await waitFor(() =>
-      expect(router.state.location.href).toBe('/?returnTo=%2Fsettings')
-    );
+    await waitForRoute(router, '/?returnTo=%2Fsettings');
   });
 
   it('shows the account to signed-in visitors', async () => {

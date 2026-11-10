@@ -1,0 +1,227 @@
+{
+  "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+  "handle": "alice.test",
+  "displayName": "Ada Example",
+  "givenName": "Ada",
+  "familyName": "Example",
+  "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiadasifaavataraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "pronouns": "she/her",
+  "headline": "Research Engineer building open research tools",
+  "about": "I build tools for researchers.",
+  "langs": ["en", "fr"],
+  "location": "Edinburgh, Scotland, United Kingdom",
+  "locationCountry": "United Kingdom",
+  "locationRegion": "Scotland",
+  "locationLocality": "Edinburgh",
+  "countryCode": "GB",
+  "locations": [
+    {
+      "rkey": "3mloc1",
+      "type": "id.sifa.defs#locationPrimary",
+      "isPrimary": true,
+      "locationCountry": "United Kingdom",
+      "locationRegion": "Scotland",
+      "locationLocality": "Edinburgh",
+      "countryCode": "GB",
+      "location": "Edinburgh, Scotland, United Kingdom"
+    }
+  ],
+  "website": "https://ada.example/",
+  "openTo": [
+    "id.sifa.defs#speakingEngagements",
+    "id.sifa.defs#mentoringOthers"
+  ],
+  "preferredWorkplace": [],
+  "industries": [
+    {
+      "domain": "id.sifa.defs#domainHigherEd",
+      "industry": "id.sifa.defs#industryEducation"
+    }
+  ],
+  "claimed": true,
+  "positions": [
+    {
+      "rkey": "3mpos1",
+      "title": "Research Engineer",
+      "company": "Example Lab",
+      "currentCompanyName": "Example Lab",
+      "startedAt": "2024-03",
+      "primary": true,
+      "employmentType": "id.sifa.defs#fullTime",
+      "workplaceType": "id.sifa.defs#hybrid",
+      "skillRkeys": ["3mskill1"]
+    },
+    {
+      "rkey": "3mpos2",
+      "title": "Visiting Fellow",
+      "company": "Open Institute",
+      "startedAt": "2025-01",
+      "primary": false,
+      "skillRkeys": []
+    },
+    {
+      "rkey": "3mpos3",
+      "title": "Software Developer",
+      "company": "Old Company",
+      "startedAt": "2018-01",
+      "endedAt": "2024-02",
+      "primary": false,
+      "skillRkeys": []
+    }
+  ],
+  "education": [
+    {
+      "rkey": "3medu1",
+      "institution": "University of Example",
+      "degree": "PhD",
+      "fieldOfStudy": "Computer Science",
+      "startedAt": "2014",
+      "endedAt": "2018",
+      "primary": false
+    }
+  ],
+  "skills": [
+    {
+      "rkey": "3mskill1",
+      "name": "TypeScript",
+      "category": "technical",
+      "endorsed": false,
+      "endorsementCount": 0,
+      "positionRkeys": ["3mpos1"]
+    },
+    {
+      "rkey": "3mskill2",
+      "name": "Public speaking",
+      "category": "interpersonal",
+      "endorsed": false,
+      "endorsementCount": 0,
+      "positionRkeys": []
+    }
+  ],
+  "certifications": [],
+  "projects": [],
+  "volunteering": [],
+  "involvement": [],
+  "courses": [],
+  "honors": [],
+  "languages": [],
+  "publications": [
+    {
+      "rkey": "3mpub1",
+      "title": "A study of open protocols",
+      "url": "https://journal.example/open-protocols",
+      "doi": "10.1234/EXAMPLE.2023",
+      "date": "2023-05",
+      "publisher": "Journal of Examples",
+      "verified": false,
+      "primary": false,
+      "contributors": [
+        {
+          "name": "Ada Example"
+        }
+      ]
+    },
+    {
+      "rkey": "std-at://did:plc:fixturealiceaaaaaaaaaaaa/site.standard.document/3mblog1",
+      "title": "A blog post Sifa merged in",
+      "url": "https://blog.ada.example/post",
+      "date": "2025-02",
+      "verified": false,
+      "publicationName": "Ada's blog"
+    }
+  ],
+  "presentations": [
+    {
+      "rkey": "3mtalk1",
+      "title": "Building on ATProto",
+      "primary": false,
+      "links": [],
+      "intendedAudiences": [],
+      "deliveries": [
+        {
+          "rkey": "3mdel1",
+          "presentationRkey": "3mtalk1",
+          "date": "2024-03-07",
+          "eventName": "Example Conf 2024",
+          "role": "id.sifa.defs#presenter",
+          "links": [
+            {
+              "uri": "https://conf.example/2024/talks/atproto",
+              "type": "id.sifa.defs#linkEvent"
+            }
+          ],
+          "coSpeakers": []
+        },
+        {
+          "rkey": "3mdel2",
+          "presentationRkey": "3mtalk1",
+          "date": "2025-06-12",
+          "eventName": "Protocol Summit",
+          "role": "id.sifa.defs#keynote",
+          "links": [],
+          "coSpeakers": []
+        }
+      ]
+    }
+  ],
+  "presentationDeliveries": [
+    {
+      "rkey": "3mdel3",
+      "title": "Panel on open science",
+      "date": "2025-09-01",
+      "eventName": "Open Science Week",
+      "role": "id.sifa.defs#panelist",
+      "mode": "community.lexicon.calendar.event#inperson",
+      "links": [
+        {
+          "uri": "https://openscience.example/panel"
+        }
+      ],
+      "coSpeakers": []
+    }
+  ],
+  "externalAccounts": [
+    {
+      "rkey": "3macc1",
+      "url": "https://orcid.org/0000-0002-1825-0097",
+      "platform": "orcid",
+      "label": "ORCID",
+      "primary": false,
+      "verified": false,
+      "verifiable": true
+    },
+    {
+      "rkey": "3macc2",
+      "url": "https://ada.example/",
+      "platform": "website",
+      "label": "Personal site",
+      "primary": true,
+      "verified": false,
+      "verifiable": true
+    },
+    {
+      "rkey": "3macc3",
+      "url": "https://github.com/ada-example",
+      "platform": "github",
+      "label": "GitHub",
+      "primary": false,
+      "verified": false,
+      "verifiable": true
+    },
+    {
+      "rkey": "3macc4",
+      "url": "https://mastodon.example/@ada",
+      "platform": "fediverse",
+      "label": "Mastodon",
+      "primary": false,
+      "verified": false,
+      "verifiable": false
+    }
+  ],
+  "activeApps": [],
+  "followersCount": 12,
+  "followingCount": 30,
+  "connectionsCount": 3,
+  "metInPersonCount": 1,
+  "atprotoFollowersCount": 120
+}

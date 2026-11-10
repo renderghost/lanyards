@@ -50,7 +50,7 @@ Lanyards prefers widely used community lexicons (`app.bsky.*`, `id.sifa.*`, `com
 
 1. **Read, don't author.** Show recent, relevant content from the user's existing records. Authoring is limited to the few `app.lanyards.*` records with no equivalent elsewhere.
 2. **Community lexicons first.** A new `app.lanyards.*` lexicon needs a written justification in this spec.
-3. **Front-end only.** The only server code is one stateless edge function for link previews. It has no database, sessions or secrets.
+3. **Front-end only.** The only server code is a pair of stateless link-preview functions (`api/meta`, `api/og`). They have no database, sessions or secrets.
 4. **Public by default, honest about it.** Every write is public on ATProto, and the UI says so at the moment of writing. Anything private stays on the device.
 5. **Lightweight.** Fast on bad venue Wi-Fi, usable offline, few screens, no busywork.
 6. **Respect people who aren't Lanyards users.** Intros show only public data, and blocks, mutes, labels and opt-outs are honoured everywhere.
@@ -64,7 +64,7 @@ These decisions were agreed in the 2026-11-10 brainstorming session.
 | # | Topic | Decision |
 |---|---|---|
 | 1 | Audience | Design for all attendee types equally; per-person toggles decide what shows |
-| 2 | Front-end only | Static app plus one stateless edge function (link previews only) |
+| 2 | Front-end only | Static app plus stateless link-preview functions only (§12.4) |
 | 3 | Form factor | Installable, mobile-first PWA with an offline-capable pack and QR |
 | 4 | Existing users | One-click migration of old `app.lanyards.*` records (§11) |
 | 5 | Sifa writes | Read-only, with "Edit on Sifa" links; the migration is the single exception |
@@ -121,7 +121,7 @@ These decisions were agreed in the 2026-11-10 brainstorming session.
 | 56 | Language | British English, i18n-ready |
 | 57 | Accessibility | WCAG 2.2 AA + AAA where feasible |
 | 58 | Leaving | Itemised deletion: Lanyards records always; shared-lexicon records opt-in |
-| 59 | Architecture | Vite + React SPA (TanStack Router/Query), PWA, one Vercel Edge Function |
+| 59 | Architecture | Vite + React SPA (TanStack Router/Query), PWA, Vercel link-preview functions (Node.js runtime, §12.4) |
 | 60 | Semble (#75) | Optional, default-off Collections block in Slice 1, read-only from `network.cosmik.*` |
 | 61 | Legal pages | `/privacy` and `/terms` in Slice 1, linked from the OAuth client metadata |
 | 62 | Content reporting (#80) | Deferred to the super-admin phase; no in-app reporting in v1 |
@@ -202,16 +202,16 @@ Time boundaries use the event's `timezone` field when present, otherwise the dev
 
 | Block `type` | Content | Source | Default |
 |---|---|---|---|
-| `links` | Important links with platform icons | `app.bsky.actor.link`, Sifa `externalAccount`, `app.lanyards.link.web.web` (deduplicated by normalised URL) | On |
+| `links` | Important links with platform icons | Bluesky profile links (`app.bsky.actor.profile.links` → `app.bsky.actor.link`, read from `getProfile`), Sifa `externalAccount`, `app.lanyards.link.web` (deduplicated by normalised URL) | On |
 | `talks` | Talks (at this event first when in event context) | Sifa `presentation` / `presentationDelivery` | On |
-| `openTo` | Open to / here for | Sifa `openTo`, plus the event override `hereFor` | Off |
+| `openTo` | Open to / here for | Sifa `profile.self` `openTo`, plus the event override `hereFor` | Off |
 | `blogPosts` | Latest blog posts | `site.standard.document` (+ `publication` for site name/icon) | Off |
 | `bskyPosts` | Latest Bluesky posts (no replies) | Bluesky `getAuthorFeed` (`posts_no_replies`) | Off |
 | `publications` | Latest publications, with ORCID ✓ | ORCID works + Sifa `publication` (deduplicated by DOI) | Off |
 | `skills` | Skills | Sifa `skill` | Off |
 | `education` | Education | Sifa `education` | Off |
-| `code` | Recent repositories | `sh.tangled.repo` | Off |
-| `collections` | Curated collections and recent links | Semble `network.cosmik.collection`, `collectionLink` → `card` (URL cards, with title/site/image metadata) | Off |
+| `code` | Recent repositories | Tangled `org.tangled.repo.*` (Tangled 1.0 retired `sh.tangled.repo` in October 2026) | Off |
+| `collections` | Curated collections and recent links | Semble `network.cosmik.collection`, `collectionLink` → `card` (URL cards, with title and site name; no third-party images) | Off |
 | `media` | Podcasts, videos, interviews | `app.lanyards.link.media.audio` / `.video` | Off |
 | `events` | Other events they're attending | Their upcoming `community.lexicon.calendar.rsvp` (going) | Off |
 | `details` | Location, languages | Sifa `profile.self` (`location`, `langs`) | Off |
@@ -240,7 +240,7 @@ It is computed by Lanyards from `getRelationships`, `getKnownFollowers` and my p
 - **Per-item hide:** the overflow menu on any item hides it (the AT-URI or URL is stored in `hidden`).
 - **Badge:** a toggle for the current-job line.
 - **Kept-record forms** follow CLAUDE.md's Form Standards and 4-file form structure:
-  - honorific: radio buttons Dr, Prof, Mx, Mr, Ms, Mrs, Rev, plus "Other" (free text, maximum 20 characters)
+  - honorific: radio buttons None, Dr and Prof, matching the kept schema's closed enum (`none`, `Dr`, `Prof`). Titles such as Mr or Ms are not academic honorifics and are out of scope (owner decision, 2026-11-10)
   - web link: URL with validation, plus title
   - audio and video: URL, platform, title, description, type, using the existing lexicon enums
 - **Saving:** changes are debounced (800 ms) to the config record via `putRecord`, with a toast: "Lanyard updated" on success, "Failed to save. Please try again." on failure.
@@ -274,9 +274,9 @@ The QR-only Connect rule is honest by default but not tamper-proof, since a QR U
 
 ### 7.8 ORCID verification (two-way link)
 
-- **Finding the iD:** from a Sifa `externalAccount` with platform `id.sifa.defs#platformOrcid`.
+- **Finding the iD:** from a Sifa `externalAccount` whose platform is `orcid` (real records store the bare value; `id.sifa.defs#platformOrcid` is also accepted) or whose URL is on `orcid.org`. The iD's ISO 7064 MOD 11-2 check digit is validated.
 - **The ✓ condition:** a ✓ shows when the public ORCID record's researcher URLs include `https://lanyards.app/d/<did>` or `https://bsky.app/profile/<did>`.
-- **Helper:** the owner gets a **Verify your ORCID** helper. It shows the exact URL to add and deep-links to ORCID's edit page, then re-checks.
+- **Helper:** the owner gets a **Verify your ORCID** helper. It shows the exact URL to add and links to `https://orcid.org/my-orcid` (ORCID has no deep link to its "Websites & social links" section), then re-checks.
 - **Unverified iDs:** publications still show, without the ✓.
 
 ---
@@ -440,16 +440,16 @@ All reads come from the browser, and all are public unless noted.
 | Data | Lexicon / endpoint | Via |
 |---|---|---|
 | Profile basics | `app.bsky.actor.profile` | Bluesky AppView `getProfile(s)` |
-| Profile links | `app.bsky.actor.link` | PDS `getRecord` (refs in `profile.links[]`) |
+| Profile links | `app.bsky.actor.link` | AppView `getProfile` `links[]` (hydrated from the strongRefs in `profile.links`, in display order) |
 | Posts | `app.bsky.feed.post` | AppView `getAuthorFeed` |
 | Relationships | `getRelationships`, `getKnownFollowers` (auth) | AppView via PDS proxy |
 | Moderation prefs, mutes, blocks | `getPreferences`, `getMutes`, `getBlocks` (auth) | AppView via PDS proxy |
 | Starter packs and lists | `getStarterPack(s)`, `getList` | AppView |
-| Professional profile | `id.sifa.profile.*` | Sifa `id.sifa.getProfileView`; PDS `listRecords` fallback |
+| Professional profile | `id.sifa.profile.*` | Sifa `https://sifa.id/xrpc/id.sifa.getProfileView` (CORS `*`, 60 requests/min). PDS `listRecords` fallback only when the view fails (network, timeout, 429, 5xx); `ProfileNotFound` means no Sifa profile. The fallback can show items the person hid on Sifa, because Sifa keeps that flag outside the records (accepted by the owner, 2026-11-10) |
 | Talks | `id.sifa.profile.presentation`, `presentationDelivery` | Sifa view / PDS; Constellation for event backlinks |
-| Blog posts | `site.standard.document`, `site.standard.publication` | PDS `listRecords` |
-| Publications | ORCID `/v3.0/{id}/works`, `/researcher-urls` | `pub.orcid.org` (CORS `*`) |
-| Code | `sh.tangled.repo` | PDS `listRecords` |
+| Blog posts | `site.standard.document`, `site.standard.publication` | PDS `listRecords`; post URL = publication `url` + document `path` |
+| Publications | ORCID `/v3.0/{id}/works`, `/researcher-urls` | `pub.orcid.org` (CORS `*`). Works responses can be several MB, so they are fetched only while the block is visible |
+| Code | `org.tangled.repo.manifest` | Tangled AppView `https://api.tangled.org/xrpc/org.tangled.repo.listRepos?subject=<did>` (CORS `*`); PDS `org.tangled.repo.declaration` fallback (names only) |
 | Collections and links | `network.cosmik.collection`, `network.cosmik.collectionLink`, `network.cosmik.card` | PDS `listRecords` |
 | Events | `community.lexicon.calendar.event` | PDS `getRecord` |
 | RSVPs | `community.lexicon.calendar.rsvp` | Own PDS `listRecords`; Constellation backlinks for attendees |
@@ -464,7 +464,7 @@ All reads come from the browser, and all are public unless noted.
 |---|---|---|
 | `app.lanyards.actor.lanyard` | Customisation, event overrides, met-pack refs | 1 |
 | `app.lanyards.actor.biography.honorific` | Honorific form | 1 |
-| `app.lanyards.link.web.web` | Web link form | 1 |
+| `app.lanyards.link.web` | Web link form | 1 |
 | `app.lanyards.link.media.audio` / `.video` | Media forms | 1 |
 | `id.sifa.profile.*` | Migration only | 1 |
 | Deleting old `app.lanyards.*` records | Migration clean-up, data deletion | 1 |
@@ -502,8 +502,8 @@ When the record is absent, Lanyards uses the smart defaults in §7.2. The first 
 ### 10.4 Kept lexicons (unchanged NSIDs and schemas)
 
 The following stay exactly as they are today, so existing records remain valid, and are available to new users:
-- `app.lanyards.actor.biography.honorific`
-- `app.lanyards.link.web.web`
+- `app.lanyards.actor.biography.honorific` (closed enum `none`, `Dr`, `Prof`)
+- `app.lanyards.link.web` (the legacy app writes this NSID; the source file is `lexicons/link/web/web.json`)
 - `app.lanyards.link.media.audio`
 - `app.lanyards.link.media.video`
 
@@ -511,13 +511,14 @@ All other `app.lanyards.*` lexicons are retired. They are read only by the migra
 
 ### 10.5 Lexicon publishing
 
-- **Records:** publish every active `app.lanyards.*` lexicon, plus a permission set `app.lanyards.authFull` (repo access to those collections), as `com.atproto.lexicon.schema` records in a `lanyards.app` ATProto account.
-- **DNS:** add `_lexicon.lanyards.app TXT "did=<did>"`.
-- **Why:** this lets OAuth request `include:app.lanyards.authFull`. bsky.social currently rejects it because the schema can't be resolved.
+- **Records:** publish every active `app.lanyards.*` lexicon, plus a permission set `app.lanyards.authFull` (repo access to those collections), as `com.atproto.lexicon.schema` records (rkey = NSID) in the `lanyards.app` account (`did:plc:ua3d6biqepazbq6mw4ysotfo`), using `goat lex publish`.
+- **DNS:** resolvers look up the NSID's authority with the last segment dropped and never walk the hierarchy, so each group needs its own TXT record, all `"did=did:plc:ua3d6biqepazbq6mw4ysotfo"`: `_lexicon.lanyards.app`, `_lexicon.actor.lanyards.app`, `_lexicon.biography.actor.lanyards.app`, `_lexicon.link.lanyards.app` and `_lexicon.media.link.lanyards.app`.
+- **Why:** this lets OAuth request `include:app.lanyards.authFull`. bsky.social rejects it until the schema resolves (`invalid_scope: Unable to resolve Lexicon schema app.lanyards.authFull`, verified 2026-11-10) and caches failures for about 5 minutes.
+- **Limit:** a permission set may only name NSIDs under its own namespace, so Bluesky scopes (follow, AppView reads) are requested directly.
 
 ### 10.6 OAuth scopes
 
-- **Requested at sign-in (Slice 1):** `atproto`, `include:app.lanyards.authFull`, `repo:app.bsky.graph.follow`, plus `rpc` scopes for the authenticated AppView reads in §10.1.
+- **Requested at sign-in (Slice 1):** `atproto`, `include:app.lanyards.authFull`, `repo:app.bsky.graph.follow?action=create&action=delete`, plus one `rpc` scope for the authenticated AppView reads in §10.1 (`rpc?lxm=…&aud=did:web:api.bsky.app%23bsky_appview`). Requested scopes must match the client metadata's `scope` byte for byte, and a PAR success does not prove a scope was granted (unparseable scopes are dropped silently), so features check the granted scope on the session.
 - **Later slices:** each adds its scopes to the client metadata as it ships. Existing sessions get a just-in-time consent prompt the first time a feature needs a new scope.
   - **Slice 2:** `repo:community.lexicon.calendar.rsvp`, `repo:app.bsky.feed.post?action=create`, `blob:image/*`
   - **Slice 3:** `repo:at.youandme.connection`, `repo:app.bsky.graph.list`, `repo:app.bsky.graph.listitem`, `repo:app.bsky.graph.starterpack`
@@ -547,12 +548,12 @@ All other `app.lanyards.*` lexicons are retired. They are read only by the migra
 | `actor.biography.affiliation` | `id.sifa.profile.position` | role → title, organizationName → company, dates. Lost: organizationType, isPrimary, location, website (listed in preview) |
 | `actor.biography.qualification` | `id.sifa.profile.education` (degree types) or `id.sifa.profile.certification` (certificate types) | yearAwarded → endedAt |
 | `actor.biography.skill` | `id.sifa.profile.skill` | Lost: proficiency, yearsOfExperience |
-| `link.social.social` | `id.sifa.profile.externalAccount` | platform mapped to Sifa platform values |
-| `link.work.work` (+ `link.work.publication` venue) | `id.sifa.profile.publication` | DOI and venue kept |
-| `link.event.event` | `id.sifa.profile.presentation` + `presentationDelivery` | eventName, date, location, role, links (relatedWorks → links) |
+| `link.social` | `id.sifa.profile.externalAccount` | platform mapped to Sifa platform values |
+| `link.work` (+ `link.work.publication` venue) | `id.sifa.profile.publication` | DOI and venue kept |
+| `link.event` | `id.sifa.profile.presentation` + `presentationDelivery` | eventName, date, location, role, links (relatedWorks → links) |
 | `link.media.code` | `id.sifa.profile.project` | name, url, description |
 | `actor.biography.honorific` | Kept as is | |
-| `link.web.web` | Kept as is | |
+| `link.web` | Kept as is | |
 | `link.media.audio` / `.video` | Kept as is | |
 | `actor.biography.identity`, `actor.profile.content`, `pinned`, `visible`, `theme`, `collection` | Not carried over | New defaults apply |
 
@@ -574,7 +575,8 @@ All other `app.lanyards.*` lexicons are retired. They are read only by the migra
 - **UI:** Tailwind CSS v4 with the existing brand tokens (`#4020DF` purple scales, DM Sans / DM Serif Text / DM Mono), and Radix primitives through shadcn components.
 - **ATProto:** `@atcute/client` and `@atcute/oauth-browser-client` (v5, which uses PKCE, PAR and DPoP). Lexicon types come from `@atcute/lex-cli`, with third-party schemas pinned from their published records.
 - **Device and offline:** Dexie (IndexedDB), and `vite-plugin-pwa` (Workbox).
-- **Utilities:** `qrcode` (SVG) and Lingui (i18n, `en-GB` catalogue).
+- **Utilities:** `lean-qr` (SVG path data, ESM, typed; about 4 KB gzipped) and Lingui (i18n, `en-GB` catalogue).
+- **Link previews:** Vercel Node.js functions (Vercel now recommends Node over Edge) with `satori` and `@resvg/resvg-wasm` for OG images.
 - **Analytics:** PostHog in cookieless mode (`persistence: 'memory'`, `person_profiles: 'never'`, autocapture off, explicit event list, exception capture), respecting Do Not Track.
 
 ### 12.2 Units
@@ -589,7 +591,7 @@ All other `app.lanyards.*` lexicons are retired. They are read only by the migra
 | `lib/query` | Query client, key factory, IndexedDB persister, offline prefetch | TanStack Query |
 | `features/*` | `auth`, `lanyard`, `connect`, `packs`, `people`, `recap`, `migration`, `settings`: routes, forms and feature components | `lib/*`, `components` |
 | `components/` | Design system (4-file structure), accent palettes, icons | Tailwind, Radix |
-| `api/meta` | Vercel Edge Function (§12.4) | Public HTTP only |
+| `api/meta`, `api/og` | Vercel Node.js functions (§12.4); shared code in `web/server/`, which never imports the app's `@/` alias | Public HTTP only |
 
 ### 12.3 Data flow: opening a lanyard
 
@@ -599,15 +601,17 @@ All other `app.lanyards.*` lexicons are retired. They are read only by the migra
 4. The context strip queries run independently.
 5. The results are cached and persisted.
 
-### 12.4 Edge function (`api/meta`)
+### 12.4 Link-preview functions (`api/meta`, `api/og`)
 
-Vercel rewrites `/@:handle`, `/d/:did` and `/e/:did/:rkey` to the function.
+Vercel rewrites `/@:handle`, `/d/:did` and `/e/:did/:rkey` to `api/meta`, ahead of the SPA catch-all.
 
 - **Fetches:** public profile data (Bluesky + Sifa headline) or the event record.
-- **Injects:** `<title>`, description, canonical, and Open Graph and Twitter tags into the built `index.html`, then returns it.
-- **Images:** `/og/p/:did.png` and `/og/e/:did/:rkey.png` render 1200×630 badge-style images with Satori.
+- **Injects:** `<title>`, description, canonical, and Open Graph and Twitter tags into the built `index.html` (read from the function bundle, not fetched over HTTP), then returns it. Every value is HTML-escaped.
+- **Images:** `/og/p/:did.png` and `/og/e/:did/:rkey.png` (via `api/og`) render 1200×630 badge-style images with Satori.
 - **Caching and constraints:** responses use `s-maxage=600, stale-while-revalidate=86400`. No secrets, no storage.
-- **Failure:** on any failure, the plain `index.html` is served with default meta.
+- **Failure:** on any failure, the plain `index.html` is served with default meta and a short cache.
+- **Opt-outs:** a profile with the `!no-unauthenticated` label gets default meta and the default image, never its name or avatar.
+- **Bots:** Bluesky's preview fetcher (cardyb) runs no JavaScript and follows redirects; every request gets the same injected HTML, with no user-agent sniffing.
 
 ### 12.5 Offline
 
@@ -755,7 +759,7 @@ Each slice is complete, tested and shippable to `next.lanyards.app`, and gets it
   - lexicon publishing and `app.lanyards.authFull`
   - OAuth (sign-in, sign-up via the PDS, scopes, session handling)
 - **Adapters and model:** `bluesky`, `sifa`, `standardSite`, `orcid`, `tangled`, `semble` (#75), `lanyards`; `PersonView`.
-- **Public pages:** `/@:handle` and `/d/:did` (without event context), and the `api/meta` edge function with OG images. In this slice, `/d/:did` offers **Follow** to signed-in scanners; **Connect** replaces it in Slice 3.
+- **Public pages:** `/@:handle` and `/d/:did` (without event context), and the `api/meta` and `api/og` link-preview functions. In this slice, `/d/:did` offers **Follow** to signed-in scanners; **Connect** replaces it in Slice 3.
 - **Navigation:** the signed-in landing page is `/lanyard`, with Settings behind the avatar. The Home tab arrives in Slice 2 and the People tab in Slice 3.
 - **Lanyard:**
   - `/lanyard` customisation and kept-record forms
@@ -811,7 +815,10 @@ Each slice is complete, tested and shippable to `next.lanyards.app`, and gets it
 |---|---|---|
 | Constellation (microcosm) availability | Attendee lists, inbox, programme | Graceful fallbacks (§13); adapter isolation lets us switch indexes later |
 | Sifa lexicons are alpha and may change | Profile blocks, migration | Pinned schemas, contract tests, `listRecords` fallback |
-| Sifa AppView availability | Profile blocks | PDS `listRecords` fallback |
+| Sifa AppView availability | Profile blocks | PDS `listRecords` fallback (may show items hidden on Sifa; accepted) |
+| Sifa records break their own schema (bare platform values such as `orcid`, `null` in optional fields) | Parsing | Strip nulls before validation; accept bare and `id.sifa.defs#…` tokens; drop invalid items, never the whole profile |
+| Large ORCID records (several MB of works) | Slow publications block | Fetch only while the block is visible; cache |
+| Tangled AppView availability | Code block | PDS `org.tangled.repo.declaration` fallback (names only) |
 | Smoke Signal search availability | Event search only | Paste a link / QR still work |
 | `at.youandme.connection` is owned by a third party | Vouch semantics | Pinned schema; minimal fields (`subject`, `createdAt`); revisit if it changes |
 | Granular OAuth scopes not supported by every PDS | Sign-in on smaller PDSes | `transition:generic` fallback |
@@ -823,20 +830,20 @@ Each slice is complete, tested and shippable to `next.lanyards.app`, and gets it
 
 ## 20. Verification tasks for the Slice 1–2 plans
 
-These are facts to confirm during planning. Each has a defined fallback, so no requirement depends on the outcome.
+These are facts to confirm during planning. Each has a defined fallback, so no requirement depends on the outcome. Outcomes recorded during Slice 1b planning (2026-11-10) are in the last column.
 
-| # | Verify | Fallback |
-|---|---|---|
-| 1 | Exact `rpc:`/`repo:`/`include:` scope strings accepted by bsky.social for §10.6 | `transition:generic` |
-| 2 | Constellation path for `presentationDelivery.eventRef` (expected `.eventRef.uri`) | Read speakers' records from the Sifa view of each attendee |
-| 3 | How to detect `app.bsky.graph.referencelistoptout` for a subject | Check the subject's repo with `listRecords` |
-| 4 | Mapping Smoke Signal `searchEvents` results to AT-URIs (the result has `url`, no `uri`) | Parse the AT-URI from `url`, or resolve it with `calendar.getEvent` |
-| 5 | Current Bluesky starter-pack membership cap (expected 150) | Use the cap the AppView enforces, read from the error |
-| 6 | `id.sifa.getProfileView` coverage (presentations, projects, external accounts) | Per-collection `listRecords` for anything missing |
-| 7 | Record hydration for large RSVP sets: direct PDS reads vs microcosm Slingshot cache | Direct PDS reads with concurrency limits (Slingshot needs explicit approval as an extra dependency) |
-| 8 | That `include:id.sifa.authProfile` covers every migration target collection (§11) | Request `repo:` scopes per collection |
-| 9 | How to find the Smoke Signal `acceptance` record for an RSVP (it references a CID, which may not be backlink-indexed) | Show RSVP status only, with no "accepted" badge |
-| 10 | Semble's public profile and collection URL format, for "View on Semble" links | Link each card to its own URL and omit the Semble link |
+| # | Verify | Fallback | Outcome |
+|---|---|---|---|
+| 1 | Exact `rpc:`/`repo:`/`include:` scope strings accepted by bsky.social for §10.6 | `transition:generic` | Repo, rpc and `transition:generic` scopes pass PAR; `include:app.lanyards.authFull` waits on publishing (§10.5). See §10.6 for the byte-for-byte rule |
+| 2 | Constellation path for `presentationDelivery.eventRef` (expected `.eventRef.uri`) | Read speakers' records from the Sifa view of each attendee | Slice 2 planning |
+| 3 | How to detect `app.bsky.graph.referencelistoptout` for a subject | Check the subject's repo with `listRecords` | The record exists (`app.bsky.graph.referencelistoptout`, key `tid`, `subject` = list AT-URI), enforced only for `#referencelist` lists; detection left for Slice 3 planning |
+| 4 | Mapping Smoke Signal `searchEvents` results to AT-URIs (the result has `url`, no `uri`) | Parse the AT-URI from `url`, or resolve it with `calendar.getEvent` | Slice 2 planning |
+| 5 | Current Bluesky starter-pack membership cap (expected 150) | Use the cap the AppView enforces, read from the error | Slice 3 planning |
+| 6 | `id.sifa.getProfileView` coverage (presentations, projects, external accounts) | Per-collection `listRecords` for anything missing | Covers presentations (with nested deliveries), standalone deliveries, projects, external accounts and `openTo`. View keys differ from records (`rkey`, `primary`), and items hidden on Sifa are omitted |
+| 7 | Record hydration for large RSVP sets: direct PDS reads vs microcosm Slingshot cache | Direct PDS reads with concurrency limits (Slingshot needs explicit approval as an extra dependency) | Slice 2 planning |
+| 8 | That `include:id.sifa.authProfile` covers every migration target collection (§11) | Request `repo:` scopes per collection | Partly: it covers `self`, `position`, `education`, `skill`, `certification`, `project`, `volunteering`, `publication`, `course`, `honor`, `language`, `externalAccount` and `graph.follow`, but not `presentation`, `presentationDelivery` or `location`, so Slice 1c also requests `repo:` scopes for those |
+| 9 | How to find the Smoke Signal `acceptance` record for an RSVP (it references a CID, which may not be backlink-indexed) | Show RSVP status only, with no "accepted" badge | Slice 2 planning |
+| 10 | Semble's public profile and collection URL format, for "View on Semble" links | Link each card to its own URL and omit the Semble link | `https://semble.so/profile/<handle>/collections/<rkey>` (a DID also works); `semble.so/@handle` returns 404 |
 
 ---
 
@@ -847,7 +854,11 @@ These are facts to confirm during planning. Each has a defined fallback, so no r
 - youandme.at: `_lexicon.youandme.at` → `did:plc:zfgfhm7mpslcdc3mk3z6sebw`, schema `at.youandme.connection`.
 - standard.site: published on `did:plc:re3ebnp5v7ffagz6rb6xfei4`.
 - Semble: `_lexicon.cosmik.network` → `did:plc:b2p6rujcgpenbtcjposmjuc3` (`network.cosmik.card`, `collection`, `collectionLink`; about 1,100 accounts).
-- Bluesky lexicons: `github.com/bluesky-social/bsky`; PDS rate limits from the PDS source.
+- Bluesky lexicons: `github.com/bluesky-social/bsky` (the `app.bsky` lexicons moved there from `bluesky-social/atproto`); PDS rate limits from the PDS source.
+- Sifa AppView: `https://sifa.id/xrpc/id.sifa.getProfileView` (the documented `api.sifa.id` host does not resolve); Sifa lexicons are published from the PDS `https://eurosky.social`.
+- Tangled: `_lexicon.repo.tangled.org` → `did:plc:wshs7t2adsemcrrd4snkeqli`; AppView `https://api.tangled.org`; repo URLs `https://tangled.org/<handle>/<name>`.
+- Lanyards lexicons: `lanyards.app` → `did:plc:ua3d6biqepazbq6mw4ysotfo`.
+- Lexicon and permission rules: atproto.com/specs/lexicon (publication and resolution) and atproto.com/specs/permission; `goat` v0.2.9 (`lex publish`, `lex check-dns`, `lex lint`).
 - Constellation: `constellation.microcosm.blue`. Verified 2026-11-10: 30 RSVP backlinks returned for a live Atmo event, CORS `*`.
 - Smoke Signal search: `smokesignal.events/xrpc/community.lexicon.calendar.searchEvents` (CORS `*`).
 - ORCID public API: `pub.orcid.org/v3.0` (CORS `*`; anonymous limit 25k reads/day per IP).

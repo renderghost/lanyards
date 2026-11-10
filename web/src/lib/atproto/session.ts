@@ -21,13 +21,37 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 
+import { readE2eSession } from './e2eSession';
+import { BSKY_APPVIEW_AUD } from './endpoints';
 import { identityResolver } from './identity';
+import { parseGrantedScope } from './permissions';
 import {
   DID_STORAGE_KEY,
-  OAUTH_SCOPE,
+  FALLBACK_SCOPE,
+  GRANULAR_SCOPE,
   safeReturnTo,
   SIGN_UP_PDS,
 } from './oauthConfig';
+
+/** Where to send someone who has to start signing in again. */
+const RETURN_TO_KEY = 'lanyards:returnTo';
+
+function rememberReturnTo(path: string): void {
+  try {
+    sessionStorage.setItem(RETURN_TO_KEY, path);
+  } catch {
+    // Storage blocked: "Try again" falls back to the landing page.
+  }
+}
+
+/** The safe path sign-in started from, for "Try again" after a failure. */
+export function recallReturnTo(): string {
+  try {
+    return safeReturnTo(sessionStorage.getItem(RETURN_TO_KEY));
+  } catch {
+    return '/';
+  }
+}
 
 /** Give the browser time to persist OAuth state before navigating away. */
 const REDIRECT_DELAY_MS = 200;
@@ -54,7 +78,12 @@ export class OAuthCallbackError extends Error {
 export type SessionHandle = {
   did: Did;
   agent: OAuthUserAgent;
+  /** Calls the user's own PDS. */
   rpc: Client;
+  /** Calls the Bluesky AppView through the user's PDS (service proxy). */
+  appview: Client;
+  /** The scope the authorisation server actually granted. */
+  scope: string;
 };
 
 export type RestoreResult =
@@ -94,25 +123,88 @@ export function configureAuth(): void {
   });
 }
 
+type AuthorizationOptions = Omit<
+  Parameters<typeof createAuthorizationUrl>[0],
+  'scope'
+>;
+
+/**
+ * Requests the granular scopes, falling back once to transition:generic
+ * when the authorisation server refuses them (for example a PDS without
+ * permission-set support, or a permission set it cannot resolve yet).
+ */
+/**
+ * Accounts whose server granted identity only, though granular scopes were
+ * requested: it dropped them silently (spec §10.6). Asking again would loop,
+ * so the next request for such an account uses the broad fallback.
+ */
+const fallbackKey = (did: string) => `lanyards:scope-fallback:${did}`;
+
+function grantsNothingGranular(scope: string): boolean {
+  const granted = parseGrantedScope(scope);
+  return !granted.generic && granted.repo.size === 0 && granted.rpc.size === 0;
+}
+
+function rememberScopeOutcome(did: string, scope: string): void {
+  try {
+    if (grantsNothingGranular(scope)) {
+      localStorage.setItem(fallbackKey(did), '1');
+    } else {
+      localStorage.removeItem(fallbackKey(did));
+    }
+  } catch {
+    // Storage blocked: the next sign-in simply asks for granular scopes.
+  }
+}
+
+function needsFallback(identifier: string): boolean {
+  try {
+    return localStorage.getItem(fallbackKey(identifier)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+async function authorizationUrl(
+  options: AuthorizationOptions,
+  identifier?: string
+): Promise<URL> {
+  if (identifier && needsFallback(identifier)) {
+    track('oauth_scope_fallback');
+    return createAuthorizationUrl({ ...options, scope: FALLBACK_SCOPE });
+  }
+  try {
+    return await createAuthorizationUrl({ ...options, scope: GRANULAR_SCOPE });
+  } catch (error) {
+    if (!(error instanceof OAuthResponseError)) throw error;
+    if (error.error !== 'invalid_scope') throw error;
+    track('oauth_scope_fallback');
+    return createAuthorizationUrl({ ...options, scope: FALLBACK_SCOPE });
+  }
+}
+
 export async function startSignIn(
   identifier: string,
   returnTo: string
 ): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
-  const url = await createAuthorizationUrl({
-    target: { type: 'account', identifier: identifier as ActorIdentifier },
-    scope: OAUTH_SCOPE,
-    state,
-  });
+  rememberReturnTo(state.returnTo);
+  const url = await authorizationUrl(
+    {
+      target: { type: 'account', identifier: identifier as ActorIdentifier },
+      state,
+    },
+    identifier
+  );
   track('sign_in_started');
   await redirect(url);
 }
 
 export async function startSignUp(returnTo: string): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
-  const url = await createAuthorizationUrl({
+  rememberReturnTo(state.returnTo);
+  const url = await authorizationUrl({
     target: { type: 'pds', serviceUrl: SIGN_UP_PDS },
-    scope: OAUTH_SCOPE,
     prompt: 'create',
     state,
   });
@@ -162,6 +254,7 @@ async function finishSignIn(
 
   const did = result.session.info.sub;
   localStorage.setItem(DID_STORAGE_KEY, did);
+  rememberScopeOutcome(did, result.session.token.scope);
   const state = result.state as Partial<SignInState> | null;
   return { did, returnTo: safeReturnTo(state?.returnTo) };
 }
@@ -176,6 +269,10 @@ async function finishSignIn(
  * storage reads as signed out.
  */
 export async function restoreSession(): Promise<RestoreResult> {
+  if (import.meta.env.VITE_E2E === 'true') {
+    const seeded = readE2eSession();
+    if (seeded) return { status: 'restored', session: seeded };
+  }
   const stored = readStoredDid();
   if (!stored) return { status: 'none' };
   const did = stored as Did;
@@ -252,7 +349,13 @@ function toHandle(
   session: Awaited<ReturnType<typeof getSession>>
 ): SessionHandle {
   const agent = new OAuthUserAgent(session);
-  return { did, agent, rpc: new Client({ handler: agent }) };
+  return {
+    did,
+    agent,
+    rpc: new Client({ handler: agent }),
+    appview: new Client({ handler: agent, proxy: BSKY_APPVIEW_AUD }),
+    scope: session.token.scope,
+  };
 }
 
 async function redirect(url: URL): Promise<void> {

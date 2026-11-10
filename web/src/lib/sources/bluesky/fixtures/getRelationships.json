@@ -1,0 +1,11 @@
+{
+  "actor": "did:plc:fixturebeaaaaaaaaaaaaaaa",
+  "relationships": [
+    {
+      "$type": "app.bsky.graph.defs#relationship",
+      "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+      "following": "at://did:plc:fixturebeaaaaaaaaaaaaaaa/app.bsky.graph.follow/3mfixturefollow",
+      "followedBy": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.graph.follow/3mfixturefollowback"
+    }
+  ]
+}

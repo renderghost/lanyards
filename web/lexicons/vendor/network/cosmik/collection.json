@@ -1,0 +1,58 @@
+{
+  "id": "network.cosmik.collection",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "accessType",
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Name of the collection"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this collection was created (usually set by PDS)."
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this collection was last updated."
+          },
+          "accessType": {
+            "type": "string",
+            "description": "Access control for the collection",
+            "knownValues": [
+              "CLOSED",
+              "OPEN"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Description of the collection"
+          },
+          "collaborators": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "DID of a collaborator"
+            },
+            "description": "List of collaborator DIDs who can add cards to closed collections"
+          }
+        }
+      },
+      "description": "A record representing a collection of cards."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "A single record type for collections of cards."
+}

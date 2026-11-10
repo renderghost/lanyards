@@ -7,21 +7,25 @@ import {
   XrpcHandleResolver,
 } from '@atcute/identity-resolver';
 
-/** Bluesky's public AppView: unauthenticated reads with CORS enabled. */
-export const PUBLIC_APPVIEW = 'https://public.api.bsky.app';
+import { PUBLIC_APPVIEW } from './endpoints';
+
+export { PUBLIC_APPVIEW };
 
 /**
  * Resolves handles and DIDs. Browsers have no DNS access, so handles are
  * resolved through the public AppView.
  */
+/** Resolves did:plc and did:web documents. */
+export const didDocumentResolver = new CompositeDidDocumentResolver({
+  methods: {
+    plc: new PlcDidDocumentResolver(),
+    web: new WebDidDocumentResolver(),
+  },
+});
+
 export const identityResolver = new LocalActorResolver({
   handleResolver: new XrpcHandleResolver({ serviceUrl: PUBLIC_APPVIEW }),
-  didDocumentResolver: new CompositeDidDocumentResolver({
-    methods: {
-      plc: new PlcDidDocumentResolver(),
-      web: new WebDidDocumentResolver(),
-    },
-  }),
+  didDocumentResolver,
 });
 
 export const publicAppView = new Client({

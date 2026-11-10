@@ -1,0 +1,159 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.actor.lanyard",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "How a person's lanyard is presented: accent, block order and visibility, hidden items, connect preferences and per-event overrides.",
+      "key": "literal:self",
+      "record": {
+        "type": "object",
+        "required": ["createdAt"],
+        "properties": {
+          "accent": {
+            "type": "string",
+            "maxLength": 32,
+            "knownValues": [
+              "violet",
+              "indigo",
+              "plum",
+              "rose",
+              "ember",
+              "moss",
+              "teal",
+              "ocean"
+            ],
+            "description": "Accent palette; violet when absent or unknown"
+          },
+          "showJob": {
+            "type": "boolean",
+            "default": true,
+            "description": "Show the current job line on the badge"
+          },
+          "blocks": {
+            "type": "array",
+            "maxLength": 20,
+            "items": { "type": "ref", "ref": "#block" },
+            "description": "Blocks in display order"
+          },
+          "hidden": {
+            "type": "array",
+            "maxLength": 500,
+            "items": { "type": "string", "maxLength": 2048 },
+            "description": "AT-URIs or URLs of individual items hidden from the lanyard"
+          },
+          "connect": {
+            "type": "ref",
+            "ref": "#connectPrefs"
+          },
+          "events": {
+            "type": "array",
+            "maxLength": 200,
+            "items": { "type": "ref", "ref": "#eventOverride" },
+            "description": "Per-event lanyard overrides, matched by event URI"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    },
+    "block": {
+      "type": "object",
+      "required": ["type", "visible"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "maxLength": 32,
+          "knownValues": [
+            "links",
+            "talks",
+            "openTo",
+            "blogPosts",
+            "bskyPosts",
+            "publications",
+            "skills",
+            "education",
+            "code",
+            "collections",
+            "media",
+            "events",
+            "details"
+          ]
+        },
+        "visible": { "type": "boolean" },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "description": "How many items to show; 3 by default, all links (up to 20) for the links block"
+        }
+      }
+    },
+    "connectPrefs": {
+      "type": "object",
+      "description": "What a Connect does; each defaults to true",
+      "properties": {
+        "follow": { "type": "boolean", "default": true },
+        "vouch": { "type": "boolean", "default": true },
+        "metPack": { "type": "boolean", "default": true }
+      }
+    },
+    "eventOverride": {
+      "type": "object",
+      "required": ["event"],
+      "properties": {
+        "event": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "The community.lexicon.calendar.event this override applies to"
+        },
+        "headline": {
+          "type": "string",
+          "maxGraphemes": 100,
+          "maxLength": 1000
+        },
+        "hereFor": {
+          "type": "string",
+          "maxGraphemes": 200,
+          "maxLength": 2000
+        },
+        "emphasise": {
+          "type": "array",
+          "maxLength": 13,
+          "items": {
+            "type": "string",
+            "maxLength": 32,
+            "knownValues": [
+              "links",
+              "talks",
+              "openTo",
+              "blogPosts",
+              "bskyPosts",
+              "publications",
+              "skills",
+              "education",
+              "code",
+              "collections",
+              "media",
+              "events",
+              "details"
+            ]
+          },
+          "description": "Block types moved to the top for this event"
+        },
+        "metPacks": {
+          "type": "array",
+          "maxLength": 20,
+          "items": { "type": "string", "format": "at-uri" },
+          "description": "Starter packs of people met at this event, in rollover order"
+        }
+      }
+    }
+  }
+}

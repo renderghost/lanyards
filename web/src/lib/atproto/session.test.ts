@@ -18,7 +18,7 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 
-import { DID_STORAGE_KEY } from './oauthConfig';
+import { DID_STORAGE_KEY, FALLBACK_SCOPE, GRANULAR_SCOPE } from './oauthConfig';
 import {
   completeSignIn,
   isUnknownAccountError,
@@ -60,7 +60,8 @@ vi.mock('@atcute/oauth-browser-client', async (importOriginal) => {
 });
 
 const DID = 'did:plc:ewvi7nxzyoun6zhxrhs64oiz' as Did;
-const fakeSession = { info: { sub: DID } } as never;
+const GRANTED = 'atproto include:app.lanyards.authFull';
+const fakeSession = { info: { sub: DID }, token: { scope: GRANTED } } as never;
 const assign = vi.fn();
 
 beforeEach(() => {
@@ -75,7 +76,7 @@ afterEach(() => {
 });
 
 describe('startSignIn', () => {
-  it('requests the atproto scope with a safe return path, then redirects', async () => {
+  it('requests the granular scopes with a safe return path, then redirects', async () => {
     const url = new URL('https://bsky.social/oauth/authorize?x=1');
     vi.mocked(createAuthorizationUrl).mockResolvedValue(url);
 
@@ -83,11 +84,57 @@ describe('startSignIn', () => {
 
     expect(createAuthorizationUrl).toHaveBeenCalledWith({
       target: { type: 'account', identifier: 'alice.bsky.social' },
-      scope: 'atproto',
+      scope: GRANULAR_SCOPE,
       state: { returnTo: '/' },
     });
     expect(assign).toHaveBeenCalledWith(url);
     expect(track).toHaveBeenCalledWith('sign_in_started');
+  });
+
+  it('falls back to transition:generic when the server rejects the scopes', async () => {
+    const url = new URL('https://pds.example/oauth/authorize');
+    vi.mocked(createAuthorizationUrl)
+      .mockRejectedValueOnce(
+        new OAuthResponseError(new Response(null, { status: 400 }), {
+          error: 'invalid_scope',
+          error_description: 'Unable to resolve Lexicon schema',
+        })
+      )
+      .mockResolvedValueOnce(url);
+
+    await startSignIn('alice.example', '/@alice.example');
+
+    expect(createAuthorizationUrl).toHaveBeenCalledTimes(2);
+    expect(createAuthorizationUrl).toHaveBeenLastCalledWith({
+      target: { type: 'account', identifier: 'alice.example' },
+      scope: FALLBACK_SCOPE,
+      state: { returnTo: '/@alice.example' },
+    });
+    expect(track).toHaveBeenCalledWith('oauth_scope_fallback');
+    expect(assign).toHaveBeenCalledWith(url);
+  });
+
+  it('remembers where to return to if sign-in has to be retried', async () => {
+    vi.mocked(createAuthorizationUrl).mockResolvedValue(
+      new URL('https://bsky.social/oauth/authorize')
+    );
+    await startSignIn('alice.example', '/@alice.example');
+    expect(sessionStorage.getItem('lanyards:returnTo')).toBe('/@alice.example');
+    await startSignUp('/d/did:plc:abc');
+    expect(sessionStorage.getItem('lanyards:returnTo')).toBe('/d/did:plc:abc');
+    sessionStorage.clear();
+  });
+
+  it('rethrows other authorisation errors without retrying', async () => {
+    const failure = new OAuthResponseError(
+      new Response(null, { status: 400 }),
+      { error: 'invalid_request' }
+    );
+    vi.mocked(createAuthorizationUrl).mockRejectedValueOnce(failure);
+
+    await expect(startSignIn('alice.example', '/')).rejects.toBe(failure);
+    expect(createAuthorizationUrl).toHaveBeenCalledTimes(1);
+    expect(track).not.toHaveBeenCalledWith('oauth_scope_fallback');
   });
 });
 
@@ -121,7 +168,7 @@ describe('startSignUp', () => {
     await startSignUp('/settings');
     expect(createAuthorizationUrl).toHaveBeenCalledWith({
       target: { type: 'pds', serviceUrl: 'https://bsky.social' },
-      scope: 'atproto',
+      scope: GRANULAR_SCOPE,
       prompt: 'create',
       state: { returnTo: '/settings' },
     });
@@ -201,6 +248,18 @@ describe('restoreSession', () => {
     const result = await restoreSession();
     expect(result.status).toBe('restored');
     if (result.status === 'restored') expect(result.session.did).toBe(DID);
+  });
+
+  it('exposes the granted scope and a client proxied to the Bluesky AppView', async () => {
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession).mockResolvedValue(fakeSession);
+    const result = await restoreSession();
+    if (result.status !== 'restored') throw new Error('not restored');
+    expect(result.session.scope).toBe(GRANTED);
+    expect(result.session.appview.proxy).toBe(
+      'did:web:api.bsky.app#bsky_appview'
+    );
+    expect(result.session.rpc.proxy).toBeNull();
   });
 
   it('clears a revoked session and reports it expired', async () => {
@@ -303,5 +362,65 @@ describe('signOut', () => {
 
     expect(deleteStoredSession).not.toHaveBeenCalled();
     expect(localStorage.getItem(DID_STORAGE_KEY)).toBeNull();
+  });
+});
+
+describe('restoreSession in end-to-end builds', () => {
+  const e2eSession = JSON.stringify({ did: DID, scope: 'atproto' });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    localStorage.clear();
+  });
+
+  it('uses the seeded test session only when built for e2e', async () => {
+    vi.stubEnv('VITE_E2E', 'true');
+    localStorage.setItem('lanyards:e2e-session', e2eSession);
+    const result = await restoreSession();
+    expect(result.status).toBe('restored');
+    if (result.status === 'restored') {
+      expect(result.session.did).toBe(DID);
+      expect(result.session.scope).toBe('atproto');
+    }
+    expect(getSession).not.toHaveBeenCalled();
+  });
+
+  it('ignores a seeded test session in a normal build', async () => {
+    localStorage.setItem('lanyards:e2e-session', e2eSession);
+    await expect(restoreSession()).resolves.toEqual({ status: 'none' });
+  });
+});
+
+describe('servers that silently drop granular scopes', () => {
+  const flag = `lanyards:scope-fallback:${DID}`;
+  const finish = (scope: string) =>
+    vi.mocked(finalizeAuthorization).mockResolvedValue({
+      session: { info: { sub: DID }, token: { scope } } as never,
+      state: { returnTo: '/' },
+    });
+
+  it('remembers when sign-in granted identity only', async () => {
+    finish('atproto');
+    await completeSignIn('#code=abc&state=xyz');
+    expect(localStorage.getItem(flag)).toBe('1');
+  });
+
+  it('forgets that once granular permissions are granted', async () => {
+    localStorage.setItem(flag, '1');
+    finish(GRANTED);
+    await completeSignIn('#code=abc&state=xyz');
+    expect(localStorage.getItem(flag)).toBeNull();
+  });
+
+  it('asks such an account for the broad fallback scope next time', async () => {
+    localStorage.setItem(flag, '1');
+    const url = new URL('https://pds.example/oauth/authorize');
+    vi.mocked(createAuthorizationUrl).mockResolvedValue(url);
+    await startSignIn(DID, '/@alice.example');
+    expect(createAuthorizationUrl).toHaveBeenCalledTimes(1);
+    expect(createAuthorizationUrl).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: FALLBACK_SCOPE })
+    );
+    expect(track).toHaveBeenCalledWith('oauth_scope_fallback');
   });
 });

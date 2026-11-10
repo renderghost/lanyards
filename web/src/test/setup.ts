@@ -22,7 +22,8 @@ afterAll(() => {
 
 // jsdom lacks matchMedia; components that follow the system colour scheme
 // (e.g. the toaster) need it.
-if (!window.matchMedia) {
+// Server tests run in the node environment, which has no window.
+if (typeof window !== 'undefined' && !window.matchMedia) {
   window.matchMedia = (query: string) =>
     ({
       matches: false,

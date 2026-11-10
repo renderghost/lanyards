@@ -1,0 +1,19 @@
+{
+  "id": "network.cosmik.defs",
+  "defs": {
+    "provenance": {
+      "type": "object",
+      "properties": {
+        "via": {
+          "ref": "com.atproto.repo.strongRef",
+          "type": "ref",
+          "description": "Strong reference to the card that led to this record."
+        }
+      },
+      "description": "Represents the provenance or source of a record."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "Common definitions for annotation types and references"
+}

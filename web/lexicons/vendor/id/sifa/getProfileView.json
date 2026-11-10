@@ -1,0 +1,1660 @@
+{
+  "id": "id.sifa.getProfileView",
+  "defs": {
+    "main": {
+      "type": "query",
+      "errors": [
+        {
+          "name": "ProfileNotFound",
+          "description": "No profile exists for the given actor, or the actor could not be resolved."
+        }
+      ],
+      "output": {
+        "schema": {
+          "ref": "#profileView",
+          "type": "ref"
+        },
+        "encoding": "application/json"
+      },
+      "parameters": {
+        "type": "params",
+        "required": [
+          "actor"
+        ],
+        "properties": {
+          "actor": {
+            "type": "string",
+            "format": "at-identifier",
+            "description": "The handle or DID of the profile to fetch."
+          }
+        }
+      },
+      "description": "Get the aggregated public profile view for an actor."
+    },
+    "honorView": {
+      "type": "object",
+      "required": [
+        "rkey",
+        "title"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Date received. Partial date."
+        },
+        "kind": {
+          "type": "string",
+          "description": "What kind of honor this is. Absent means unspecified.",
+          "knownValues": [
+            "id.sifa.defs#honorAward",
+            "id.sifa.defs#honorChampionship",
+            "id.sifa.defs#honorNomination",
+            "id.sifa.defs#honorRecognition",
+            "id.sifa.defs#honorRecord"
+          ]
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the honor record."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#artifactLink",
+            "type": "ref"
+          },
+          "description": "Public sources for the honor."
+        },
+        "title": {
+          "type": "string",
+          "description": "Honor or award title."
+        },
+        "issuer": {
+          "type": "string",
+          "description": "Issuing organization."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical issuer reference (name plus optional did/entityRef). Mirrors the flat issuer/entityRef fields during the migration; the two always agree."
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved issuer entity."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        }
+      },
+      "description": "An honor or award."
+    },
+    "skillView": {
+      "type": "object",
+      "required": [
+        "name",
+        "rkey"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid",
+          "description": "CID of the skill record, for referencing it in endorsements."
+        },
+        "name": {
+          "type": "string",
+          "description": "Skill name."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the skill record."
+        },
+        "category": {
+          "ref": "id.sifa.defs#skillCategory",
+          "type": "ref",
+          "description": "Broad category."
+        },
+        "endorsed": {
+          "type": "boolean",
+          "description": "Whether this skill has any confirmed endorsements."
+        },
+        "endorsedAs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Prior names this skill was endorsed under before it was renamed."
+        },
+        "subCategory": {
+          "type": "string",
+          "description": "Freeform user-defined grouping label nested under category."
+        },
+        "positionRkeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Record keys of positions this skill is linked to."
+        },
+        "endorsementCount": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of confirmed endorsements of this skill."
+        }
+      },
+      "description": "A skill entry."
+    },
+    "atfundLink": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Contribution URL."
+        },
+        "label": {
+          "type": "string",
+          "description": "Optional display label."
+        }
+      },
+      "description": "A contribution or funding link."
+    },
+    "courseView": {
+      "type": "object",
+      "required": [
+        "name",
+        "rkey"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Course name."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the course record."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role in the course (id.sifa.defs#courseRole). Absent means taken."
+        },
+        "number": {
+          "type": "string",
+          "description": "Course number or code."
+        },
+        "endedAt": {
+          "type": "string",
+          "description": "When the user last taught the course; absent if ongoing."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical institution reference (name plus optional did/entityRef). Mirrors the flat institution/entityRef fields during the migration; the two always agree."
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved institution entity."
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "When the user started teaching the course (YYYY, YYYY-MM or YYYY-MM-DD)."
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Completion date of a taken course (YYYY, YYYY-MM or YYYY-MM-DD)."
+        },
+        "institution": {
+          "type": "string",
+          "description": "Institution name."
+        },
+        "positionRkey": {
+          "type": "string",
+          "description": "Record key of the linked position the course was part of, when present."
+        },
+        "educationRkey": {
+          "type": "string",
+          "description": "Record key of the linked education record the course was part of, when present."
+        },
+        "credentialRkey": {
+          "type": "string",
+          "description": "Record key of a linked certification, when present."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        }
+      },
+      "description": "A course entry."
+    },
+    "profileView": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "The account DID. Stable identifier for the profile."
+        },
+        "about": {
+          "type": "string",
+          "maxLength": 50000,
+          "description": "Longer professional summary or bio.",
+          "maxGraphemes": 5000
+        },
+        "langs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "BCP-47 language tags the user has indicated."
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the profile avatar image."
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle",
+          "description": "The current handle for the account."
+        },
+        "honors": {
+          "type": "array",
+          "items": {
+            "ref": "#honorView",
+            "type": "ref"
+          },
+          "description": "Honors and awards."
+        },
+        "openTo": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#openToWorkStatus",
+            "type": "ref"
+          },
+          "description": "The kinds of opportunities the user is open to."
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "ref": "#skillView",
+            "type": "ref"
+          },
+          "description": "Skills, optionally linked to positions."
+        },
+        "claimed": {
+          "type": "boolean",
+          "description": "Whether the profile has been claimed by its owner on Sifa."
+        },
+        "courses": {
+          "type": "array",
+          "items": {
+            "ref": "#courseView",
+            "type": "ref"
+          },
+          "description": "Courses, optionally linked to a credential."
+        },
+        "website": {
+          "type": "string",
+          "format": "uri",
+          "description": "Primary personal or professional website."
+        },
+        "headline": {
+          "type": "string",
+          "maxLength": 3000,
+          "description": "Short professional headline.",
+          "maxGraphemes": 300
+        },
+        "location": {
+          "type": "string",
+          "description": "Assembled human-readable primary location string."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "ref": "#projectView",
+            "type": "ref"
+          },
+          "description": "Personal or professional projects."
+        },
+        "pronouns": {
+          "type": "string",
+          "maxLength": 640,
+          "description": "Self-described pronouns.",
+          "maxGraphemes": 64
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "When the profile record was created."
+        },
+        "education": {
+          "type": "array",
+          "items": {
+            "ref": "#educationView",
+            "type": "ref"
+          },
+          "description": "Education history entries."
+        },
+        "givenName": {
+          "type": "string",
+          "maxLength": 1280,
+          "description": "Given (first) name, when provided.",
+          "maxGraphemes": 128
+        },
+        "languages": {
+          "type": "array",
+          "items": {
+            "ref": "#languageView",
+            "type": "ref"
+          },
+          "description": "Spoken/written languages with proficiency."
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "ref": "#locationView",
+            "type": "ref"
+          },
+          "description": "All professional locations on the profile."
+        },
+        "positions": {
+          "type": "array",
+          "items": {
+            "ref": "#positionView",
+            "type": "ref"
+          },
+          "description": "Work history entries."
+        },
+        "activeApps": {
+          "type": "array",
+          "items": {
+            "ref": "#activeAppView",
+            "type": "ref"
+          },
+          "description": "AT Protocol apps this account has recently created records in."
+        },
+        "familyName": {
+          "type": "string",
+          "maxLength": 1280,
+          "description": "Family (last) name, when provided.",
+          "maxGraphemes": 128
+        },
+        "industries": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#industryDomain",
+            "type": "ref"
+          },
+          "description": "Industry/domain pairs the user works in."
+        },
+        "countryCode": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code for the primary location."
+        },
+        "displayName": {
+          "type": "string",
+          "maxLength": 1280,
+          "description": "Display name shown on the profile.",
+          "maxGraphemes": 128
+        },
+        "involvement": {
+          "type": "array",
+          "items": {
+            "ref": "#involvementView",
+            "type": "ref"
+          },
+          "description": "Community, open-source, charity, and civic involvement."
+        },
+        "pdsProvider": {
+          "ref": "#pdsProviderView",
+          "type": "ref",
+          "description": "The account PDS provider."
+        },
+        "publications": {
+          "type": "array",
+          "items": {
+            "ref": "#publicationView",
+            "type": "ref"
+          },
+          "description": "Publications, merged from Sifa records and linked ORCID works."
+        },
+        "volunteering": {
+          "type": "array",
+          "items": {
+            "ref": "#volunteeringView",
+            "type": "ref"
+          },
+          "description": "Legacy volunteering entries. New entries are surfaced under involvement."
+        },
+        "presentations": {
+          "type": "array",
+          "items": {
+            "ref": "#presentationView",
+            "type": "ref"
+          },
+          "description": "Talks and sessions (content), each with its deliveries grouped underneath."
+        },
+        "availableToUtc": {
+          "type": "integer",
+          "description": "End of an availability window, as a UTC offset, if set."
+        },
+        "certifications": {
+          "type": "array",
+          "items": {
+            "ref": "#certificationView",
+            "type": "ref"
+          },
+          "description": "Certifications and licenses."
+        },
+        "followersCount": {
+          "type": "integer",
+          "description": "Number of Sifa graph followers."
+        },
+        "followingCount": {
+          "type": "integer",
+          "description": "Number of accounts this profile follows on the Sifa graph."
+        },
+        "locationRegion": {
+          "type": "string",
+          "description": "Primary location region, state, or province."
+        },
+        "blueskyVerified": {
+          "type": "boolean",
+          "description": "Whether the account holds a Bluesky verification."
+        },
+        "locationCountry": {
+          "type": "string",
+          "description": "Primary location country name."
+        },
+        "atfundContribute": {
+          "ref": "#atfundLink",
+          "type": "ref",
+          "description": "Optional contribution/funding link."
+        },
+        "availableFromUtc": {
+          "type": "integer",
+          "description": "Start of an availability window, as a UTC offset, if set."
+        },
+        "connectionsCount": {
+          "type": "integer",
+          "description": "Number of confirmed professional connections."
+        },
+        "externalAccounts": {
+          "type": "array",
+          "items": {
+            "ref": "#externalAccountView",
+            "type": "ref"
+          },
+          "description": "Linked external accounts, with verification state."
+        },
+        "locationLocality": {
+          "type": "string",
+          "description": "Primary location city or locality."
+        },
+        "metInPersonCount": {
+          "type": "integer",
+          "description": "Number of confirmed in-person meetings."
+        },
+        "blueskyVerifiedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "When the Bluesky verification was issued."
+        },
+        "namePronunciation": {
+          "type": "string",
+          "maxLength": 640,
+          "description": "Free-form phonetic respelling of the name, when provided.",
+          "maxGraphemes": 64
+        },
+        "preferredWorkplace": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#workplaceType",
+            "type": "ref"
+          },
+          "description": "Preferred workplace arrangements."
+        },
+        "atprotoFollowersCount": {
+          "type": "integer",
+          "description": "Number of app.bsky.graph followers."
+        },
+        "presentationDeliveries": {
+          "type": "array",
+          "items": {
+            "ref": "#presentationDeliveryView",
+            "type": "ref"
+          },
+          "description": "Standalone deliveries that reference no owned presentation."
+        },
+        "namePronunciationAudioUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the name-pronunciation audio clip, served from the PDS. Present when a clip is set."
+        }
+      },
+      "description": "The aggregated public professional profile view."
+    },
+    "projectView": {
+      "type": "object",
+      "required": [
+        "name",
+        "rkey"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Project URL."
+        },
+        "name": {
+          "type": "string",
+          "description": "Project name."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the project record."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's own role on the project."
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "ref": "#projectEventView",
+            "type": "ref"
+          },
+          "maxLength": 200,
+          "description": "Events this project organized or hosted (from the record's events field), with display fields resolved from the referenced event records."
+        },
+        "sameAs": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the same project on another person's profile, when they keep one."
+        },
+        "endDate": {
+          "type": "string",
+          "description": "End date. Partial date."
+        },
+        "members": {
+          "type": "array",
+          "items": {
+            "ref": "#projectMemberView",
+            "type": "ref"
+          },
+          "description": "People named as members of this project."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary ongoing project."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date. Partial date."
+        },
+        "description": {
+          "type": "string",
+          "description": "Project description."
+        }
+      },
+      "description": "A project entry."
+    },
+    "durationView": {
+      "type": "object",
+      "required": [
+        "minMinutes"
+      ],
+      "properties": {
+        "maxMinutes": {
+          "type": "integer",
+          "description": "Maximum duration in minutes."
+        },
+        "minMinutes": {
+          "type": "integer",
+          "description": "Minimum duration in minutes."
+        }
+      },
+      "description": "A duration range in minutes."
+    },
+    "languageView": {
+      "type": "object",
+      "required": [
+        "language",
+        "rkey"
+      ],
+      "properties": {
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the language record."
+        },
+        "language": {
+          "type": "string",
+          "description": "Language name or BCP-47 tag."
+        },
+        "proficiency": {
+          "ref": "id.sifa.defs#proficiency",
+          "type": "ref",
+          "description": "Proficiency level."
+        }
+      },
+      "description": "A language with proficiency."
+    },
+    "locationView": {
+      "type": "object",
+      "required": [
+        "rkey"
+      ],
+      "properties": {
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the location record."
+        },
+        "type": {
+          "ref": "id.sifa.defs#locationType",
+          "type": "ref",
+          "description": "The role this location plays."
+        },
+        "label": {
+          "type": "string",
+          "description": "Optional custom label."
+        },
+        "location": {
+          "type": "string",
+          "description": "Assembled human-readable location string."
+        },
+        "isPrimary": {
+          "type": "boolean",
+          "description": "Whether this is the primary location."
+        },
+        "countryCode": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code."
+        },
+        "locationRegion": {
+          "type": "string",
+          "description": "Region, state, or province."
+        },
+        "locationCountry": {
+          "type": "string",
+          "description": "Country name."
+        },
+        "locationLocality": {
+          "type": "string",
+          "description": "City or locality."
+        }
+      },
+      "description": "A professional location on the profile."
+    },
+    "positionView": {
+      "type": "object",
+      "required": [
+        "rkey",
+        "title"
+      ],
+      "properties": {
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the position record."
+        },
+        "title": {
+          "type": "string",
+          "description": "Job title or role."
+        },
+        "company": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "endedAt": {
+          "type": "string",
+          "description": "End date. Partial date, absent if current."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary current position."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical organization reference (name plus optional did/entityRef). Mirrors the flat company/companyDid/entityRef fields during the migration; the two always agree."
+        },
+        "location": {
+          "type": "string",
+          "description": "Assembled human-readable location string."
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved organization entity."
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Start date. Partial date (YYYY, YYYY-MM, or YYYY-MM-DD)."
+        },
+        "companyDid": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the organization, when known."
+        },
+        "entityName": {
+          "type": "string",
+          "description": "Resolved canonical organization name."
+        },
+        "onBehalfOf": {
+          "type": "string",
+          "description": "Party this role is held on behalf of, when the person represents someone else — most often a fund whose board seat this is. A disclosure, not a role type. Absent for independent roles."
+        },
+        "skillRkeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Record keys of skills linked to this position."
+        },
+        "countryCode": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code."
+        },
+        "description": {
+          "type": "string",
+          "description": "Role description."
+        },
+        "verification": {
+          "ref": "#positionVerification",
+          "type": "ref",
+          "description": "Sifa's verification of this position, when one is issued. Absent when the position is not verified; absence is not a negative signal."
+        },
+        "onBehalfOfDid": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the represented party, when known. May be an organization or a person."
+        },
+        "workplaceType": {
+          "ref": "id.sifa.defs#workplaceType",
+          "type": "ref",
+          "description": "Workplace arrangement."
+        },
+        "employmentType": {
+          "ref": "id.sifa.defs#employmentType",
+          "type": "ref",
+          "description": "Employment arrangement."
+        },
+        "locationRegion": {
+          "type": "string",
+          "description": "Region, state, or province."
+        },
+        "locationCountry": {
+          "type": "string",
+          "description": "Country name."
+        },
+        "locationLocality": {
+          "type": "string",
+          "description": "City or locality."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        },
+        "onBehalfOfEntityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved entity for the represented party."
+        },
+        "onBehalfOfEntityName": {
+          "type": "string",
+          "description": "Resolved canonical name for the represented party. Present only when the reference resolves; clients render onBehalfOf otherwise, never the raw URI."
+        }
+      },
+      "description": "A work-history entry."
+    },
+    "activeAppView": {
+      "type": "object",
+      "required": [
+        "id",
+        "name"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "App identifier."
+        },
+        "name": {
+          "type": "string",
+          "description": "App display name."
+        },
+        "category": {
+          "type": "string",
+          "description": "App category."
+        },
+        "recentCount": {
+          "type": "integer",
+          "description": "Recent record count."
+        },
+        "latestRecordAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Timestamp of the latest record."
+        }
+      },
+      "description": "An AT Protocol app the account has recently created records in."
+    },
+    "coSpeakerView": {
+      "type": "object",
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the co-speaker, when linked to a Sifa profile."
+        },
+        "name": {
+          "type": "string",
+          "description": "Free-text co-speaker name, when not linked."
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri",
+          "description": "Avatar URL, when linked."
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle",
+          "description": "Handle, when linked."
+        },
+        "claimed": {
+          "type": "boolean",
+          "description": "Whether the co-speaker holds a claimed Sifa account. Identity is shown before confirmation when claimed."
+        },
+        "confirmed": {
+          "type": "boolean",
+          "description": "Whether the co-speaker has confirmed the claim with an id.sifa.confirmation."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name, when linked."
+        },
+        "confirmedStale": {
+          "type": "boolean",
+          "description": "Whether the delivery changed materially after the co-speaker confirmed it."
+        },
+        "hasSifaProfile": {
+          "type": "boolean",
+          "description": "Whether Sifa has indexed this account (it may be an unclaimed atproto account)."
+        }
+      },
+      "description": "A co-speaker on a presentation delivery."
+    },
+    "educationView": {
+      "type": "object",
+      "required": [
+        "rkey"
+      ],
+      "properties": {
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the education record."
+        },
+        "degree": {
+          "type": "string",
+          "description": "Degree earned."
+        },
+        "endedAt": {
+          "type": "string",
+          "description": "End date. Partial date."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary education entry."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical institution reference (name plus optional did/entityRef). Mirrors the flat institution/institutionDid/entityRef fields during the migration; the two always agree."
+        },
+        "eqfLevel": {
+          "type": "integer",
+          "maximum": 8,
+          "minimum": 1,
+          "description": "European Qualifications Framework level of the degree (1 to 8, 8 is doctoral), when set."
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved institution entity."
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Start date. Partial date."
+        },
+        "activities": {
+          "type": "string",
+          "description": "Activities and societies."
+        },
+        "description": {
+          "type": "string",
+          "description": "Additional description."
+        },
+        "institution": {
+          "type": "string",
+          "description": "Institution name."
+        },
+        "fieldOfStudy": {
+          "type": "string",
+          "description": "Field of study."
+        },
+        "institutionDid": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the institution, when known."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        }
+      },
+      "description": "An education-history entry."
+    },
+    "contributorView": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "Sifa/AT Protocol DID, when linked."
+        },
+        "name": {
+          "type": "string",
+          "description": "Contributor name."
+        },
+        "handle": {
+          "type": "string",
+          "format": "handle",
+          "description": "Handle, when linked."
+        },
+        "orcidId": {
+          "type": "string",
+          "description": "ORCID identifier."
+        }
+      },
+      "description": "A linked publication contributor."
+    },
+    "involvementView": {
+      "type": "object",
+      "required": [
+        "kind",
+        "legacy",
+        "links",
+        "rkey"
+      ],
+      "properties": {
+        "kind": {
+          "ref": "id.sifa.defs#involvementKind",
+          "type": "ref",
+          "description": "The nature of the involvement."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the involvement (or legacy volunteering) record."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role in the involvement."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "ref": "#involvementLinkView",
+            "type": "ref"
+          },
+          "description": "Public artifact links proving the work."
+        },
+        "legacy": {
+          "type": "boolean",
+          "description": "True if mapped from a legacy volunteering record."
+        },
+        "endedAt": {
+          "type": "string",
+          "description": "End date. Partial date."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary current involvement."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical upstream reference (name plus optional did/entityRef). Mirrors the flat upstream/upstreamDid/entityRef fields during the migration; the two always agree."
+        },
+        "upstream": {
+          "type": "string",
+          "description": "Name of the community, org, or person the involvement is with."
+        },
+        "startedAt": {
+          "type": "string",
+          "description": "Start date. Partial date."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description."
+        },
+        "upstreamDid": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the upstream, when known."
+        },
+        "upstreamUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the upstream, when provided."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        }
+      },
+      "description": "A community, open-source, charity, or civic involvement."
+    },
+    "pdsProviderView": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "host": {
+          "type": "string",
+          "description": "PDS hostname."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human-readable provider name."
+        }
+      },
+      "description": "A PDS provider descriptor."
+    },
+    "publicationView": {
+      "type": "object",
+      "required": [
+        "rkey",
+        "title",
+        "verified"
+      ],
+      "properties": {
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Publication URL."
+        },
+        "date": {
+          "type": "string",
+          "description": "Publication date. Partial date."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key, or a synthetic key for ORCID-only works."
+        },
+        "type": {
+          "type": "string",
+          "description": "Publication type token."
+        },
+        "image": {
+          "type": "string",
+          "format": "uri",
+          "description": "Cover or preview image URL."
+        },
+        "title": {
+          "type": "string",
+          "description": "Publication title."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary publication."
+        },
+        "subtitle": {
+          "type": "string",
+          "description": "Subtitle."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether the publication is verified (e.g. via ORCID)."
+        },
+        "publisher": {
+          "type": "string",
+          "description": "Publisher or journal."
+        },
+        "typeLabel": {
+          "type": "string",
+          "description": "Human-readable publication type."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description or abstract."
+        },
+        "verifiedVia": {
+          "type": "string",
+          "description": "Verification source, when verified."
+        },
+        "contributors": {
+          "type": "array",
+          "items": {
+            "ref": "#contributorView",
+            "type": "ref"
+          },
+          "description": "Linked contributors (co-authors)."
+        },
+        "publicationUri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the source publication record, when present."
+        },
+        "publicationUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Canonical publication URL, when present."
+        },
+        "publicationName": {
+          "type": "string",
+          "description": "Name of the source publication venue, when present."
+        },
+        "orcidCorroborated": {
+          "type": "boolean",
+          "description": "Whether an ORCID work corroborates a Sifa record."
+        },
+        "relatedIdentifiers": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#relatedIdentifier",
+            "type": "ref"
+          },
+          "description": "Other versions or forms of this work: the relations declared on the record plus, for a DOI, those registered with DataCite or Crossref. Clients can fold a preprint under its published version."
+        }
+      },
+      "description": "A publication, merged from Sifa and linked ORCID works."
+    },
+    "presentationView": {
+      "type": "object",
+      "required": [
+        "deliveries",
+        "rkey",
+        "title"
+      ],
+      "properties": {
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the presentation record."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#presentationLink",
+            "type": "ref"
+          },
+          "description": "Related links (slides, recording, etc.)."
+        },
+        "title": {
+          "type": "string",
+          "description": "Presentation title."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the user's primary talk."
+        },
+        "duration": {
+          "ref": "#durationView",
+          "type": "ref",
+          "description": "Duration range in minutes."
+        },
+        "deliveries": {
+          "type": "array",
+          "items": {
+            "ref": "#presentationDeliveryView",
+            "type": "ref"
+          },
+          "description": "Deliveries of this presentation."
+        },
+        "writeupUri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of a linked write-up record."
+        },
+        "description": {
+          "type": "string",
+          "description": "Presentation description."
+        },
+        "coverImageUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Renderable URL of the presentation cover image, when set."
+        },
+        "intendedAudiences": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Intended audiences."
+        }
+      },
+      "description": "A talk or session (content), with its deliveries grouped underneath."
+    },
+    "projectEventView": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the linked community.lexicon.calendar.event."
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Event website, from the event's first uri."
+        },
+        "mode": {
+          "type": "string",
+          "description": "Event mode token, from the event record."
+        },
+        "name": {
+          "type": "string",
+          "description": "Event name, from the event record."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role at this occurrence, if it differs from the project's role."
+        },
+        "country": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code, from the event's first address."
+        },
+        "locality": {
+          "type": "string",
+          "description": "City, from the event's first address."
+        },
+        "startsAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Event start, from the event record."
+        }
+      }
+    },
+    "volunteeringView": {
+      "type": "object",
+      "required": [
+        "organization",
+        "rkey"
+      ],
+      "properties": {
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the volunteering record."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role held."
+        },
+        "cause": {
+          "type": "string",
+          "description": "Cause supported."
+        },
+        "endDate": {
+          "type": "string",
+          "description": "End date. Partial date."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical organization reference (name plus optional did/entityRef). Mirrors the flat organization/entityRef fields during the migration; the two always agree."
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved organization entity."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "Start date. Partial date."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description."
+        },
+        "organization": {
+          "type": "string",
+          "description": "Organization name."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        }
+      },
+      "description": "A legacy volunteering entry."
+    },
+    "certificationView": {
+      "type": "object",
+      "required": [
+        "name",
+        "rkey"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Certification name."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the certification record."
+        },
+        "agentRef": {
+          "ref": "id.sifa.defs#agentRef",
+          "type": "ref",
+          "description": "Canonical issuing-authority reference (name plus optional did/entityRef). Mirrors the flat authority/entityRef fields during the migration; the two always agree."
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Pointer URI to the resolved issuer entity."
+        },
+        "issueDate": {
+          "type": "string",
+          "description": "Issue date. Partial date."
+        },
+        "expiryDate": {
+          "type": "string",
+          "description": "Expiry date. Partial date."
+        },
+        "issuingOrg": {
+          "type": "string",
+          "description": "Issuing organization."
+        },
+        "credentialUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the credential."
+        },
+        "currentCompanyName": {
+          "type": "string",
+          "description": "Current canonical name of the linked entity, when it resolves. The web shows it as a \"Now {name}\" hint when it differs from the saved snapshot name (#516)."
+        }
+      },
+      "description": "A certification or license."
+    },
+    "projectMemberView": {
+      "type": "object",
+      "required": [
+        "did",
+        "handle"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the member."
+        },
+        "role": {
+          "type": "string",
+          "description": "The member's role, as labelled by the project owner."
+        },
+        "title": {
+          "type": "string",
+          "description": "The member's title, as labelled by the project owner."
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri",
+          "description": "Avatar URL, when identity may be shown."
+        },
+        "handle": {
+          "type": "string",
+          "description": "Handle of the member (falls back to the DID when it does not resolve)."
+        },
+        "claimed": {
+          "type": "boolean",
+          "description": "Whether the member holds a claimed Sifa account. Identity is shown before confirmation when claimed."
+        },
+        "confirmed": {
+          "type": "boolean",
+          "description": "Whether the member has confirmed the claim with an id.sifa.confirmation."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name, when identity may be shown."
+        },
+        "confirmedStale": {
+          "type": "boolean",
+          "description": "Whether the project changed materially after the member confirmed it."
+        },
+        "hasSifaProfile": {
+          "type": "boolean",
+          "description": "Whether Sifa has indexed this account (it may be an unclaimed atproto account)."
+        }
+      },
+      "description": "A person named as a member of a project."
+    },
+    "externalAccountView": {
+      "type": "object",
+      "required": [
+        "rkey",
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Account URL."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the external account record."
+        },
+        "label": {
+          "type": "string",
+          "description": "Optional custom label."
+        },
+        "feedUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "Feed URL (RSS/Atom), when applicable."
+        },
+        "primary": {
+          "type": "boolean",
+          "description": "Whether this is the primary external account."
+        },
+        "platform": {
+          "ref": "id.sifa.defs#externalPlatform",
+          "type": "ref",
+          "description": "Platform type."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "Whether the account is verified."
+        },
+        "verifiable": {
+          "type": "boolean",
+          "description": "Whether the account can be verified."
+        },
+        "verifiedVia": {
+          "type": "string",
+          "description": "Verification method, when verified."
+        }
+      },
+      "description": "A linked external account with verification state."
+    },
+    "involvementLinkView": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Artifact URL."
+        },
+        "kind": {
+          "type": "string",
+          "description": "What the link points to (e.g. pull-request, talk, article)."
+        },
+        "label": {
+          "type": "string",
+          "description": "Optional human-readable label."
+        },
+        "verified": {
+          "type": "boolean",
+          "description": "True if the link host matches a verified external account."
+        },
+        "verifiedPlatform": {
+          "type": "string",
+          "description": "Platform token of the verified host, when verified."
+        }
+      },
+      "description": "A proof link on an involvement."
+    },
+    "positionVerification": {
+      "type": "object",
+      "required": [
+        "methods",
+        "status",
+        "verifiedAt"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the issued id.sifa.verification.employment record in Sifa's issuer repository."
+        },
+        "status": {
+          "ref": "id.sifa.defs#employmentStatus",
+          "type": "ref"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#verificationMethod",
+            "type": "ref"
+          },
+          "description": "Every method that currently backs the verification."
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "Present only while the verification rests on email alone."
+        },
+        "verifiedAt": {
+          "type": "string",
+          "format": "datetime"
+        }
+      },
+      "description": "Summary of the id.sifa.verification.employment record Sifa issued for a position."
+    },
+    "presentationDeliveryView": {
+      "type": "object",
+      "required": [
+        "rkey"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "description": "Delivery date. Partial date."
+        },
+        "mode": {
+          "type": "string",
+          "description": "Delivery mode (e.g. in-person, remote, hybrid)."
+        },
+        "rkey": {
+          "type": "string",
+          "description": "Record key of the delivery record."
+        },
+        "role": {
+          "ref": "id.sifa.defs#presentationRole",
+          "type": "ref",
+          "description": "The user's role in the delivery."
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "ref": "id.sifa.defs#presentationLink",
+            "type": "ref"
+          },
+          "description": "Related links for this delivery."
+        },
+        "title": {
+          "type": "string",
+          "description": "Delivery title (may differ from the presentation title)."
+        },
+        "sameAs": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the same delivery on another person's profile, when they keep one."
+        },
+        "status": {
+          "type": "string",
+          "description": "Delivery status."
+        },
+        "eventUri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of a linked event record."
+        },
+        "location": {
+          "type": "string",
+          "description": "Event location."
+        },
+        "eventName": {
+          "type": "string",
+          "description": "Name of the event or occasion."
+        },
+        "coSpeakers": {
+          "type": "array",
+          "items": {
+            "ref": "#coSpeakerView",
+            "type": "ref"
+          },
+          "description": "Co-speakers on this delivery."
+        },
+        "countryCode": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code of the delivery location."
+        },
+        "locationRegion": {
+          "type": "string",
+          "description": "Region or state of the delivery location."
+        },
+        "locationCountry": {
+          "type": "string",
+          "description": "Resolved country name of the delivery location."
+        },
+        "locationLocality": {
+          "type": "string",
+          "description": "City or locality of the delivery location."
+        },
+        "presentationRkey": {
+          "type": "string",
+          "description": "Record key of the parent presentation, when grouped."
+        }
+      },
+      "description": "A single delivery of a presentation at an occasion."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "Get the aggregated public professional profile for an actor, as computed by a Sifa AppView. This view joins a user's id.sifa.* records across all sections (positions, education, skills, endorsements received, and more) plus AppView-computed aggregates (follower/connection counts, active apps, verification state). Raw records remain readable directly from the user's PDS; this method exposes the enriched, joined view that only exists in the AppView. Public projection: viewer-specific and internal fields are not included."
+}

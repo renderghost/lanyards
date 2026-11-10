@@ -1,0 +1,79 @@
+{
+  "id": "id.sifa.profile.skill",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 640,
+            "minLength": 1,
+            "description": "Skill name (e.g., 'JavaScript', 'Project Management').",
+            "maxGraphemes": 64
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "ref": "id.sifa.defs#toolRef",
+              "type": "ref"
+            },
+            "maxLength": 50,
+            "description": "Tools the owner uses for this skill, for expertise tied to a specific tool. Each entry is a URI reference to a tool item record owned by the same DID. Consumers ignore entries that do not resolve."
+          },
+          "category": {
+            "type": "string",
+            "description": "Broad skill category for grouping.",
+            "knownValues": [
+              "id.sifa.defs#business",
+              "id.sifa.defs#community",
+              "id.sifa.defs#creative",
+              "id.sifa.defs#industry",
+              "id.sifa.defs#interpersonal",
+              "id.sifa.defs#security",
+              "id.sifa.defs#technical"
+            ]
+          },
+          "contexts": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "id.sifa.defs#contextPersonal",
+                "id.sifa.defs#contextProfessional"
+              ]
+            },
+            "maxLength": 2,
+            "description": "Where the owner uses this skill: for work, in private life or as a hobby, or both. Set by the owner, never inferred from the skill or its tools. Absent or empty means unspecified. Consumers treat a repeated value as one. A display hint only: it does not make the skill or anything else private, and all records are public."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this record was originally created."
+          },
+          "subCategory": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Optional user-defined grouping label nested under category (e.g., 'Frontend', 'Backend', 'Databases'). Freeform: unlike category there are no known values, so renderers can present skills in the user's own groups. Renderers decide the display label.",
+            "maxGraphemes": 64
+          }
+        }
+      },
+      "description": "Record representing a single professional skill.",
+      "x-skos:note": "ESCO is the value anchor.",
+      "x-skos:closeMatch": [
+        "schema:knowsAbout",
+        "schema:DefinedTerm"
+      ]
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "A skill claimed by the user. Can be endorsed by other users via id.sifa.endorsement."
+}

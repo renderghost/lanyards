@@ -1,0 +1,145 @@
+{
+  "id": "network.cosmik.card",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "content",
+          "type"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional URL associated with the card. Required for URL cards, optional for NOTE cards."
+          },
+          "type": {
+            "type": "string",
+            "description": "The type of card",
+            "knownValues": [
+              "NOTE",
+              "URL"
+            ]
+          },
+          "content": {
+            "refs": [
+              "#noteContent",
+              "#urlContent"
+            ],
+            "type": "union",
+            "description": "The specific content of the card, determined by the card type."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this card was created (usually set by PDS)."
+          },
+          "parentCard": {
+            "ref": "com.atproto.repo.strongRef",
+            "type": "ref",
+            "description": "Optional strong reference to a parent card (for NOTE cards)."
+          },
+          "provenance": {
+            "ref": "network.cosmik.defs#provenance",
+            "type": "ref",
+            "description": "Optional provenance information for this card."
+          },
+          "originalCard": {
+            "ref": "com.atproto.repo.strongRef",
+            "type": "ref",
+            "description": "Optional strong reference to the original card (for NOTE cards)."
+          }
+        }
+      },
+      "description": "A record representing a card with content."
+    },
+    "urlContent": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "The URL being saved"
+        },
+        "metadata": {
+          "ref": "#urlMetadata",
+          "type": "ref",
+          "description": "Optional metadata about the URL"
+        }
+      },
+      "description": "Content structure for a URL card."
+    },
+    "noteContent": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "text": {
+          "type": "string",
+          "maxLength": 10000,
+          "description": "The note text content"
+        }
+      },
+      "description": "Content structure for a note card."
+    },
+    "urlMetadata": {
+      "type": "object",
+      "properties": {
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier (DOI) for academic content"
+        },
+        "isbn": {
+          "type": "string",
+          "description": "International Standard Book Number (ISBN) for books"
+        },
+        "type": {
+          "type": "string",
+          "description": "Type of content (e.g., 'video', 'article')"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the page"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author of the content"
+        },
+        "imageUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of a representative image"
+        },
+        "siteName": {
+          "type": "string",
+          "description": "Name of the site"
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the page"
+        },
+        "retrievedAt": {
+          "type": "string",
+          "format": "datetime",
+          "description": "When the metadata was retrieved"
+        },
+        "publishedDate": {
+          "type": "string",
+          "format": "datetime",
+          "description": "When the content was published"
+        }
+      },
+      "description": "Metadata about a URL."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "A single record type for all cards."
+}

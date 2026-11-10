@@ -1,0 +1,72 @@
+{
+  "id": "id.sifa.profile.externalAccount",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "platform",
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "The profile or site URL. Displayed as a clickable link on the user's profile."
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Optional display name for this account (e.g., 'My Blog', 'Photography').",
+            "maxGraphemes": 64
+          },
+          "feedUrl": {
+            "type": "string",
+            "format": "uri",
+            "description": "Optional RSS or Atom feed URL. Auto-discovered or manually provided. Used for content rendering in the ATmosphere Stream."
+          },
+          "platform": {
+            "type": "string",
+            "description": "The platform or type of external account.",
+            "knownValues": [
+              "id.sifa.defs#platformCodeberg",
+              "id.sifa.defs#platformFediverse",
+              "id.sifa.defs#platformForgejo",
+              "id.sifa.defs#platformGitea",
+              "id.sifa.defs#platformGithub",
+              "id.sifa.defs#platformGitlab",
+              "id.sifa.defs#platformInstagram",
+              "id.sifa.defs#platformLinkedin",
+              "id.sifa.defs#platformOrcid",
+              "id.sifa.defs#platformOther",
+              "id.sifa.defs#platformRss",
+              "id.sifa.defs#platformTwitter",
+              "id.sifa.defs#platformWebsite",
+              "id.sifa.defs#platformYoutube"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this record was originally created."
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the user's primary external link, displayed prominently on the profile card."
+          }
+        }
+      },
+      "description": "Record representing a single external account or website linked by the user.",
+      "x-skos:exactMatch": [
+        "schema:sameAs",
+        "foaf:account"
+      ]
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "A linked external account or website not on AT Protocol. Displayed on the user's profile and optionally rendered in the ATmosphere Stream via feed ingestion."
+}

@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.link.web",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "Custom web link to any website (max 3 per profile)",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["url", "createdAt"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Full URL to the website"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Display title for the link"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Timestamp when this link was created"
+          }
+        }
+      }
+    }
+  }
+}

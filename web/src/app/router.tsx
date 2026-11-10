@@ -9,6 +9,8 @@ export const router = createRouter({
   context: { queryClient },
   defaultPreload: 'intent',
   scrollRestoration: true,
+  // Keep DIDs (did:plc:…) and handles readable in URLs.
+  pathParamsAllowedCharacters: [':', '@'],
 });
 
 declare module '@tanstack/react-router' {

@@ -1,0 +1,193 @@
+{
+  "id.sifa.profile.self": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.self/self",
+      "cid": "bafyreifixturesifaselfaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.self",
+        "displayName": "Ada Example",
+        "headline": "Research Engineer building open research tools",
+        "pronouns": "she/her",
+        "langs": ["en"],
+        "openTo": ["id.sifa.defs#mentoringOthers"],
+        "avatar": {
+          "$type": "blob",
+          "ref": {
+            "$link": "bafkreiadasifaavatarblobaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "mimeType": "image/jpeg",
+          "size": 30697
+        },
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.position": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.position/3mpos1",
+      "cid": "bafyreifixturesifamposaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.position",
+        "title": "Research Engineer",
+        "company": "Example Lab",
+        "startedAt": "2024-03",
+        "isPrimary": true,
+        "onBehalfOf": null,
+        "location": {
+          "$type": "community.lexicon.location.address",
+          "country": "GB",
+          "locality": "Edinburgh"
+        },
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.position/3mpos3",
+      "cid": "bafyreifixturesifamposaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.position",
+        "title": "Software Developer",
+        "company": "Old Company",
+        "startedAt": "2018-01",
+        "endedAt": "2024-02",
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.education": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.education/3medu1",
+      "cid": "bafyreifixturesifameduaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.education",
+        "institution": "University of Example",
+        "degree": "PhD",
+        "fieldOfStudy": "Computer Science",
+        "startedAt": "2014",
+        "endedAt": "2018",
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.skill": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.skill/3mskill1",
+      "cid": "bafyreifixturesifamskillaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.skill",
+        "name": "TypeScript",
+        "category": "technical",
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.externalAccount": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.externalAccount/3macc1",
+      "cid": "bafyreifixturesifamaccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.externalAccount",
+        "url": "https://orcid.org/0000-0002-1825-0097",
+        "platform": "id.sifa.defs#platformOrcid",
+        "label": "ORCID",
+        "isPrimary": false,
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.externalAccount/3macc3",
+      "cid": "bafyreifixturesifamaccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.externalAccount",
+        "url": "https://github.com/ada-example",
+        "platform": "GitHub",
+        "label": "GitHub",
+        "isPrimary": false,
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.publication": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.publication/3mpub1",
+      "cid": "bafyreifixturesifampubaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.publication",
+        "title": "A study of open protocols",
+        "url": "https://journal.example/open-protocols",
+        "doi": "10.1234/EXAMPLE.2023",
+        "publishedAt": "2023-05",
+        "publisher": "Journal of Examples",
+        "authors": [
+          {
+            "name": "Ada Example"
+          }
+        ],
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.presentation": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.presentation/3mtalk1",
+      "cid": "bafyreifixturesifamtalkaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.presentation",
+        "title": "Building on ATProto",
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.presentationDelivery": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.presentationDelivery/3mdel1",
+      "cid": "bafyreifixturesifamdelaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.presentationDelivery",
+        "presentationRef": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.presentation/3mtalk1"
+        },
+        "date": "2024-03-07",
+        "eventName": "Example Conf 2024",
+        "role": "id.sifa.defs#presenter",
+        "links": [
+          {
+            "uri": "https://conf.example/2024/talks/atproto",
+            "type": "id.sifa.defs#linkEvent"
+          }
+        ],
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.presentationDelivery/3mdel3",
+      "cid": "bafyreifixturesifamdelaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.presentationDelivery",
+        "title": "Panel on open science",
+        "date": "2025-09-01",
+        "eventName": "Open Science Week",
+        "role": "id.sifa.defs#panelist",
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ],
+  "id.sifa.profile.location": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/id.sifa.profile.location/3mloc1",
+      "cid": "bafyreifixturesifamlocaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "id.sifa.profile.location",
+        "type": "id.sifa.defs#locationPrimary",
+        "isPrimary": true,
+        "address": {
+          "$type": "community.lexicon.location.address",
+          "country": "GB",
+          "region": "Scotland",
+          "locality": "Edinburgh"
+        },
+        "createdAt": "2026-09-18T14:29:57.211Z"
+      }
+    }
+  ]
+}

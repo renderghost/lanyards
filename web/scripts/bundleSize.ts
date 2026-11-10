@@ -14,10 +14,13 @@ export type ManifestChunk = {
 /**
  * The JavaScript the browser must download before the app can start: the
  * index.html entry plus everything it imports statically. Lazy chunks
- * (dynamic imports) are excluded.
+ * (dynamic imports) are excluded, except those of the routes named in
+ * `routeKeys` (matched against manifest keys), which a page needs before
+ * it can render — such as the public lanyard.
  */
 export function initialJsFiles(
-  manifest: Record<string, ManifestChunk>
+  manifest: Record<string, ManifestChunk>,
+  routeKeys: string[] = []
 ): string[] {
   const entry = manifest['index.html'];
   if (!entry) throw new Error('Vite manifest has no index.html entry');
@@ -34,6 +37,16 @@ export function initialJsFiles(
     }
   };
   visit(entry);
+  for (const routeKey of routeKeys) {
+    const keys = Object.keys(manifest).filter((key) => key.includes(routeKey));
+    if (keys.length === 0) {
+      throw new Error(`Vite manifest has no chunk for ${routeKey}`);
+    }
+    for (const key of keys) {
+      const chunk = manifest[key];
+      if (chunk) visit(chunk);
+    }
+  }
   return files;
 }
 

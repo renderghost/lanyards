@@ -38,11 +38,14 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm run lex:check
       - run: npm run i18n:check
       - run: npm test -- --run
       - run: npm run build:e2e
-      - name: Bundle budget (initial JS ≤ 200 KB gzipped)
+      - name: Bundle budget (lanyard route initial JS ≤ 200 KB gzipped)
         run: npm run size
       - run: npx playwright install --with-deps chromium
       - name: End-to-end and accessibility tests
         run: npm run e2e
+      - name: Production build has no e2e test session
+        run: npm run check:prod

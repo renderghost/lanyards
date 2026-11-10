@@ -1,0 +1,112 @@
+{
+  "records": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collectionLink/3mlinkone",
+      "cid": "bafyreifixture3mlinkoneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collectionLink",
+        "collection": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcolone",
+          "cid": "bafyreifixture3mcoloneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "card": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardone",
+          "cid": "bafyreifixture3mcardoneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "addedBy": "did:plc:fixturealiceaaaaaaaaaaaa",
+        "addedAt": "2026-09-10T09:00:00.000Z",
+        "createdAt": "2026-09-10T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collectionLink/3mlinktwo",
+      "cid": "bafyreifixture3mlinktwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collectionLink",
+        "collection": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcolone",
+          "cid": "bafyreifixture3mcoloneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "card": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardtwo",
+          "cid": "bafyreifixture3mcardtwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "addedBy": "did:plc:fixturealiceaaaaaaaaaaaa",
+        "addedAt": "2026-09-12T09:00:00.000Z",
+        "createdAt": "2026-09-12T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collectionLink/3mlinknote",
+      "cid": "bafyreifixture3mlinknoteaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collectionLink",
+        "collection": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcolone",
+          "cid": "bafyreifixture3mcoloneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "card": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardnote",
+          "cid": "bafyreifixture3mcardnoteaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "addedBy": "did:plc:fixturealiceaaaaaaaaaaaa",
+        "addedAt": "2026-09-13T09:00:00.000Z",
+        "createdAt": "2026-09-13T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collectionLink/3mlinkunsafe",
+      "cid": "bafyreifixture3mlinkunsafeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collectionLink",
+        "collection": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcolone",
+          "cid": "bafyreifixture3mcoloneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "card": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardunsafe",
+          "cid": "bafyreifixture3mcardunsafeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "addedBy": "did:plc:fixturealiceaaaaaaaaaaaa",
+        "addedAt": "2026-09-14T09:00:00.000Z",
+        "createdAt": "2026-09-14T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collectionLink/3mlinkothercol",
+      "cid": "bafyreifixture3mlinkothercolaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collectionLink",
+        "collection": {
+          "uri": "at://did:plc:fixtureotheraaaaaaaaaaaa/network.cosmik.collection/3mothercol",
+          "cid": "bafyreiothercolaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "card": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.card/3mcardone",
+          "cid": "bafyreifixture3mcardoneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "addedBy": "did:plc:fixturealiceaaaaaaaaaaaa",
+        "addedAt": "2026-09-15T09:00:00.000Z",
+        "createdAt": "2026-09-15T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collectionLink/3mlinkothercard",
+      "cid": "bafyreifixture3mlinkothercardaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collectionLink",
+        "collection": {
+          "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcoltwo",
+          "cid": "bafyreifixture3mcoltwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "card": {
+          "uri": "at://did:plc:fixtureotheraaaaaaaaaaaa/network.cosmik.card/3mothercard",
+          "cid": "bafyreiothercardaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "addedBy": "did:plc:fixturealiceaaaaaaaaaaaa",
+        "addedAt": "2026-09-16T09:00:00.000Z",
+        "createdAt": "2026-09-16T09:00:00.000Z"
+      }
+    }
+  ]
+}

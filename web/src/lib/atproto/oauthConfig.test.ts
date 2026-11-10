@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildOAuthEnv, resolveBaseUrl, safeReturnTo } from './oauthConfig';
+import {
+  buildOAuthEnv,
+  CLIENT_SCOPE,
+  FALLBACK_SCOPE,
+  GRANULAR_SCOPE,
+  resolveBaseUrl,
+  safeReturnTo,
+} from './oauthConfig';
 
 describe('buildOAuthEnv', () => {
   it('uses the RFC 8252 loopback client on 127.0.0.1', () => {
@@ -93,5 +100,38 @@ describe('safeReturnTo', () => {
     '/\u0000x',
   ])('replaces %j with the home page', (bad) => {
     expect(safeReturnTo(bad)).toBe('/');
+  });
+});
+
+describe('OAuth scopes', () => {
+  it('requests identity, the Lanyards permission set, follows and AppView reads', () => {
+    expect(GRANULAR_SCOPE).toBe(
+      [
+        'atproto',
+        'include:app.lanyards.authFull',
+        'repo:app.bsky.graph.follow?action=create&action=delete',
+        'rpc?lxm=app.bsky.actor.getPreferences&lxm=app.bsky.graph.getBlocks&lxm=app.bsky.graph.getKnownFollowers&lxm=app.bsky.graph.getMutes&lxm=app.bsky.graph.getRelationships&aud=did:web:api.bsky.app%23bsky_appview',
+      ].join(' ')
+    );
+    expect(FALLBACK_SCOPE).toBe('atproto transition:generic');
+  });
+
+  it('declares both the granular and the fallback scopes for the client', () => {
+    expect(CLIENT_SCOPE).toBe(`${GRANULAR_SCOPE} transition:generic`);
+  });
+
+  it('puts the client scope byte for byte into the loopback client_id', () => {
+    const { clientId } = buildOAuthEnv('http://127.0.0.1:5173', CLIENT_SCOPE);
+    const declared = new URL(clientId).searchParams.get('scope');
+    expect(declared).toBe(CLIENT_SCOPE);
+    expect(declared).toContain('aud=did:web:api.bsky.app%23bsky_appview');
+  });
+
+  it('puts the client scope into the hosted metadata', () => {
+    const { metadata } = buildOAuthEnv(
+      'https://next.lanyards.app',
+      CLIENT_SCOPE
+    );
+    expect(metadata?.scope).toBe(CLIENT_SCOPE);
   });
 });

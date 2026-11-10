@@ -1,0 +1,205 @@
+{
+  "id": "id.sifa.profile.publication",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "title"
+        ],
+        "properties": {
+          "doi": {
+            "type": "string",
+            "maxLength": 2560,
+            "description": "Digital Object Identifier, bare rather than as a URL: \"10.1234/example\", not \"https://doi.org/10.1234/example\". A DOI identifies the work itself, so it is what two records describing one publication can be matched on. Carrying it inside `url` makes it a link and stops it being an identifier.",
+            "x-skos:note": "schema:identifier with a PropertyValue of propertyID 'doi' is the JSON-LD serialization; bibo:doi is the direct term.",
+            "maxGraphemes": 256,
+            "x-skos:exactMatch": [
+              "bibo:doi",
+              "prism:doi"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to the publication.",
+            "x-skos:exactMatch": [
+              "bibo:uri",
+              "schema:url"
+            ]
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Resource type. Open set: the known values are ORCID's work-type vocabulary, which is what Sifa already ingests and stores unmapped, so a synced work round-trips without a translation table. A value outside the set is kept as written rather than rejected, because a publication that reached Sifa from somewhere other than ORCID need not fit ORCID's list.",
+            "knownValues": [
+              "annotation",
+              "artistic-performance",
+              "book",
+              "book-chapter",
+              "book-review",
+              "conference-abstract",
+              "conference-paper",
+              "conference-poster",
+              "dataset",
+              "design",
+              "dictionary-entry",
+              "disclosure",
+              "dissertation",
+              "edited-book",
+              "encyclopedia-entry",
+              "journal-article",
+              "lecture-speech",
+              "license",
+              "newspaper-article",
+              "online-resource",
+              "other",
+              "patent",
+              "preprint",
+              "registered-copyright",
+              "report",
+              "research-technique",
+              "review",
+              "software",
+              "spin-off-company",
+              "standards-and-policy",
+              "supervised-student-publication",
+              "technical-standard",
+              "test",
+              "trademark",
+              "translation",
+              "working-paper"
+            ],
+            "x-skos:note": "COAR Resource Types is the anchor a consumer should map to. The values here are ORCID's because that is the vocabulary the data arrives in; deviating from the id.sifa.defs token convention is deliberate, since the vocabulary is ORCID's rather than Sifa's.",
+            "maxGraphemes": 64,
+            "x-skos:closeMatch": [
+              "dcterms:type",
+              "schema:additionalType"
+            ]
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 2000,
+            "minLength": 1,
+            "description": "Publication title.",
+            "maxGraphemes": 200,
+            "x-skos:exactMatch": [
+              "dcterms:title",
+              "schema:name"
+            ]
+          },
+          "sameAs": {
+            "ref": "id.sifa.defs#externalRecordRef",
+            "type": "ref",
+            "description": "The same publication as recorded on another person's profile. Set when you keep your own entry for work someone else has also recorded, so consumers can tell the two describe one thing rather than showing it twice. Each side stays its own record: the other person cannot edit yours, and yours does not change theirs. Resolve by AT-URI, since they will keep editing their copy."
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "ref": "#author",
+              "type": "ref"
+            },
+            "maxLength": 50,
+            "description": "Co-authors. The record owner is always an implicit author.",
+            "x-skos:note": "bibo:authorList is an ordered rdf:List and preserves author order, which schema:author does not guarantee.",
+            "x-skos:exactMatch": [
+              "bibo:authorList",
+              "schema:author"
+            ]
+          },
+          "subtitle": {
+            "type": "string",
+            "maxLength": 2000,
+            "description": "Publication subtitle. Carries the distinguishing part of a title that sources such as Crossref and ORCID store separately from the main title -- for example the volume/part designation and descriptive clause of a multi-part paper series (\"III. Using cluster masses to create a cleaned catalogue\"). Absent for publications with no subtitle.",
+            "maxGraphemes": 200,
+            "x-skos:closeMatch": [
+              "schema:alternativeHeadline"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this record was originally created."
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the user's primary publication, surfaced in profile Highlights. Any entry may be primary."
+          },
+          "publisher": {
+            "type": "string",
+            "maxLength": 2560,
+            "description": "Publisher, journal, or venue name.",
+            "maxGraphemes": 256,
+            "x-skos:exactMatch": [
+              "dcterms:publisher",
+              "schema:publisher"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 50000,
+            "description": "Description or abstract.",
+            "maxGraphemes": 5000,
+            "x-skos:exactMatch": [
+              "bibo:abstract",
+              "schema:abstract"
+            ]
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Publication date in YYYY, YYYY-MM or YYYY-MM-DD format.",
+            "x-skos:exactMatch": [
+              "dcterms:issued",
+              "schema:datePublished"
+            ]
+          },
+          "relatedIdentifiers": {
+            "type": "array",
+            "items": {
+              "ref": "id.sifa.defs#relatedIdentifier",
+              "type": "ref"
+            },
+            "maxLength": 20,
+            "description": "Other versions or forms of this work, such as the published version of a preprint. A consumer can show linked versions as one publication.",
+            "x-skos:closeMatch": [
+              "dcterms:relation"
+            ]
+          }
+        }
+      },
+      "description": "Record representing a single publication.",
+      "x-skos:note": "Refine to bibo:AcademicArticle, bibo:Book, bibo:Report or bibo:Thesis when a resource type is known. COAR is the value anchor.",
+      "x-skos:broadMatch": [
+        "bibo:Document",
+        "schema:CreativeWork"
+      ]
+    },
+    "author": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "Author's ATproto DID, if they have an account."
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 1000,
+          "minLength": 1,
+          "description": "Author's display name.",
+          "maxGraphemes": 100
+        }
+      },
+      "description": "A co-author of the publication."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "A publication authored or co-authored by the user."
+}

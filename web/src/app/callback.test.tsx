@@ -9,7 +9,7 @@ import { completeSignIn, OAuthCallbackError } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
 import { TYPEAHEAD_URL } from '@/test/fixtures';
 import { server } from '@/test/msw';
-import { renderRoute } from '@/test/router';
+import { renderRoute, waitForRoute } from '@/test/router';
 
 vi.mock('@/lib/atproto/session', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/atproto/session')>();
@@ -34,6 +34,30 @@ beforeEach(() => {
 });
 
 const tryAgain = () => screen.getByRole('link', { name: 'Try again' });
+
+describe('OAuth callback, trying again', () => {
+  it('returns to the page the person started signing in from', async () => {
+    sessionStorage.setItem('lanyards:returnTo', '/@alice.test');
+    vi.mocked(completeSignIn).mockRejectedValue(
+      new OAuthCallbackError('denied')
+    );
+    renderRoute('/oauth/callback#error=access_denied');
+    await screen.findByText('Sign-in was cancelled.');
+    expect(tryAgain()).toHaveAttribute('href', '/?returnTo=%2F%40alice.test');
+    sessionStorage.clear();
+  });
+
+  it('ignores an unsafe remembered path', async () => {
+    sessionStorage.setItem('lanyards:returnTo', '//evil.example');
+    vi.mocked(completeSignIn).mockRejectedValue(
+      new OAuthCallbackError('denied')
+    );
+    renderRoute('/oauth/callback#error=access_denied');
+    await screen.findByText('Sign-in was cancelled.');
+    expect(tryAgain()).toHaveAttribute('href', '/');
+    sessionStorage.clear();
+  });
+});
 
 describe('OAuth callback', () => {
   it('explains a cancelled sign-in and scrubs the URL', async () => {
@@ -108,9 +132,7 @@ describe('OAuth callback', () => {
     // A path with no redirect of its own (the mocked session stays signed
     // out, so /settings would bounce back to sign-in).
     finish({ did: 'did:plc:x' as never, returnTo: '/somewhere-else' });
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/somewhere-else')
-    );
+    await waitForRoute(router, '/somewhere-else');
     expect(refresh).toHaveBeenCalled();
   });
 

@@ -3,12 +3,12 @@ import { loadEnv, type Plugin } from 'vite';
 import {
   buildOAuthEnv,
   type ClientMetadata,
-  OAUTH_SCOPE,
+  CLIENT_SCOPE,
   resolveBaseUrl,
 } from '../src/lib/atproto/oauthConfig.ts';
 
 /**
- * Exposes the OAuth client id, redirect URI and scope to the app, and, for
+ * Exposes the OAuth client id, redirect URI and base URL to the app, and, for
  * https builds, emits the hosted oauth-client-metadata.json.
  */
 export function oauthMetadataPlugin(): Plugin {
@@ -18,10 +18,8 @@ export function oauthMetadataPlugin(): Plugin {
     name: 'lanyards:oauth-metadata',
     config(_config, { command, mode }) {
       const env = { ...loadEnv(mode, process.cwd(), ''), ...process.env };
-      const oauth = buildOAuthEnv(
-        resolveBaseUrl({ command, env }),
-        OAUTH_SCOPE
-      );
+      const baseUrl = resolveBaseUrl({ command, env });
+      const oauth = buildOAuthEnv(baseUrl, CLIENT_SCOPE);
       metadata = oauth.metadata;
       return {
         define: {
@@ -31,7 +29,7 @@ export function oauthMetadataPlugin(): Plugin {
           'import.meta.env.VITE_OAUTH_REDIRECT_URI': JSON.stringify(
             oauth.redirectUri
           ),
-          'import.meta.env.VITE_OAUTH_SCOPE': JSON.stringify(OAUTH_SCOPE),
+          'import.meta.env.VITE_PUBLIC_BASE_URL': JSON.stringify(baseUrl),
         },
       };
     },

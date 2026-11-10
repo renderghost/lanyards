@@ -1,0 +1,1451 @@
+{
+  "id": "id.sifa.defs",
+  "defs": {
+    "host": {
+      "type": "token",
+      "description": "Hosted or moderated the session, including acting as MC, moderator, or host of a podcast or livestream recorded there. Organizing the event itself is recorded as an id.sifa.profile.project whose events field references it, not as a delivery role."
+    },
+    "author": {
+      "type": "token",
+      "description": "The named person co-authored the referenced id.sifa.profile.publication."
+    },
+    "hybrid": {
+      "type": "token",
+      "description": "Hybrid on-site and remote work."
+    },
+    "native": {
+      "type": "token",
+      "description": "Native or bilingual proficiency."
+    },
+    "onSite": {
+      "type": "token",
+      "description": "On-site/in-office work."
+    },
+    "remote": {
+      "type": "token",
+      "description": "Fully remote work (unspecified scope). Treated as remoteGlobal by AppViews. Prefer the scoped variants for new records."
+    },
+    "advisor": {
+      "type": "token",
+      "description": "Advisory role, paid or unpaid, without a board seat or line responsibility."
+    },
+    "keynote": {
+      "type": "token",
+      "description": "Gave a keynote address."
+    },
+    "toolRef": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of a tool item record in the same repo."
+        }
+      },
+      "description": "A reference to one of the owner's tool item records by AT-URI. No CID is required because tool items are mutable records in the same user's repo. Consumers ignore references that do not resolve."
+    },
+    "trainee": {
+      "type": "token",
+      "description": "Structured early-career rotation or graduate program."
+    },
+    "agentRef": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the referenced organization or person's atproto account, if one exists. The stable identity: it survives handle and name changes."
+        },
+        "name": {
+          "type": "string",
+          "maxLength": 2560,
+          "description": "Human-readable label for the organization or person, as it was known when the record was saved. A point-in-time snapshot, not refreshed from a lookup.",
+          "maxGraphemes": 256
+        },
+        "entityRef": {
+          "type": "string",
+          "format": "uri",
+          "description": "Portable, app-neutral identifier for the referenced organization: a Wikidata Q-ID URI, a ROR URI, or an LEI URI, else a resolver URL. Enables deterministic resolution to a canonical entity even before the organization claims an atproto account. Absent for a bare person or a free-text entry."
+        }
+      },
+      "description": "A reference to an organization or person named by a record: a human label plus stable machine anchors. The name is a point-in-time snapshot captured when the record was saved; did and entityRef are the durable identity and should be resolved live. Consumers render the name, and follow did or entityRef to reach the current entity."
+    },
+    "business": {
+      "type": "token",
+      "description": "Business and management skills."
+    },
+    "contract": {
+      "type": "token",
+      "description": "Fixed-scope engagement as an independent contractor."
+    },
+    "creative": {
+      "type": "token",
+      "description": "Creative and design skills."
+    },
+    "fullTime": {
+      "type": "token",
+      "description": "Full-time employee of the organization."
+    },
+    "industry": {
+      "type": "token",
+      "description": "Industry-specific domain knowledge."
+    },
+    "language": {
+      "type": "token",
+      "description": "Superseded. Language proficiency is its own record type, id.sifa.profile.language, so this is no longer offered as a skill category. Retained because removing a published token would break any consumer referencing it."
+    },
+    "panelist": {
+      "type": "token",
+      "description": "Participated as a member of a panel."
+    },
+    "partTime": {
+      "type": "token",
+      "description": "Part-time employee of the organization."
+    },
+    "seasonal": {
+      "type": "token",
+      "description": "Recurring role tied to a season or peak period."
+    },
+    "security": {
+      "type": "token",
+      "description": "Security and privacy skills."
+    },
+    "skillRef": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the id.sifa.profile.skill record."
+        }
+      },
+      "description": "A reference to an id.sifa.profile.skill record by AT-URI. No CID is required because skills are mutable records in the same user's repo."
+    },
+    "workshop": {
+      "type": "token",
+      "description": "Led or facilitated a workshop or tutorial."
+    },
+    "coSpeaker": {
+      "type": "token",
+      "description": "The named person presented alongside the claimer at the referenced id.sifa.profile.presentationDelivery occasion."
+    },
+    "colleague": {
+      "type": "token",
+      "description": "The confirming person worked with the owner of the referenced id.sifa.profile.position at the same organization. Unlike the other relations, the subject record names its owner rather than the confirming person. An organization account can write this too, but it stays a colleague-level confirmation: the organization-verified tier comes only from an id.sifa.org.employmentAttestation in the organization's own repository."
+    },
+    "community": {
+      "type": "token",
+      "description": "Community building and developer relations skills."
+    },
+    "freelance": {
+      "type": "token",
+      "description": "Solo service provider working with multiple clients on a project basis. No employees."
+    },
+    "linkEvent": {
+      "type": "token",
+      "description": "The event or session page."
+    },
+    "linkOther": {
+      "type": "token",
+      "description": "Other related link."
+    },
+    "presenter": {
+      "type": "token",
+      "description": "Delivered the session as the speaker or presenter (spoken or non-spoken)."
+    },
+    "stageSeed": {
+      "type": "token",
+      "description": "Seed round."
+    },
+    "technical": {
+      "type": "token",
+      "description": "Technical/engineering skills."
+    },
+    "temporary": {
+      "type": "token",
+      "description": "Fixed-end-date role as a direct employee of the organization."
+    },
+    "volunteer": {
+      "type": "token",
+      "description": "Volunteer work (when used as employment type)."
+    },
+    "courseRole": {
+      "type": "string",
+      "description": "The user's role in a course: taking it, teaching it, or assisting with it.",
+      "knownValues": [
+        "id.sifa.defs#courseTaken",
+        "id.sifa.defs#courseTaught",
+        "id.sifa.defs#courseTeachingAssistant"
+      ]
+    },
+    "domainType": {
+      "type": "string",
+      "description": "Professional domain within an industry. Optional refinement of industryType.",
+      "knownValues": [
+        "id.sifa.defs#domainAdvertising",
+        "id.sifa.defs#domainAerospace",
+        "id.sifa.defs#domainAgritech",
+        "id.sifa.defs#domainAutomotive",
+        "id.sifa.defs#domainAutonomousVehicles",
+        "id.sifa.defs#domainBanking",
+        "id.sifa.defs#domainClimateTech",
+        "id.sifa.defs#domainClinicalResearch",
+        "id.sifa.defs#domainCompliance",
+        "id.sifa.defs#domainCybersecurity",
+        "id.sifa.defs#domainDataScience",
+        "id.sifa.defs#domainDefense",
+        "id.sifa.defs#domainDevops",
+        "id.sifa.defs#domainDevrel",
+        "id.sifa.defs#domainEcommerce",
+        "id.sifa.defs#domainEdtech",
+        "id.sifa.defs#domainExtraction",
+        "id.sifa.defs#domainFashionDesign",
+        "id.sifa.defs#domainFilmVideo",
+        "id.sifa.defs#domainFintech",
+        "id.sifa.defs#domainFoodBeverage",
+        "id.sifa.defs#domainFoodTech",
+        "id.sifa.defs#domainGameDev",
+        "id.sifa.defs#domainGaming",
+        "id.sifa.defs#domainGeological",
+        "id.sifa.defs#domainHardware",
+        "id.sifa.defs#domainHealthtech",
+        "id.sifa.defs#domainHigherEd",
+        "id.sifa.defs#domainHotels",
+        "id.sifa.defs#domainHrRecruitment",
+        "id.sifa.defs#domainHumanRights",
+        "id.sifa.defs#domainInsurance",
+        "id.sifa.defs#domainInvestmentMgmt",
+        "id.sifa.defs#domainIpLaw",
+        "id.sifa.defs#domainJournalism",
+        "id.sifa.defs#domainLogistics",
+        "id.sifa.defs#domainManagementConsulting",
+        "id.sifa.defs#domainMobileServices",
+        "id.sifa.defs#domainNavalArchitecture",
+        "id.sifa.defs#domainNetworkInfra",
+        "id.sifa.defs#domainOilGas",
+        "id.sifa.defs#domainOpenSource",
+        "id.sifa.defs#domainPharma",
+        "id.sifa.defs#domainPortOperations",
+        "id.sifa.defs#domainPrimarySecondary",
+        "id.sifa.defs#domainProductDesign",
+        "id.sifa.defs#domainProptech",
+        "id.sifa.defs#domainPublicPolicy",
+        "id.sifa.defs#domainRenewables",
+        "id.sifa.defs#domainShipping",
+        "id.sifa.defs#domainSoftwareEngineering",
+        "id.sifa.defs#domainSupplyChain",
+        "id.sifa.defs#domainTextileManufacturing",
+        "id.sifa.defs#domainTravelTourism"
+      ]
+    },
+    "elementary": {
+      "type": "token",
+      "description": "Elementary proficiency."
+    },
+    "fellowship": {
+      "type": "token",
+      "description": "Funded research, academic, or mission-driven position, typically selective."
+    },
+    "honorAward": {
+      "type": "token",
+      "description": "An award, prize, or grant that was won."
+    },
+    "internship": {
+      "type": "token",
+      "description": "Structured early-career work experience, often tied to studies."
+    },
+    "linkSlides": {
+      "type": "token",
+      "description": "Slides or presentation deck."
+    },
+    "stageOther": {
+      "type": "token",
+      "description": "A stage that fits none of the above, including rounds that predate the standard naming."
+    },
+    "boardMember": {
+      "type": "token",
+      "description": "Seat on a board of directors or supervisory board, carrying a vote and fiduciary duty. Usually not employment, in the same way volunteer is not."
+    },
+    "commissions": {
+      "type": "token",
+      "description": "Open to commissioned creative work (illustration, design, voice work, music, etc.)."
+    },
+    "courseTaken": {
+      "type": "token",
+      "description": "The user took the course as a student."
+    },
+    "domainIpLaw": {
+      "type": "token",
+      "description": "Intellectual Property."
+    },
+    "honorRecord": {
+      "type": "token",
+      "description": "A record set or held, such as a national or event record."
+    },
+    "linkWriteup": {
+      "type": "token",
+      "description": "A long-form write-up, article, or transcript of the talk."
+    },
+    "platformRss": {
+      "type": "token",
+      "description": "RSS or Atom feed (blog, newsletter, podcast)."
+    },
+    "proficiency": {
+      "type": "string",
+      "description": "Language proficiency level. Maps to LinkedIn's five-level scale for lossless import.",
+      "knownValues": [
+        "id.sifa.defs#elementary",
+        "id.sifa.defs#fullProfessional",
+        "id.sifa.defs#limitedWorking",
+        "id.sifa.defs#native",
+        "id.sifa.defs#professionalWorking"
+      ]
+    },
+    "projectCore": {
+      "type": "token",
+      "description": "Core team member with elevated involvement."
+    },
+    "projectRole": {
+      "type": "string",
+      "description": "Role within a collaborative project.",
+      "knownValues": [
+        "id.sifa.defs#projectContributor",
+        "id.sifa.defs#projectCore",
+        "id.sifa.defs#projectOwner"
+      ]
+    },
+    "remoteLocal": {
+      "type": "token",
+      "description": "Remote work within the same country as the employer."
+    },
+    "stageGrowth": {
+      "type": "token",
+      "description": "Growth or late-stage round."
+    },
+    "artifactLink": {
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the artifact."
+        },
+        "kind": {
+          "type": "string",
+          "description": "What this link points to.",
+          "knownValues": [
+            "article",
+            "commit",
+            "dataset",
+            "edit",
+            "issue",
+            "other",
+            "pull-request",
+            "release",
+            "review",
+            "slides",
+            "talk",
+            "thread",
+            "video"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 2000,
+          "description": "Optional human-readable label (e.g. 'Merged PR #1234: keep-alive support').",
+          "maxGraphemes": 200
+        }
+      },
+      "description": "A public artifact proving a piece of work. Reusable across involvement, and later projects/publications."
+    },
+    "collaborator": {
+      "type": "token",
+      "description": "The named person worked alongside the claimer on the referenced id.sifa.profile.involvement."
+    },
+    "courseTaught": {
+      "type": "token",
+      "description": "The user taught the course as an instructor or lecturer."
+    },
+    "domainDevops": {
+      "type": "token",
+      "description": "DevOps & Infrastructure."
+    },
+    "domainDevrel": {
+      "type": "token",
+      "description": "Developer Relations."
+    },
+    "domainEdtech": {
+      "type": "token",
+      "description": "Education Technology."
+    },
+    "domainGaming": {
+      "type": "token",
+      "description": "Gaming & Interactive Media."
+    },
+    "domainHotels": {
+      "type": "token",
+      "description": "Hotels & Accommodation."
+    },
+    "domainOilGas": {
+      "type": "token",
+      "description": "Oil & Gas."
+    },
+    "domainPharma": {
+      "type": "token",
+      "description": "Pharmaceuticals."
+    },
+    "industryType": {
+      "type": "string",
+      "description": "Professional industry sector.",
+      "knownValues": [
+        "id.sifa.defs#industryAgriculture",
+        "id.sifa.defs#industryConsulting",
+        "id.sifa.defs#industryEducation",
+        "id.sifa.defs#industryEnergy",
+        "id.sifa.defs#industryFashion",
+        "id.sifa.defs#industryFinance",
+        "id.sifa.defs#industryGovernment",
+        "id.sifa.defs#industryHealthcare",
+        "id.sifa.defs#industryHospitality",
+        "id.sifa.defs#industryLegal",
+        "id.sifa.defs#industryManufacturing",
+        "id.sifa.defs#industryMaritime",
+        "id.sifa.defs#industryMedia",
+        "id.sifa.defs#industryMining",
+        "id.sifa.defs#industryNonprofit",
+        "id.sifa.defs#industryOther",
+        "id.sifa.defs#industryRealEstate",
+        "id.sifa.defs#industryRetail",
+        "id.sifa.defs#industryTechnology",
+        "id.sifa.defs#industryTelecom",
+        "id.sifa.defs#industryTransport"
+      ]
+    },
+    "locationType": {
+      "type": "string",
+      "description": "The role a location plays in a user's professional profile.",
+      "knownValues": [
+        "id.sifa.defs#locationBusiness",
+        "id.sifa.defs#locationPrimary",
+        "id.sifa.defs#locationTravel"
+      ]
+    },
+    "projectOwner": {
+      "type": "token",
+      "description": "Project owner with full management permissions. Multiple owners are supported."
+    },
+    "remoteGlobal": {
+      "type": "token",
+      "description": "Remote work from anywhere worldwide."
+    },
+    "remoteRegion": {
+      "type": "token",
+      "description": "Remote work within the same timezone region or continent."
+    },
+    "selfEmployed": {
+      "type": "token",
+      "description": "Operating your own business or practice. May have employees."
+    },
+    "stagePreSeed": {
+      "type": "token",
+      "description": "Pre-seed round."
+    },
+    "stageSeriesA": {
+      "type": "token",
+      "description": "Series A round."
+    },
+    "stageSeriesB": {
+      "type": "token",
+      "description": "Series B round."
+    },
+    "beingMentored": {
+      "type": "token",
+      "description": "Open to being mentored."
+    },
+    "boardObserver": {
+      "type": "token",
+      "description": "Board observer seat: attends and is informed but holds no vote. The common shape of an investor seat, kept distinct so it does not read as directorship."
+    },
+    "contractRoles": {
+      "type": "token",
+      "description": "Open to B2B contract or project-based freelance work, consulting, contract development."
+    },
+    "domainBanking": {
+      "type": "token",
+      "description": "Banking."
+    },
+    "domainDefense": {
+      "type": "token",
+      "description": "Defense & Intelligence."
+    },
+    "domainFintech": {
+      "type": "token",
+      "description": "Fintech."
+    },
+    "domainGameDev": {
+      "type": "token",
+      "description": "Game Development."
+    },
+    "fullTimeRoles": {
+      "type": "token",
+      "description": "Open to full-time employment opportunities."
+    },
+    "industryLegal": {
+      "type": "token",
+      "description": "Legal."
+    },
+    "industryMedia": {
+      "type": "token",
+      "description": "Media & Entertainment."
+    },
+    "industryOther": {
+      "type": "token",
+      "description": "Other industry."
+    },
+    "interpersonal": {
+      "type": "token",
+      "description": "Interpersonal and communication skills."
+    },
+    "linkRecording": {
+      "type": "token",
+      "description": "Video or audio recording of the presentation."
+    },
+    "partTimeRoles": {
+      "type": "token",
+      "description": "Open to part-time employment opportunities."
+    },
+    "platformGitea": {
+      "type": "token",
+      "description": "Gitea account on a self-hosted instance."
+    },
+    "platformOrcid": {
+      "type": "token",
+      "description": "ORCID researcher identifier."
+    },
+    "platformOther": {
+      "type": "token",
+      "description": "Other platform not covered by specific tokens."
+    },
+    "projectActive": {
+      "type": "token",
+      "description": "Project is actively maintained or in development."
+    },
+    "projectMember": {
+      "type": "token",
+      "description": "The named person worked on the referenced id.sifa.profile.project."
+    },
+    "projectStatus": {
+      "type": "string",
+      "description": "Current status of a collaborative project.",
+      "knownValues": [
+        "id.sifa.defs#projectActive",
+        "id.sifa.defs#projectArchived",
+        "id.sifa.defs#projectCompleted"
+      ]
+    },
+    "skillCategory": {
+      "type": "string",
+      "description": "Broad category for grouping skills.",
+      "knownValues": [
+        "id.sifa.defs#business",
+        "id.sifa.defs#community",
+        "id.sifa.defs#creative",
+        "id.sifa.defs#industry",
+        "id.sifa.defs#interpersonal",
+        "id.sifa.defs#security",
+        "id.sifa.defs#technical"
+      ]
+    },
+    "verifiedByOrg": {
+      "type": "token",
+      "description": "The organization's own account wrote an id.sifa.org.employmentAttestation for the position."
+    },
+    "workplaceType": {
+      "type": "string",
+      "description": "The workplace arrangement.",
+      "knownValues": [
+        "id.sifa.defs#hybrid",
+        "id.sifa.defs#onSite",
+        "id.sifa.defs#remote",
+        "id.sifa.defs#remoteGlobal",
+        "id.sifa.defs#remoteLocal",
+        "id.sifa.defs#remoteRegion"
+      ]
+    },
+    "apprenticeship": {
+      "type": "token",
+      "description": "Formal training-to-certification program combining paid work and education."
+    },
+    "boardPositions": {
+      "type": "token",
+      "description": "Open to advisory or board positions."
+    },
+    "collaborations": {
+      "type": "token",
+      "description": "Open to project collaborations."
+    },
+    "domainAgritech": {
+      "type": "token",
+      "description": "Agricultural Technology."
+    },
+    "domainFoodTech": {
+      "type": "token",
+      "description": "Food Technology & Processing."
+    },
+    "domainHardware": {
+      "type": "token",
+      "description": "Hardware & Electronics."
+    },
+    "domainHigherEd": {
+      "type": "token",
+      "description": "Higher Education."
+    },
+    "domainProptech": {
+      "type": "token",
+      "description": "Property Technology."
+    },
+    "domainShipping": {
+      "type": "token",
+      "description": "Shipping & Freight."
+    },
+    "employmentPast": {
+      "type": "token",
+      "description": "The person held the position in the past. An end date gives the period."
+    },
+    "employmentType": {
+      "type": "string",
+      "description": "The type of employment arrangement.",
+      "knownValues": [
+        "id.sifa.defs#advisor",
+        "id.sifa.defs#apprenticeship",
+        "id.sifa.defs#boardMember",
+        "id.sifa.defs#boardObserver",
+        "id.sifa.defs#contract",
+        "id.sifa.defs#fellowship",
+        "id.sifa.defs#freelance",
+        "id.sifa.defs#fullTime",
+        "id.sifa.defs#independentWork",
+        "id.sifa.defs#internship",
+        "id.sifa.defs#partTime",
+        "id.sifa.defs#seasonal",
+        "id.sifa.defs#selfEmployed",
+        "id.sifa.defs#temporary",
+        "id.sifa.defs#trainee",
+        "id.sifa.defs#volunteer"
+      ]
+    },
+    "industryDomain": {
+      "type": "object",
+      "required": [
+        "industry"
+      ],
+      "properties": {
+        "domain": {
+          "type": "string",
+          "description": "Professional domain within the selected industry. Optional refinement.",
+          "knownValues": [
+            "id.sifa.defs#domainAdvertising",
+            "id.sifa.defs#domainAerospace",
+            "id.sifa.defs#domainAgritech",
+            "id.sifa.defs#domainAutomotive",
+            "id.sifa.defs#domainAutonomousVehicles",
+            "id.sifa.defs#domainBanking",
+            "id.sifa.defs#domainClimateTech",
+            "id.sifa.defs#domainClinicalResearch",
+            "id.sifa.defs#domainCompliance",
+            "id.sifa.defs#domainCybersecurity",
+            "id.sifa.defs#domainDataScience",
+            "id.sifa.defs#domainDefense",
+            "id.sifa.defs#domainDevops",
+            "id.sifa.defs#domainDevrel",
+            "id.sifa.defs#domainEcommerce",
+            "id.sifa.defs#domainEdtech",
+            "id.sifa.defs#domainExtraction",
+            "id.sifa.defs#domainFashionDesign",
+            "id.sifa.defs#domainFilmVideo",
+            "id.sifa.defs#domainFintech",
+            "id.sifa.defs#domainFoodBeverage",
+            "id.sifa.defs#domainFoodTech",
+            "id.sifa.defs#domainGameDev",
+            "id.sifa.defs#domainGaming",
+            "id.sifa.defs#domainGeological",
+            "id.sifa.defs#domainHardware",
+            "id.sifa.defs#domainHealthtech",
+            "id.sifa.defs#domainHigherEd",
+            "id.sifa.defs#domainHotels",
+            "id.sifa.defs#domainHrRecruitment",
+            "id.sifa.defs#domainHumanRights",
+            "id.sifa.defs#domainInsurance",
+            "id.sifa.defs#domainInvestmentMgmt",
+            "id.sifa.defs#domainIpLaw",
+            "id.sifa.defs#domainJournalism",
+            "id.sifa.defs#domainLogistics",
+            "id.sifa.defs#domainManagementConsulting",
+            "id.sifa.defs#domainMobileServices",
+            "id.sifa.defs#domainNavalArchitecture",
+            "id.sifa.defs#domainNetworkInfra",
+            "id.sifa.defs#domainOilGas",
+            "id.sifa.defs#domainOpenSource",
+            "id.sifa.defs#domainPharma",
+            "id.sifa.defs#domainPortOperations",
+            "id.sifa.defs#domainPrimarySecondary",
+            "id.sifa.defs#domainProductDesign",
+            "id.sifa.defs#domainProptech",
+            "id.sifa.defs#domainPublicPolicy",
+            "id.sifa.defs#domainRenewables",
+            "id.sifa.defs#domainShipping",
+            "id.sifa.defs#domainSoftwareEngineering",
+            "id.sifa.defs#domainSupplyChain",
+            "id.sifa.defs#domainTextileManufacturing",
+            "id.sifa.defs#domainTravelTourism"
+          ]
+        },
+        "industry": {
+          "type": "string",
+          "description": "Professional industry sector token.",
+          "knownValues": [
+            "id.sifa.defs#industryAgriculture",
+            "id.sifa.defs#industryConsulting",
+            "id.sifa.defs#industryEducation",
+            "id.sifa.defs#industryEnergy",
+            "id.sifa.defs#industryFashion",
+            "id.sifa.defs#industryFinance",
+            "id.sifa.defs#industryGovernment",
+            "id.sifa.defs#industryHealthcare",
+            "id.sifa.defs#industryHospitality",
+            "id.sifa.defs#industryLegal",
+            "id.sifa.defs#industryManufacturing",
+            "id.sifa.defs#industryMaritime",
+            "id.sifa.defs#industryMedia",
+            "id.sifa.defs#industryMining",
+            "id.sifa.defs#industryNonprofit",
+            "id.sifa.defs#industryOther",
+            "id.sifa.defs#industryRealEstate",
+            "id.sifa.defs#industryRetail",
+            "id.sifa.defs#industryTechnology",
+            "id.sifa.defs#industryTelecom",
+            "id.sifa.defs#industryTransport"
+          ]
+        }
+      },
+      "description": "An industry/domain pair. Industry is required; domain is an optional refinement within the industry."
+    },
+    "industryEnergy": {
+      "type": "token",
+      "description": "Energy & Environment."
+    },
+    "industryMining": {
+      "type": "token",
+      "description": "Mining & Resources."
+    },
+    "industryRetail": {
+      "type": "token",
+      "description": "Retail & E-commerce."
+    },
+    "investmentRole": {
+      "type": "string",
+      "description": "How the capital went in. General partner is deliberately absent: running a fund is a role, recorded as an id.sifa.profile.position, and a partner's own commitment to their fund is a limitedPartner entry against that fund.",
+      "knownValues": [
+        "id.sifa.defs#angelInvestment",
+        "id.sifa.defs#limitedPartner",
+        "id.sifa.defs#otherInvestment",
+        "id.sifa.defs#syndicateInvestment"
+      ]
+    },
+    "limitedPartner": {
+      "type": "token",
+      "description": "Capital committed to a fund rather than to a company. The person does not choose the fund's deals, and the named entity is the fund itself."
+    },
+    "limitedWorking": {
+      "type": "token",
+      "description": "Limited working proficiency."
+    },
+    "locationTravel": {
+      "type": "token",
+      "description": "Frequent travel or temporary location."
+    },
+    "platformGithub": {
+      "type": "token",
+      "description": "GitHub account."
+    },
+    "platformGitlab": {
+      "type": "token",
+      "description": "GitLab account (gitlab.com or self-hosted)."
+    },
+    "stageSecondary": {
+      "type": "token",
+      "description": "Purchase of existing shares from another holder rather than newly issued shares."
+    },
+    "verifiedByPeer": {
+      "type": "token",
+      "description": "Enough verified colleagues confirmed the position. Reserved: not published in the first version."
+    },
+    "angelInvestment": {
+      "type": "token",
+      "description": "Direct investment in the person's own name, with the person choosing the deal."
+    },
+    "contextPersonal": {
+      "type": "token",
+      "description": "The owner uses this skill in private life or as a hobby."
+    },
+    "domainAerospace": {
+      "type": "token",
+      "description": "Aerospace & Defense."
+    },
+    "domainEcommerce": {
+      "type": "token",
+      "description": "E-commerce."
+    },
+    "domainFilmVideo": {
+      "type": "token",
+      "description": "Film & Video."
+    },
+    "domainInsurance": {
+      "type": "token",
+      "description": "Insurance."
+    },
+    "domainLogistics": {
+      "type": "token",
+      "description": "Logistics & Warehousing."
+    },
+    "honorNomination": {
+      "type": "token",
+      "description": "A nomination or shortlisting for an award, without a win."
+    },
+    "independentWork": {
+      "type": "token",
+      "description": "Self-initiated, sustained work I lead — community building, content creation, ecosystem contribution, or similar. May involve a registered entity but does not pay me personally. Often run alongside other employment."
+    },
+    "industryFashion": {
+      "type": "token",
+      "description": "Fashion & Textiles."
+    },
+    "industryFinance": {
+      "type": "token",
+      "description": "Finance & Banking."
+    },
+    "industryTelecom": {
+      "type": "token",
+      "description": "Telecommunications."
+    },
+    "investmentStage": {
+      "type": "string",
+      "description": "The company's funding stage at the time the investment was made, not its stage today.",
+      "knownValues": [
+        "id.sifa.defs#stageGrowth",
+        "id.sifa.defs#stageOther",
+        "id.sifa.defs#stagePreSeed",
+        "id.sifa.defs#stageSecondary",
+        "id.sifa.defs#stageSeed",
+        "id.sifa.defs#stageSeriesA",
+        "id.sifa.defs#stageSeriesB",
+        "id.sifa.defs#stageSeriesCPlus"
+      ]
+    },
+    "involvementKind": {
+      "type": "string",
+      "description": "The nature of an involvement record.",
+      "knownValues": [
+        "id.sifa.defs#involvementCharity",
+        "id.sifa.defs#involvementCivic",
+        "id.sifa.defs#involvementCommunity",
+        "id.sifa.defs#involvementOpenSource",
+        "id.sifa.defs#involvementOther"
+      ]
+    },
+    "locationPrimary": {
+      "type": "token",
+      "description": "Primary residence or home location."
+    },
+    "mentoringOthers": {
+      "type": "token",
+      "description": "Open to mentoring others."
+    },
+    "otherInvestment": {
+      "type": "token",
+      "description": "A capital position that fits none of the above."
+    },
+    "platformForgejo": {
+      "type": "token",
+      "description": "Forgejo account on a self-hosted instance other than Codeberg."
+    },
+    "platformTwitter": {
+      "type": "token",
+      "description": "Twitter/X account."
+    },
+    "platformWebsite": {
+      "type": "token",
+      "description": "Personal or professional website."
+    },
+    "platformYoutube": {
+      "type": "token",
+      "description": "YouTube channel."
+    },
+    "projectArchived": {
+      "type": "token",
+      "description": "Project is archived and no longer active."
+    },
+    "verifiedByEmail": {
+      "type": "token",
+      "description": "The person proved control of a mailbox at a domain recognized for the employing organization. Time-limited: the issued record carries expiresAt while this is the only method."
+    },
+    "domainAutomotive": {
+      "type": "token",
+      "description": "Automotive."
+    },
+    "domainCompliance": {
+      "type": "token",
+      "description": "Compliance & Regulatory."
+    },
+    "domainExtraction": {
+      "type": "token",
+      "description": "Extraction & Processing."
+    },
+    "domainGeological": {
+      "type": "token",
+      "description": "Geological Services."
+    },
+    "domainHealthtech": {
+      "type": "token",
+      "description": "Health Technology."
+    },
+    "domainJournalism": {
+      "type": "token",
+      "description": "Journalism."
+    },
+    "domainOpenSource": {
+      "type": "token",
+      "description": "Open Source."
+    },
+    "domainRenewables": {
+      "type": "token",
+      "description": "Renewable Energy."
+    },
+    "employmentStatus": {
+      "type": "string",
+      "description": "Whether an employment relationship is ongoing or has ended.",
+      "knownValues": [
+        "id.sifa.defs#employmentCurrent",
+        "id.sifa.defs#employmentPast"
+      ]
+    },
+    "externalPlatform": {
+      "type": "string",
+      "description": "Platform type for an external account linked to a Sifa profile.",
+      "knownValues": [
+        "id.sifa.defs#platformCodeberg",
+        "id.sifa.defs#platformFediverse",
+        "id.sifa.defs#platformForgejo",
+        "id.sifa.defs#platformGitea",
+        "id.sifa.defs#platformGithub",
+        "id.sifa.defs#platformGitlab",
+        "id.sifa.defs#platformInstagram",
+        "id.sifa.defs#platformLinkedin",
+        "id.sifa.defs#platformOrcid",
+        "id.sifa.defs#platformOther",
+        "id.sifa.defs#platformRss",
+        "id.sifa.defs#platformSubstack",
+        "id.sifa.defs#platformTwitter",
+        "id.sifa.defs#platformWebsite",
+        "id.sifa.defs#platformYoutube"
+      ]
+    },
+    "fullProfessional": {
+      "type": "token",
+      "description": "Full professional proficiency."
+    },
+    "honorRecognition": {
+      "type": "token",
+      "description": "Other recognition, such as an honorary title, fellowship, or listing."
+    },
+    "industryMaritime": {
+      "type": "token",
+      "description": "Maritime & Shipping."
+    },
+    "investmentActive": {
+      "type": "token",
+      "description": "The position is still held."
+    },
+    "investmentAmount": {
+      "type": "object",
+      "required": [
+        "currency",
+        "value"
+      ],
+      "properties": {
+        "value": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Amount in whole major currency units (euros, not cents). Cheque sizes are round numbers, and whole units avoid the ambiguity of a bare figure."
+        },
+        "currency": {
+          "type": "string",
+          "maxLength": 3,
+          "minLength": 3,
+          "description": "ISO 4217 three-letter currency code, uppercase. Enforced at the app layer."
+        }
+      },
+      "description": "An optional, deliberately structured amount. Free text was rejected here because an unparseable money string is worse than no amount at all."
+    },
+    "investmentExited": {
+      "type": "token",
+      "description": "The position was realised through an acquisition, IPO, or secondary sale."
+    },
+    "investmentStatus": {
+      "type": "string",
+      "description": "Where the position stands now. Recording a write-off is showing your work; Sifa never derives a hit rate or return from these values.",
+      "knownValues": [
+        "id.sifa.defs#investmentActive",
+        "id.sifa.defs#investmentExited",
+        "id.sifa.defs#investmentUndisclosed",
+        "id.sifa.defs#investmentWrittenOff"
+      ]
+    },
+    "involvementCivic": {
+      "type": "token",
+      "description": "Board membership, policy, advisory, or public-consultation work."
+    },
+    "involvementOther": {
+      "type": "token",
+      "description": "Other uncompensated involvement."
+    },
+    "linkRegistration": {
+      "type": "token",
+      "description": "Registration or ticket page."
+    },
+    "locationBusiness": {
+      "type": "token",
+      "description": "Business or operational location."
+    },
+    "openToWorkStatus": {
+      "type": "string",
+      "description": "The type of opportunity the user is open to.",
+      "knownValues": [
+        "id.sifa.defs#beingMentored",
+        "id.sifa.defs#boardPositions",
+        "id.sifa.defs#collaborations",
+        "id.sifa.defs#commissions",
+        "id.sifa.defs#contractRoles",
+        "id.sifa.defs#fullTimeRoles",
+        "id.sifa.defs#mentoringOthers",
+        "id.sifa.defs#partTimeRoles",
+        "id.sifa.defs#speakingEngagements"
+      ]
+    },
+    "platformCodeberg": {
+      "type": "token",
+      "description": "Codeberg account."
+    },
+    "platformLinkedin": {
+      "type": "token",
+      "description": "LinkedIn profile."
+    },
+    "platformSubstack": {
+      "type": "token",
+      "description": "Substack newsletter."
+    },
+    "presentationLink": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "uri",
+          "description": "The link URL."
+        },
+        "type": {
+          "type": "string",
+          "description": "Optional link category, used to pick an icon. Open set; see id.sifa.defs#presentationLinkType.",
+          "knownValues": [
+            "id.sifa.defs#linkEvent",
+            "id.sifa.defs#linkOther",
+            "id.sifa.defs#linkRecording",
+            "id.sifa.defs#linkRegistration",
+            "id.sifa.defs#linkSlides",
+            "id.sifa.defs#linkWriteup"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "maxLength": 640,
+          "description": "Optional display label (e.g., 'Watch recording', 'Slides').",
+          "maxGraphemes": 64
+        }
+      },
+      "description": "A related link for a presentation or one of its deliveries."
+    },
+    "presentationRole": {
+      "type": "string",
+      "description": "The user's role in a presentation or session. Open set.",
+      "knownValues": [
+        "id.sifa.defs#host",
+        "id.sifa.defs#keynote",
+        "id.sifa.defs#panelist",
+        "id.sifa.defs#presenter",
+        "id.sifa.defs#workshop"
+      ]
+    },
+    "projectCompleted": {
+      "type": "token",
+      "description": "Project has been completed."
+    },
+    "projectMemberRef": {
+      "type": "object",
+      "required": [
+        "did"
+      ],
+      "properties": {
+        "did": {
+          "type": "string",
+          "format": "did",
+          "description": "DID of the person named as a project member. Any atproto account is allowed."
+        },
+        "role": {
+          "type": "string",
+          "description": "Role the named person held on the project. Display only: it grants no write access to the project record, which lives in the author's repository.",
+          "knownValues": [
+            "id.sifa.defs#projectContributor",
+            "id.sifa.defs#projectCore",
+            "id.sifa.defs#projectOwner"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "maxLength": 1280,
+          "description": "Optional title within the project (e.g. 'Lead Designer', 'Backend Engineer').",
+          "maxGraphemes": 128
+        }
+      },
+      "description": "Another person named as a member of a project. A claim by the record author, not a fact: it carries the named person's display name, avatar, and profile link only once they publish a matching id.sifa.confirmation."
+    },
+    "stageSeriesCPlus": {
+      "type": "token",
+      "description": "Series C or later round."
+    },
+    "attestationManual": {
+      "type": "token",
+      "description": "An account holder of the organization confirmed the employment by hand."
+    },
+    "attestationSource": {
+      "type": "string",
+      "description": "How an id.sifa.org.employmentAttestation came to be written. Absent means manual.",
+      "knownValues": [
+        "id.sifa.defs#attestationDirectory",
+        "id.sifa.defs#attestationManual"
+      ]
+    },
+    "domainAdvertising": {
+      "type": "token",
+      "description": "Advertising & Marketing."
+    },
+    "domainClimateTech": {
+      "type": "token",
+      "description": "Climate Tech."
+    },
+    "domainDataScience": {
+      "type": "token",
+      "description": "Data Science & ML."
+    },
+    "domainHumanRights": {
+      "type": "token",
+      "description": "Human Rights."
+    },
+    "domainSupplyChain": {
+      "type": "token",
+      "description": "Supply Chain & Fulfillment."
+    },
+    "employmentCurrent": {
+      "type": "token",
+      "description": "The person currently holds the position."
+    },
+    "externalRecordRef": {
+      "type": "object",
+      "required": [
+        "uri"
+      ],
+      "properties": {
+        "cid": {
+          "type": "string",
+          "format": "cid",
+          "description": "Optional CID of a specific version of the referenced record. Used as an integrity hint only; live resolution is by AT-URI."
+        },
+        "uri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT-URI of the referenced record."
+        }
+      },
+      "description": "A reference to a record in another repository or lexicon by AT-URI. The CID is optional: it pins a specific version as an integrity hint, but consumers should resolve the AT-URI live so the reference tracks edits to the target."
+    },
+    "honorChampionship": {
+      "type": "token",
+      "description": "A title or medal won in a competition or championship."
+    },
+    "industryEducation": {
+      "type": "token",
+      "description": "Education & Research."
+    },
+    "industryNonprofit": {
+      "type": "token",
+      "description": "Non-profit & Social Impact."
+    },
+    "industryTransport": {
+      "type": "token",
+      "description": "Transportation & Logistics."
+    },
+    "platformFediverse": {
+      "type": "token",
+      "description": "Fediverse account (Mastodon, Misskey, Pleroma, etc.)."
+    },
+    "platformInstagram": {
+      "type": "token",
+      "description": "Instagram account."
+    },
+    "relatedIdentifier": {
+      "type": "object",
+      "required": [
+        "identifier",
+        "relationType"
+      ],
+      "properties": {
+        "identifier": {
+          "type": "string",
+          "maxLength": 2048,
+          "description": "The related work: a bare DOI (\"10.1234/example\"), an AT-URI of another record, or a URL, as named by identifierType."
+        },
+        "relationType": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "How this work relates to the identified one, in DataCite relationType terms. For example IsPreprintOf on a preprint points at its published version.",
+          "knownValues": [
+            "HasPreprint",
+            "HasVersion",
+            "IsIdenticalTo",
+            "IsNewVersionOf",
+            "IsPreprintOf",
+            "IsPreviousVersionOf",
+            "IsPublishedIn",
+            "IsVersionOf"
+          ]
+        },
+        "identifierType": {
+          "type": "string",
+          "maxLength": 32,
+          "description": "Kind of identifier. Absent means DOI.",
+          "knownValues": [
+            "AT-URI",
+            "DOI",
+            "URL"
+          ]
+        }
+      },
+      "description": "A typed link from this work to another version or form of it, such as the published version of a preprint. Values mirror the DataCite relatedIdentifier vocabulary so they round-trip with DataCite and Crossref metadata."
+    },
+    "domainFoodBeverage": {
+      "type": "token",
+      "description": "Food & Beverage."
+    },
+    "domainNetworkInfra": {
+      "type": "token",
+      "description": "Network Infrastructure."
+    },
+    "domainPublicPolicy": {
+      "type": "token",
+      "description": "Public Policy."
+    },
+    "industryConsulting": {
+      "type": "token",
+      "description": "Consulting & Professional Services."
+    },
+    "industryGovernment": {
+      "type": "token",
+      "description": "Government & Public Sector."
+    },
+    "industryHealthcare": {
+      "type": "token",
+      "description": "Healthcare & Life Sciences."
+    },
+    "industryRealEstate": {
+      "type": "token",
+      "description": "Real Estate & Construction."
+    },
+    "industryTechnology": {
+      "type": "token",
+      "description": "Technology."
+    },
+    "involvementCharity": {
+      "type": "token",
+      "description": "Charitable or volunteer work for a cause or person."
+    },
+    "projectContributor": {
+      "type": "token",
+      "description": "Project contributor."
+    },
+    "verificationMethod": {
+      "type": "string",
+      "description": "How Sifa verified an employment: which evidence backs an id.sifa.verification.employment record.",
+      "knownValues": [
+        "id.sifa.defs#verifiedByDirectory",
+        "id.sifa.defs#verifiedByEmail",
+        "id.sifa.defs#verifiedByOrg",
+        "id.sifa.defs#verifiedByPeer"
+      ]
+    },
+    "contextProfessional": {
+      "type": "token",
+      "description": "The owner uses this skill for work."
+    },
+    "domainCybersecurity": {
+      "type": "token",
+      "description": "Cybersecurity."
+    },
+    "domainFashionDesign": {
+      "type": "token",
+      "description": "Fashion Design."
+    },
+    "domainHrRecruitment": {
+      "type": "token",
+      "description": "HR & Recruitment."
+    },
+    "domainProductDesign": {
+      "type": "token",
+      "description": "Product & UX Design."
+    },
+    "domainTravelTourism": {
+      "type": "token",
+      "description": "Travel & Tourism."
+    },
+    "industryAgriculture": {
+      "type": "token",
+      "description": "Agriculture & Food."
+    },
+    "industryHospitality": {
+      "type": "token",
+      "description": "Hospitality & Tourism."
+    },
+    "professionalWorking": {
+      "type": "token",
+      "description": "Professional working proficiency."
+    },
+    "speakingEngagements": {
+      "type": "token",
+      "description": "Open to speaking engagements (talks, panels, keynotes, workshops)."
+    },
+    "syndicateInvestment": {
+      "type": "token",
+      "description": "Investment in a deal led by someone else, made through a per-deal pooled vehicle."
+    },
+    "verifiedByDirectory": {
+      "type": "token",
+      "description": "The organization's directory sync wrote the attestation on the organization's behalf."
+    },
+    "attestationDirectory": {
+      "type": "token",
+      "description": "The organization's directory sync (for example SCIM) wrote the attestation."
+    },
+    "confirmationRelation": {
+      "type": "string",
+      "description": "What an id.sifa.confirmation record affirms. Open set.",
+      "knownValues": [
+        "id.sifa.defs#author",
+        "id.sifa.defs#coSpeaker",
+        "id.sifa.defs#collaborator",
+        "id.sifa.defs#colleague",
+        "id.sifa.defs#projectMember"
+      ]
+    },
+    "domainInvestmentMgmt": {
+      "type": "token",
+      "description": "Investment Management."
+    },
+    "domainMobileServices": {
+      "type": "token",
+      "description": "Mobile & Wireless Services."
+    },
+    "domainPortOperations": {
+      "type": "token",
+      "description": "Port & Terminal Operations."
+    },
+    "investmentWrittenOff": {
+      "type": "token",
+      "description": "The company failed or the position was written down to nothing."
+    },
+    "involvementCommunity": {
+      "type": "token",
+      "description": "Community organizing, moderation, or meetup/event running."
+    },
+    "presentationLinkType": {
+      "type": "string",
+      "description": "The category of a related link on a presentation. Open set.",
+      "knownValues": [
+        "id.sifa.defs#linkEvent",
+        "id.sifa.defs#linkOther",
+        "id.sifa.defs#linkRecording",
+        "id.sifa.defs#linkRegistration",
+        "id.sifa.defs#linkSlides",
+        "id.sifa.defs#linkWriteup"
+      ]
+    },
+    "industryManufacturing": {
+      "type": "token",
+      "description": "Manufacturing & Engineering."
+    },
+    "investmentUndisclosed": {
+      "type": "token",
+      "description": "The person prefers not to say where the position stands."
+    },
+    "involvementOpenSource": {
+      "type": "token",
+      "description": "Open-source contribution or maintainership."
+    },
+    "domainClinicalResearch": {
+      "type": "token",
+      "description": "Clinical Research."
+    },
+    "domainPrimarySecondary": {
+      "type": "token",
+      "description": "Primary & Secondary Education."
+    },
+    "courseTeachingAssistant": {
+      "type": "token",
+      "description": "The user assisted with teaching the course, for example as a teaching assistant."
+    },
+    "domainNavalArchitecture": {
+      "type": "token",
+      "description": "Naval Architecture & Marine Engineering."
+    },
+    "domainAutonomousVehicles": {
+      "type": "token",
+      "description": "Autonomous Vehicles."
+    },
+    "domainSoftwareEngineering": {
+      "type": "token",
+      "description": "Software Engineering."
+    },
+    "domainManagementConsulting": {
+      "type": "token",
+      "description": "Management Consulting."
+    },
+    "domainTextileManufacturing": {
+      "type": "token",
+      "description": "Textile Manufacturing."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "Shared type definitions for Sifa professional profile lexicons."
+}

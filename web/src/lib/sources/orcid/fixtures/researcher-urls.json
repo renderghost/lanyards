@@ -1,0 +1,68 @@
+{
+  "last-modified-date": {
+    "value": 1462157645967
+  },
+  "researcher-url": [
+    {
+      "created-date": {
+        "value": 1446663146890
+      },
+      "last-modified-date": {
+        "value": 1462157645967
+      },
+      "source": {
+        "source-orcid": {
+          "uri": "https://orcid.org/0000-0002-1825-0097",
+          "path": "0000-0002-1825-0097",
+          "host": "orcid.org"
+        },
+        "source-client-id": null,
+        "source-name": {
+          "value": "Josiah Carberry"
+        },
+        "assertion-origin-orcid": null,
+        "assertion-origin-client-id": null,
+        "assertion-origin-name": null
+      },
+      "url-name": "Brown University Page",
+      "url": {
+        "value": "http://library.brown.edu/about/hay/carberry.php"
+      },
+      "visibility": "public",
+      "path": "/0000-0002-1825-0097/researcher-urls/568395",
+      "put-code": 568395,
+      "display-index": 2
+    },
+    {
+      "created-date": {
+        "value": 1446663146889
+      },
+      "last-modified-date": {
+        "value": 1462157645967
+      },
+      "source": {
+        "source-orcid": {
+          "uri": "https://orcid.org/0000-0002-1825-0097",
+          "path": "0000-0002-1825-0097",
+          "host": "orcid.org"
+        },
+        "source-client-id": null,
+        "source-name": {
+          "value": "Josiah Carberry"
+        },
+        "assertion-origin-orcid": null,
+        "assertion-origin-client-id": null,
+        "assertion-origin-name": null
+      },
+      "url-name": "Wikipedia Entry",
+      "url": {
+        "value": "http://en.wikipedia.org/wiki/Josiah_Carberry"
+      },
+      "visibility": "public",
+      "path": "/0000-0002-1825-0097/researcher-urls/568394",
+      "put-code": 568394,
+      "display-index": 1
+    }
+  ],
+  "path": "/0000-0002-1825-0097/researcher-urls"
+}

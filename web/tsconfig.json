@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
   },
-  "include": ["src", "plugins", "scripts", "e2e", "*.config.ts"]
+  "include": ["src", "plugins", "scripts", "e2e", "api", "server", "*.config.ts"]
 }

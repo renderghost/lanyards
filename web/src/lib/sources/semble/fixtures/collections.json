@@ -1,0 +1,28 @@
+{
+  "records": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcolone",
+      "cid": "bafyreifixture3mcoloneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collection",
+        "name": "Protocol reading",
+        "description": "Papers and posts about ATProto",
+        "accessType": "OPEN",
+        "collaborators": [],
+        "createdAt": "2026-09-01T09:00:00.000Z",
+        "updatedAt": "2026-10-01T09:00:00.000Z"
+      }
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/network.cosmik.collection/3mcoltwo",
+      "cid": "bafyreifixture3mcoltwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "value": {
+        "$type": "network.cosmik.collection",
+        "name": "Conference talks",
+        "accessType": "CLOSED",
+        "createdAt": "2026-08-01T09:00:00.000Z",
+        "updatedAt": "2026-08-02T09:00:00.000Z"
+      }
+    }
+  ]
+}

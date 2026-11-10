@@ -48,6 +48,46 @@ describe('initialJsFiles', () => {
     ]);
   });
 
+  it('also counts the chunks of the named lazy routes and their imports', () => {
+    const manifest = {
+      'index.html': {
+        file: 'assets/index.js',
+        isEntry: true,
+        imports: ['_session.js'],
+        dynamicImports: [
+          'src/routes/@{$handle}.tsx?tsr-split=component',
+          'src/routes/settings.tsx?tsr-split=component',
+        ],
+      },
+      '_session.js': { file: 'assets/session.js' },
+      'src/routes/@{$handle}.tsx?tsr-split=component': {
+        file: 'assets/handle.js',
+        isDynamicEntry: true,
+        imports: ['_LanyardPage.js', 'index.html', '_session.js'],
+      },
+      '_LanyardPage.js': { file: 'assets/LanyardPage.js' },
+      'src/routes/settings.tsx?tsr-split=component': {
+        file: 'assets/settings.js',
+        isDynamicEntry: true,
+      },
+    };
+    expect(initialJsFiles(manifest, ['routes/@{$handle}.tsx'])).toEqual([
+      'assets/index.js',
+      'assets/session.js',
+      'assets/handle.js',
+      'assets/LanyardPage.js',
+    ]);
+  });
+
+  it('fails clearly when a named route is missing from the build', () => {
+    expect(() =>
+      initialJsFiles(
+        { 'index.html': { file: 'assets/index.js', isEntry: true } },
+        ['routes/@{$handle}.tsx']
+      )
+    ).toThrow('routes/@{$handle}.tsx');
+  });
+
   it('fails clearly when there is no HTML entry', () => {
     expect(() => initialJsFiles({})).toThrow('index.html');
   });
