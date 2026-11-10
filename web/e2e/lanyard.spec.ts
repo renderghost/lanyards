@@ -186,7 +186,7 @@ test.describe('public lanyard, signed in', () => {
     await page.getByRole('button', { name: 'Follow' }).click();
     await expect(
       page.getByRole('heading', { name: 'Lanyards needs your permission' })
-    ).toBeVisible();
+    ).toBeFocused();
     expect(writes.created).toEqual([]);
   });
 });

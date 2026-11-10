@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { notify } from '@/components/Toaster/notify';
@@ -16,12 +16,20 @@ import type { PermissionNoticeProps } from './PermissionNotice.types';
  */
 export function PermissionNotice({
   returnTo,
+  focusOnShow = false,
   className,
 }: PermissionNoticeProps) {
   const { t } = useLingui();
   const session = useSession();
   const headingId = useId();
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const [busy, setBusy] = useState(false);
+  const shown = session.status === 'signedIn';
+
+  useEffect(() => {
+    if (focusOnShow && shown) headingRef.current?.focus();
+  }, [focusOnShow, shown]);
+
   if (session.status !== 'signedIn') return null;
   const { did } = session.session;
 
@@ -38,7 +46,12 @@ export function PermissionNotice({
       aria-labelledby={headingId}
       className={cn(styles.notice, className)}
     >
-      <h2 id={headingId} className={styles.heading}>
+      <h2
+        id={headingId}
+        ref={headingRef}
+        tabIndex={-1}
+        className={styles.heading}
+      >
         {t`Lanyards needs your permission`}
       </h2>
       <p className={styles.text}>

@@ -54,7 +54,7 @@ export function FollowButton({
           {t`Couldn't check whether you already follow them`}
         </p>
       )}
-      {askForPermission && <PermissionNotice returnTo={returnTo} />}
+      {askForPermission && <PermissionNotice returnTo={returnTo} focusOnShow />}
     </div>
   );
 }

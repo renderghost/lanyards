@@ -81,7 +81,7 @@ describe('VisitorActions when signed in', () => {
     );
     expect(
       screen.getByRole('heading', { name: 'Lanyards needs your permission' })
-    ).toBeInTheDocument();
+    ).toHaveFocus();
     await userEvent.click(
       screen.getByRole('button', { name: 'Give permission' })
     );
