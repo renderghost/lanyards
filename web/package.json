@@ -18,9 +18,13 @@
     "format": "prettier --write .",
     "i18n:extract": "lingui extract --clean",
     "i18n:check": "lingui extract --clean && git diff --exit-code src/i18n/locales",
-    "size": "tsx scripts/check-bundle-size.ts"
+    "size": "tsx scripts/check-bundle-size.ts",
+    "lex:pull": "lex-cli pull",
+    "lex:gen": "lex-cli generate",
+    "lex:check": "lex-cli generate && git diff --exit-code -- src/lexicons && git ls-files --others --exclude-standard -- src/lexicons | (! grep .)"
   },
   "dependencies": {
+    "@atcute/atproto": "^4.0.4",
     "@atcute/bluesky": "^4.0.26",
     "@atcute/client": "^5.1.2",
     "@atcute/identity-resolver": "^2.0.3",
@@ -43,6 +47,8 @@
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
+    "@atcute/lex-cli": "^3.3.0",
+    "@atcute/lexicon-doc": "^3.1.0",
     "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@lingui/cli": "^6.12.0",
@@ -72,6 +78,7 @@
     "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.2",
+    "valibot": "^1.5.0",
     "vite": "^8.3.7",
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.1.0",

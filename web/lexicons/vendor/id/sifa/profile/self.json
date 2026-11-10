@@ -1,0 +1,210 @@
+{
+  "id": "id.sifa.profile.self",
+  "defs": {
+    "main": {
+      "key": "literal:self",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt"
+        ],
+        "properties": {
+          "about": {
+            "type": "string",
+            "maxLength": 50000,
+            "description": "Professional summary or about section. Longer-form than Bluesky's description field.",
+            "maxGraphemes": 5000,
+            "x-skos:exactMatch": [
+              "schema:description"
+            ]
+          },
+          "langs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "language"
+            },
+            "maxLength": 3,
+            "description": "BCP 47 language tags indicating the user's primary professional languages."
+          },
+          "avatar": {
+            "type": "blob",
+            "accept": [
+              "image/jpeg",
+              "image/png"
+            ],
+            "maxSize": 1000000,
+            "description": "Professional-context avatar image. Overrides app.bsky.actor.profile.avatar when present.",
+            "x-skos:exactMatch": [
+              "schema:image",
+              "foaf:depiction"
+            ]
+          },
+          "labels": {
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ],
+            "type": "union",
+            "description": "Self-label values for the professional profile."
+          },
+          "openTo": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "id.sifa.defs#beingMentored",
+                "id.sifa.defs#boardPositions",
+                "id.sifa.defs#collaborations",
+                "id.sifa.defs#commissions",
+                "id.sifa.defs#contractRoles",
+                "id.sifa.defs#fullTimeRoles",
+                "id.sifa.defs#mentoringOthers",
+                "id.sifa.defs#partTimeRoles",
+                "id.sifa.defs#speakingEngagements"
+              ]
+            },
+            "maxLength": 10,
+            "description": "Types of opportunities the user is open to. Empty array or omitted means not actively seeking."
+          },
+          "headline": {
+            "type": "string",
+            "maxLength": 2200,
+            "description": "Professional headline (e.g., 'Senior Engineer at Acme Corp'). Distinct from Bluesky's displayName.",
+            "maxGraphemes": 220,
+            "x-skos:closeMatch": [
+              "schema:jobTitle"
+            ]
+          },
+          "location": {
+            "ref": "community.lexicon.location.address",
+            "type": "ref",
+            "description": "Professional location. Sifa enforces ISO 3166-1 alpha-2 country codes at the app layer.",
+            "x-skos:closeMatch": [
+              "schema:homeLocation"
+            ]
+          },
+          "pronouns": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Free-form pronouns text. Professional-context override for app.bsky.actor.profile.pronouns.",
+            "maxGraphemes": 20
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this profile was originally created."
+          },
+          "givenName": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Given (first) name. Maps to Schema.org Person.givenName. Optional; if absent, displayName is used for rendering.",
+            "maxGraphemes": 64,
+            "x-skos:exactMatch": [
+              "schema:givenName",
+              "foaf:givenname"
+            ]
+          },
+          "familyName": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Family (last) name. Maps to Schema.org Person.familyName. Optional.",
+            "maxGraphemes": 64,
+            "x-skos:exactMatch": [
+              "schema:familyName",
+              "foaf:family_name"
+            ]
+          },
+          "industries": {
+            "type": "array",
+            "items": {
+              "ref": "id.sifa.defs#industryDomain",
+              "type": "ref"
+            },
+            "maxLength": 10,
+            "description": "Professional industry/domain pairs. Each entry has a required industry and optional domain refinement. Replaces the former singular industry/domain fields."
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Professional-context display name. Overrides app.bsky.actor.profile.displayName when present.",
+            "maxGraphemes": 64,
+            "x-skos:exactMatch": [
+              "schema:name",
+              "foaf:name"
+            ]
+          },
+          "avatarSource": {
+            "type": "string",
+            "maxLength": 128,
+            "description": "Where the professional-context avatar comes from instead of the avatar blob. 'actor.rpg.sprite' means the user's rpg.actor character: the actor.rpg.sprite record with key self in the same repository, rendered as a picture of the character. Apps that do not support the value, or find no usable record, fall back to avatar, then to app.bsky.actor.profile.avatar. Absent means use avatar. The avatar blob is kept, so removing this field brings it back.",
+            "knownValues": [
+              "actor.rpg.sprite"
+            ]
+          },
+          "discoverable": {
+            "type": "boolean",
+            "description": "Whether the rendered profile page may be indexed by search engines and AI tools. Default true when absent. When false, the rendering app emits noindex directives and excludes the page from any sitemap or push-indexing protocol. Does not affect the public visibility of the underlying ATproto records, which remain readable by any client."
+          },
+          "showActivity": {
+            "type": "boolean",
+            "description": "Whether the rendering app shows the user's activity in other ATproto apps (records the user creates in collections outside this namespace) on their profile and in activity feeds. Default true when absent. When false, the rendering app hides all of that activity, including activity from apps it starts to recognize in the future. Any per-app display choices the rendering app keeps stay as they are and apply again when this is true. Does not affect the public visibility of the underlying ATproto records, which remain readable by any client."
+          },
+          "availableToUtc": {
+            "type": "integer",
+            "maximum": 23,
+            "minimum": 0,
+            "description": "End of typical working hours in UTC (0-23). May wrap around midnight (e.g., from 22 to 06 for someone in Asia working US hours)."
+          },
+          "availableFromUtc": {
+            "type": "integer",
+            "maximum": 23,
+            "minimum": 0,
+            "description": "Start of typical working hours in UTC (0-23). Used with availableToUtc for search filtering by work-hours overlap. Set via local-time UI, converted to UTC by the client."
+          },
+          "namePronunciation": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Free-form phonetic respelling of the user's name (e.g., 'Foo-kuh'). A native professional-profile field with no app.bsky.actor.profile equivalent; extends the name fields rather than overriding anything. Text only; the spoken version lives in namePronunciationAudio.",
+            "maxGraphemes": 64
+          },
+          "preferredWorkplace": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "knownValues": [
+                "id.sifa.defs#hybrid",
+                "id.sifa.defs#onSite",
+                "id.sifa.defs#remote",
+                "id.sifa.defs#remoteGlobal",
+                "id.sifa.defs#remoteLocal",
+                "id.sifa.defs#remoteRegion"
+              ]
+            },
+            "maxLength": 5,
+            "description": "Preferred workplace arrangements. Orthogonal to openTo. Empty array or omitted means no preference. Prefer the scoped remote variants (remoteLocal, remoteRegion, remoteGlobal) over the generic 'remote' token."
+          },
+          "namePronunciationAudio": {
+            "type": "blob",
+            "accept": [
+              "audio/mp4",
+              "audio/mpeg",
+              "audio/ogg",
+              "audio/webm"
+            ],
+            "maxSize": 1048576,
+            "description": "Short audio clip (a few seconds) of the user saying their own name. Recorded in-app or uploaded. Complements the text respelling in namePronunciation."
+          }
+        }
+      },
+      "description": "The user's professional profile summary.",
+      "x-skos:exactMatch": [
+        "schema:Person",
+        "foaf:Person"
+      ]
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "Professional profile summary. Singleton record providing professional identity beyond the base ATproto profile. Fields overlapping app.bsky.actor.profile (displayName, avatar, pronouns) act as optional professional-context overrides; absence means fall back to the bsky record. Structured name fields (givenName, familyName) extend rather than override displayName, since app.bsky.actor.profile has no structured-name primitive."
+}

@@ -1,0 +1,52 @@
+{
+  "id": "id.sifa.profile.location",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "address",
+          "createdAt",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The role of this location.",
+            "knownValues": [
+              "id.sifa.defs#locationBusiness",
+              "id.sifa.defs#locationPrimary",
+              "id.sifa.defs#locationTravel"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "maxLength": 600,
+            "description": "Optional user-defined label for this location.",
+            "maxGraphemes": 60
+          },
+          "address": {
+            "ref": "community.lexicon.location.address",
+            "type": "ref",
+            "description": "Structured location address. Sifa enforces ISO 3166-1 alpha-2 country codes at the app layer."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this record was created."
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the primary/display location."
+          }
+        }
+      },
+      "description": "A single location entry in the user's profile."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "A location associated with the user's professional profile. Supports multiple locations per user (e.g. residential, business, travel)."
+}

@@ -1,0 +1,146 @@
+{
+  "id": "id.sifa.profile.education",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "institution"
+        ],
+        "properties": {
+          "grade": {
+            "type": "string",
+            "maxLength": 500,
+            "description": "Grade, GPA, or classification achieved.",
+            "maxGraphemes": 50
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "ref": "id.sifa.defs#toolRef",
+              "type": "ref"
+            },
+            "maxLength": 50,
+            "description": "Tools used in this education. Each entry is a URI reference to a tool item record owned by the same DID. Consumers ignore entries that do not resolve."
+          },
+          "degree": {
+            "type": "string",
+            "maxLength": 2560,
+            "description": "Degree name (e.g., 'Bachelor of Science', 'Master of Arts').",
+            "maxGraphemes": 256,
+            "x-skos:closeMatch": [
+              "schema:hasCredential",
+              "bibo:degree"
+            ]
+          },
+          "labels": {
+            "refs": [
+              "com.atproto.label.defs#selfLabels"
+            ],
+            "type": "union",
+            "description": "Self-label values for this education record."
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "ref": "id.sifa.defs#skillRef",
+              "type": "ref"
+            },
+            "maxLength": 50,
+            "description": "Skills gained or used in this education. Each entry is a URI reference to an id.sifa.profile.skill record owned by the same DID."
+          },
+          "endedAt": {
+            "type": "string",
+            "description": "End date (graduation or expected graduation) in YYYY, YYYY-MM or YYYY-MM-DD format. Omit if currently enrolled."
+          },
+          "agentRef": {
+            "ref": "id.sifa.defs#agentRef",
+            "type": "ref",
+            "description": "The educational institution, as a single nested reference mirroring the flat institution / institutionDid / entityRef fields. Additive dual-write: the flat fields remain the source of truth for existing consumers."
+          },
+          "eqfLevel": {
+            "type": "integer",
+            "maximum": 8,
+            "minimum": 1,
+            "description": "Level of the qualification on the European Qualifications Framework (EQF), 1 to 8. 6 is bachelor level, 7 is master level, 8 is doctoral level. Omit when unknown. The free-text degree stays the display name.",
+            "x-skos:note": "EQF is the value anchor.",
+            "x-skos:closeMatch": [
+              "schema:educationalLevel"
+            ]
+          },
+          "location": {
+            "ref": "community.lexicon.location.address",
+            "type": "ref",
+            "description": "Institution location. Sifa enforces ISO 3166-1 alpha-2 country codes at the app layer."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "Client-declared timestamp when this record was originally created."
+          },
+          "entityRef": {
+            "type": "string",
+            "format": "uri",
+            "description": "Portable, app-neutral identifier for the educational institution the user selected from a resolver dropdown: a Wikidata Q-ID URI (http://www.wikidata.org/entity/Q...), a ROR URI, or an LEI URI. Enables deterministic resolution to a canonical entity even before the institution claims an ATproto account. Absent for free-text entries."
+          },
+          "isPrimary": {
+            "type": "boolean",
+            "description": "Whether this is the user's primary education entry, surfaced in profile Highlights. Any entry may be primary."
+          },
+          "startedAt": {
+            "type": "string",
+            "description": "Start date in YYYY, YYYY-MM or YYYY-MM-DD format."
+          },
+          "activities": {
+            "type": "string",
+            "maxLength": 10000,
+            "description": "Activities, societies, and extracurriculars.",
+            "maxGraphemes": 1000
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 50000,
+            "description": "Additional description or notes about the education.",
+            "maxGraphemes": 5000
+          },
+          "institution": {
+            "type": "string",
+            "maxLength": 2560,
+            "minLength": 1,
+            "description": "Name of the educational institution.",
+            "maxGraphemes": 256,
+            "x-skos:exactMatch": [
+              "schema:alumniOf"
+            ]
+          },
+          "fieldOfStudy": {
+            "type": "string",
+            "maxLength": 2560,
+            "description": "Field of study or major.",
+            "x-skos:note": "ISCED-F is the value anchor.",
+            "maxGraphemes": 256,
+            "x-skos:closeMatch": [
+              "schema:educationalCredentialAwarded"
+            ]
+          },
+          "institutionDid": {
+            "type": "string",
+            "format": "did",
+            "description": "DID of the institution's ATproto account, if one exists."
+          }
+        }
+      },
+      "description": "Record representing a single education credential.",
+      "x-skos:note": "One record maps to two schema.org assertions: alumniOf for the institution and hasCredential for the degree.",
+      "x-skos:closeMatch": [
+        "schema:EducationalOccupationalCredential"
+      ]
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": "An education entry in the user's professional profile."
+}

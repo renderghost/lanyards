@@ -1,0 +1,24 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.authFull",
+  "defs": {
+    "main": {
+      "type": "permission-set",
+      "title": "Manage your Lanyards profile",
+      "detail": "Create, update and delete your lanyard settings, honorific, web links, and audio and video links.",
+      "permissions": [
+        {
+          "type": "permission",
+          "resource": "repo",
+          "collection": [
+            "app.lanyards.actor.lanyard",
+            "app.lanyards.actor.biography.honorific",
+            "app.lanyards.link.web",
+            "app.lanyards.link.media.audio",
+            "app.lanyards.link.media.video"
+          ]
+        }
+      ]
+    }
+  }
+}
