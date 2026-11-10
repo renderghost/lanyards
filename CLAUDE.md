@@ -26,6 +26,7 @@ All work is tracked in GitHub Issues. Use the `gh` CLI or the GitHub MCP tools, 
 - You may commit and push to your working branch autonomously, without asking first
 - Commit in small, coherent increments that each pass `npm run lint`, and the build and tests where they exist
 - Message format: `<type>: <description> (#<number>)`, e.g. `fix: handle empty skills list (#88)`
+- Author commits as the repository owner, using the same name and email as the owner's commits on `main`, and credit Claude with a `Co-Authored-By` trailer. Vercel's Hobby plan blocks deployments, including previews, for commits by any other author. In a fresh environment, set this first: `git config user.name` / `git config user.email`.
 - **NEVER** use `--force`, `reset --hard` or other destructive git commands
 - **NEVER** commit secrets, `.env` files or generated build output
 
