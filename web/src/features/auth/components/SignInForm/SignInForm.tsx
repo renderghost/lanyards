@@ -6,7 +6,11 @@ import { HandleCombobox } from '@/components/HandleCombobox/HandleCombobox';
 import { notify } from '@/components/Toaster/notify';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { captureError, track } from '@/lib/analytics/analytics';
-import { startSignIn, startSignUp } from '@/lib/atproto/session';
+import {
+  isUnknownAccountError,
+  startSignIn,
+  startSignUp,
+} from '@/lib/atproto/session';
 
 import { ERROR_MESSAGES, FIELD_ID } from './SignInForm.constants';
 import * as styles from './SignInForm.styles';
@@ -53,6 +57,13 @@ export function SignInForm({ returnTo }: SignInFormProps) {
       await startSignIn(normaliseIdentifier(value), returnTo);
     } catch (startError) {
       setSubmitting(false);
+      if (isUnknownAccountError(startError)) {
+        // Usually a typo: say so where the user is looking.
+        track('sign_in_failed', { reason: 'unknown-account' });
+        setError('notFound');
+        inputRef.current?.focus();
+        return;
+      }
       track('sign_in_failed', { reason: 'start' });
       captureError(startError, { source: 'sign-in' });
       notify.error(t`Couldn't start sign-in. Please try again.`);

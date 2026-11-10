@@ -1,4 +1,12 @@
 import { Client } from '@atcute/client';
+import {
+  AmbiguousHandleError,
+  DidNotFoundError,
+  DocumentNotFoundError,
+  ImproperDidError,
+  InvalidResolvedHandleError,
+  UnsupportedDidMethodError,
+} from '@atcute/identity-resolver';
 import type { ActorIdentifier, Did } from '@atcute/lexicons';
 import {
   configureOAuth,
@@ -6,6 +14,7 @@ import {
   deleteStoredSession,
   finalizeAuthorization,
   getSession,
+  LoginError,
   OAuthUserAgent,
   TokenRefreshError,
 } from '@atcute/oauth-browser-client';
@@ -47,6 +56,26 @@ export type RestoreResult =
   | { status: 'expired' };
 
 type SignInState = { returnTo: string };
+
+const UNKNOWN_ACCOUNT_ERRORS = [
+  DidNotFoundError,
+  InvalidResolvedHandleError,
+  AmbiguousHandleError,
+  DocumentNotFoundError,
+  UnsupportedDidMethodError,
+  ImproperDidError,
+];
+
+/**
+ * True when sign-in could not start because the handle or DID does not
+ * exist (usually a typo), as opposed to a network or server failure.
+ */
+export function isUnknownAccountError(error: unknown): boolean {
+  return UNKNOWN_ACCOUNT_ERRORS.some((type) => error instanceof type);
+}
+
+// atcute signals a consumed or unknown OAuth state only through its message.
+const REPLAYED_CALLBACK = /unknown state|missing parameters/i;
 
 export function configureAuth(): void {
   configureOAuth({
@@ -118,7 +147,10 @@ async function finishSignIn(
   try {
     result = await finalizeAuthorization(params);
   } catch (cause) {
-    throw new OAuthCallbackError('failed', { cause });
+    // A bookmarked, reloaded or reused callback URL: its state was consumed.
+    const replayed =
+      cause instanceof LoginError && REPLAYED_CALLBACK.test(cause.message);
+    throw new OAuthCallbackError(replayed ? 'missing' : 'failed', { cause });
   }
 
   const did = result.session.info.sub;

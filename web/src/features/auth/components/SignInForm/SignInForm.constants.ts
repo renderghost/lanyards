@@ -9,4 +9,5 @@ export const ERROR_MESSAGES: Record<SignInError, MessageDescriptor> = {
   required: msg`Enter your handle`,
   email: msg`Enter your handle, not your email — for example alice.bsky.social`,
   invalid: msg`That doesn't look like a handle — for example alice.bsky.social`,
+  notFound: msg`We couldn't find that handle — check the spelling`,
 };

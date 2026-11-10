@@ -1,6 +1,7 @@
 import {
   createAuthorizationUrl,
   deleteStoredSession,
+  LoginError,
   finalizeAuthorization,
   getSession,
   TokenRefreshError,
@@ -8,11 +9,18 @@ import {
 import type { Did } from '@atcute/lexicons';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import {
+  DidNotFoundError,
+  DocumentNotFoundError,
+  FailedHandleResolutionError,
+} from '@atcute/identity-resolver';
+
 import { track } from '@/lib/analytics/analytics';
 
 import { DID_STORAGE_KEY } from './oauthConfig';
 import {
   completeSignIn,
+  isUnknownAccountError,
   OAuthCallbackError,
   restoreSession,
   signOut,
@@ -81,6 +89,28 @@ describe('startSignIn', () => {
   });
 });
 
+describe('isUnknownAccountError', () => {
+  it('recognises handles and DIDs that do not exist', () => {
+    expect(
+      isUnknownAccountError(new DidNotFoundError('alise.bsky.social'))
+    ).toBe(true);
+    expect(
+      isUnknownAccountError(new DocumentNotFoundError('did:plc:abc' as Did))
+    ).toBe(true);
+  });
+
+  it('treats network failures as system errors', () => {
+    expect(
+      isUnknownAccountError(
+        new FailedHandleResolutionError('alice.bsky.social', {
+          cause: new TypeError('Failed to fetch'),
+        })
+      )
+    ).toBe(false);
+    expect(isUnknownAccountError(new Error('boom'))).toBe(false);
+  });
+});
+
 describe('startSignUp', () => {
   it('opens account creation at bsky.social', async () => {
     vi.mocked(createAuthorizationUrl).mockResolvedValue(
@@ -120,6 +150,16 @@ describe('completeSignIn', () => {
     expect(error).toBeInstanceOf(OAuthCallbackError);
     expect(error).toMatchObject({ code: 'failed' });
     expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'failed' });
+  });
+
+  it('reports a replayed or consumed callback as missing', async () => {
+    vi.mocked(finalizeAuthorization).mockRejectedValue(
+      new LoginError('unknown state provided')
+    );
+    await expect(completeSignIn('#code=abc&state=used')).rejects.toMatchObject({
+      code: 'missing',
+    });
+    expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'missing' });
   });
 
   it('stores the DID and returns the requested path', async () => {

@@ -1,5 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { DidNotFoundError } from '@atcute/identity-resolver';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,10 +15,10 @@ import { renderWithProviders } from '@/test/render';
 
 import { SignInForm } from './SignInForm';
 
-vi.mock('@/lib/atproto/session', () => ({
-  startSignIn: vi.fn(),
-  startSignUp: vi.fn(),
-}));
+vi.mock('@/lib/atproto/session', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/atproto/session')>();
+  return { ...actual, startSignIn: vi.fn(), startSignUp: vi.fn() };
+});
 vi.mock('@/hooks/useOnlineStatus', () => ({ useOnlineStatus: vi.fn() }));
 vi.mock('@/components/Toaster/notify', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
@@ -80,6 +81,27 @@ describe('SignInForm', () => {
     expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'start' });
     expect(input()).toHaveValue('alice.bsky.social');
     expect(submit()).toBeEnabled();
+  });
+
+  it('explains inline when a handle does not exist, without a toast', async () => {
+    vi.mocked(startSignIn).mockRejectedValue(
+      new DidNotFoundError('alise.bsky.social')
+    );
+    renderWithProviders(<SignInForm returnTo="/" />);
+    await userEvent.type(input(), 'alise.bsky.social');
+    await userEvent.click(submit());
+    expect(
+      await screen.findByText(
+        "We couldn't find that handle — check the spelling"
+      )
+    ).toBeInTheDocument();
+    expect(input()).toHaveAttribute('aria-invalid', 'true');
+    expect(input()).toHaveFocus();
+    expect(input()).toHaveValue('alise.bsky.social');
+    expect(notify.error).not.toHaveBeenCalled();
+    expect(track).toHaveBeenCalledWith('sign_in_failed', {
+      reason: 'unknown-account',
+    });
   });
 
   it('cannot be submitted while offline and says why', () => {

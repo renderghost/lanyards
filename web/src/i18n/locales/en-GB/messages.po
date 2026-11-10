@@ -11,15 +11,15 @@ msgstr ""
 msgid "A new version of Lanyards is available"
 msgstr "A new version of Lanyards is available"
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:69
+#: src/features/auth/components/SignInForm/SignInForm.tsx:80
 msgid "Couldn't start creating an account. Please try again."
 msgstr "Couldn't start creating an account. Please try again."
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:58
+#: src/features/auth/components/SignInForm/SignInForm.tsx:69
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:101
+#: src/features/auth/components/SignInForm/SignInForm.tsx:112
 msgid "Create an account"
 msgstr "Create an account"
 
@@ -31,7 +31,7 @@ msgstr "Enter your handle"
 msgid "Enter your handle, not your email — for example alice.bsky.social"
 msgstr "Enter your handle, not your email — for example alice.bsky.social"
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:78
+#: src/features/auth/components/SignInForm/SignInForm.tsx:89
 msgid "For example alice.bsky.social"
 msgstr "For example alice.bsky.social"
 
@@ -57,7 +57,7 @@ msgstr "Loading…"
 msgid "Reload"
 msgstr "Reload"
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:94
+#: src/features/auth/components/SignInForm/SignInForm.tsx:105
 msgid "Sign in"
 msgstr "Sign in"
 
@@ -93,6 +93,10 @@ msgstr "This sign-in link has expired or was already used."
 msgid "Try again"
 msgstr "Try again"
 
+#: src/features/auth/components/SignInForm/SignInForm.constants.ts:12
+msgid "We couldn't find that handle — check the spelling"
+msgstr "We couldn't find that handle — check the spelling"
+
 #: src/components/NotFound/NotFound.tsx:13
 msgid "We couldn't find that page"
 msgstr "We couldn't find that page"
@@ -105,7 +109,7 @@ msgstr "We couldn't finish signing you in."
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:89
+#: src/features/auth/components/SignInForm/SignInForm.tsx:100
 msgid "You're offline. Connect to sign in."
 msgstr "You're offline. Connect to sign in."
 
@@ -126,6 +130,6 @@ msgstr "Your account"
 msgid "Your conference lanyard, from your AT Protocol account"
 msgstr "Your conference lanyard, from your AT Protocol account"
 
-#: src/features/auth/components/SignInForm/SignInForm.tsx:77
+#: src/features/auth/components/SignInForm/SignInForm.tsx:88
 msgid "Your handle"
 msgstr "Your handle"
