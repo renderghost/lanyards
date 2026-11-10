@@ -11,21 +11,65 @@ keeps serving `lanyards.app` until the rebuild's Slice 1c swaps it over.
 
 Run everything from `web/`:
 
-| Command             | What it does                                            |
-| ------------------- | ------------------------------------------------------- |
-| `npm run dev`       | Dev server on `http://127.0.0.1:5173` (never localhost) |
-| `npm test`          | Unit and component tests (Vitest)                       |
-| `npm run e2e`       | End-to-end tests (Playwright) against a preview build   |
-| `npm run lint`      | ESLint, including accessibility rules                   |
-| `npm run typecheck` | TypeScript                                              |
-| `npm run build`     | Production build (needs `PUBLIC_BASE_URL`)              |
-| `npm run format`    | Prettier                                                |
+| Command              | What it does                                            |
+| -------------------- | ------------------------------------------------------- |
+| `npm run dev`        | Dev server on `http://127.0.0.1:5173` (never localhost) |
+| `npm test`           | Unit and component tests (Vitest)                       |
+| `npm run e2e`        | End-to-end tests (Playwright) against a preview build   |
+| `npm run lint`       | ESLint, including accessibility rules                   |
+| `npm run typecheck`  | TypeScript                                              |
+| `npm run build`      | Production build (needs `PUBLIC_BASE_URL`)              |
+| `npm run format`     | Prettier                                                |
+| `npm run lex:gen`    | Regenerate `src/lexicons` from `lexicons/**/*.json`     |
+| `npm run lex:pull`   | Re-pin third-party lexicons into `lexicons/vendor`      |
+| `npm run lex:check`  | Fail if `src/lexicons` is out of date (runs in CI)      |
+| `npm run lex:verify` | Check our lexicons are published and match `lexicons/`  |
 
 Copy `.env.example` to `.env.local` for local overrides.
 
 `npm run size` checks the initial JavaScript against the 200 KB gzipped
 budget after a build. If your environment ships its own Chromium, point the
 e2e tests at it with `PW_CHROMIUM_PATH=/path/to/chromium npm run e2e`.
+
+## Lexicons
+
+- `lexicons/lanyards/` holds the `app.lanyards.*` lexicons we publish.
+- `lexicons/vendor/` holds third-party lexicons (Sifa, standard.site, Tangled,
+  Semble), pinned from their published records with `npm run lex:pull`.
+- After editing either, run `npm run lex:gen` and commit `src/lexicons/`.
+
+### Publishing lexicons
+
+Lanyards' lexicons are published from the `@lanyards.app` account
+(`did:plc:ua3d6biqepazbq6mw4ysotfo`). OAuth can only request
+`include:app.lanyards.authFull` once that permission set resolves.
+
+1. Install Bluesky's `goat` CLI: `brew install goat`, or
+   `go install github.com/bluesky-social/goat@latest`.
+2. In Bluesky, signed in as `@lanyards.app`, create an app password
+   (Settings → Privacy and security → App passwords).
+3. Check which DNS records are needed:
+   `goat lex check-dns --example-did did:plc:ua3d6biqepazbq6mw4ysotfo`.
+4. In Cloudflare DNS for `lanyards.app`, add these TXT records, each with the
+   value `did=did:plc:ua3d6biqepazbq6mw4ysotfo`. Resolvers never walk up the
+   hierarchy, so each group needs its own record:
+
+   | Name                                    | Covers                                    |
+   | --------------------------------------- | ----------------------------------------- |
+   | `_lexicon.lanyards.app`                 | `app.lanyards.authFull`                   |
+   | `_lexicon.actor.lanyards.app`           | `app.lanyards.actor.lanyard`              |
+   | `_lexicon.biography.actor.lanyards.app` | `app.lanyards.actor.biography.honorific`  |
+   | `_lexicon.link.lanyards.app`            | `app.lanyards.link.web`                   |
+   | `_lexicon.media.link.lanyards.app`      | `app.lanyards.link.media.audio`, `.video` |
+
+5. From `web/`, publish:
+   `GOAT_USERNAME=lanyards.app GOAT_PASSWORD=<app password> goat lex publish --lexicons-dir lexicons/lanyards`.
+   Add `--update` when republishing a changed lexicon.
+6. Run `npm run lex:verify`. Every line should start with ✓.
+7. Revoke the app password.
+
+bsky.social caches a failed lexicon lookup for about 5 minutes, so sign-in may
+keep falling back to broad permissions for a few minutes after publishing.
 
 ## Deploying the beta (`next.lanyards.app`)
 

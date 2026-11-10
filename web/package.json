@@ -21,7 +21,8 @@
     "size": "tsx scripts/check-bundle-size.ts",
     "lex:pull": "lex-cli pull",
     "lex:gen": "lex-cli generate",
-    "lex:check": "lex-cli generate && git diff --exit-code -- src/lexicons && git ls-files --others --exclude-standard -- src/lexicons | (! grep .)"
+    "lex:check": "lex-cli generate && git diff --exit-code -- src/lexicons && git ls-files --others --exclude-standard -- src/lexicons | (! grep .)",
+    "lex:verify": "tsx scripts/verify-lexicons.ts"
   },
   "dependencies": {
     "@atcute/atproto": "^4.0.4",
@@ -49,6 +50,7 @@
   "devDependencies": {
     "@atcute/lex-cli": "^3.3.0",
     "@atcute/lexicon-doc": "^3.1.0",
+    "@atcute/lexicon-resolver": "^1.0.2",
     "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@lingui/cli": "^6.12.0",
