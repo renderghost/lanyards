@@ -31,6 +31,26 @@ import {
   SIGN_UP_PDS,
 } from './oauthConfig';
 
+/** Where to send someone who has to start signing in again. */
+const RETURN_TO_KEY = 'lanyards:returnTo';
+
+function rememberReturnTo(path: string): void {
+  try {
+    sessionStorage.setItem(RETURN_TO_KEY, path);
+  } catch {
+    // Storage blocked: "Try again" falls back to the landing page.
+  }
+}
+
+/** The safe path sign-in started from, for "Try again" after a failure. */
+export function recallReturnTo(): string {
+  try {
+    return safeReturnTo(sessionStorage.getItem(RETURN_TO_KEY));
+  } catch {
+    return '/';
+  }
+}
+
 /** Give the browser time to persist OAuth state before navigating away. */
 const REDIRECT_DELAY_MS = 200;
 
@@ -127,6 +147,7 @@ export async function startSignIn(
   returnTo: string
 ): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
+  rememberReturnTo(state.returnTo);
   const url = await authorizationUrl({
     target: { type: 'account', identifier: identifier as ActorIdentifier },
     state,
@@ -137,6 +158,7 @@ export async function startSignIn(
 
 export async function startSignUp(returnTo: string): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
+  rememberReturnTo(state.returnTo);
   const url = await authorizationUrl({
     target: { type: 'pds', serviceUrl: SIGN_UP_PDS },
     prompt: 'create',

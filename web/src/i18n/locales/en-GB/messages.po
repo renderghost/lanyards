@@ -79,17 +79,30 @@ msgstr "Conference talk"
 msgid "Contract roles"
 msgstr "Contract roles"
 
+#: src/features/lanyard/components/FollowButton/FollowButton.tsx:54
+msgid "Couldn't check whether you already follow them"
+msgstr "Couldn't check whether you already follow them"
+
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:54
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
+
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:42
+msgid "Couldn't start account creation. Please try again."
+msgstr "Couldn't start account creation. Please try again."
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:80
 msgid "Couldn't start creating an account. Please try again."
 msgstr "Couldn't start creating an account. Please try again."
 
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:32
 #: src/features/auth/components/SignInForm/SignInForm.tsx:69
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
+
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:58
+msgid "Create account"
+msgstr "Create account"
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:111
 msgid "Create an account"
@@ -110,6 +123,26 @@ msgstr "Enter your handle"
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:10
 msgid "Enter your handle, not your email — for example alice.bsky.social"
 msgstr "Enter your handle, not your email — for example alice.bsky.social"
+
+#: src/features/lanyard/hooks/useFollow.ts:91
+msgid "Failed to follow. Please try again."
+msgstr "Failed to follow. Please try again."
+
+#: src/features/lanyard/hooks/useFollow.ts:109
+msgid "Failed to unfollow. Please try again."
+msgstr "Failed to unfollow. Please try again."
+
+#: src/features/lanyard/components/FollowButton/FollowButton.tsx:50
+msgid "Follow"
+msgstr "Follow"
+
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:52
+msgid "Follow on Bluesky"
+msgstr "Follow on Bluesky"
+
+#: src/features/lanyard/hooks/useFollow.ts:86
+msgid "Followed @{handle}"
+msgstr "Followed @{handle}"
 
 #: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:29
 msgid "Followed by {first} and {others}+ others you follow"
@@ -135,6 +168,10 @@ msgstr "Followed by {first}, {second} and {rest} you follow"
 msgid "Followed by {first}, who you follow"
 msgstr "Followed by {first}, who you follow"
 
+#: src/features/lanyard/components/FollowButton/FollowButton.tsx:50
+msgid "Following"
+msgstr "Following"
+
 #: src/features/auth/components/SignInForm/SignInForm.tsx:89
 msgid "For example alice.bsky.social"
 msgstr "For example alice.bsky.social"
@@ -142,6 +179,10 @@ msgstr "For example alice.bsky.social"
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:6
 msgid "Full-time roles"
 msgstr "Full-time roles"
+
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:48
+msgid "Give permission"
+msgstr "Give permission"
 
 #: src/components/NotFound/NotFound.tsx:17
 msgid "Go to the home page"
@@ -163,7 +204,7 @@ msgstr "Keynote"
 msgid "Languages"
 msgstr "Languages"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:37
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:38
 msgid "Lanyard"
 msgstr "Lanyard"
 
@@ -175,6 +216,10 @@ msgstr "Lanyard unavailable"
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:12
 msgid "Lanyards"
 msgstr "Lanyards"
+
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:42
+msgid "Lanyards needs your permission"
+msgstr "Lanyards needs your permission"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:19
 msgid "Lecture"
@@ -284,15 +329,16 @@ msgstr "Show lanyard"
 msgid "Sifa"
 msgstr "Sifa"
 
-#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:14
-#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:24
+#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:22
+#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:65
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:66
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:55
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:60
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:61
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -312,7 +358,7 @@ msgstr "Signed out"
 msgid "Signing in"
 msgstr "Signing in"
 
-#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:16
+#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:24
 msgid "Signing you in…"
 msgstr "Signing you in…"
 
@@ -361,11 +407,15 @@ msgstr "That doesn't look like a handle — for example alice.bsky.social"
 msgid "This account isn't available"
 msgstr "This account isn't available"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:72
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:28
+msgid "This is your lanyard"
+msgstr "This is your lanyard"
+
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:73
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:62
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:63
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 
@@ -377,7 +427,11 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
-#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:29
+#: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:45
+msgid "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
+msgstr "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
+
+#: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:37
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:37
 msgid "Try again"
 msgstr "Try again"
@@ -389,6 +443,10 @@ msgstr "Tutorial"
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:11
 msgid "Twitch"
 msgstr "Twitch"
+
+#: src/features/lanyard/hooks/useFollow.ts:104
+msgid "Unfollowed @{handle}"
+msgstr "Unfollowed @{handle}"
 
 #: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:35
 msgid "Verified on ORCID"

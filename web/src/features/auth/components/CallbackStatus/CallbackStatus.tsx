@@ -1,9 +1,17 @@
 import { useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
+import { recallReturnTo } from '@/lib/atproto/session';
+
 import { ERROR_COPY } from './CallbackStatus.constants';
 import * as styles from './CallbackStatus.styles';
 import type { CallbackStatusProps } from './CallbackStatus.types';
+
+/** Keeps the page sign-in started from, so trying again returns there. */
+function tryAgainSearch(): { returnTo?: string } {
+  const returnTo = recallReturnTo();
+  return returnTo === '/' ? {} : { returnTo };
+}
 
 export function CallbackStatus({ status }: CallbackStatusProps) {
   const { t } = useLingui();
@@ -25,7 +33,7 @@ export function CallbackStatus({ status }: CallbackStatusProps) {
       <p role="alert" className={styles.message}>
         {t(ERROR_COPY[status])}
       </p>
-      <Link to="/" className={styles.link}>
+      <Link to="/" search={tryAgainSearch()} className={styles.link}>
         {t`Try again`}
       </Link>
     </section>

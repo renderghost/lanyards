@@ -2,6 +2,8 @@ import type { Did } from '@atcute/lexicons';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
+import type { Client } from '@atcute/client';
+
 import { useSession } from '@/features/auth/session/useSession';
 import { canCall, parseGrantedScope } from '@/lib/atproto/permissions';
 import { queryKeys } from '@/lib/query/keys';
@@ -15,6 +17,20 @@ import type {
 } from '@/lib/sources/bluesky/bluesky.types';
 
 import { sourceQueryOptions } from './sourceQuery';
+
+/** The viewer's relationship to `subject`; shared by everything that needs it. */
+export function relationshipQueryOptions(
+  appview: Client,
+  viewer: Did,
+  subject: Did
+) {
+  return {
+    queryKey: queryKeys.relationship(viewer, subject),
+    ...sourceQueryOptions((signal) =>
+      fetchRelationship(appview, viewer, subject, signal)
+    ),
+  };
+}
 
 export type SharedContext = {
   mutual: boolean;
@@ -43,11 +59,12 @@ export function useSharedContext(did: Did): SharedContext {
     someoneElse && canCall(granted, 'app.bsky.graph.getKnownFollowers');
 
   const relationship = useQuery({
-    queryKey: queryKeys.relationship(viewer ?? '', did),
-    enabled: relationshipEnabled,
-    ...sourceQueryOptions((signal) =>
-      fetchRelationship(signedIn!.appview, viewer as Did, did, signal)
+    ...relationshipQueryOptions(
+      signedIn?.appview as Client,
+      (viewer ?? '') as Did,
+      did
     ),
+    enabled: relationshipEnabled,
   });
   const followers = useQuery({
     queryKey: queryKeys.knownFollowers(viewer ?? '', did),

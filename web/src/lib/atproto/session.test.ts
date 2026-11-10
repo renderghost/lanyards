@@ -114,6 +114,17 @@ describe('startSignIn', () => {
     expect(assign).toHaveBeenCalledWith(url);
   });
 
+  it('remembers where to return to if sign-in has to be retried', async () => {
+    vi.mocked(createAuthorizationUrl).mockResolvedValue(
+      new URL('https://bsky.social/oauth/authorize')
+    );
+    await startSignIn('alice.example', '/@alice.example');
+    expect(sessionStorage.getItem('lanyards:returnTo')).toBe('/@alice.example');
+    await startSignUp('/d/did:plc:abc');
+    expect(sessionStorage.getItem('lanyards:returnTo')).toBe('/d/did:plc:abc');
+    sessionStorage.clear();
+  });
+
   it('rethrows other authorisation errors without retrying', async () => {
     const failure = new OAuthResponseError(
       new Response(null, { status: 400 }),

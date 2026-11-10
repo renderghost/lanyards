@@ -18,6 +18,7 @@ import { LanyardNotice } from '../LanyardNotice/LanyardNotice';
 import { LanyardProblem } from '../LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '../LanyardSkeleton/LanyardSkeleton';
 import { SharedContextStrip } from '../SharedContextStrip/SharedContextStrip';
+import { VisitorActions } from '../VisitorActions/VisitorActions';
 import { NO_UNAUTHENTICATED } from './LanyardPage.constants';
 import * as styles from './LanyardPage.styles';
 import type { LanyardPageProps } from './LanyardPage.types';
@@ -78,6 +79,11 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
       <SharedContextStrip
         mutual={shared.mutual}
         knownFollowers={shared.knownFollowers}
+      />
+      <VisitorActions
+        did={did}
+        handle={view.hero.handle}
+        owner={view.mode === 'owner'}
       />
       <LanyardBlocks
         blocks={view.blocks}

@@ -35,6 +35,30 @@ beforeEach(() => {
 
 const tryAgain = () => screen.getByRole('link', { name: 'Try again' });
 
+describe('OAuth callback, trying again', () => {
+  it('returns to the page the person started signing in from', async () => {
+    sessionStorage.setItem('lanyards:returnTo', '/@alice.test');
+    vi.mocked(completeSignIn).mockRejectedValue(
+      new OAuthCallbackError('denied')
+    );
+    renderRoute('/oauth/callback#error=access_denied');
+    await screen.findByText('Sign-in was cancelled.');
+    expect(tryAgain()).toHaveAttribute('href', '/?returnTo=%2F%40alice.test');
+    sessionStorage.clear();
+  });
+
+  it('ignores an unsafe remembered path', async () => {
+    sessionStorage.setItem('lanyards:returnTo', '//evil.example');
+    vi.mocked(completeSignIn).mockRejectedValue(
+      new OAuthCallbackError('denied')
+    );
+    renderRoute('/oauth/callback#error=access_denied');
+    await screen.findByText('Sign-in was cancelled.');
+    expect(tryAgain()).toHaveAttribute('href', '/');
+    sessionStorage.clear();
+  });
+});
+
 describe('OAuth callback', () => {
   it('explains a cancelled sign-in and scrubs the URL', async () => {
     vi.mocked(completeSignIn).mockRejectedValue(

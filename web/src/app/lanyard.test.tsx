@@ -20,8 +20,14 @@ vi.mock('@/lib/analytics/analytics', () => ({
   track: vi.fn(),
 }));
 
+// The first render loads the lazily split route, which can take a while
+// when the whole suite runs in parallel.
 const hero = () =>
-  screen.findByRole('heading', { level: 1, name: 'Dr Ada Example' });
+  screen.findByRole(
+    'heading',
+    { level: 1, name: 'Dr Ada Example' },
+    { timeout: 5000 }
+  );
 
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedOutSession());
@@ -263,5 +269,27 @@ describe('lanyard blocks', () => {
     expect(
       within(talks).getByRole('button', { name: 'Retry' })
     ).toBeInTheDocument();
+  });
+});
+
+describe('visitor actions on the page', () => {
+  it('offers signed-out visitors Bluesky, sign-in and sign-up', async () => {
+    servePerson();
+    renderRoute('/@alice.test');
+    expect(
+      await screen.findByRole('link', {
+        name: 'Follow on Bluesky (opens in a new tab)',
+      })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Create account' })
+    ).toBeInTheDocument();
+  });
+
+  it('tells owners it is their own lanyard', async () => {
+    servePerson();
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    renderRoute('/@alice.test');
+    expect(await screen.findByText('This is your lanyard')).toBeInTheDocument();
   });
 });
