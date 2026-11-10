@@ -27,6 +27,7 @@ import { HonorificForm } from '../HonorificForm/HonorificForm';
 import { ItemMenu } from '../ItemMenu/ItemMenu';
 import { MediaForm } from '../MediaForm/MediaForm';
 import { MediaList } from '../MediaList/MediaList';
+import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
 import { WebLinkForm } from '../WebLinkForm/WebLinkForm';
 import { WebLinkList } from '../WebLinkList/WebLinkList';
 import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
@@ -178,6 +179,11 @@ function Customiser({
               hidden: config.hidden.filter((hidden) => hidden !== key),
             }))
           }
+        />
+        <OrcidHelper
+          did={did}
+          handle={view.hero?.handle ?? did}
+          orcidId={view.orcidId}
         />
         <HonorificForm
           current={kept.data?.honorific ?? 'none'}

@@ -174,6 +174,7 @@ export function usePersonView(
     hiddenItems: configUsable
       ? findHiddenItems({ config, sources, orcidVerified })
       : [],
+    orcidId: sifa.status === 'success' ? (orcidId ?? null) : undefined,
     config,
     configReady,
     configError,

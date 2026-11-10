@@ -10,6 +10,7 @@ export type AnalyticsEvent =
   | 'lanyard_updated'
   | 'kept_record_saved'
   | 'qr_opened'
+  | 'orcid_checked'
   | 'follow_created'
   | 'follow_deleted'
   | 'signed_out'

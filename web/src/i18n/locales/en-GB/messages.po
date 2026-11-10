@@ -47,6 +47,14 @@ msgstr "Add link"
 msgid "Add media"
 msgstr "Add media"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:115
+msgid "Add this link to the Websites & social links section of your ORCID record:"
+msgstr "Add this link to the Websites & social links section of your ORCID record:"
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:60
+msgid "Add your ORCID iD on Sifa to show verified publications."
+msgstr "Add your ORCID iD on Sifa to show verified publications."
+
 #: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:26
 msgid "An item that is no longer available"
 msgstr "An item that is no longer available"
@@ -95,9 +103,17 @@ msgstr "Bluesky isn't answering right now. Check your connection and try again."
 msgid "Board positions"
 msgstr "Board positions"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:136
+msgid "Check again"
+msgstr "Check again"
+
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:38
 msgid "Check the spelling, or search for them."
 msgstr "Check the spelling, or search for them."
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:106
+msgid "Checking your ORCID iD…"
+msgstr "Checking your ORCID iD…"
 
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:53
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:149
@@ -136,6 +152,7 @@ msgstr "Conference talk"
 msgid "Contract roles"
 msgstr "Contract roles"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:126
 #: src/features/qr/components/QrSheet/QrSheet.tsx:63
 msgid "Copy link"
 msgstr "Copy link"
@@ -144,6 +161,7 @@ msgstr "Copy link"
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:91
 #: src/features/qr/components/QrSheet/QrSheet.tsx:36
 msgid "Couldn't copy the link. Please try again."
 msgstr "Couldn't copy the link. Please try again."
@@ -159,6 +177,10 @@ msgstr "Couldn't load {sources}"
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:116
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:74
+msgid "Couldn't reach ORCID. Please try again."
+msgstr "Couldn't reach ORCID. Please try again."
 
 #: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:42
 msgid "Couldn't start account creation. Please try again."
@@ -181,7 +203,7 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:140
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:141
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -400,6 +422,7 @@ msgstr "Lecture"
 msgid "Link added"
 msgstr "Link added"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:89
 #: src/features/qr/components/QrSheet/QrSheet.tsx:34
 msgid "Link copied"
 msgstr "Link copied"
@@ -407,6 +430,10 @@ msgstr "Link copied"
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:33
 msgid "Link deleted"
 msgstr "Link deleted"
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:118
+msgid "Link to add"
+msgstr "Link to add"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:23
 msgid "Links"
@@ -423,7 +450,7 @@ msgstr "Loading your profile…"
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:129
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:61
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:62
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -472,6 +499,10 @@ msgstr "Not found"
 msgid "Not specified"
 msgstr "Not specified"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:81
+msgid "Not verified yet. ORCID can take a few minutes to update."
+msgstr "Not verified yet. ORCID can take a few minutes to update."
+
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:133
 msgid "Nothing to show yet"
 msgstr "Nothing to show yet"
@@ -480,6 +511,14 @@ msgstr "Nothing to show yet"
 msgid "Ocean"
 msgstr "Ocean"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:129
+msgid "Open ORCID"
+msgstr "Open ORCID"
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:64
+msgid "Open Sifa"
+msgstr "Open Sifa"
+
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:25
 msgid "Open to"
 msgstr "Open to"
@@ -487,6 +526,11 @@ msgstr "Open to"
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:9
 msgid "ORCID"
 msgstr "ORCID"
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:57
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:103
+msgid "ORCID iD"
+msgstr "ORCID iD"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:13
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:24
@@ -537,7 +581,7 @@ msgstr "Posts on Bluesky"
 msgid "Presentation"
 msgstr "Presentation"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:201
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:207
 msgid "Preview"
 msgstr "Preview"
 
@@ -581,11 +625,11 @@ msgstr "Rose"
 msgid "Save honorific"
 msgstr "Save honorific"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:144
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:145
 msgid "Saved"
 msgstr "Saved"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:144
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:145
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -609,7 +653,7 @@ msgstr "Show {name}"
 msgid "Show again"
 msgstr "Show again"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:162
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:163
 msgid "Show current job on your badge"
 msgstr "Show current job on your badge"
 
@@ -766,6 +810,14 @@ msgstr "Unfollowed @{handle}"
 msgid "Verified on ORCID"
 msgstr "Verified on ORCID"
 
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:80
+msgid "Verified. Your publications now show the ORCID tick."
+msgstr "Verified. Your publications now show the ORCID tick."
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:103
+msgid "Verify your ORCID iD"
+msgstr "Verify your ORCID iD"
+
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:46
 msgid "Video"
 msgstr "Video"
@@ -778,7 +830,7 @@ msgstr "Video added"
 msgid "Video deleted"
 msgstr "Video deleted"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:212
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:218
 msgid "View as visitor"
 msgstr "View as visitor"
 
@@ -865,7 +917,7 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:52
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
 #: src/features/qr/components/QrSheet/QrSheet.tsx:27
 msgid "Your lanyard"
 msgstr "Your lanyard"
@@ -874,11 +926,15 @@ msgstr "Your lanyard"
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:188
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:194
 msgid "Your links"
 msgstr "Your links"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:195
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:110
+msgid "Your ORCID iD is verified"
+msgstr "Your ORCID iD is verified"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:201
 msgid "Your podcasts and videos"
 msgstr "Your podcasts and videos"
 

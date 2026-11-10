@@ -106,6 +106,8 @@ export type PersonViewState = {
   statuses: Partial<Record<RenderableBlockType, BlockStatus>>;
   /** The owner's hidden items, for "Show again". */
   hiddenItems: HiddenItem[];
+  /** The ORCID iD on Sifa: null when there is none, undefined until Sifa answers. */
+  orcidId: string | null | undefined;
   config: LanyardConfig;
   /** The owner's config has loaded (or is known to be absent). */
   configReady: boolean;
