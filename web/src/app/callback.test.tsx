@@ -9,7 +9,7 @@ import { completeSignIn, OAuthCallbackError } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
 import { TYPEAHEAD_URL } from '@/test/fixtures';
 import { server } from '@/test/msw';
-import { renderRoute } from '@/test/router';
+import { renderRoute, waitForRoute } from '@/test/router';
 
 vi.mock('@/lib/atproto/session', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/atproto/session')>();
@@ -108,9 +108,7 @@ describe('OAuth callback', () => {
     // A path with no redirect of its own (the mocked session stays signed
     // out, so /settings would bounce back to sign-in).
     finish({ did: 'did:plc:x' as never, returnTo: '/somewhere-else' });
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/somewhere-else')
-    );
+    await waitForRoute(router, '/somewhere-else');
     expect(refresh).toHaveBeenCalled();
   });
 

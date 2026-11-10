@@ -5,8 +5,9 @@ import {
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router';
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import type { ReactElement } from 'react';
+import { expect } from 'vitest';
 
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
 import { routeTree } from '@/routeTree.gen';
@@ -49,4 +50,19 @@ export function renderInRouter(ui: ReactElement, path = '/') {
     </QueryClientProvider>
   );
   return { router, ...view };
+}
+
+/**
+ * Waits until the router has finished loading the current location,
+ * including lazy route chunks. Tests that end on a navigation must await
+ * this, or the load finishes after the test environment is torn down.
+ */
+export async function waitForRoute(
+  router: { state: { status: string; resolvedLocation?: { href: string } } },
+  href: string
+) {
+  await waitFor(() => {
+    expect(router.state.status).toBe('idle');
+    expect(router.state.resolvedLocation?.href).toBe(href);
+  });
 }
