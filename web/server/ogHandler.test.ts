@@ -51,13 +51,55 @@ describe('OG image handler', () => {
     expect(render).toHaveBeenCalledWith(null);
   });
 
-  it('draws the default badge when the profile cannot be read', async () => {
+  it('keeps the default badge for a day when no person was asked for', async () => {
+    const render = vi.fn(async () => PNG);
+    const response = await createOgHandler({ fetchImpl, render })(
+      new Request('https://next.lanyards.app/og/default.png')
+    );
+    expect(response.headers.get('cache-control')).toBe(
+      'public, s-maxage=86400, stale-while-revalidate=604800'
+    );
+  });
+
+  it('draws the default badge, briefly cached, when the profile cannot be read', async () => {
     const render = vi.fn(async () => PNG);
     const failing = (async () =>
       new Response(null, { status: 500 })) as typeof fetch;
-    await createOgHandler({ fetchImpl: failing, render })(
+    const response = await createOgHandler({ fetchImpl: failing, render })(
       new Request(`https://next.lanyards.app/api/og?did=${DID}`)
     );
     expect(render).toHaveBeenCalledWith(null);
+    expect(response.headers.get('cache-control')).toBe('public, s-maxage=60');
+  });
+
+  it('falls back to the default badge, briefly cached, when drawing fails', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const render = vi.fn(async (input: unknown) => {
+      if (input) throw new Error('unsupported glyph');
+      return PNG;
+    });
+    const response = await createOgHandler({ fetchImpl, render })(
+      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+    );
+    expect(render).toHaveBeenLastCalledWith(null);
+    expect(response.status).toBe(200);
+    expect(response.headers.get('content-type')).toBe('image/png');
+    expect(response.headers.get('cache-control')).toBe('public, s-maxage=60');
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
+  });
+
+  it('answers 503, never cached, when even the default badge cannot be drawn', async () => {
+    const error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const render = vi.fn(async () => {
+      throw new Error('wasm failed to load');
+    });
+    const response = await createOgHandler({ fetchImpl, render })(
+      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+    );
+    expect(response.status).toBe(503);
+    expect(response.headers.get('cache-control')).toBe('no-store');
+    expect(error).toHaveBeenCalled();
+    error.mockRestore();
   });
 });

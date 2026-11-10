@@ -2,6 +2,8 @@ import type { BadgeImageInput } from './badgeImage.tsx';
 import { fetchPreviewProfile, UPSTREAM_TIMEOUT_MS } from './profileMeta.ts';
 
 const IMAGE_CACHE = 'public, s-maxage=86400, stale-while-revalidate=604800';
+/** When the default stands in for a person, so their badge appears soon. */
+const STAND_IN_CACHE = 'public, s-maxage=60';
 const DID = /^did:[a-z]+:[a-zA-Z0-9._:%-]{1,2048}$/;
 const MAX_AVATAR_BYTES = 1_000_000;
 
@@ -51,9 +53,30 @@ export function createOgHandler(options: Options) {
         };
       }
     }
-    const png = await options.render(input);
+    let cache = input || !DID.test(did) ? IMAGE_CACHE : STAND_IN_CACHE;
+    let png: Uint8Array;
+    try {
+      png = await options.render(input);
+    } catch (error) {
+      if (!input) return unavailable(error);
+      console.error('Could not draw the badge image', error);
+      try {
+        png = await options.render(null);
+        cache = STAND_IN_CACHE;
+      } catch (fallbackError) {
+        return unavailable(fallbackError);
+      }
+    }
     return new Response(Uint8Array.from(png), {
-      headers: { 'content-type': 'image/png', 'cache-control': IMAGE_CACHE },
+      headers: { 'content-type': 'image/png', 'cache-control': cache },
     });
   };
+}
+
+function unavailable(error: unknown): Response {
+  console.error('Could not draw the default badge image', error);
+  return new Response(null, {
+    status: 503,
+    headers: { 'cache-control': 'no-store' },
+  });
 }
