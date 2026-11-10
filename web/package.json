@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": "26.x"
   },
   "scripts": {
     "dev": "vite",
@@ -71,7 +71,7 @@
     "@testing-library/react": "^16.3.3",
     "@testing-library/user-event": "^14.6.9",
     "@types/culori": "^4.0.1",
-    "@types/node": "^22.20.5",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vite-pwa/assets-generator": "^2.0.0",
