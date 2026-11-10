@@ -21,6 +21,20 @@ vi.mock('@/lib/analytics/analytics', () => ({
 vi.mock('@/components/Toaster/notify', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
+// Reading the export throws while `sheetFails` is set, as a chunk that
+// failed to load would.
+const sheetFails = vi.hoisted(() => ({ value: false }));
+vi.mock('../QrSheet/QrSheet', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../QrSheet/QrSheet')>();
+  return {
+    get QrSheet() {
+      if (sheetFails.value) {
+        throw new TypeError('Failed to fetch dynamically imported module');
+      }
+      return actual.QrSheet;
+    },
+  };
+});
 
 const release = vi.fn(async () => undefined);
 const request = vi.fn(async () => ({
@@ -40,6 +54,7 @@ beforeEach(() => {
 
 afterEach(() => {
   Reflect.deleteProperty(navigator, 'wakeLock');
+  sheetFails.value = false;
 });
 
 const open = async () => {
@@ -100,6 +115,32 @@ describe('ShowQrButton', () => {
     expect(captureError).toHaveBeenCalledWith(new Error('Denied'), {
       source: 'copy-link',
     });
+  });
+
+  it('says so, and opens on a later try, when the sheet fails to load', async () => {
+    sheetFails.value = true;
+    renderWithClient(<ShowQrButton />);
+    const show = screen.getByRole('button', { name: 'Show QR' });
+    await userEvent.click(show);
+    await waitFor(() =>
+      expect(notify.error).toHaveBeenCalledWith(
+        "Couldn't open your QR code. Please try again."
+      )
+    );
+    expect(captureError).toHaveBeenCalledWith(expect.any(TypeError), {
+      source: 'qr-sheet',
+    });
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    sheetFails.value = false;
+    await userEvent.click(show);
+    expect(
+      await screen.findByRole(
+        'dialog',
+        { name: 'Ada Example' },
+        { timeout: 5000 }
+      )
+    ).toBeVisible();
   });
 
   it('closes on Escape and returns focus to the button', async () => {

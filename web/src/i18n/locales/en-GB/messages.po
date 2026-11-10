@@ -182,6 +182,10 @@ msgstr "Couldn't load {sources}"
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
+#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:41
+msgid "Couldn't open your QR code. Please try again."
+msgstr "Couldn't open your QR code. Please try again."
+
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:76
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
@@ -681,7 +685,7 @@ msgstr "Show current job on your badge"
 msgid "Show lanyard"
 msgstr "Show lanyard"
 
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:40
+#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:54
 msgid "Show QR"
 msgstr "Show QR"
 
