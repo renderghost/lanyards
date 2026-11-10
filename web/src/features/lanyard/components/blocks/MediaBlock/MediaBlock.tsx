@@ -1,19 +1,14 @@
 import { useLingui } from '@lingui/react/macro';
 
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
+import { hostOf } from '@/lib/normalise';
 import { cn } from '@/lib/utils';
 
+import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { itemTitle } from '../itemTitle';
 import { PLATFORM_LABELS, TYPE_LABELS } from './MediaBlock.constants';
 import * as styles from './MediaBlock.styles';
 import type { MediaBlockProps } from './MediaBlock.types';
-
-const hostOf = (url: string) => {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-};
 
 /** Podcasts, videos and interviews from the person's Lanyards records. */
 export function MediaBlock({ items, className }: MediaBlockProps) {
@@ -31,12 +26,17 @@ export function MediaBlock({ items, className }: MediaBlockProps) {
         ].filter(Boolean);
         return (
           <li key={media.key} className={styles.item}>
-            <ExternalLink href={media.url} className={styles.title}>
-              {media.title ?? hostOf(media.url)}
-            </ExternalLink>
-            {meta.length > 0 && (
-              <p className={styles.meta}>{meta.join(' · ')}</p>
-            )}
+            <ItemFrame
+              itemKey={media.key}
+              title={itemTitle('media', media, i18n)}
+            >
+              <ExternalLink href={media.url} className={styles.title}>
+                {media.title ?? hostOf(media.url)}
+              </ExternalLink>
+              {meta.length > 0 && (
+                <p className={styles.meta}>{meta.join(' · ')}</p>
+              )}
+            </ItemFrame>
           </li>
         );
       })}

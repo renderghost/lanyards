@@ -64,7 +64,9 @@ describe('SignInForm', () => {
     await userEvent.type(input(), '@Alice.Bsky.Social');
     await userEvent.click(submit());
     expect(startSignIn).toHaveBeenCalledWith('alice.bsky.social', '/settings');
-    await waitFor(() => expect(submit()).toBeDisabled());
+    await waitFor(() =>
+      expect(submit()).toHaveAttribute('aria-disabled', 'true')
+    );
     expect(submit()).toHaveAttribute('aria-busy', 'true');
   });
 

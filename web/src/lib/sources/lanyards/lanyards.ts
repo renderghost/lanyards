@@ -57,11 +57,12 @@ export async function fetchLanyardConfig(
     signal
   );
   if (!config.ok) return config;
-  return ok(
-    config.value && validateRecord(LANYARDS_NSID.lanyard, config.value.value).ok
-      ? { value: config.value.value, cid: config.value.cid }
-      : null
-  );
+  if (!config.value) return ok(null);
+  return ok({
+    value: config.value.value,
+    cid: config.value.cid,
+    valid: validateRecord(LANYARDS_NSID.lanyard, config.value.value).ok,
+  });
 }
 
 /** The person's kept Lanyards records: honorific, web links and media. */

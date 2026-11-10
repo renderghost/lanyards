@@ -1,7 +1,7 @@
 import type { ButtonSize, ButtonVariant } from './Button.types';
 
 export const base =
-  'inline-flex items-center justify-center gap-2 rounded-md px-4 font-medium leading-6 motion-safe:transition-colors disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex items-center justify-center gap-2 rounded-md px-4 font-medium leading-6 motion-safe:transition-colors disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
 
 export const variants: Record<ButtonVariant, string> = {
   primary: 'bg-accent text-on-accent hover:opacity-90',

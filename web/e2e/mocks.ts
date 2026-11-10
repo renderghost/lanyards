@@ -39,6 +39,15 @@ type PersonOptions = {
 
 /** Answers every public read for ADA's lanyard. */
 export async function mockPerson(page: Page, options: PersonOptions = {}) {
+  // Ada's Sifa profile lists an ORCID iD: no back-link yet, and no works.
+  await page.route('https://pub.orcid.org/v3.0/**', (route) => {
+    const url = route.request().url();
+    if (url.endsWith('/researcher-urls')) {
+      return json(route, { 'researcher-url': [] });
+    }
+    if (url.endsWith('/works')) return json(route, { group: [] });
+    return json(route, {}, 404);
+  });
   const profile = fixture('bluesky/fixtures/getProfile.json');
   const view = fixture('sifa/fixtures/getProfileView.json');
 
@@ -189,4 +198,29 @@ export async function signIn(
   await page.addInitScript((value) => {
     localStorage.setItem('lanyards:e2e-session', value);
   }, JSON.stringify(session));
+}
+
+export type OwnerWrite = {
+  method: 'createRecord' | 'putRecord' | 'deleteRecord';
+  body: { collection: string; rkey?: string; record?: Record<string, unknown> };
+};
+
+/** Records the owner's writes from the customiser, in order. */
+export async function mockOwnerWrites(page: Page): Promise<OwnerWrite[]> {
+  const writes: OwnerWrite[] = [];
+  for (const method of ['createRecord', 'putRecord', 'deleteRecord'] as const) {
+    await page.route(
+      `https://pds.e2e.test/xrpc/com.atproto.repo.${method}`,
+      (route) => {
+        const body = route.request().postDataJSON() as OwnerWrite['body'];
+        writes.push({ method, body });
+        if (method === 'deleteRecord') return json(route, {});
+        return json(route, {
+          uri: `at://${ADA.did}/${body.collection}/${body.rkey ?? '3mnewrecord'}`,
+          cid: CID,
+        });
+      }
+    );
+  }
+  return writes;
 }

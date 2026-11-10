@@ -4,6 +4,8 @@ import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { formatPartialDate } from '@/lib/person/format';
 import { cn } from '@/lib/utils';
 
+import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { itemTitle } from '../itemTitle';
 import { ROLE_LABELS } from './TalksBlock.constants';
 import * as styles from './TalksBlock.styles';
 import type { TalksBlockProps } from './TalksBlock.types';
@@ -22,16 +24,21 @@ export function TalksBlock({ items, className }: TalksBlockProps) {
         ].filter(Boolean);
         return (
           <li key={talk.key} className={styles.item}>
-            {talk.url ? (
-              <ExternalLink href={talk.url} className={styles.title}>
-                {talk.title}
-              </ExternalLink>
-            ) : (
-              <p className={styles.title}>{talk.title}</p>
-            )}
-            {meta.length > 0 && (
-              <p className={styles.meta}>{meta.join(' · ')}</p>
-            )}
+            <ItemFrame
+              itemKey={talk.key}
+              title={itemTitle('talks', talk, i18n)}
+            >
+              {talk.url ? (
+                <ExternalLink href={talk.url} className={styles.title}>
+                  {talk.title}
+                </ExternalLink>
+              ) : (
+                <p className={styles.title}>{talk.title}</p>
+              )}
+              {meta.length > 0 && (
+                <p className={styles.meta}>{meta.join(' · ')}</p>
+              )}
+            </ItemFrame>
           </li>
         );
       })}

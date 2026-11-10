@@ -1,0 +1,271 @@
+import type { Did } from '@atcute/lexicons';
+import { useLingui } from '@lingui/react/macro';
+import { hashKey, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+
+import { notify } from '@/components/Toaster/notify';
+import { useSession } from '@/features/auth/session/useSession';
+import { captureError, track } from '@/lib/analytics/analytics';
+import { putRecord, type WriteSession } from '@/lib/atproto/writes';
+import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
+import { validateRecord } from '@/lib/lexicons/validate';
+import {
+  type LanyardConfig,
+  resolveConfig,
+  serialiseConfig,
+} from '@/lib/person/config';
+import { sourceQueryOptions } from '@/lib/person/sourceQuery';
+import { queryKeys } from '@/lib/query/keys';
+import { fetchLanyardConfig } from '@/lib/sources/lanyards/lanyards';
+import type { LanyardConfigRecord } from '@/lib/sources/lanyards/lanyards.types';
+
+/** Changes this close together are saved as one write (spec §7.4). */
+export const SAVE_DELAY_MS = 800;
+
+type RecordValue = Record<string, unknown>;
+
+export type UseLanyardConfig = {
+  config: LanyardConfig;
+  /** The stored settings have been read; until then nothing is saved. */
+  ready: boolean;
+  /**
+   * The stored record exists but doesn't pass its lexicon, so it can't be
+   * edited safely; `reset` replaces it with the defaults.
+   */
+  invalid: boolean;
+  update(patch: (config: LanyardConfig) => LanyardConfig): void;
+  /** Replaces an unreadable record with the defaults, keeping createdAt. */
+  reset(): void;
+  /** A change is waiting to be saved, or being saved. */
+  saving: boolean;
+  /** The last save failed; the change is kept for `retry`. */
+  error: boolean;
+  retry(): void;
+};
+
+/** The stored createdAt, when it is still a valid record timestamp. */
+function keptCreatedAt(value: unknown): string | null {
+  const createdAt = (value as RecordValue | null)?.createdAt;
+  return typeof createdAt === 'string' &&
+    validateRecord(LANYARDS_NSID.lanyard, {
+      $type: LANYARDS_NSID.lanyard,
+      createdAt,
+    }).ok
+    ? createdAt
+    : null;
+}
+
+/**
+ * The signed-in owner's lanyard settings, edited optimistically.
+ *
+ * - Each change shows at once (the preview reads the same query) and is
+ *   kept as an unsaved overlay until a save succeeds, so a refetch of the
+ *   settings can never undo it.
+ * - Saves go to the app.lanyards.actor.lanyard record 800 ms after the
+ *   last change, or straight away when the page is hidden or closed.
+ * - Leaving after a failed save puts the stored settings back in the
+ *   shared cache, so the public lanyard never shows unsaved settings.
+ * - A record that fails its lexicon is never edited, only reset on request.
+ */
+export function useLanyardConfig(): UseLanyardConfig {
+  const { t } = useLingui();
+  const queryClient = useQueryClient();
+  const session = useSession();
+  const writer: WriteSession | null =
+    session.status === 'signedIn' ? session.session : null;
+  const did = (writer?.did ?? '') as Did;
+  const key = useMemo(() => queryKeys.source('lanyards', did, 'config'), [did]);
+
+  const query = useQuery({
+    queryKey: key,
+    enabled: Boolean(writer),
+    ...sourceQueryOptions((signal) => fetchLanyardConfig(did, signal)),
+  });
+  const config = useMemo(
+    () => resolveConfig(query.data?.value ?? null),
+    [query.data]
+  );
+  const invalid = query.status === 'success' && query.data?.valid === false;
+  const ready = query.status === 'success' && !invalid;
+
+  const [pending, setPending] = useState(false);
+  const [inFlight, setInFlight] = useState(0);
+  const [error, setError] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const queue = useRef<Promise<void>>(Promise.resolve());
+  /** The record with the owner's changes not yet confirmed saved. */
+  const unsaved = useRef<RecordValue | null>(null);
+  /** The record as the server last returned or confirmed it. */
+  const server = useRef<LanyardConfigRecord | null | undefined>(undefined);
+  const mounted = useRef(true);
+  // Read when a save runs or a change arrives, so both use the latest
+  // session and load state. Kept current before any event can fire.
+  const latest = useRef({ writer, ready, invalid });
+  useLayoutEffect(() => {
+    latest.current = { writer, ready, invalid };
+    if (server.current === undefined && query.status === 'success') {
+      server.current = query.data;
+    }
+  });
+  // The failure toast's Retry outlives the render that showed it.
+  const saveLater = useRef<() => void>(() => undefined);
+
+  const show = useCallback(
+    (value: RecordValue) => {
+      const shown: LanyardConfigRecord = {
+        value,
+        cid: server.current?.cid ?? '',
+        valid: true,
+      };
+      queryClient.setQueryData<LanyardConfigRecord | null>(key, shown);
+    },
+    [queryClient, key]
+  );
+
+  /** Puts the stored settings back, dropping changes that weren't saved. */
+  const restore = useCallback(() => {
+    unsaved.current = null;
+    if (server.current !== undefined) {
+      queryClient.setQueryData<LanyardConfigRecord | null>(key, server.current);
+    }
+  }, [queryClient, key]);
+
+  // A fetch of the settings (a retry, a refocus) brings the server's
+  // record; keep it, but keep showing the owner's unsaved changes on top.
+  useEffect(() => {
+    const watched = hashKey(key);
+    return queryClient.getQueryCache().subscribe((event) => {
+      if (event.type !== 'updated' || event.action.type !== 'success') return;
+      if ('manual' in event.action && event.action.manual) return;
+      if (event.query.queryHash !== watched) return;
+      server.current = event.query.state.data as LanyardConfigRecord | null;
+      if (unsaved.current) show(unsaved.current);
+    });
+  }, [queryClient, key, show]);
+
+  /** Sends the unsaved changes, after any save already under way. */
+  const save = useCallback((): void => {
+    clearTimeout(timer.current);
+    timer.current = undefined;
+    setPending(false);
+    const changes = unsaved.current;
+    if (!changes) return;
+    setInFlight((count) => count + 1);
+    queue.current = queue.current.then(async () => {
+      try {
+        const current = latest.current.writer;
+        if (!current) throw new Error('Not signed in');
+        const { $type: _type, ...fields } = changes;
+        const reference = await putRecord(
+          current,
+          LANYARDS_NSID.lanyard,
+          'self',
+          { ...fields, updatedAt: new Date().toISOString() }
+        );
+        server.current = { value: changes, cid: reference.cid, valid: true };
+        if (unsaved.current === changes) unsaved.current = null;
+        setError(false);
+        notify.success(t`Lanyard updated`);
+        track('lanyard_updated');
+      } catch (cause) {
+        captureError(cause, { source: 'lanyard-settings' });
+        if (!mounted.current) {
+          restore();
+          return;
+        }
+        setError(true);
+        notify.error(t`Failed to save. Please try again.`, {
+          action: { label: t`Retry`, onClick: () => saveLater.current() },
+        });
+      } finally {
+        setInFlight((count) => count - 1);
+      }
+    });
+  }, [t, restore]);
+
+  const schedule = useCallback(
+    (value: RecordValue) => {
+      unsaved.current = value;
+      show(value);
+      setPending(true);
+      clearTimeout(timer.current);
+      timer.current = setTimeout(save, SAVE_DELAY_MS);
+    },
+    [show, save]
+  );
+
+  const update = useCallback(
+    (patch: (config: LanyardConfig) => LanyardConfig): void => {
+      if (!latest.current.ready) return;
+      const previous =
+        unsaved.current ??
+        queryClient.getQueryData<LanyardConfigRecord | null>(key)?.value ??
+        null;
+      const fields = serialiseConfig(
+        patch(resolveConfig(previous)),
+        previous,
+        new Date().toISOString()
+      );
+      schedule({ $type: LANYARDS_NSID.lanyard, ...fields });
+    },
+    [queryClient, key, schedule]
+  );
+
+  const reset = useCallback((): void => {
+    if (!latest.current.invalid) return;
+    const stored = queryClient.getQueryData<LanyardConfigRecord | null>(key);
+    const createdAt = keptCreatedAt(stored?.value);
+    const fields = serialiseConfig(
+      resolveConfig(null),
+      createdAt ? { createdAt } : null,
+      new Date().toISOString()
+    );
+    schedule({ $type: LANYARDS_NSID.lanyard, ...fields });
+    save();
+  }, [queryClient, key, schedule, save]);
+
+  useLayoutEffect(() => {
+    saveLater.current = save;
+  }, [save]);
+
+  // Save a waiting change before the page goes away, the app goes into the
+  // background (phones often skip pagehide) or the customiser closes.
+  useEffect(() => {
+    mounted.current = true;
+    const flush = () => {
+      if (timer.current !== undefined) save();
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') flush();
+    };
+    window.addEventListener('pagehide', flush);
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      mounted.current = false;
+      window.removeEventListener('pagehide', flush);
+      document.removeEventListener('visibilitychange', onVisibility);
+      if (timer.current !== undefined) save();
+      // A change whose save already failed won't be saved now: show
+      // everyone the stored settings again.
+      else if (unsaved.current) restore();
+    };
+  }, [save, restore]);
+
+  return {
+    config,
+    ready,
+    invalid,
+    update,
+    reset,
+    saving: pending || inFlight > 0,
+    error,
+    retry: save,
+  };
+}

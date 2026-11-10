@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 
 import { Logo } from '@/components/Logo/Logo';
 import { useSession } from '@/features/auth/session/useSession';
+import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
 import { useProfile } from '@/lib/atproto/useProfile';
 import { cn } from '@/lib/utils';
 
@@ -21,17 +22,23 @@ export function AppHeader({ className }: AppHeaderProps) {
         <Logo />
       </Link>
       {did && (
-        <Link
-          to="/settings"
-          aria-label={t`Your account`}
-          className={styles.accountLink}
-        >
-          {profile.data?.avatar ? (
-            <img src={profile.data.avatar} alt="" className={styles.avatar} />
-          ) : (
-            <span className={styles.avatar} aria-hidden="true" />
-          )}
-        </Link>
+        <nav aria-label={t`Your Lanyards`} className={styles.nav}>
+          <Link to="/lanyard" className={styles.navLink}>
+            {t`My lanyard`}
+          </Link>
+          <ShowQrButton />
+          <Link
+            to="/settings"
+            aria-label={t`Your account`}
+            className={styles.accountLink}
+          >
+            {profile.data?.avatar ? (
+              <img src={profile.data.avatar} alt="" className={styles.avatar} />
+            ) : (
+              <span className={styles.avatar} aria-hidden="true" />
+            )}
+          </Link>
+        </nav>
       )}
     </header>
   );

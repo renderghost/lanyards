@@ -8,3 +8,8 @@ export const accountLink =
   'inline-flex size-11 items-center justify-center rounded-full';
 
 export const avatar = 'size-9 rounded-full bg-accent-subtle';
+
+export const nav = 'flex items-center gap-2';
+
+export const navLink =
+  'inline-flex min-h-11 items-center rounded-md px-3 text-base font-medium leading-6 text-accent-text hover:bg-accent-subtle';

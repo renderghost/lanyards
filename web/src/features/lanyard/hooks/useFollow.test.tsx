@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { server } from '@/test/msw';
 import { ADA, BEA } from '@/test/people';
 import { serveViewerReads, signedInSession, VIEWER_PDS } from '@/test/person';
@@ -112,6 +112,9 @@ describe('useFollow', () => {
     expect(notify.error).toHaveBeenCalledWith(
       'Failed to follow. Please try again.'
     );
+    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
+      source: 'follow',
+    });
   });
 
   it('rechecks with the server after a failed follow that went through', async () => {
@@ -175,6 +178,9 @@ describe('useFollow', () => {
     act(() => result.current.unfollow());
     await waitFor(() => expect(result.current.pending).toBe(false));
     expect(result.current.state).toBe('notFollowing');
+    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
+      source: 'follow',
+    });
   });
 
   it('asks for permission instead of writing when the session lacks it', async () => {

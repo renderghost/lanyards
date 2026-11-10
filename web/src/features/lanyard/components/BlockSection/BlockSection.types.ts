@@ -11,7 +11,7 @@ export type BlockSectionProps = {
   owner: boolean;
   onRetry?(): void;
   /** Where the owner edits this block's data (Sifa, Bluesky). */
-  editLink?: { label: string; url: string };
+  editLinks?: { label: string; url: string }[];
   children?: ReactNode;
   className?: string;
 };

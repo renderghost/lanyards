@@ -27,6 +27,12 @@ describe('AppHeader', () => {
     expect(
       screen.queryByRole('link', { name: 'Your account' })
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'My lanyard' })
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Show QR' })
+    ).not.toBeInTheDocument();
   });
 
   it('links to the account when signed in', async () => {
@@ -41,6 +47,11 @@ describe('AppHeader', () => {
     expect(
       await screen.findByRole('link', { name: 'Your account' })
     ).toHaveAttribute('href', '/settings');
+    expect(screen.getByRole('link', { name: 'My lanyard' })).toHaveAttribute(
+      'href',
+      '/lanyard'
+    );
+    expect(screen.getByRole('button', { name: 'Show QR' })).toBeInTheDocument();
   });
 
   it('clears the top safe area in the installed app', async () => {

@@ -61,10 +61,14 @@ export function renderInRouter(ui: ReactElement, path = '/') {
  */
 export async function waitForRoute(
   router: { state: { status: string; resolvedLocation?: { href: string } } },
-  href: string
+  href: string,
+  timeout?: number
 ) {
-  await waitFor(() => {
-    expect(router.state.status).toBe('idle');
-    expect(router.state.resolvedLocation?.href).toBe(href);
-  });
+  await waitFor(
+    () => {
+      expect(router.state.status).toBe('idle');
+      expect(router.state.resolvedLocation?.href).toBe(href);
+    },
+    timeout ? { timeout } : undefined
+  );
 }

@@ -7,7 +7,7 @@ import { SourceError } from '@/lib/sources/result';
 import type { SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { ADA } from '@/test/people';
 
-import { composeBlocks } from './blocks';
+import { blockStatuses, composeBlocks, hiddenItems } from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
 import type { SourceSnapshot } from './personView.types';
 
@@ -322,5 +322,81 @@ describe('composeBlocks: loading and failures', () => {
     );
     expect(links?.status === 'ready' && links.failedSources).toEqual(['sifa']);
     expect(links?.status === 'ready' && links.items).toHaveLength(3);
+  });
+});
+
+describe('blockStatuses', () => {
+  const statuses = (config: LanyardConfig, sources = allSources) =>
+    blockStatuses({ config, sources, orcidVerified: false });
+
+  it('counts what each visible block would show, after hidden items', () => {
+    expect(
+      statuses(
+        showOnly(['talks', 'links'], {
+          hidden: [sifaKey('presentationDelivery', 'd1')],
+        })
+      )
+    ).toEqual({
+      talks: { status: 'ready', count: 3, failedSources: [] },
+      links: { status: 'ready', count: 5, failedSources: [] },
+    });
+  });
+
+  it('reports an empty block, which the lanyard itself leaves out', () => {
+    expect(
+      statuses(showOnly(['skills']), { sifa: ready({ ...sifa, skills: [] }) })
+    ).toEqual({ skills: { status: 'empty' } });
+  });
+
+  it('reports a failed source and a loading one', () => {
+    expect(
+      statuses(showOnly(['talks', 'publications']), {
+        sifa: failed('sifa'),
+        orcidWorks: { status: 'loading' },
+      })
+    ).toEqual({
+      talks: { status: 'error', sources: ['sifa'] },
+      publications: { status: 'loading' },
+    });
+  });
+
+  it('says nothing about blocks the owner turned off', () => {
+    const config: LanyardConfig = {
+      ...resolveConfig(null),
+      blocks: [
+        { type: 'talks', visible: false },
+        { type: 'skills', visible: true },
+      ],
+    };
+    expect(Object.keys(statuses(config))).toEqual(['skills']);
+  });
+});
+
+describe('hiddenItems', () => {
+  it('finds each hidden item with its block, so the owner can show it again', () => {
+    const config = showOnly(['talks'], {
+      hidden: [
+        sifaKey('presentationDelivery', 'd2'),
+        'https://ada.example/cv',
+        'at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/gone',
+      ],
+    });
+    expect(
+      hiddenItems({ config, sources: allSources, orcidVerified: false })
+    ).toEqual([
+      {
+        key: sifaKey('presentationDelivery', 'd2'),
+        type: 'talks',
+        item: expect.objectContaining({ title: 'Talk two' }),
+      },
+      {
+        key: 'https://ada.example/cv',
+        type: 'links',
+        item: expect.objectContaining({ title: 'CV' }),
+      },
+      {
+        key: 'at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/gone',
+      },
+    ]);
   });
 });

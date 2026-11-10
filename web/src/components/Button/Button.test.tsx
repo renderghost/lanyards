@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithProviders } from '@/test/render';
@@ -21,11 +21,41 @@ describe('Button', () => {
     );
   });
 
-  it('is disabled and marked busy while loading', () => {
-    renderWithProviders(<Button loading>Sign in</Button>);
+  it('is unavailable and marked busy while loading, keeping focus', () => {
+    const onClick = vi.fn();
+    const { rerender } = renderWithProviders(
+      <Button onClick={onClick}>Sign in</Button>
+    );
     const button = screen.getByRole('button', { name: 'Sign in' });
-    expect(button).toBeDisabled();
+    button.focus();
+    rerender(
+      <Button loading onClick={onClick}>
+        Sign in
+      </Button>
+    );
+    expect(button).toHaveFocus();
+    expect(button).toHaveAttribute('aria-disabled', 'true');
     expect(button).toHaveAttribute('aria-busy', 'true');
+    fireEvent.click(button);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('never submits its form while loading', () => {
+    const onSubmit = vi.fn((event: Event) => event.preventDefault());
+    renderWithProviders(
+      <form onSubmit={(event) => onSubmit(event.nativeEvent)}>
+        <Button type="submit" loading>
+          Save
+        </Button>
+      </form>
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it('is truly disabled when disabled', () => {
+    renderWithProviders(<Button disabled>Save</Button>);
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
   });
 
   it('defaults to type="button" so it never submits a form by accident', () => {

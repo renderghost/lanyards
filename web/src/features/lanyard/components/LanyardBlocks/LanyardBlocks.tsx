@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 import { captureError } from '@/lib/analytics/analytics';
+import { EDIT_LINKS } from '@/lib/person/editLinks';
 import { cn } from '@/lib/utils';
 
 import { BlockSection } from '../BlockSection/BlockSection';
@@ -16,6 +17,7 @@ import type { LanyardBlocksProps } from './LanyardBlocks.types';
 export function LanyardBlocks({
   blocks,
   owner,
+  handle,
   onRetry,
   className,
 }: LanyardBlocksProps) {
@@ -43,6 +45,14 @@ export function LanyardBlocks({
                     : []
               }
               owner={owner}
+              editLinks={
+                owner && handle
+                  ? EDIT_LINKS[block.type](handle).map((link) => ({
+                      label: i18n._(link.label),
+                      url: link.url,
+                    }))
+                  : undefined
+              }
               onRetry={() => onRetry(block.type)}
             >
               {block.status === 'ready' && (

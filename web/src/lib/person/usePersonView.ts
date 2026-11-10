@@ -19,7 +19,11 @@ import { fetchSifaProfile } from '@/lib/sources/sifa/sifa';
 import { fetchBlogPosts } from '@/lib/sources/standardSite/standardSite';
 import { fetchRepos } from '@/lib/sources/tangled/tangled';
 
-import { composeBlocks } from './blocks';
+import {
+  blockStatuses,
+  composeBlocks,
+  hiddenItems as findHiddenItems,
+} from './blocks';
 import { type RenderableBlockType, resolveConfig } from './config';
 import { composeHero } from './hero';
 import type {
@@ -35,11 +39,15 @@ const FETCH_LIMIT = 20;
 /**
  * Everything a lanyard shows, loaded progressively: one query per source,
  * and only the sources the owner's visible blocks need (spec §12.3).
+ * `mode` overrides who it is shown to, for the customiser's preview.
  */
-export function usePersonView(did: Did): PersonViewState {
+export function usePersonView(
+  did: Did,
+  options: { mode?: 'owner' | 'visitor' } = {}
+): PersonViewState {
   const session = useSession();
   const viewer = session.status === 'signedIn' ? session.session.did : null;
-  const mode = viewer === did ? 'owner' : 'visitor';
+  const mode = options.mode ?? (viewer === did ? 'owner' : 'visitor');
 
   const profile = useQuery({
     queryKey: queryKeys.source('bluesky', did),
@@ -132,6 +140,9 @@ export function usePersonView(did: Did): PersonViewState {
     orcidWorks: toSourceState(works, enabled.orcid),
   };
 
+  const configUsable = configReady && !configError;
+  const orcidVerified = verified.data === true;
+
   const queries: Record<SourceKey, { refetch: () => unknown }> = {
     bluesky: profile,
     sifa,
@@ -154,15 +165,16 @@ export function usePersonView(did: Did): PersonViewState {
           config,
         })
       : undefined,
-    blocks:
-      configReady && !configError
-        ? composeBlocks({
-            config,
-            sources,
-            mode,
-            orcidVerified: verified.data === true,
-          })
-        : [],
+    blocks: configUsable
+      ? composeBlocks({ config, sources, mode, orcidVerified })
+      : [],
+    statuses: configUsable
+      ? blockStatuses({ config, sources, orcidVerified })
+      : {},
+    hiddenItems: configUsable
+      ? findHiddenItems({ config, sources, orcidVerified })
+      : [],
+    orcidId: sifa.status === 'success' ? (orcidId ?? null) : undefined,
     config,
     configReady,
     configError,

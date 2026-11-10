@@ -58,3 +58,12 @@ export function normaliseDoi(value: string): string | null {
   const doi = value.trim().replace(DOI_PREFIX, '').toLowerCase();
   return doi.startsWith('10.') && doi.includes('/') ? doi : null;
 }
+
+/** A URL's host without "www.", to name a link with no title. */
+export function hostOf(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}

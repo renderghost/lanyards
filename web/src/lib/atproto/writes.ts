@@ -47,7 +47,7 @@ function typed(
   return record;
 }
 
-type Reference = { uri: string; cid: string };
+export type Reference = { uri: string; cid: string };
 
 /** Adds a record with a new TID key to the signed-in person's repository. */
 export async function createRecord(

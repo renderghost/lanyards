@@ -17,8 +17,16 @@ export type MediaLink = {
   publishedDate?: string;
 };
 
-/** The raw, validated app.lanyards.actor.lanyard record. */
-export type LanyardConfigRecord = { value: unknown; cid: string };
+/**
+ * The raw app.lanyards.actor.lanyard record. `valid` is false when it
+ * exists but fails its lexicon: readers use defaults, and the customiser
+ * won't edit it (it offers a reset instead).
+ */
+export type LanyardConfigRecord = {
+  value: unknown;
+  cid: string;
+  valid: boolean;
+};
 
 export type LanyardRecords = {
   honorific?: 'Dr' | 'Prof';

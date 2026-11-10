@@ -1,5 +1,5 @@
 import { Client, simpleFetchHandler } from '@atcute/client';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { vi } from 'vitest';
 
 import { BSKY_APPVIEW_AUD } from '@/lib/atproto/endpoints';
@@ -156,3 +156,50 @@ export const signedOutSession = () => ({
   signOut: vi.fn(),
   refresh: vi.fn(),
 });
+
+type WriteMethod = 'createRecord' | 'putRecord' | 'deleteRecord';
+
+/**
+ * Records the signed-in viewer's writes to their PDS. `fail` answers the
+ * named methods with a server error; `delayMs` holds every answer back.
+ */
+export function captureWrites(
+  options: { fail?: WriteMethod[]; delayMs?: number } = {}
+) {
+  const writes = {
+    created: [] as Record<string, unknown>[],
+    put: [] as Record<string, unknown>[],
+    deleted: [] as Record<string, unknown>[],
+  };
+  const lists: Record<WriteMethod, Record<string, unknown>[]> = {
+    createRecord: writes.created,
+    putRecord: writes.put,
+    deleteRecord: writes.deleted,
+  };
+  for (const method of Object.keys(lists) as WriteMethod[]) {
+    server.use(
+      http.post(
+        `${VIEWER_PDS}/xrpc/com.atproto.repo.${method}`,
+        async ({ request }) => {
+          if (options.delayMs) await delay(options.delayMs);
+          if (options.fail?.includes(method)) {
+            return HttpResponse.json(
+              { error: 'InternalServerError' },
+              { status: 500 }
+            );
+          }
+          const body = (await request.json()) as Record<string, unknown>;
+          lists[method].push(body);
+          if (method === 'deleteRecord') return HttpResponse.json({});
+          const rkey =
+            typeof body.rkey === 'string' ? body.rkey : '3mnewrecord';
+          return HttpResponse.json({
+            uri: `at://${String(body.repo)}/${String(body.collection)}/${rkey}`,
+            cid: CID,
+          });
+        }
+      )
+    );
+  }
+  return writes;
+}

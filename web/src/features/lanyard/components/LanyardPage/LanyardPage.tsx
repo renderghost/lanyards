@@ -25,11 +25,16 @@ import * as styles from './LanyardPage.styles';
 import type { LanyardPageProps } from './LanyardPage.types';
 
 /** Someone's public lanyard: badge, shared context and blocks. */
-export function LanyardPage({ did, handle, className }: LanyardPageProps) {
+export function LanyardPage({
+  did,
+  handle,
+  preview,
+  className,
+}: LanyardPageProps) {
   const { t } = useLingui();
   const session = useSession();
   const location = useLocation();
-  const view = usePersonView(did);
+  const view = usePersonView(did, preview ? { mode: preview } : {});
   const shared = useSharedContext(did);
   const signedOut = session.status !== 'signedIn';
   const viewer = signedOut ? 'signedOut' : view.mode;
@@ -43,16 +48,18 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
   useApplyAccent(view.configReady ? view.config.accent : DEFAULT_ACCENT);
   // Never put the name in the tab title (or history) when it isn't shown.
   useDocumentTitle(
-    optedOut
-      ? t`Sign in to see this lanyard`
-      : blocked
-        ? t`Lanyard unavailable`
-        : (view.hero?.displayName ?? t`Lanyard`)
+    preview
+      ? null
+      : optedOut
+        ? t`Sign in to see this lanyard`
+        : blocked
+          ? t`Lanyard unavailable`
+          : (view.hero?.displayName ?? t`Lanyard`)
   );
 
   useEffect(() => {
-    if (hasHero) track('lanyard_viewed', { viewer });
-  }, [did, viewer, hasHero]);
+    if (hasHero && !preview) track('lanyard_viewed', { viewer });
+  }, [did, viewer, hasHero, preview]);
 
   if (view.profile.status === 'error') {
     return (
@@ -88,16 +95,20 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
 
   return (
     <article className={cn(styles.page, className)}>
-      <BadgeHero hero={view.hero} />
-      <SharedContextStrip
-        mutual={shared.mutual}
-        knownFollowers={shared.knownFollowers}
-      />
-      <VisitorActions
-        did={did}
-        handle={view.hero.handle}
-        owner={view.mode === 'owner'}
-      />
+      <BadgeHero hero={view.hero} headingLevel={preview ? 2 : 1} />
+      {!preview && (
+        <>
+          <SharedContextStrip
+            mutual={shared.mutual}
+            knownFollowers={shared.knownFollowers}
+          />
+          <VisitorActions
+            did={did}
+            handle={view.hero.handle}
+            owner={view.mode === 'owner'}
+          />
+        </>
+      )}
       {view.configError && view.mode === 'owner' && (
         <div className={styles.problem} role="status">
           <p
@@ -111,6 +122,7 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
       <LanyardBlocks
         blocks={view.blocks}
         owner={view.mode === 'owner'}
+        handle={view.hero.handle}
         onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
       />
     </article>
