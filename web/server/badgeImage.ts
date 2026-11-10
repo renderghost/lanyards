@@ -21,6 +21,38 @@ const MUTED = '#5B4E80';
 type Child = ReactElement | string | false | null | undefined;
 
 /**
+ * Emoji and other pictographs, which DM Sans has no glyphs for, so satori
+ * would draw them as empty boxes. Keeps ©, ® and ™, which it has, and a
+ * zero-width joiner between letters (Devanagari and other scripts use it).
+ * Built with RegExp because the `v` flag needs a newer target than the app
+ * compiles to; the functions run on Node, which supports it.
+ */
+const EMOJI = new RegExp(
+  String.raw`\p{RGI_Emoji}|[\p{Extended_Pictographic}--[©®™]]|[\p{Regional_Indicator}\u{FE0F}\u{20E3}\u{E0020}-\u{E007F}]|(?<![\p{L}\p{M}])\u200D|\u200D(?!\p{L})`,
+  'gv'
+);
+
+/** `text` without emoji, tidying the spaces they leave behind. */
+export function withoutEmoji(text: string): string {
+  return text
+    .replace(EMOJI, '')
+    .replace(/[^\S\n]+/g, ' ')
+    .replace(/ ?\n ?/g, '\n')
+    .trim();
+}
+
+/** The badge's text as the font can draw it. */
+export function badgeText(input: BadgeImageInput): BadgeImageInput {
+  const { headline: rawHeadline, ...rest } = input;
+  const headline = rawHeadline ? withoutEmoji(rawHeadline) : '';
+  return {
+    ...rest,
+    displayName: withoutEmoji(input.displayName) || input.handle,
+    ...(headline ? { headline } : {}),
+  };
+}
+
+/**
  * Builds the element objects satori renders. This file is plain .ts, not
  * .tsx, because Vercel's Node builder leaves .tsx modules out of the
  * function bundle (#110).
@@ -181,7 +213,7 @@ export async function renderBadgePng(
             background: '#FFFFFF',
           },
         },
-        input ? personBadge(input) : defaultBadge(),
+        input ? personBadge(badgeText(input)) : defaultBadge(),
         h(
           'div',
           { style: { display: 'flex', fontSize: 28, color: MUTED } },

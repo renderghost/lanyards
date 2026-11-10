@@ -6,25 +6,34 @@ const IMAGE_CACHE = 'public, s-maxage=86400, stale-while-revalidate=604800';
 const STAND_IN_CACHE = 'public, s-maxage=60';
 const DID = /^did:[a-z]+:[a-zA-Z0-9._:%-]{1,2048}$/;
 const MAX_AVATAR_BYTES = 1_000_000;
+/** Image types satori can draw; the CDN may otherwise send WebP. */
+const DRAWABLE = new Set(['image/jpeg', 'image/png']);
 
 type Options = {
   render(input: BadgeImageInput | null): Promise<Uint8Array>;
   fetchImpl?: typeof fetch;
 };
 
-/** The small CDN variant, fetched as a data URI so satori never fetches. */
+/**
+ * The small CDN variant as a JPEG, fetched as a data URI so satori never
+ * fetches. Avatar URLs may name any format, or none (the CDN then sends
+ * WebP), so the format is always set to JPEG.
+ */
 async function avatarDataUri(
   avatar: string | undefined,
   fetchImpl: typeof fetch
 ): Promise<string | undefined> {
   if (!avatar?.startsWith('https://cdn.bsky.app/img/avatar/')) return undefined;
-  const url = avatar.replace('/img/avatar/', '/img/avatar_thumbnail/');
+  const url = `${avatar
+    .replace('/img/avatar/', '/img/avatar_thumbnail/')
+    .replace(/@[a-z]+$/, '')}@jpeg`;
   try {
     const response = await fetchImpl(url, {
       signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
     });
-    const type = response.headers.get('content-type') ?? '';
-    if (!response.ok || !type.startsWith('image/')) return undefined;
+    const type =
+      (response.headers.get('content-type') ?? '').split(';')[0]?.trim() ?? '';
+    if (!response.ok || !DRAWABLE.has(type)) return undefined;
     const bytes = new Uint8Array(await response.arrayBuffer());
     if (bytes.byteLength > MAX_AVATAR_BYTES) return undefined;
     return `data:${type};base64,${Buffer.from(bytes).toString('base64')}`;
