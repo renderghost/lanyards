@@ -5,7 +5,7 @@ import {
   type ClientMetadata,
   OAUTH_SCOPE,
   resolveBaseUrl,
-} from '../src/lib/atproto/oauthConfig';
+} from '../src/lib/atproto/oauthConfig.ts';
 
 /**
  * Exposes the OAuth client id, redirect URI and scope to the app, and, for

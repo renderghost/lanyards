@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en-GB\n"
 
+#: src/hooks/usePwaUpdatePrompt.ts:21
+msgid "A new version of Lanyards is available"
+msgstr "A new version of Lanyards is available"
+
 #: src/features/auth/components/SignInForm/SignInForm.tsx:69
 msgid "Couldn't start creating an account. Please try again."
 msgstr "Couldn't start creating an account. Please try again."
@@ -49,6 +53,7 @@ msgid "Loading…"
 msgstr "Loading…"
 
 #: src/components/AppError/AppError.tsx:20
+#: src/hooks/usePwaUpdatePrompt.ts:23
 msgid "Reload"
 msgstr "Reload"
 
