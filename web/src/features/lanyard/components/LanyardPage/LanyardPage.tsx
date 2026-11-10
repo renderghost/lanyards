@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useLocation } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
+import { Button } from '@/components/Button/Button';
 import { DEFAULT_ACCENT } from '@/design/accents';
 import { useSession } from '@/features/auth/session/useSession';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
@@ -97,6 +98,16 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
         handle={view.hero.handle}
         owner={view.mode === 'owner'}
       />
+      {view.configError && view.mode === 'owner' && (
+        <div className={styles.problem} role="status">
+          <p
+            className={styles.text}
+          >{t`Couldn't load your lanyard settings`}</p>
+          <Button variant="secondary" onClick={() => view.retry('lanyards')}>
+            {t`Retry`}
+          </Button>
+        </div>
+      )}
       <LanyardBlocks
         blocks={view.blocks}
         owner={view.mode === 'owner'}

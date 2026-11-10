@@ -177,3 +177,55 @@ describe('usePersonView', () => {
     expect(result.current.mode).toBe('owner');
   });
 });
+
+describe(
+  'usePersonView when the owner’s records partly fail',
+  { timeout: 10_000 },
+  () => {
+    it('keeps the owner’s block choices when a kept-record list fails', async () => {
+      serveLanyards({
+        blocks: [
+          { type: 'links', visible: false },
+          { type: 'talks', visible: false },
+          { type: 'skills', visible: true },
+        ],
+      });
+      server.use(
+        http.get(
+          `${ADA.pds}/xrpc/com.atproto.repo.listRecords`,
+          ({ request }) =>
+            new URL(request.url).searchParams.get('collection') ===
+            'app.lanyards.link.media.video'
+              ? HttpResponse.json({}, { status: 502 })
+              : undefined
+        )
+      );
+      const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
+      await waitFor(
+        () =>
+          expect(result.current.blocks.map((block) => block.type)).toEqual([
+            'skills',
+          ]),
+        { timeout: 5000 }
+      );
+    });
+
+    it('shows no blocks, rather than the defaults, when the config cannot be read', async () => {
+      serveLanyards(null);
+      server.use(
+        http.get(`${ADA.pds}/xrpc/com.atproto.repo.getRecord`, ({ request }) =>
+          new URL(request.url).searchParams.get('collection') ===
+          'app.lanyards.actor.lanyard'
+            ? HttpResponse.json({}, { status: 500 })
+            : undefined
+        )
+      );
+      const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
+      await waitFor(() => expect(result.current.configError).toBe(true), {
+        timeout: 5000,
+      });
+      expect(result.current.blocks).toEqual([]);
+      expect(result.current.hero).toBeDefined();
+    });
+  }
+);

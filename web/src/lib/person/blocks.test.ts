@@ -96,7 +96,6 @@ const sifa: SifaProfile = {
 };
 
 const lanyards: LanyardRecords = {
-  config: null,
   webLinks: [
     {
       key: `at://${ADA.did}/app.lanyards.link.web/1`,

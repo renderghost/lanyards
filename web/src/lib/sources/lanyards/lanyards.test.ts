@@ -8,7 +8,7 @@ import {
 import { ADA } from '@/test/people';
 
 import records from './fixtures/records.json';
-import { fetchLanyardRecords } from './lanyards';
+import { fetchLanyardConfig, fetchLanyardRecords } from './lanyards';
 
 const LANYARD = 'app.lanyards.actor.lanyard';
 const HONORIFIC = 'app.lanyards.actor.biography.honorific';
@@ -59,7 +59,6 @@ describe('fetchLanyardRecords', () => {
     expect(result).toEqual({
       ok: true,
       value: {
-        config: { value: records.config.value, cid: records.config.cid },
         honorific: 'Dr',
         webLinks: [
           {
@@ -97,9 +96,18 @@ describe('fetchLanyardRecords', () => {
     expect(result.ok && result.value.honorific).toBeUndefined();
   });
 
+  it('reads the config on its own', async () => {
+    await expect(fetchLanyardConfig(ADA.did)).resolves.toEqual({
+      ok: true,
+      value: { value: records.config.value, cid: records.config.cid },
+    });
+  });
+
   it('returns a null config when the person has not customised their lanyard', async () => {
     serve({ config: false });
-    const result = await fetchLanyardRecords(ADA.did);
-    expect(result.ok && result.value.config).toBeNull();
+    await expect(fetchLanyardConfig(ADA.did)).resolves.toEqual({
+      ok: true,
+      value: null,
+    });
   });
 });

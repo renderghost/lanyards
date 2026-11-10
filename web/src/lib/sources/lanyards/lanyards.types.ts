@@ -17,9 +17,10 @@ export type MediaLink = {
   publishedDate?: string;
 };
 
+/** The raw, validated app.lanyards.actor.lanyard record. */
+export type LanyardConfigRecord = { value: unknown; cid: string };
+
 export type LanyardRecords = {
-  /** The raw, validated app.lanyards.actor.lanyard record, if any. */
-  config: { value: unknown; cid: string } | null;
   honorific?: 'Dr' | 'Prof';
   webLinks: WebLink[];
   media: MediaLink[];

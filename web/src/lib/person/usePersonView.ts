@@ -5,7 +5,10 @@ import { useMemo } from 'react';
 import { useSession } from '@/features/auth/session/useSession';
 import { queryKeys } from '@/lib/query/keys';
 import { fetchPosts, fetchProfile } from '@/lib/sources/bluesky/bluesky';
-import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
+import {
+  fetchLanyardConfig,
+  fetchLanyardRecords,
+} from '@/lib/sources/lanyards/lanyards';
 import {
   fetchOrcidVerified,
   fetchOrcidWorks,
@@ -50,14 +53,21 @@ export function usePersonView(did: Did): PersonViewState {
     queryKey: queryKeys.source('lanyards', did),
     ...sourceQueryOptions((signal) => fetchLanyardRecords(did, signal)),
   });
+  // The owner's choices are read on their own: if they can't be read, no
+  // blocks show at all, rather than the defaults undoing what they hid.
+  const configQuery = useQuery({
+    queryKey: queryKeys.source('lanyards', did, 'config'),
+    ...sourceQueryOptions((signal) => fetchLanyardConfig(did, signal)),
+  });
 
-  const configReady = lanyards.status !== 'pending';
+  const configReady = configQuery.status !== 'pending';
+  const configError = configQuery.status === 'error';
   const config = useMemo(
-    () => resolveConfig(lanyards.data?.config?.value ?? null),
-    [lanyards.data]
+    () => resolveConfig(configQuery.data?.value ?? null),
+    [configQuery.data]
   );
   const visible = new Set<RenderableBlockType>(
-    configReady
+    configReady && !configError
       ? config.blocks.filter((block) => block.visible).map((b) => b.type)
       : []
   );
@@ -144,19 +154,22 @@ export function usePersonView(did: Did): PersonViewState {
           config,
         })
       : undefined,
-    blocks: configReady
-      ? composeBlocks({
-          config,
-          sources,
-          mode,
-          orcidVerified: verified.data === true,
-        })
-      : [],
+    blocks:
+      configReady && !configError
+        ? composeBlocks({
+            config,
+            sources,
+            mode,
+            orcidVerified: verified.data === true,
+          })
+        : [],
     config,
     configReady,
+    configError,
     mode,
     retry: (source) => {
       void queries[source].refetch();
+      if (source === 'lanyards') void configQuery.refetch();
     },
   };
 }

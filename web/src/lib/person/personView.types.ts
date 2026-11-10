@@ -104,6 +104,8 @@ export type PersonViewState = {
   config: LanyardConfig;
   /** The owner's config has loaded (or is known to be absent). */
   configReady: boolean;
+  /** The owner's config couldn't be read, so no blocks are shown. */
+  configError: boolean;
   mode: ViewerMode;
   retry(source: SourceKey): void;
 };

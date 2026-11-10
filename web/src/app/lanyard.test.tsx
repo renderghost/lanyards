@@ -340,3 +340,30 @@ describe('blocks between viewer and owner', () => {
     await waitFor(() => expect(document.title).not.toContain('Ada'));
   });
 });
+
+describe('owner settings that cannot be read', () => {
+  it('tells the owner, with Retry, instead of showing the defaults', async () => {
+    servePerson();
+    server.use(
+      http.get(`${ADA.pds}/xrpc/com.atproto.repo.getRecord`, ({ request }) =>
+        new URL(request.url).searchParams.get('collection') ===
+        'app.lanyards.actor.lanyard'
+          ? HttpResponse.json({}, { status: 500 })
+          : undefined
+      )
+    );
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    renderRoute('/@alice.test');
+    expect(
+      await screen.findByText(
+        "Couldn't load your lanyard settings",
+        undefined,
+        { timeout: 5000 }
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Retry' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('region', { name: 'Links' })
+    ).not.toBeInTheDocument();
+  }, 10_000);
+});

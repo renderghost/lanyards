@@ -83,7 +83,7 @@ describe('composeHero', () => {
           }),
         ],
       },
-      lanyards: { config: null, honorific: 'Dr', webLinks: [], media: [] },
+      lanyards: { honorific: 'Dr', webLinks: [], media: [] },
       config: resolveConfig(null),
     });
     expect(hero).toEqual({
