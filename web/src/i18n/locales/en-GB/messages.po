@@ -272,7 +272,7 @@ msgstr "Failed to follow. Please try again."
 #: src/features/lanyard/customise/MediaList/MediaList.tsx:37
 #: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:70
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:35
-#: src/features/lanyard/hooks/useLanyardConfig.ts:107
+#: src/features/lanyard/hooks/useLanyardConfig.ts:184
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
@@ -401,7 +401,7 @@ msgstr "Lanyard"
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
-#: src/features/lanyard/hooks/useLanyardConfig.ts:103
+#: src/features/lanyard/hooks/useLanyardConfig.ts:175
 msgid "Lanyard updated"
 msgstr "Lanyard updated"
 
@@ -581,7 +581,7 @@ msgstr "Posts on Bluesky"
 msgid "Presentation"
 msgstr "Presentation"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:207
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:224
 msgid "Preview"
 msgstr "Preview"
 
@@ -610,10 +610,14 @@ msgstr "Reorder {name}"
 msgid "Reordering cancelled. {name} stayed where it was."
 msgstr "Reordering cancelled. {name} stayed where it was."
 
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:157
+msgid "Reset to defaults"
+msgstr "Reset to defaults"
+
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:65
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:118
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:149
-#: src/features/lanyard/hooks/useLanyardConfig.ts:108
+#: src/features/lanyard/hooks/useLanyardConfig.ts:185
 msgid "Retry"
 msgstr "Retry"
 
@@ -625,11 +629,11 @@ msgstr "Rose"
 msgid "Save honorific"
 msgstr "Save honorific"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:145
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:162
 msgid "Saved"
 msgstr "Saved"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:145
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:162
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -653,7 +657,7 @@ msgstr "Show {name}"
 msgid "Show again"
 msgstr "Show again"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:163
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:180
 msgid "Show current job on your badge"
 msgstr "Show current job on your badge"
 
@@ -748,6 +752,10 @@ msgstr "Teal"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:150
+msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
+msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
+
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:45
 msgid "This account isn't available"
 msgstr "This account isn't available"
@@ -830,7 +838,7 @@ msgstr "Video added"
 msgid "Video deleted"
 msgstr "Video deleted"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:218
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:235
 msgid "View as visitor"
 msgstr "View as visitor"
 
@@ -873,6 +881,10 @@ msgstr "We couldn't load this lanyard"
 #: src/features/account/components/AccountCard/AccountCard.tsx:38
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:147
+msgid "We couldn't read your lanyard settings"
+msgstr "We couldn't read your lanyard settings"
 
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:136
 #: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:80
@@ -926,7 +938,7 @@ msgstr "Your lanyard"
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:194
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:211
 msgid "Your links"
 msgstr "Your links"
 
@@ -934,7 +946,7 @@ msgstr "Your links"
 msgid "Your ORCID iD is verified"
 msgstr "Your ORCID iD is verified"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:201
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:218
 msgid "Your podcasts and videos"
 msgstr "Your podcasts and videos"
 

@@ -22,3 +22,10 @@ export const loading = 'px-4 py-6 text-base leading-6 text-muted-foreground';
 export const kept = 'flex flex-col gap-3';
 
 export const subheading = 'text-lg font-medium leading-7 text-foreground';
+
+export const notice =
+  'flex flex-col items-start gap-3 rounded-md border border-border bg-surface p-4';
+
+export const noticeHeading = 'text-base font-medium leading-6 text-foreground';
+
+export const noticeText = 'text-base leading-6 text-muted-foreground';

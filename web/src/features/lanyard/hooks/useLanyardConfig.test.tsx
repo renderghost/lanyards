@@ -8,6 +8,7 @@ import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
 import { track } from '@/lib/analytics/analytics';
 import { putRecord } from '@/lib/atproto/writes';
+import { fetchLanyardConfig } from '@/lib/sources/lanyards/lanyards';
 import { queryKeys } from '@/lib/query/keys';
 import { ADA } from '@/test/people';
 import { signedInSession } from '@/test/person';
@@ -21,6 +22,9 @@ vi.mock('@/lib/analytics/analytics', () => ({
 }));
 vi.mock('@/components/Toaster/notify', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+}));
+vi.mock('@/lib/sources/lanyards/lanyards', () => ({
+  fetchLanyardConfig: vi.fn(),
 }));
 vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/atproto/writes')>()),
@@ -66,8 +70,13 @@ beforeEach(() => {
   client.setQueryData(queryKeys.source('lanyards', ADA.did, 'config'), {
     value: STORED,
     cid: CID,
+    valid: true,
   });
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+  vi.mocked(fetchLanyardConfig).mockResolvedValue({
+    ok: true,
+    value: { value: STORED, cid: CID, valid: true },
+  });
   vi.mocked(putRecord).mockResolvedValue({
     uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
     cid: CID,
@@ -158,6 +167,105 @@ describe('useLanyardConfig', () => {
         fields: expect.objectContaining({ accent: 'plum' }),
       }),
     ]);
+  });
+
+  it('never saves over a stored record it cannot read, until reset', async () => {
+    const invalid = {
+      ...STORED,
+      events: [{ event: 'at://did:plc:x/community.lexicon.calendar.event/1' }],
+      blocks: [{ type: 'links', visible: true, limit: 0 }],
+    };
+    client.setQueryData(queryKeys.source('lanyards', ADA.did, 'config'), {
+      value: invalid,
+      cid: CID,
+      valid: false,
+    });
+    const { result } = render();
+    expect(result.current.ready).toBe(false);
+    expect(result.current.invalid).toBe(true);
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await advance(1000);
+    expect(putRecord).not.toHaveBeenCalled();
+
+    act(() => result.current.reset());
+    await advance(0);
+    expect(saved()).toEqual([
+      expect.objectContaining({
+        rkey: 'self',
+        fields: expect.objectContaining({
+          accent: 'violet',
+          createdAt: STORED.createdAt,
+        }),
+      }),
+    ]);
+    expect(saved()[0]?.fields).not.toHaveProperty('events');
+    expect(result.current.invalid).toBe(false);
+    expect(result.current.ready).toBe(true);
+  });
+
+  const key = () => queryKeys.source('lanyards', ADA.did, 'config');
+  const refetch = () =>
+    act(async () => {
+      await client.refetchQueries({ queryKey: key() });
+    });
+
+  it('keeps an unsaved change when the settings are fetched again', async () => {
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await refetch();
+    expect(fetchLanyardConfig).toHaveBeenCalled();
+    expect(result.current.config.accent).toBe('teal');
+    await advance(800);
+    expect(saved()).toEqual([
+      expect.objectContaining({
+        fields: expect.objectContaining({ accent: 'teal' }),
+      }),
+    ]);
+  });
+
+  it('keeps a change whose save failed when the settings are fetched again', async () => {
+    vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await advance(800);
+    expect(result.current.error).toBe(true);
+    await refetch();
+    expect(result.current.config.accent).toBe('teal');
+    act(() => result.current.retry());
+    await advance(0);
+    expect(saved()[1]?.fields).toMatchObject({ accent: 'teal' });
+  });
+
+  it('puts back the saved settings for everyone when it closes after a failed save', async () => {
+    vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
+    const { result, unmount } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await advance(800);
+    unmount();
+    const stored = client.getQueryData<{ value: { accent: string } }>(key());
+    expect(stored?.value.accent).toBe('violet');
+  });
+
+  it('saves a pending change when the app goes into the background', async () => {
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'moss' })));
+    act(() => {
+      Object.defineProperty(document, 'visibilityState', {
+        value: 'hidden',
+        configurable: true,
+      });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    await advance(0);
+    expect(saved()).toEqual([
+      expect.objectContaining({
+        fields: expect.objectContaining({ accent: 'moss' }),
+      }),
+    ]);
+    Object.defineProperty(document, 'visibilityState', {
+      value: 'visible',
+      configurable: true,
+    });
   });
 
   it('saves a pending change when the customiser closes', async () => {

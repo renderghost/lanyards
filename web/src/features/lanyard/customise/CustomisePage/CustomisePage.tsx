@@ -141,6 +141,23 @@ function Customiser({
           {t`Customise your lanyard`}
         </h2>
         {!canEdit && <PermissionNotice returnTo={CUSTOMISE_PATH} />}
+        {lanyard.invalid && (
+          <div role="status" className={styles.notice}>
+            <p className={styles.noticeHeading}>
+              {t`We couldn't read your lanyard settings`}
+            </p>
+            <p className={styles.noticeText}>
+              {t`They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults.`}
+            </p>
+            <Button
+              variant="secondary"
+              disabled={!canEdit}
+              onClick={lanyard.reset}
+            >
+              {t`Reset to defaults`}
+            </Button>
+          </div>
+        )}
         <p aria-live="polite" className={styles.status}>
           {lanyard.saving ? t`Saving…` : saved ? t`Saved` : ''}
         </p>

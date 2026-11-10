@@ -259,6 +259,32 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(screen.getByRole('button', { name: 'Add media' })).toBeEnabled();
   });
 
+  it('explains a stored record it cannot read, and resets only when asked', async () => {
+    servePerson({
+      config: { blocks: [{ type: 'links', visible: true, limit: 0 }] },
+    });
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    expect(
+      await screen.findByText(
+        "We couldn't read your lanyard settings",
+        undefined,
+        {
+          timeout: 5000,
+        }
+      )
+    ).toBeInTheDocument();
+    expect(await accent('Teal')).toBeDisabled();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Reset to defaults' })
+    );
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    expect(saves[0]).toMatchObject({
+      record: { accent: 'violet', createdAt: '2026-11-01T09:00:00.000Z' },
+    });
+    await waitFor(() => expect(accent('Teal')).resolves.toBeEnabled());
+  });
+
   it('has no accessibility violations', async () => {
     servePerson();
     const { container } = renderRoute('/lanyard');

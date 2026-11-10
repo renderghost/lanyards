@@ -99,7 +99,26 @@ describe('fetchLanyardRecords', () => {
   it('reads the config on its own', async () => {
     await expect(fetchLanyardConfig(ADA.did)).resolves.toEqual({
       ok: true,
-      value: { value: records.config.value, cid: records.config.cid },
+      value: {
+        value: records.config.value,
+        cid: records.config.cid,
+        valid: true,
+      },
+    });
+  });
+
+  it('keeps a config that fails validation, marked invalid', async () => {
+    const invalid = {
+      ...records.config,
+      value: {
+        ...records.config.value,
+        blocks: [{ type: 'links', visible: true, limit: 0 }],
+      },
+    };
+    mockGetRecord(ADA.pds, ADA.did, LANYARD, 'self', invalid);
+    await expect(fetchLanyardConfig(ADA.did)).resolves.toEqual({
+      ok: true,
+      value: { value: invalid.value, cid: invalid.cid, valid: false },
     });
   });
 
