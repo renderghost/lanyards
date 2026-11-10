@@ -204,7 +204,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       { name: 'Links' },
       { timeout: 5000 }
     );
-    const down = within(links).getByRole('button', { name: 'Move down' });
+    const down = within(links).getByRole('button', { name: 'Move Links down' });
     await waitFor(() => expect(down).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(down);
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
@@ -235,12 +235,12 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
 
     const hidden = screen.getByRole('region', { name: 'Hidden items' });
-    await userEvent.click(
-      within(hidden).getByRole('button', {
-        name: 'Show again',
-        description: 'Building on ATProto at Example Conf 2024',
-      })
-    );
+    const showAgain = within(hidden).getByRole('button', {
+      name: 'Show again',
+      description: 'Building on ATProto at Example Conf 2024',
+    });
+    await waitFor(() => expect(showAgain).toHaveFocus());
+    await userEvent.click(showAgain);
     expect(
       await within(region).findByText(/Example Conf 2024/)
     ).toBeInTheDocument();

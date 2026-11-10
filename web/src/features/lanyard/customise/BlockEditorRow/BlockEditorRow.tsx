@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useLingui } from '@lingui/react/macro';
 import { ArrowDown, ArrowUp, GripVertical } from 'lucide-react';
 import { Switch } from 'radix-ui';
-import { useId } from 'react';
+import { useEffect, useId, useRef } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
@@ -36,6 +36,19 @@ export function BlockEditorRow({
 }: BlockEditorRowProps) {
   const { t, i18n } = useLingui();
   const nameId = useId();
+  const upRef = useRef<HTMLButtonElement>(null);
+  const downRef = useRef<HTMLButtonElement>(null);
+  // The Move button just pressed, so focus stays on it as the row moves
+  // (React may re-insert the row, which would drop focus).
+  const pressed = useRef<'up' | 'down' | null>(null);
+  const atTop = index === 0;
+  const atBottom = index === total - 1;
+
+  useEffect(() => {
+    if (!pressed.current) return;
+    (pressed.current === 'up' ? upRef : downRef).current?.focus();
+    pressed.current = null;
+  }, [index]);
   const {
     attributes,
     listeners,
@@ -90,19 +103,33 @@ export function BlockEditorRow({
       </div>
       <div className={styles.controls}>
         <button
+          ref={upRef}
           type="button"
-          aria-label={t`Move up`}
-          disabled={disabled || index === 0}
-          onClick={() => onMove(index - 1)}
+          aria-label={t`Move ${name} up`}
+          // At the ends the button stays focusable, so pressing it again
+          // does nothing rather than dropping focus to the page.
+          aria-disabled={atTop || undefined}
+          disabled={disabled}
+          onClick={() => {
+            if (atTop) return;
+            pressed.current = 'up';
+            onMove(index - 1);
+          }}
           className={styles.move}
         >
           <ArrowUp aria-hidden="true" className={styles.icon} />
         </button>
         <button
+          ref={downRef}
           type="button"
-          aria-label={t`Move down`}
-          disabled={disabled || index === total - 1}
-          onClick={() => onMove(index + 1)}
+          aria-label={t`Move ${name} down`}
+          aria-disabled={atBottom || undefined}
+          disabled={disabled}
+          onClick={() => {
+            if (atBottom) return;
+            pressed.current = 'down';
+            onMove(index + 1);
+          }}
           className={styles.move}
         >
           <ArrowDown aria-hidden="true" className={styles.icon} />
@@ -110,6 +137,7 @@ export function BlockEditorRow({
         <label className={styles.limit}>
           <span>{t`Items to show`}</span>
           <select
+            aria-label={t`Items to show for ${name}`}
             value={itemLimit(block)}
             disabled={disabled}
             onChange={(event) => onLimit(Number(event.target.value))}
@@ -145,7 +173,11 @@ export function BlockEditorRow({
           {status.status === 'error' && (
             <>
               <p className={styles.statusText}>{t`Couldn't load ${failed}`}</p>
-              <Button variant="secondary" onClick={onRetry}>
+              <Button
+                variant="secondary"
+                aria-label={t`Retry ${name}`}
+                onClick={onRetry}
+              >
                 {t`Retry`}
               </Button>
             </>

@@ -9,3 +9,5 @@ export const entry =
 
 export const title =
   'min-w-0 text-base leading-6 text-foreground [overflow-wrap:anywhere]';
+
+export const empty = 'text-base leading-6 text-muted-foreground';

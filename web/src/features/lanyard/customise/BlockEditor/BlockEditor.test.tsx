@@ -59,33 +59,35 @@ describe('BlockEditor', () => {
     expect(
       within(links).getByRole('button', { name: 'Reorder Links' })
     ).toBeInTheDocument();
+    const up = within(links).getByRole('button', { name: 'Move Links up' });
+    expect(up).toHaveAttribute('aria-disabled', 'true');
+    expect(up).toBeEnabled();
     expect(
-      within(links).getByRole('button', { name: 'Move up' })
-    ).toBeDisabled();
-    expect(
-      within(links).getByRole('button', { name: 'Move down' })
-    ).toBeEnabled();
+      within(links).getByRole('button', { name: 'Move Links down' })
+    ).not.toHaveAttribute('aria-disabled');
     expect(
       within(links).getByRole('switch', { name: 'Show Links' })
     ).toBeChecked();
     const limit = within(links).getByRole('combobox', {
-      name: 'Items to show',
+      name: 'Items to show for Links',
     });
     expect(within(limit).getAllByRole('option')).toHaveLength(20);
     expect(limit).toHaveValue('20');
     expect(
-      within(row('Talks')).getByRole('combobox', { name: 'Items to show' })
+      within(row('Talks')).getByRole('combobox', {
+        name: 'Items to show for Talks',
+      })
     ).toHaveValue('3');
     expect(
-      within(row('Details')).getByRole('button', { name: 'Move down' })
-    ).toBeDisabled();
+      within(row('Details')).getByRole('button', { name: 'Move Details down' })
+    ).toHaveAttribute('aria-disabled', 'true');
   });
 
   it('moves a block down, saves and announces where it went', async () => {
     const onSave = vi.fn();
     renderWithProviders(<Harness onSave={onSave} />);
     await userEvent.click(
-      within(row('Links')).getByRole('button', { name: 'Move down' })
+      within(row('Links')).getByRole('button', { name: 'Move Links down' })
     );
     expect(order().slice(0, 2)).toEqual(['talks', 'links']);
     expect(
@@ -96,6 +98,20 @@ describe('BlockEditor', () => {
     expect(
       screen.getByText('Links moved to position 2 of 12')
     ).toBeInTheDocument();
+  });
+
+  it('keeps focus on the button pressed as its block moves, even to the top', async () => {
+    renderWithProviders(<Harness />);
+    const up = within(row('Talks')).getByRole('button', {
+      name: 'Move Talks up',
+    });
+    await userEvent.click(up);
+    expect(order().slice(0, 2)).toEqual(['talks', 'links']);
+    expect(up).toHaveFocus();
+    expect(up).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(up);
+    expect(order().slice(0, 2)).toEqual(['talks', 'links']);
+    expect(up).toHaveFocus();
   });
 
   it('saves a block’s visibility', async () => {
@@ -115,7 +131,9 @@ describe('BlockEditor', () => {
     const onSave = vi.fn();
     renderWithProviders(<Harness onSave={onSave} />);
     await userEvent.selectOptions(
-      within(row('Talks')).getByRole('combobox', { name: 'Items to show' }),
+      within(row('Talks')).getByRole('combobox', {
+        name: 'Items to show for Talks',
+      }),
       '5'
     );
     expect(
@@ -147,7 +165,9 @@ describe('BlockEditor', () => {
     );
     const talks = row('Talks');
     expect(within(talks).getByText("Couldn't load Sifa")).toBeInTheDocument();
-    await userEvent.click(within(talks).getByRole('button', { name: 'Retry' }));
+    await userEvent.click(
+      within(talks).getByRole('button', { name: 'Retry Talks' })
+    );
     expect(onRetry).toHaveBeenCalledWith('talks');
   });
 
@@ -155,13 +175,13 @@ describe('BlockEditor', () => {
     renderWithProviders(<Harness disabled />);
     const links = row('Links');
     expect(
-      within(links).getByRole('button', { name: 'Move down' })
+      within(links).getByRole('button', { name: 'Move Links down' })
     ).toBeDisabled();
     expect(
       within(links).getByRole('switch', { name: 'Show Links' })
     ).toBeDisabled();
     expect(
-      within(links).getByRole('combobox', { name: 'Items to show' })
+      within(links).getByRole('combobox', { name: 'Items to show for Links' })
     ).toBeDisabled();
   });
 

@@ -48,11 +48,14 @@ test.describe('lanyard customiser', () => {
     const editor = page.getByRole('region', { name: 'Blocks' });
     await editor
       .getByRole('listitem', { name: 'Links' })
-      .getByRole('button', { name: 'Move down' })
+      .getByRole('button', { name: 'Move Links down' })
       .click();
     await expect(
       page.getByText('Links moved to position 2 of 12')
     ).toBeAttached();
+    await expect(
+      editor.getByRole('button', { name: 'Move Links down' })
+    ).toBeFocused();
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
     expect(
       lanyardSaves(writes)[0]
@@ -112,8 +115,11 @@ test.describe('lanyard customiser', () => {
     const honorific = page.getByRole('group', { name: 'Honorific' });
     await expect(honorific.getByRole('radio', { name: 'Dr' })).toBeChecked();
     await honorific.getByRole('radio', { name: 'Prof' }).check();
-    await page.getByRole('button', { name: 'Save honorific' }).click();
+    const save = page.getByRole('button', { name: 'Save honorific' });
+    await save.focus();
+    await page.keyboard.press('Enter');
     await expect(page.getByText('Honorific updated')).toBeVisible();
+    await expect(save).toBeFocused();
     const saved = writes.find(
       (write) =>
         write.body.collection === 'app.lanyards.actor.biography.honorific'
@@ -163,11 +169,12 @@ test.describe('lanyard customiser', () => {
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
     expect(lanyardSaves(writes)[0]?.hidden).toHaveLength(1);
 
-    await page
-      .getByRole('region', { name: 'Hidden items' })
-      .getByRole('button', { name: 'Show again' })
-      .click();
+    const hidden = page.getByRole('region', { name: 'Hidden items' });
+    const showAgain = hidden.getByRole('button', { name: 'Show again' });
+    await expect(showAgain).toBeFocused();
+    await page.keyboard.press('Enter');
     await expect(preview.getByText(/Example Conf 2024/)).toBeVisible();
+    await expect(hidden.getByText('No items are hidden.')).toBeFocused();
     await expect.poll(() => lanyardSaves(writes).length).toBe(2);
     expect(lanyardSaves(writes)[1]?.hidden).toEqual([]);
   });

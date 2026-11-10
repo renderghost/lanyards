@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react/macro';
 import { Ellipsis } from 'lucide-react';
 import { DropdownMenu } from 'radix-ui';
+import { useRef } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -10,6 +11,9 @@ import type { ItemMenuProps } from './ItemMenu.types';
 /** An item's menu in the owner's preview: hide it from the lanyard. */
 export function ItemMenu({ title, onHide, className }: ItemMenuProps) {
   const { t } = useLingui();
+  // Hiding removes this menu's button, so focus goes where the customiser
+  // sends it (the item's Show again) instead of back to the trigger.
+  const hiding = useRef(false);
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger
@@ -23,8 +27,19 @@ export function ItemMenu({ title, onHide, className }: ItemMenuProps) {
           align="end"
           sideOffset={4}
           className={styles.content}
+          onCloseAutoFocus={(event) => {
+            if (!hiding.current) return;
+            hiding.current = false;
+            event.preventDefault();
+          }}
         >
-          <DropdownMenu.Item onSelect={onHide} className={styles.item}>
+          <DropdownMenu.Item
+            onSelect={() => {
+              hiding.current = true;
+              onHide();
+            }}
+            className={styles.item}
+          >
             {t`Hide this item`}
           </DropdownMenu.Item>
         </DropdownMenu.Content>

@@ -1,7 +1,7 @@
 import type { Did } from '@atcute/lexicons';
 import { useLingui } from '@lingui/react/macro';
 import { useRouter } from '@tanstack/react-router';
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { PermissionNotice } from '@/features/auth/components/PermissionNotice/PermissionNotice';
@@ -85,10 +85,14 @@ function Customiser({
   const headingId = useId();
   const linksId = useId();
   const mediaId = useId();
+  const linksHeading = useRef<HTMLHeadingElement>(null);
+  const mediaHeading = useRef<HTMLHeadingElement>(null);
   const lanyard = useLanyardConfig();
   const view = usePersonView(did, { mode: 'owner' });
   const kept = useKeptRecords(did);
   const [viewAs, setViewAs] = useState<'owner' | 'visitor'>('owner');
+  /** The item just hidden, whose Show again takes focus. */
+  const [justHidden, setJustHidden] = useState<string | undefined>();
 
   // "Saved" follows a save that finished without an error.
   const [wasSaving, setWasSaving] = useState(lanyard.saving);
@@ -120,13 +124,14 @@ function Customiser({
             renderMenu: (itemKey, title) => (
               <ItemMenu
                 title={title}
-                onHide={() =>
+                onHide={() => {
                   update((config) =>
                     config.hidden.includes(itemKey)
                       ? config
                       : { ...config, hidden: [...config.hidden, itemKey] }
-                  )
-                }
+                  );
+                  setJustHidden(itemKey);
+                }}
               />
             ),
           }
@@ -190,6 +195,8 @@ function Customiser({
         <HiddenItems
           items={view.hiddenItems}
           disabled={disabled}
+          focusKey={justHidden}
+          onFocused={() => setJustHidden(undefined)}
           onShow={(key) =>
             update((config) => ({
               ...config,
@@ -207,17 +214,35 @@ function Customiser({
           disabled={!canKeep || kept.status !== 'success'}
         />
         <section aria-labelledby={linksId} className={styles.kept}>
-          <h2 id={linksId} className={styles.subheading}>
+          <h2
+            ref={linksHeading}
+            id={linksId}
+            tabIndex={-1}
+            className={styles.subheading}
+          >
             {t`Your links`}
           </h2>
-          <WebLinkList links={kept.data?.webLinks ?? []} disabled={!canKeep} />
+          <WebLinkList
+            links={kept.data?.webLinks ?? []}
+            disabled={!canKeep}
+            onEmptied={() => linksHeading.current?.focus()}
+          />
           <WebLinkForm disabled={!canKeep} />
         </section>
         <section aria-labelledby={mediaId} className={styles.kept}>
-          <h2 id={mediaId} className={styles.subheading}>
+          <h2
+            ref={mediaHeading}
+            id={mediaId}
+            tabIndex={-1}
+            className={styles.subheading}
+          >
             {t`Your podcasts and videos`}
           </h2>
-          <MediaList items={kept.data?.media ?? []} disabled={!canKeep} />
+          <MediaList
+            items={kept.data?.media ?? []}
+            disabled={!canKeep}
+            onEmptied={() => mediaHeading.current?.focus()}
+          />
           <MediaForm disabled={!canKeep} />
         </section>
       </section>

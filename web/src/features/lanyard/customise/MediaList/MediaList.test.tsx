@@ -79,6 +79,21 @@ describe('MediaList', () => {
     ).toBeEnabled();
   });
 
+  it('moves focus to the next item, then out of the emptied list', async () => {
+    captureWrites();
+    const onEmptied = vi.fn();
+    renderWithClient(<MediaList items={items} onEmptied={onEmptied} />);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Delete Talking protocols' })
+    );
+    const next = await screen.findByRole('button', {
+      name: 'Delete video.example',
+    });
+    await waitFor(() => expect(next).toHaveFocus());
+    await userEvent.click(next);
+    await waitFor(() => expect(onEmptied).toHaveBeenCalled());
+  });
+
   it('has no axe violations', async () => {
     const { container } = renderWithClient(<MediaList items={items} />);
     await expectNoAxeViolations(container);

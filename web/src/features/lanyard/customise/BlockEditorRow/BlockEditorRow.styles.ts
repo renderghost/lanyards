@@ -22,7 +22,7 @@ export const switchThumb =
 export const controls = 'flex flex-wrap items-center gap-2';
 
 export const move =
-  'inline-flex size-11 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-accent-subtle disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex size-11 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-accent-subtle disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
 
 export const limit =
   'flex items-center gap-2 text-sm leading-5 text-foreground';

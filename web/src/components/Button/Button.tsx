@@ -12,14 +12,25 @@ export function Button({
   className,
   children,
   ref,
+  onClick,
   ...rest
 }: ButtonProps) {
   return (
     <button
       ref={ref}
       type={type}
-      disabled={disabled || loading}
+      disabled={disabled}
+      // While loading the button stays focusable, so pressing it never
+      // drops focus to the page; presses (and submits) are ignored.
+      aria-disabled={loading || undefined}
       aria-busy={loading || undefined}
+      onClick={(event) => {
+        if (loading) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.(event);
+      }}
       className={cn(base, variants[variant], sizes[size], className)}
       {...rest}
     >

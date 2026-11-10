@@ -73,6 +73,19 @@ describe('WebLinkList', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
+  it('moves focus to the next item, then out of the emptied list', async () => {
+    captureWrites();
+    const onEmptied = vi.fn();
+    renderWithClient(<WebLinkList links={links} onEmptied={onEmptied} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Delete CV' }));
+    const next = await screen.findByRole('button', {
+      name: 'Delete blog.ada.example',
+    });
+    await waitFor(() => expect(next).toHaveFocus());
+    await userEvent.click(next);
+    await waitFor(() => expect(onEmptied).toHaveBeenCalled());
+  });
+
   it('has no axe violations', async () => {
     const { container } = renderWithClient(<WebLinkList links={links} />);
     await expectNoAxeViolations(container);

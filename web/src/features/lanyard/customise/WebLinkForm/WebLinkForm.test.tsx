@@ -75,8 +75,10 @@ describe('WebLinkForm', () => {
     renderWithClient(<WebLinkForm />);
     await userEvent.type(address(), 'https://ada.example/cv');
     await userEvent.type(title(), 'CV');
-    await userEvent.click(add());
-    expect(add()).toBeDisabled();
+    add().focus();
+    await userEvent.keyboard('{Enter}');
+    expect(add()).toHaveAttribute('aria-disabled', 'true');
+    expect(add()).toHaveFocus();
     await waitFor(() => expect(writes.created).toHaveLength(1));
     const write = writes.created[0] as {
       collection: string;
