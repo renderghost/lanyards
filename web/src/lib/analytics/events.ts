@@ -9,6 +9,7 @@ export type AnalyticsEvent =
   | 'lanyard_viewed'
   | 'lanyard_updated'
   | 'kept_record_saved'
+  | 'qr_opened'
   | 'follow_created'
   | 'follow_deleted'
   | 'signed_out'

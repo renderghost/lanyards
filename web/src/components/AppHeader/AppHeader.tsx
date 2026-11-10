@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 
 import { Logo } from '@/components/Logo/Logo';
 import { useSession } from '@/features/auth/session/useSession';
+import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
 import { useProfile } from '@/lib/atproto/useProfile';
 import { cn } from '@/lib/utils';
 
@@ -25,6 +26,7 @@ export function AppHeader({ className }: AppHeaderProps) {
           <Link to="/lanyard" className={styles.navLink}>
             {t`My lanyard`}
           </Link>
+          <ShowQrButton />
           <Link
             to="/settings"
             aria-label={t`Your account`}

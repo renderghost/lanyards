@@ -108,6 +108,10 @@ msgstr "Choose a platform"
 msgid "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 msgstr "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 
+#: src/features/qr/components/QrSheet/QrSheet.tsx:67
+msgid "Close"
+msgstr "Close"
+
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:31
 msgid "Code"
 msgstr "Code"
@@ -132,9 +136,17 @@ msgstr "Conference talk"
 msgid "Contract roles"
 msgstr "Contract roles"
 
+#: src/features/qr/components/QrSheet/QrSheet.tsx:63
+msgid "Copy link"
+msgstr "Copy link"
+
 #: src/features/lanyard/components/FollowButton/FollowButton.tsx:54
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
+
+#: src/features/qr/components/QrSheet/QrSheet.tsx:36
+msgid "Couldn't copy the link. Please try again."
+msgstr "Couldn't copy the link. Please try again."
 
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:147
 msgid "Couldn't load {failed}"
@@ -388,6 +400,10 @@ msgstr "Lecture"
 msgid "Link added"
 msgstr "Link added"
 
+#: src/features/qr/components/QrSheet/QrSheet.tsx:34
+msgid "Link copied"
+msgstr "Link copied"
+
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:33
 msgid "Link deleted"
 msgstr "Link deleted"
@@ -439,7 +455,7 @@ msgstr "Move down"
 msgid "Move up"
 msgstr "Move up"
 
-#: src/components/AppHeader/AppHeader.tsx:26
+#: src/components/AppHeader/AppHeader.tsx:27
 msgid "My lanyard"
 msgstr "My lanyard"
 
@@ -533,6 +549,10 @@ msgstr "Prof"
 msgid "Publications"
 msgstr "Publications"
 
+#: src/components/QrCode/QrCode.tsx:31
+msgid "QR code for {value}"
+msgstr "QR code for {value}"
+
 #: src/components/AppError/AppError.tsx:22
 #: src/hooks/usePwaUpdatePrompt.ts:23
 msgid "Reload"
@@ -569,6 +589,10 @@ msgstr "Saved"
 msgid "Saving…"
 msgstr "Saving…"
 
+#: src/features/qr/components/QrSheet/QrSheet.tsx:53
+msgid "Scan to see my lanyard"
+msgstr "Scan to see my lanyard"
+
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:43
 msgid "Search for someone"
 msgstr "Search for someone"
@@ -592,6 +616,10 @@ msgstr "Show current job on your badge"
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:47
 msgid "Show lanyard"
 msgstr "Show lanyard"
+
+#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:40
+msgid "Show QR"
+msgstr "Show QR"
 
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:7
 msgid "Sifa"
@@ -823,7 +851,7 @@ msgstr "You're offline. Some things won't work until you reconnect."
 msgid "You've been signed out. Please sign in again."
 msgstr "You've been signed out. Please sign in again."
 
-#: src/components/AppHeader/AppHeader.tsx:30
+#: src/components/AppHeader/AppHeader.tsx:32
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:19
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:35
 msgid "Your account"
@@ -838,10 +866,11 @@ msgid "Your handle"
 msgstr "Your handle"
 
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:52
+#: src/features/qr/components/QrSheet/QrSheet.tsx:27
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:24
+#: src/components/AppHeader/AppHeader.tsx:25
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 
