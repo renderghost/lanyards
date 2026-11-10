@@ -50,6 +50,33 @@ test.describe('public lanyard, signed out', () => {
     expect(width).toBeLessThanOrEqual(320);
   });
 
+  test('fits 320px even with long unbroken pronouns and skill names', async ({
+    page,
+  }) => {
+    const unbroken = 'x'.repeat(64);
+    await mockPerson(page, {
+      sifa: {
+        pronouns: unbroken,
+        openTo: ['id.sifa.defs#mentoringOthers'],
+        skills: [{ rkey: 's1', name: `Skill${'y'.repeat(120)}` }],
+      },
+      config: {
+        blocks: [
+          { type: 'skills', visible: true },
+          { type: 'openTo', visible: true },
+        ],
+      },
+    });
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/@alice.test');
+    await expect(page.getByRole('region', { name: 'Skills' })).toBeVisible();
+    await expect(page.getByText(unbroken)).toBeVisible();
+    const width = await page.evaluate(
+      () => document.documentElement.scrollWidth
+    );
+    expect(width).toBeLessThanOrEqual(320);
+  });
+
   test('redirects an encoded @ to the canonical URL', async ({ page }) => {
     await mockPerson(page);
     await page.goto('/%40alice.test');
@@ -121,6 +148,32 @@ test.describe('public lanyard, signed in', () => {
     expect(writes.deleted).toEqual([
       { repo: BEA.did, collection: 'app.bsky.graph.follow', rkey: '3mnew' },
     ]);
+  });
+
+  test('fits 320px when a known follower has a long unbroken name', async ({
+    page,
+  }) => {
+    const unbroken = 'z'.repeat(80);
+    await mockPerson(page);
+    await mockViewer(page, {
+      knownFollowers: [
+        {
+          did: 'did:plc:fixturecalaaaaaaaaaaaaaaa',
+          handle: 'cal.test',
+          displayName: unbroken,
+        },
+      ],
+    });
+    await signIn(page, { did: BEA.did, scope: GRANULAR });
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/@alice.test');
+    await expect(
+      page.getByRole('list', { name: 'What you share' })
+    ).toContainText(unbroken);
+    const width = await page.evaluate(
+      () => document.documentElement.scrollWidth
+    );
+    expect(width).toBeLessThanOrEqual(320);
   });
 
   test('asks for permission instead of writing with an identity-only session', async ({

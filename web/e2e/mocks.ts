@@ -29,6 +29,10 @@ const json = (route: Route, body: unknown, status = 200) =>
 
 type PersonOptions = {
   labels?: string[];
+  /** Fields merged into the Sifa view. */
+  sifa?: Record<string, unknown>;
+  /** app.lanyards.actor.lanyard fields; no record when absent. */
+  config?: Record<string, unknown>;
   /** Make the Sifa view and its PDS fallback fail. */
   sifaDown?: boolean;
 };
@@ -64,7 +68,9 @@ export async function mockPerson(page: Page, options: PersonOptions = {}) {
     }
   );
   await page.route('https://sifa.id/xrpc/id.sifa.getProfileView**', (route) =>
-    options.sifaDown ? json(route, {}, 500) : json(route, view)
+    options.sifaDown
+      ? json(route, {}, 500)
+      : json(route, { ...view, ...options.sifa })
   );
   await page.route(`https://plc.directory/**`, (route) =>
     json(route, {
@@ -85,6 +91,17 @@ export async function mockPerson(page: Page, options: PersonOptions = {}) {
     const collection = new URL(route.request().url()).searchParams.get(
       'collection'
     );
+    if (collection === 'app.lanyards.actor.lanyard' && options.config) {
+      return json(route, {
+        uri: `at://${ADA.did}/${collection}/self`,
+        cid: CID,
+        value: {
+          $type: collection,
+          createdAt: '2026-11-01T09:00:00.000Z',
+          ...options.config,
+        },
+      });
+    }
     if (collection === 'app.lanyards.actor.biography.honorific') {
       return json(route, {
         uri: `at://${ADA.did}/${collection}/self`,
@@ -116,7 +133,11 @@ export type Writes = { created: unknown[]; deleted: unknown[] };
 /** Answers the signed-in viewer's AppView reads and records their writes. */
 export async function mockViewer(
   page: Page,
-  options: { following?: boolean } = {}
+  options: {
+    following?: boolean;
+    /** People the viewer follows who follow the person. */
+    knownFollowers?: { did: string; handle: string; displayName?: string }[];
+  } = {}
 ): Promise<Writes> {
   const writes: Writes = { created: [], deleted: [] };
   await page.route(
@@ -137,7 +158,8 @@ export async function mockViewer(
   );
   await page.route(
     'https://appview.e2e.test/xrpc/app.bsky.graph.getKnownFollowers**',
-    (route) => json(route, { subject: {}, followers: [] })
+    (route) =>
+      json(route, { subject: {}, followers: options.knownFollowers ?? [] })
   );
   await page.route(
     'https://pds.e2e.test/xrpc/com.atproto.repo.createRecord',

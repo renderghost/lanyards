@@ -12,4 +12,4 @@ export const meta =
 export const chips = 'flex flex-wrap gap-2';
 
 export const chip =
-  'rounded-full border border-border px-3 py-1 text-sm leading-5 text-foreground';
+  'max-w-full rounded-full border border-border px-3 py-1 text-sm leading-5 text-foreground [overflow-wrap:anywhere]';

@@ -9,7 +9,8 @@ export const text = 'flex min-w-0 max-w-full flex-col items-center gap-1';
 export const name =
   'break-words font-serif text-3xl leading-tight text-foreground [overflow-wrap:anywhere]';
 
-export const pronouns = 'text-sm leading-5 text-muted-foreground';
+export const pronouns =
+  'max-w-full text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]';
 
 export const headline =
   'line-clamp-3 break-words text-lg leading-7 text-foreground [overflow-wrap:anywhere]';
