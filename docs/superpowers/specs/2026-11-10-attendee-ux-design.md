@@ -123,6 +123,8 @@ These decisions were agreed in the 2026-11-10 brainstorming session.
 | 58 | Leaving | Itemised deletion: Lanyards records always; shared-lexicon records opt-in |
 | 59 | Architecture | Vite + React SPA (TanStack Router/Query), PWA, one Vercel Edge Function |
 | 60 | Semble (#75) | Optional, default-off Collections block in Slice 1, read-only from `network.cosmik.*` |
+| 61 | Legal pages | `/privacy` and `/terms` in Slice 1, linked from the OAuth client metadata |
+| 62 | Content reporting (#80) | Deferred to the super-admin phase; no in-app reporting in v1 |
 
 ---
 
@@ -152,6 +154,8 @@ Speakers, organisers and exhibitors appear in v1 only as **role badges** derived
 | `/settings` | Signed in | Connect behaviour, export/import, migration, delete data |
 | `/migrate` | Signed in | Migration wizard (shown only when old records exist) |
 | `/oauth/callback` | — | OAuth redirect target |
+| `/privacy` | Public | Privacy notice (§14) |
+| `/terms` | Public | Terms of use (§14) |
 
 ### 6.2 Navigation (signed in)
 
@@ -622,7 +626,7 @@ Vercel rewrites `/@:handle`, `/d/:did` and `/e/:did/:rkey` to the function.
 | Beta | `https://next.lanyards.app` | `https://next.lanyards.app/oauth-client-metadata.json` |
 | Production | `https://lanyards.app` | `https://lanyards.app/oauth-client-metadata.json` |
 
-- **Client metadata:** generated at build time per environment.
+- **Client metadata:** generated at build time per environment. It includes `client_name`, `logo_uri`, `policy_uri` (`/privacy`) and `tos_uri` (`/terms`).
 - **Hosting:** Vercel static hosting plus `api/meta`.
 - **Housekeeping:** the stale Hugo Pages workflow is removed, and CLAUDE.md's Tech Stack and OAuth sections are updated for the new stack in Slice 1. The project conventions are unchanged.
 
@@ -671,6 +675,16 @@ All caught errors are reported to analytics with their error class and source na
   - URLs pass a scheme allowlist (`https`, `http`, `mailto`)
   - external links use `rel="noopener noreferrer"`
 - **Analytics:** contain no DIDs, handles, names or URLs.
+- **Legal pages:**
+  - `/privacy` explains, in plain English:
+    - what Lanyards reads and writes on the user's account
+    - what stays on the device
+    - what analytics collect
+    - which third-party services the browser contacts (Bluesky, Sifa, Constellation, Smoke Signal, ORCID, Semble)
+    - how to delete data
+  - `/terms` covers acceptable use and the fact that ATProto data is public.
+  - Both are linked from the footer, the sign-in screen and the OAuth client metadata.
+  - Text is drafted for the owner's review and is not legal advice.
 - **Delete my Lanyards data** (Settings) is itemised:
   - Always deleted: all `app.lanyards.*` records and all device data.
   - Optional, unticked by default: youandme connections, met starter packs (and their lists and list items), RSVPs written by Lanyards, and follows created through Lanyards. Lanyards keeps a device-side log of records it created to support this. When the log is gone, it falls back to youandme connections and met packs, which can be identified by collection and name.
@@ -750,6 +764,7 @@ Each slice is complete, tested and shippable to `next.lanyards.app`, and gets it
   - the ORCID verify helper
 - **Migration and settings:** the migration wizard and clean-up; `/settings` (connect defaults stored for later slices, export/import, itemised delete).
 - **Housekeeping:** update CLAUDE.md; remove the stale Hugo workflow.
+- **Legal pages:** `/privacy` and `/terms` (§14), with `policy_uri` and `tos_uri` in the OAuth client metadata.
 - **Partner deliverable (not code):** the Sifa meeting-token proposal (§9.5), sent early because of partner lead time.
 - **Exit:** `lanyards.app` swaps over to the new app, and the old app is retired.
 
@@ -783,6 +798,7 @@ Each slice is complete, tested and shippable to `next.lanyards.app`, and gets it
 ## 18. Out of scope (later)
 
 - **Other experiences:** organiser, speaker, exhibitor and super-admin experiences (including formalising organiser starter packs and a programme/schedule lexicon).
+- **Content reporting and moderation (#80):** deferred to the super-admin phase. The ATProto-native route is reporting via `com.atproto.moderation.createReport` plus a Lanyards labeller (Ozone). Until then, Bluesky blocks, mutes and labels apply (§14).
 - **Data-dependent features:** perks, gifts and vouchers; side events and event grouping; Sifa meetings (pending the Sifa proposal).
 - **Platform extras:** push notifications, native wrapper, NFC, Wallet passes, lock-screen QR.
 - **Smaller deferrals:** contact export (vCard/CSV), languages other than British English, and private "watching" packs without an RSVP.
