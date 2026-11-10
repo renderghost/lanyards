@@ -21,17 +21,22 @@ export function AppHeader({ className }: AppHeaderProps) {
         <Logo />
       </Link>
       {did && (
-        <Link
-          to="/settings"
-          aria-label={t`Your account`}
-          className={styles.accountLink}
-        >
-          {profile.data?.avatar ? (
-            <img src={profile.data.avatar} alt="" className={styles.avatar} />
-          ) : (
-            <span className={styles.avatar} aria-hidden="true" />
-          )}
-        </Link>
+        <nav aria-label={t`Your Lanyards`} className={styles.nav}>
+          <Link to="/lanyard" className={styles.navLink}>
+            {t`My lanyard`}
+          </Link>
+          <Link
+            to="/settings"
+            aria-label={t`Your account`}
+            className={styles.accountLink}
+          >
+            {profile.data?.avatar ? (
+              <img src={profile.data.avatar} alt="" className={styles.avatar} />
+            ) : (
+              <span className={styles.avatar} aria-hidden="true" />
+            )}
+          </Link>
+        </nav>
       )}
     </header>
   );

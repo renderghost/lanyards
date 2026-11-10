@@ -19,6 +19,10 @@ msgstr "{others, plural, one {# other} other {# others}}"
 msgid "A new version of Lanyards is available"
 msgstr "A new version of Lanyards is available"
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.tsx:25
+msgid "Accent colour"
+msgstr "Accent colour"
+
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:33
 msgid "Account unavailable"
 msgstr "Account unavailable"
@@ -87,7 +91,7 @@ msgstr "Couldn't check whether you already follow them"
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:105
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:116
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
@@ -112,6 +116,10 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:64
+msgid "Customise your lanyard"
+msgstr "Customise your lanyard"
+
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:34
 msgid "Details"
 msgstr "Details"
@@ -119,6 +127,10 @@ msgstr "Details"
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:30
 msgid "Education"
 msgstr "Education"
+
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:11
+msgid "Ember"
+msgstr "Ember"
 
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:9
 msgid "Enter your handle"
@@ -131,6 +143,10 @@ msgstr "Enter your handle, not your email — for example alice.bsky.social"
 #: src/features/lanyard/hooks/useFollow.ts:95
 msgid "Failed to follow. Please try again."
 msgstr "Failed to follow. Please try again."
+
+#: src/features/lanyard/hooks/useLanyardConfig.ts:95
+msgid "Failed to save. Please try again."
+msgstr "Failed to save. Please try again."
 
 #: src/features/lanyard/hooks/useFollow.ts:113
 msgid "Failed to unfollow. Please try again."
@@ -196,6 +212,10 @@ msgstr "Go to the home page"
 msgid "Host"
 msgstr "Host"
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:8
+msgid "Indigo"
+msgstr "Indigo"
+
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:18
 msgid "Interview"
 msgstr "Interview"
@@ -208,14 +228,18 @@ msgstr "Keynote"
 msgid "Languages"
 msgstr "Languages"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:50
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:57
 msgid "Lanyard"
 msgstr "Lanyard"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:49
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:56
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:34
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
+
+#: src/features/lanyard/hooks/useLanyardConfig.ts:91
+msgid "Lanyard updated"
+msgstr "Lanyard updated"
 
 #: src/components/Logo/Logo.tsx:16
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:12
@@ -244,6 +268,7 @@ msgstr "Loading your profile…"
 
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:49
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -255,10 +280,22 @@ msgstr "Location"
 msgid "Mentoring others"
 msgstr "Mentoring others"
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:12
+msgid "Moss"
+msgstr "Moss"
+
+#: src/components/AppHeader/AppHeader.tsx:26
+msgid "My lanyard"
+msgstr "My lanyard"
+
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:19
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:31
 msgid "Not found"
 msgstr "Not found"
+
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:14
+msgid "Ocean"
+msgstr "Ocean"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:25
 msgid "Open to"
@@ -289,6 +326,10 @@ msgstr "Panellist"
 msgid "Part-time roles"
 msgstr "Part-time roles"
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:9
+msgid "Plum"
+msgstr "Plum"
+
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:17
 msgid "Podcast episode"
 msgstr "Podcast episode"
@@ -305,6 +346,10 @@ msgstr "Posts on Bluesky"
 msgid "Presentation"
 msgstr "Presentation"
 
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:91
+msgid "Preview"
+msgstr "Preview"
+
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:28
 msgid "Publications"
 msgstr "Publications"
@@ -315,9 +360,22 @@ msgid "Reload"
 msgstr "Reload"
 
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:57
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:107
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:118
+#: src/features/lanyard/hooks/useLanyardConfig.ts:96
 msgid "Retry"
 msgstr "Retry"
+
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:10
+msgid "Rose"
+msgstr "Rose"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:68
+msgid "Saved"
+msgstr "Saved"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:68
+msgid "Saving…"
+msgstr "Saving…"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:43
 msgid "Search for someone"
@@ -326,6 +384,10 @@ msgstr "Search for someone"
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:11
 msgid "Semble"
 msgstr "Semble"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:88
+msgid "Show current job on your badge"
+msgstr "Show current job on your badge"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:47
 msgid "Show lanyard"
@@ -339,13 +401,13 @@ msgstr "Sifa"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:79
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:86
 #: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:55
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:47
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:74
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:54
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:81
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -406,6 +468,10 @@ msgstr "Talks"
 msgid "Tangled"
 msgstr "Tangled"
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:13
+msgid "Teal"
+msgstr "Teal"
+
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:11
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
@@ -418,11 +484,11 @@ msgstr "This account isn't available"
 msgid "This is your lanyard"
 msgstr "This is your lanyard"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:86
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:93
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:76
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:83
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 
@@ -459,6 +525,10 @@ msgstr "Unfollowed @{handle}"
 msgid "Verified on ORCID"
 msgstr "Verified on ORCID"
 
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:102
+msgid "View as visitor"
+msgstr "View as visitor"
+
 #: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:24
 msgid "View on Bluesky"
 msgstr "View on Bluesky"
@@ -466,6 +536,10 @@ msgstr "View on Bluesky"
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:10
 msgid "Vimeo"
 msgstr "Vimeo"
+
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:7
+msgid "Violet"
+msgstr "Violet"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:33
 msgid "We couldn't find @{handle}"
@@ -519,7 +593,7 @@ msgstr "You're offline. Some things won't work until you reconnect."
 msgid "You've been signed out. Please sign in again."
 msgstr "You've been signed out. Please sign in again."
 
-#: src/components/AppHeader/AppHeader.tsx:26
+#: src/components/AppHeader/AppHeader.tsx:30
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:19
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:35
 msgid "Your account"
@@ -532,6 +606,14 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 #: src/features/auth/components/SignInForm/SignInForm.tsx:88
 msgid "Your handle"
 msgstr "Your handle"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:32
+msgid "Your lanyard"
+msgstr "Your lanyard"
+
+#: src/components/AppHeader/AppHeader.tsx:24
+msgid "Your Lanyards"
+msgstr "Your Lanyards"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:9
 msgid "YouTube"

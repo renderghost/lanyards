@@ -7,6 +7,7 @@ export type AnalyticsEvent =
   | 'sign_up_started'
   | 'oauth_scope_fallback'
   | 'lanyard_viewed'
+  | 'lanyard_updated'
   | 'follow_created'
   | 'follow_deleted'
   | 'signed_out'

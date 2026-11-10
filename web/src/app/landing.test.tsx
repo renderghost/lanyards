@@ -11,7 +11,7 @@ vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 
 const signedIn = {
   status: 'signedIn',
-  session: { did: 'did:plc:ewvi7nxzyoun6zhxrhs64oiz' },
+  session: { did: 'did:plc:ewvi7nxzyoun6zhxrhs64oiz', scope: 'atproto' },
   signOut: vi.fn(),
   refresh: vi.fn(),
 } as never;
@@ -37,10 +37,10 @@ describe('landing page', () => {
     expect(document.title).toBe('Sign in · Lanyards');
   });
 
-  it('sends a signed-in visitor to their account', async () => {
+  it('sends a signed-in visitor to their lanyard', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/');
-    await waitForRoute(router, '/settings');
+    await waitForRoute(router, '/lanyard');
   });
 
   it('honours a safe return path for signed-in visitors', async () => {
@@ -52,6 +52,6 @@ describe('landing page', () => {
   it('ignores an unsafe return path', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/?returnTo=%2F%2Fevil.com');
-    await waitForRoute(router, '/settings');
+    await waitForRoute(router, '/lanyard');
   });
 });

@@ -99,3 +99,48 @@ export function itemLimit(block: BlockConfig): number {
   }
   return block.limit ?? DEFAULT_ITEM_LIMIT;
 }
+
+type StoredFields = Record<string, unknown>;
+
+const isStoredBlock = (value: unknown): value is StoredBlock =>
+  typeof value === 'object' &&
+  value !== null &&
+  typeof (value as StoredBlock).type === 'string';
+
+/**
+ * The app.lanyards.actor.lanyard fields for `config`, ready for putRecord.
+ * Everything this slice doesn't edit is kept from `previous`: createdAt,
+ * connect preferences, per-event overrides, unknown future fields, and
+ * block entries of types it doesn't render (such as `events`), at their
+ * positions. `updatedAt` is set to `now`; `createdAt` too on first save.
+ */
+export function serialiseConfig(
+  config: LanyardConfig,
+  previous: unknown | null,
+  now: string
+): StoredFields {
+  const { $type: _type, ...kept } =
+    previous && typeof previous === 'object' ? (previous as StoredFields) : {};
+  const previousBlocks = Array.isArray(kept.blocks) ? kept.blocks : [];
+
+  const blocks: StoredBlock[] = config.blocks.map((block) => ({
+    type: block.type,
+    visible: block.visible,
+    ...(block.limit ? { limit: block.limit } : {}),
+  }));
+  previousBlocks.forEach((block: unknown, index: number) => {
+    if (isStoredBlock(block) && !isRenderable(block.type)) {
+      blocks.splice(Math.min(index, blocks.length), 0, block);
+    }
+  });
+
+  return {
+    ...kept,
+    accent: config.accent,
+    showJob: config.showJob,
+    blocks,
+    hidden: config.hidden,
+    createdAt: typeof kept.createdAt === 'string' ? kept.createdAt : now,
+    updatedAt: now,
+  };
+}

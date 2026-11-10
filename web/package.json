@@ -48,6 +48,7 @@
     "downshift": "^9.5.0",
     "lucide-react": "1.61.0",
     "posthog-js": "^1.447.7",
+    "radix-ui": "^1.8.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "satori": "0.63.2",

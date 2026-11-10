@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { itemLimit, resolveConfig } from './config';
+import { validateRecord } from '@/lib/lexicons/validate';
+
+import { itemLimit, resolveConfig, serialiseConfig } from './config';
 
 const ALL_TYPES = [
   'links',
@@ -83,5 +85,69 @@ describe('itemLimit', () => {
     [{ type: 'links' as const, visible: true, limit: 4 }, 4],
   ])('gives %o a limit of %i', (block, expected) => {
     expect(itemLimit(block)).toBe(expected);
+  });
+});
+
+describe('serialiseConfig', () => {
+  const NOW = '2026-11-10T12:00:00.000Z';
+  const EVENT =
+    'at://did:plc:fixtureeventaaaaaaaaaaaaa/community.lexicon.calendar.event/3mevent';
+  const previous = {
+    $type: 'app.lanyards.actor.lanyard',
+    accent: 'violet',
+    blocks: [
+      { type: 'links', visible: true },
+      { type: 'events', visible: true },
+      { type: 'talks', visible: false },
+    ],
+    connect: { follow: true, vouch: false, metPack: true },
+    events: [{ event: EVENT, headline: 'Speaking on Thursday' }],
+    createdAt: '2026-11-01T09:00:00.000Z',
+  };
+
+  it('keeps what this slice does not edit, in place, and stamps updatedAt', () => {
+    const config = {
+      ...resolveConfig(previous),
+      accent: 'teal' as const,
+      showJob: false,
+    };
+    const fields = serialiseConfig(config, previous, NOW);
+    expect(fields).toMatchObject({
+      accent: 'teal',
+      showJob: false,
+      connect: previous.connect,
+      events: previous.events,
+      createdAt: previous.createdAt,
+      updatedAt: NOW,
+    });
+    expect(
+      (fields.blocks as { type: string }[]).slice(0, 3).map((b) => b.type)
+    ).toEqual(['links', 'events', 'talks']);
+  });
+
+  it('keeps an unrendered block at its position when blocks move', () => {
+    const config = resolveConfig(previous);
+    const [links, talks, ...rest] = config.blocks;
+    const reordered = { ...config, blocks: [talks!, links!, ...rest] };
+    const fields = serialiseConfig(reordered, previous, NOW);
+    expect(
+      (fields.blocks as { type: string }[]).slice(0, 3).map((b) => b.type)
+    ).toEqual(['talks', 'events', 'links']);
+  });
+
+  it('creates the record on the first customisation', () => {
+    const fields = serialiseConfig(resolveConfig(null), null, NOW);
+    expect(fields).toMatchObject({ createdAt: NOW, updatedAt: NOW });
+    expect(fields).not.toHaveProperty('$type');
+  });
+
+  it('validates as app.lanyards.actor.lanyard', () => {
+    const fields = serialiseConfig(resolveConfig(previous), previous, NOW);
+    expect(
+      validateRecord('app.lanyards.actor.lanyard', {
+        $type: 'app.lanyards.actor.lanyard',
+        ...fields,
+      }).ok
+    ).toBe(true);
   });
 });
