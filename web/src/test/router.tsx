@@ -21,6 +21,7 @@ export function renderRoute(path: string) {
     routeTree,
     context: { queryClient },
     history: createMemoryHistory({ initialEntries: [path] }),
+    pathParamsAllowedCharacters: [':', '@'],
   });
   const view = render(
     <QueryClientProvider client={queryClient}>
@@ -41,6 +42,7 @@ export function renderInRouter(ui: ReactElement, path = '/') {
   const router = createRouter({
     routeTree: rootRoute,
     history: createMemoryHistory({ initialEntries: [path] }),
+    pathParamsAllowedCharacters: [':', '@'],
   });
   const view = render(
     <QueryClientProvider client={queryClient}>

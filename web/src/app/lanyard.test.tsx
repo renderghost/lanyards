@@ -1,8 +1,10 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { expectNoAxeViolations } from '@/test/axe';
+import { server } from '@/test/msw';
 import { ADA, BEA } from '@/test/people';
 import {
   servePerson,
@@ -196,5 +198,70 @@ describe('accent', () => {
     await waitFor(() =>
       expect(document.documentElement.dataset.accent).toBe('teal')
     );
+  });
+});
+
+describe('lanyard blocks', () => {
+  it('shows the default blocks: links and talks', async () => {
+    servePerson();
+    renderRoute('/@alice.test');
+    const links = await screen.findByRole('region', { name: 'Links' });
+    expect(
+      within(links).getByRole('link', { name: 'GitHub (opens in a new tab)' })
+    ).toBeInTheDocument();
+    const talks = await screen.findByRole('region', { name: 'Talks' });
+    expect(within(talks).getAllByText('Building on ATProto')).toHaveLength(2);
+    expect(
+      screen.queryByRole('region', { name: 'Skills' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('shows blocks the owner turned on, in their order', async () => {
+    servePerson({
+      config: {
+        blocks: [
+          { type: 'skills', visible: true },
+          { type: 'links', visible: true },
+          { type: 'talks', visible: false },
+        ],
+      },
+    });
+    renderRoute('/@alice.test');
+    await screen.findByRole('region', { name: 'Skills' });
+    const headings = screen
+      .getAllByRole('heading', { level: 2 })
+      .map((heading) => heading.textContent);
+    expect(headings).toEqual(['Skills', 'Links']);
+  });
+
+  it('tells the owner when Sifa could not be loaded, and retries', async () => {
+    servePerson();
+    server.use(
+      http.get('https://sifa.id/xrpc/id.sifa.getProfileView', () =>
+        HttpResponse.json({}, { status: 500 })
+      ),
+      http.get(`${ADA.pds}/xrpc/com.atproto.repo.listRecords`, ({ request }) =>
+        new URL(request.url).searchParams
+          .get('collection')
+          ?.startsWith('id.sifa')
+          ? HttpResponse.json({}, { status: 500 })
+          : undefined
+      )
+    );
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    renderRoute('/@alice.test');
+    const talks = await screen.findByRole(
+      'region',
+      { name: 'Talks' },
+      { timeout: 5000 }
+    );
+    expect(
+      await within(talks).findByText("Couldn't load Sifa", undefined, {
+        timeout: 5000,
+      })
+    ).toBeInTheDocument();
+    expect(
+      within(talks).getByRole('button', { name: 'Retry' })
+    ).toBeInTheDocument();
   });
 });

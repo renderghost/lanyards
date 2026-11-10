@@ -7,11 +7,13 @@ import { useSession } from '@/features/auth/session/useSession';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { track } from '@/lib/analytics/analytics';
+import { BLOCK_SOURCES } from '@/lib/person/blocks';
 import { usePersonView } from '@/lib/person/usePersonView';
 import { useSharedContext } from '@/lib/person/useSharedContext';
 import { cn } from '@/lib/utils';
 
 import { BadgeHero } from '../BadgeHero/BadgeHero';
+import { LanyardBlocks } from '../LanyardBlocks/LanyardBlocks';
 import { LanyardNotice } from '../LanyardNotice/LanyardNotice';
 import { LanyardProblem } from '../LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '../LanyardSkeleton/LanyardSkeleton';
@@ -76,6 +78,11 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
       <SharedContextStrip
         mutual={shared.mutual}
         knownFollowers={shared.knownFollowers}
+      />
+      <LanyardBlocks
+        blocks={view.blocks}
+        owner={view.mode === 'owner'}
+        onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
       />
     </article>
   );

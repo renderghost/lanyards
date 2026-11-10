@@ -7,6 +7,10 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en-GB\n"
 
+#: src/components/ExternalLink/ExternalLink.tsx:25
+msgid "(opens in a new tab)"
+msgstr "(opens in a new tab)"
+
 #: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:31
 msgid "{others, plural, one {# other} other {# others}}"
 msgstr "{others, plural, one {# other} other {# others}}"
@@ -19,13 +23,65 @@ msgstr "A new version of Lanyards is available"
 msgid "Account unavailable"
 msgstr "Account unavailable"
 
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:8
+msgid "Anchor"
+msgstr "Anchor"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:6
+msgid "Apple Podcasts"
+msgstr "Apple Podcasts"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:12
+msgid "Being mentored"
+msgstr "Being mentored"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:26
+msgid "Blog posts"
+msgstr "Blog posts"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:6
+msgid "Bluesky"
+msgstr "Bluesky"
+
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:35
 msgid "Bluesky isn't answering right now. Check your connection and try again."
 msgstr "Bluesky isn't answering right now. Check your connection and try again."
 
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:10
+msgid "Board positions"
+msgstr "Board positions"
+
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:38
 msgid "Check the spelling, or search for them."
 msgstr "Check the spelling, or search for them."
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:31
+msgid "Code"
+msgstr "Code"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:13
+msgid "Collaborations"
+msgstr "Collaborations"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:32
+msgid "Collections"
+msgstr "Collections"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:9
+msgid "Commissions"
+msgstr "Commissions"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:23
+msgid "Conference talk"
+msgstr "Conference talk"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:8
+msgid "Contract roles"
+msgstr "Contract roles"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:54
+msgid "Couldn't load {sources}"
+msgstr "Couldn't load {sources}"
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:80
 msgid "Couldn't start creating an account. Please try again."
@@ -38,6 +94,14 @@ msgstr "Couldn't start sign-in. Please try again."
 #: src/features/auth/components/SignInForm/SignInForm.tsx:111
 msgid "Create an account"
 msgstr "Create an account"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:34
+msgid "Details"
+msgstr "Details"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:30
+msgid "Education"
+msgstr "Education"
 
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:9
 msgid "Enter your handle"
@@ -75,11 +139,31 @@ msgstr "Followed by {first}, who you follow"
 msgid "For example alice.bsky.social"
 msgstr "For example alice.bsky.social"
 
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:6
+msgid "Full-time roles"
+msgstr "Full-time roles"
+
 #: src/components/NotFound/NotFound.tsx:17
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:35
+#: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:9
+msgid "Host"
+msgstr "Host"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:18
+msgid "Interview"
+msgstr "Interview"
+
+#: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:6
+msgid "Keynote"
+msgstr "Keynote"
+
+#: src/features/lanyard/components/blocks/DetailsBlock/DetailsBlock.tsx:33
+msgid "Languages"
+msgstr "Languages"
+
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:37
 msgid "Lanyard"
 msgstr "Lanyard"
 
@@ -88,8 +172,17 @@ msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
 #: src/components/Logo/Logo.tsx:16
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:12
 msgid "Lanyards"
 msgstr "Lanyards"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:19
+msgid "Lecture"
+msgstr "Lecture"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:23
+msgid "Links"
+msgstr "Links"
 
 #: src/features/lanyard/components/LanyardSkeleton/LanyardSkeleton.tsx:14
 msgid "Loading lanyard…"
@@ -104,37 +197,102 @@ msgstr "Loading your profile…"
 msgid "Loading…"
 msgstr "Loading…"
 
+#: src/features/lanyard/components/blocks/DetailsBlock/DetailsBlock.tsx:27
+msgid "Location"
+msgstr "Location"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:11
+msgid "Mentoring others"
+msgstr "Mentoring others"
+
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:19
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:22
 msgid "Not found"
 msgstr "Not found"
 
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:25
+msgid "Open to"
+msgstr "Open to"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:9
+msgid "ORCID"
+msgstr "ORCID"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:13
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:24
+msgid "Other"
+msgstr "Other"
+
 #: src/components/NotFound/NotFound.tsx:12
 msgid "Page not found"
 msgstr "Page not found"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:20
+msgid "Panel discussion"
+msgstr "Panel discussion"
+
+#: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:7
+msgid "Panellist"
+msgstr "Panellist"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:7
+msgid "Part-time roles"
+msgstr "Part-time roles"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:17
+msgid "Podcast episode"
+msgstr "Podcast episode"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:33
+msgid "Podcasts and videos"
+msgstr "Podcasts and videos"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:27
+msgid "Posts on Bluesky"
+msgstr "Posts on Bluesky"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:21
+msgid "Presentation"
+msgstr "Presentation"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:28
+msgid "Publications"
+msgstr "Publications"
 
 #: src/components/AppError/AppError.tsx:22
 #: src/hooks/usePwaUpdatePrompt.ts:23
 msgid "Reload"
 msgstr "Reload"
 
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:57
+msgid "Retry"
+msgstr "Retry"
+
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:43
 msgid "Search for someone"
 msgstr "Search for someone"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:11
+msgid "Semble"
+msgstr "Semble"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:47
 msgid "Show lanyard"
 msgstr "Show lanyard"
 
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:7
+msgid "Sifa"
+msgstr "Sifa"
+
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:14
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:24
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:63
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:65
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:58
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:60
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -158,10 +316,42 @@ msgstr "Signing in"
 msgid "Signing you in…"
 msgstr "Signing you in…"
 
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:29
+msgid "Skills"
+msgstr "Skills"
+
 #: src/components/AppError/AppError.tsx:13
 #: src/components/AppError/AppError.tsx:21
 msgid "Something went wrong"
 msgstr "Something went wrong"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:7
+msgid "SoundCloud"
+msgstr "SoundCloud"
+
+#: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:5
+msgid "Speaker"
+msgstr "Speaker"
+
+#: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:14
+msgid "Speaking engagements"
+msgstr "Speaking engagements"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:5
+msgid "Spotify"
+msgstr "Spotify"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:8
+msgid "standard.site"
+msgstr "standard.site"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:24
+msgid "Talks"
+msgstr "Talks"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:10
+msgid "Tangled"
+msgstr "Tangled"
 
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:11
 msgid "That doesn't look like a handle — for example alice.bsky.social"
@@ -171,11 +361,11 @@ msgstr "That doesn't look like a handle — for example alice.bsky.social"
 msgid "This account isn't available"
 msgstr "This account isn't available"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:70
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:72
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:60
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:62
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 
@@ -183,10 +373,34 @@ msgstr "This person has chosen to show their lanyard only to people who are sign
 msgid "This sign-in link has expired or was already used."
 msgstr "This sign-in link has expired or was already used."
 
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:12
+msgid "TikTok"
+msgstr "TikTok"
+
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:29
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:37
 msgid "Try again"
 msgstr "Try again"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:22
+msgid "Tutorial"
+msgstr "Tutorial"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:11
+msgid "Twitch"
+msgstr "Twitch"
+
+#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:35
+msgid "Verified on ORCID"
+msgstr "Verified on ORCID"
+
+#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:24
+msgid "View on Bluesky"
+msgstr "View on Bluesky"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:10
+msgid "Vimeo"
+msgstr "Vimeo"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:33
 msgid "We couldn't find @{handle}"
@@ -220,6 +434,10 @@ msgstr "We couldn't load your profile."
 msgid "What you share"
 msgstr "What you share"
 
+#: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:8
+msgid "Workshop"
+msgstr "Workshop"
+
 #: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:44
 msgid "You follow each other"
 msgstr "You follow each other"
@@ -249,3 +467,7 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 #: src/features/auth/components/SignInForm/SignInForm.tsx:88
 msgid "Your handle"
 msgstr "Your handle"
+
+#: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:9
+msgid "YouTube"
+msgstr "YouTube"
