@@ -6,3 +6,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en-GB\n"
+
+#: src/components/Logo/Logo.tsx:16
+msgid "Lanyards"
+msgstr "Lanyards"
