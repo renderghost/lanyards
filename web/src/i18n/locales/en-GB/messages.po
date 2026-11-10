@@ -39,15 +39,15 @@ msgstr "Accent colour"
 msgid "Account unavailable"
 msgstr "Account unavailable"
 
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:109
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:110
 msgid "Add link"
 msgstr "Add link"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:196
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:197
 msgid "Add media"
 msgstr "Add media"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:115
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:116
 msgid "Add this link to the Websites & social links section of your ORCID record:"
 msgstr "Add this link to the Websites & social links section of your ORCID record:"
 
@@ -75,7 +75,7 @@ msgstr "Audio"
 msgid "Audio added"
 msgstr "Audio added"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:51
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:52
 msgid "Audio deleted"
 msgstr "Audio deleted"
 
@@ -103,7 +103,7 @@ msgstr "Bluesky isn't answering right now. Check your connection and try again."
 msgid "Board positions"
 msgstr "Board positions"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:136
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:137
 msgid "Check again"
 msgstr "Check again"
 
@@ -111,12 +111,12 @@ msgstr "Check again"
 msgid "Check the spelling, or search for them."
 msgstr "Check the spelling, or search for them."
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:106
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:107
 msgid "Checking your ORCID iD…"
 msgstr "Checking your ORCID iD…"
 
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:54
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:152
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:153
 msgid "Choose a platform"
 msgstr "Choose a platform"
 
@@ -124,7 +124,7 @@ msgstr "Choose a platform"
 msgid "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 msgstr "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 
-#: src/features/qr/components/QrSheet/QrSheet.tsx:67
+#: src/features/qr/components/QrSheet/QrSheet.tsx:69
 msgid "Close"
 msgstr "Close"
 
@@ -152,8 +152,8 @@ msgstr "Conference talk"
 msgid "Contract roles"
 msgstr "Contract roles"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:126
-#: src/features/qr/components/QrSheet/QrSheet.tsx:63
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:127
+#: src/features/qr/components/QrSheet/QrSheet.tsx:65
 msgid "Copy link"
 msgstr "Copy link"
 
@@ -161,8 +161,8 @@ msgstr "Copy link"
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:91
-#: src/features/qr/components/QrSheet/QrSheet.tsx:36
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:92
+#: src/features/qr/components/QrSheet/QrSheet.tsx:38
 msgid "Couldn't copy the link. Please try again."
 msgstr "Couldn't copy the link. Please try again."
 
@@ -207,17 +207,17 @@ msgstr "Create an account"
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:81
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:79
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:83
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:81
 msgid "Delete"
 msgstr "Delete"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:76
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:74
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:78
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:76
 msgid "Delete {name}"
 msgstr "Delete {name}"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:172
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:173
 msgid "Description"
 msgstr "Description"
 
@@ -263,20 +263,20 @@ msgstr "Enter your handle"
 msgid "Enter your handle, not your email — for example alice.bsky.social"
 msgstr "Enter your handle, not your email — for example alice.bsky.social"
 
-#: src/features/lanyard/hooks/useFollow.ts:95
+#: src/features/lanyard/hooks/useFollow.ts:96
 msgid "Failed to follow. Please try again."
 msgstr "Failed to follow. Please try again."
 
-#: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:63
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:108
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:54
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:70
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:52
+#: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:64
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:109
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:56
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:71
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:54
 #: src/features/lanyard/hooks/useLanyardConfig.ts:184
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
-#: src/features/lanyard/hooks/useFollow.ts:113
+#: src/features/lanyard/hooks/useFollow.ts:115
 msgid "Failed to unfollow. Please try again."
 msgstr "Failed to unfollow. Please try again."
 
@@ -344,7 +344,7 @@ msgstr "Hidden items"
 msgid "Hide this item"
 msgstr "Hide this item"
 
-#: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:72
+#: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:73
 msgid "Honorific"
 msgstr "Honorific"
 
@@ -388,7 +388,7 @@ msgstr "Keep the title to 200 characters or fewer"
 msgid "Keynote"
 msgstr "Keynote"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:181
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:182
 msgid "Kind of content"
 msgstr "Kind of content"
 
@@ -427,15 +427,15 @@ msgid "Link added"
 msgstr "Link added"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:89
-#: src/features/qr/components/QrSheet/QrSheet.tsx:34
+#: src/features/qr/components/QrSheet/QrSheet.tsx:35
 msgid "Link copied"
 msgstr "Link copied"
 
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:50
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:51
 msgid "Link deleted"
 msgstr "Link deleted"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:118
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:119
 msgid "Link to add"
 msgstr "Link to add"
 
@@ -503,7 +503,7 @@ msgstr "None"
 msgid "Not found"
 msgstr "Not found"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:183
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:184
 msgid "Not specified"
 msgstr "Not specified"
 
@@ -519,7 +519,7 @@ msgstr "Nothing to show yet"
 msgid "Ocean"
 msgstr "Ocean"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:129
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:130
 msgid "Open ORCID"
 msgstr "Open ORCID"
 
@@ -536,7 +536,7 @@ msgid "ORCID"
 msgstr "ORCID"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:57
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:103
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:104
 msgid "ORCID iD"
 msgstr "ORCID iD"
 
@@ -565,7 +565,7 @@ msgstr "Part-time roles"
 msgid "Picked up {name}, at position {position} of {total}."
 msgstr "Picked up {name}, at position {position} of {total}."
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:149
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:150
 msgid "Platform"
 msgstr "Platform"
 
@@ -637,7 +637,7 @@ msgstr "Retry {name}"
 msgid "Rose"
 msgstr "Rose"
 
-#: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:96
+#: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:97
 msgid "Save honorific"
 msgstr "Save honorific"
 
@@ -649,7 +649,7 @@ msgstr "Saved"
 msgid "Saving…"
 msgstr "Saving…"
 
-#: src/features/qr/components/QrSheet/QrSheet.tsx:53
+#: src/features/qr/components/QrSheet/QrSheet.tsx:55
 msgid "Scan to see my lanyard"
 msgstr "Scan to see my lanyard"
 
@@ -792,8 +792,8 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:162
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:94
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:163
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:95
 msgid "Title"
 msgstr "Title"
 
@@ -818,11 +818,11 @@ msgstr "Tutorial"
 msgid "Twitch"
 msgstr "Twitch"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:117
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:118
 msgid "Type of media"
 msgstr "Type of media"
 
-#: src/features/lanyard/hooks/useFollow.ts:109
+#: src/features/lanyard/hooks/useFollow.ts:110
 msgid "Unfollowed @{handle}"
 msgstr "Unfollowed @{handle}"
 
@@ -834,7 +834,7 @@ msgstr "Verified on ORCID"
 msgid "Verified. Your publications now show the ORCID tick."
 msgstr "Verified. Your publications now show the ORCID tick."
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:103
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:104
 msgid "Verify your ORCID iD"
 msgstr "Verify your ORCID iD"
 
@@ -846,7 +846,7 @@ msgstr "Video"
 msgid "Video added"
 msgstr "Video added"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:51
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:52
 msgid "Video deleted"
 msgstr "Video deleted"
 
@@ -898,8 +898,8 @@ msgstr "We couldn't load your profile."
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:136
-#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:80
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:137
+#: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:81
 msgid "Web address"
 msgstr "Web address"
 
@@ -942,7 +942,7 @@ msgid "Your handle"
 msgstr "Your handle"
 
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
-#: src/features/qr/components/QrSheet/QrSheet.tsx:27
+#: src/features/qr/components/QrSheet/QrSheet.tsx:28
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
@@ -954,7 +954,7 @@ msgstr "Your Lanyards"
 msgid "Your links"
 msgstr "Your links"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:110
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:111
 msgid "Your ORCID iD is verified"
 msgstr "Your ORCID iD is verified"
 

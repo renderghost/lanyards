@@ -1,5 +1,5 @@
 export const page =
-  'mx-auto grid w-full max-w-6xl gap-8 px-4 py-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]';
+  'grid w-full max-w-6xl self-center gap-8 px-4 py-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]';
 
 export const controls = 'flex min-w-0 flex-col gap-6';
 
