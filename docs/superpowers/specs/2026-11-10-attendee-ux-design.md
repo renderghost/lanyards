@@ -122,6 +122,7 @@ These decisions were agreed in the 2026-11-10 brainstorming session.
 | 57 | Accessibility | WCAG 2.2 AA + AAA where feasible |
 | 58 | Leaving | Itemised deletion: Lanyards records always; shared-lexicon records opt-in |
 | 59 | Architecture | Vite + React SPA (TanStack Router/Query), PWA, one Vercel Edge Function |
+| 60 | Semble (#75) | Optional, default-off Collections block in Slice 1, read-only from `network.cosmik.*` |
 
 ---
 
@@ -206,6 +207,7 @@ Time boundaries use the event's `timezone` field when present, otherwise the dev
 | `skills` | Skills | Sifa `skill` | Off |
 | `education` | Education | Sifa `education` | Off |
 | `code` | Recent repositories | `sh.tangled.repo` | Off |
+| `collections` | Curated collections and recent links | Semble `network.cosmik.collection`, `collectionLink` → `card` (URL cards, with title/site/image metadata) | Off |
 | `media` | Podcasts, videos, interviews | `app.lanyards.link.media.audio` / `.video` | Off |
 | `events` | Other events they're attending | Their upcoming `community.lexicon.calendar.rsvp` (going) | Off |
 | `details` | Location, languages | Sifa `profile.self` (`location`, `langs`) | Off |
@@ -444,6 +446,7 @@ All reads come from the browser, and all are public unless noted.
 | Blog posts | `site.standard.document`, `site.standard.publication` | PDS `listRecords` |
 | Publications | ORCID `/v3.0/{id}/works`, `/researcher-urls` | `pub.orcid.org` (CORS `*`) |
 | Code | `sh.tangled.repo` | PDS `listRecords` |
+| Collections and links | `network.cosmik.collection`, `network.cosmik.collectionLink`, `network.cosmik.card` | PDS `listRecords` |
 | Events | `community.lexicon.calendar.event` | PDS `getRecord` |
 | RSVPs | `community.lexicon.calendar.rsvp` | Own PDS `listRecords`; Constellation backlinks for attendees |
 | Ticket acceptance | `events.smokesignal.calendar.acceptance` | Constellation backlinks / PDS |
@@ -575,7 +578,7 @@ All other `app.lanyards.*` lexicons are retired. They are read only by the migra
 | Unit | Responsibility | Depends on |
 |---|---|---|
 | `lib/atproto` | XRPC clients per PDS, DID/handle resolution (cached), OAuth session, and the **write builder** (typed `applyWrites` operations, client-side record keys, optimistic cache updates, undo handles) | atcute |
-| `lib/sources/<name>` | One adapter per source: `bluesky`, `sifa`, `standardSite`, `orcid`, `tangled`, `calendar`, `constellation`, `smokesignal`, `lanyards`. Contract: `(did \| uri) → Promise<Result<NormalisedType, SourceError>>`. Adapters never import each other | `lib/atproto` |
+| `lib/sources/<name>` | One adapter per source: `bluesky`, `sifa`, `standardSite`, `orcid`, `tangled`, `semble`, `calendar`, `constellation`, `smokesignal`, `lanyards`. Contract: `(did \| uri) → Promise<Result<NormalisedType, SourceError>>`. Adapters never import each other | `lib/atproto` |
 | `lib/person` | Composes adapters into `PersonView`; deduplication (URL normalisation, DOI); applies owner config (order, visibility, limits, hidden, event overrides); shared-context computation | `lib/sources` |
 | `lib/events` | Pack model, Before/During/After state machine, attendee aggregation, smart sort, programme assembly | `lib/sources` |
 | `lib/device` | Dexie stores, export/import, write queue | Dexie |
@@ -737,7 +740,7 @@ Each slice is complete, tested and shippable to `next.lanyards.app`, and gets it
   - environments and the Vercel project
   - lexicon publishing and `app.lanyards.authFull`
   - OAuth (sign-in, sign-up via the PDS, scopes, session handling)
-- **Adapters and model:** `bluesky`, `sifa`, `standardSite`, `orcid`, `tangled`, `lanyards`; `PersonView`.
+- **Adapters and model:** `bluesky`, `sifa`, `standardSite`, `orcid`, `tangled`, `semble` (#75), `lanyards`; `PersonView`.
 - **Public pages:** `/@:handle` and `/d/:did` (without event context), and the `api/meta` edge function with OG images. In this slice, `/d/:did` offers **Follow** to signed-in scanners; **Connect** replaces it in Slice 3.
 - **Navigation:** the signed-in landing page is `/lanyard`, with Settings behind the avatar. The Home tab arrives in Slice 2 and the People tab in Slice 3.
 - **Lanyard:**
@@ -817,6 +820,7 @@ These are facts to confirm during planning. Each has a defined fallback, so no r
 | 7 | Record hydration for large RSVP sets: direct PDS reads vs microcosm Slingshot cache | Direct PDS reads with concurrency limits (Slingshot needs explicit approval as an extra dependency) |
 | 8 | That `include:id.sifa.authProfile` covers every migration target collection (§11) | Request `repo:` scopes per collection |
 | 9 | How to find the Smoke Signal `acceptance` record for an RSVP (it references a CID, which may not be backlink-indexed) | Show RSVP status only, with no "accepted" badge |
+| 10 | Semble's public profile and collection URL format, for "View on Semble" links | Link each card to its own URL and omit the Semble link |
 
 ---
 
@@ -826,6 +830,7 @@ These are facts to confirm during planning. Each has a defined fallback, so no r
 - Lexicon Community calendar and location: `tangled.org/lexicon.community/lexicons`.
 - youandme.at: `_lexicon.youandme.at` → `did:plc:zfgfhm7mpslcdc3mk3z6sebw`, schema `at.youandme.connection`.
 - standard.site: published on `did:plc:re3ebnp5v7ffagz6rb6xfei4`.
+- Semble: `_lexicon.cosmik.network` → `did:plc:b2p6rujcgpenbtcjposmjuc3` (`network.cosmik.card`, `collection`, `collectionLink`; about 1,100 accounts).
 - Bluesky lexicons: `github.com/bluesky-social/bsky`; PDS rate limits from the PDS source.
 - Constellation: `constellation.microcosm.blue`. Verified 2026-11-10: 30 RSVP backlinks returned for a live Atmo event, CORS `*`.
 - Smoke Signal search: `smokesignal.events/xrpc/community.lexicon.calendar.searchEvents` (CORS `*`).
