@@ -15,25 +15,25 @@ const HOST = 'https://eu.i.posthog.com';
 describe('initAnalytics', () => {
   it('stays off without a project key', async () => {
     const { initAnalytics } = await load();
-    expect(
+    await expect(
       initAnalytics({ key: undefined, host: HOST, doNotTrack: false })
-    ).toBe(false);
+    ).resolves.toBe(false);
     expect(posthog.init).not.toHaveBeenCalled();
   });
 
   it('stays off when the browser asks not to be tracked', async () => {
     const { initAnalytics } = await load();
-    expect(initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: true })).toBe(
-      false
-    );
+    await expect(
+      initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: true })
+    ).resolves.toBe(false);
     expect(posthog.init).not.toHaveBeenCalled();
   });
 
   it('starts PostHog cookieless, anonymous and without autocapture', async () => {
     const { initAnalytics } = await load();
-    expect(initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: false })).toBe(
-      true
-    );
+    await expect(
+      initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: false })
+    ).resolves.toBe(true);
     expect(posthog.init).toHaveBeenCalledWith(
       'phc_x',
       expect.objectContaining({
@@ -58,18 +58,31 @@ describe('track', () => {
 
   it('sends events with identifying values removed', async () => {
     const { initAnalytics, track } = await load();
-    initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: false });
+    await initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: false });
     track('sign_in_failed', { reason: 'denied', who: 'did:plc:abc' });
     expect(posthog.capture).toHaveBeenCalledWith('sign_in_failed', {
       reason: 'denied',
     });
+  });
+
+  it('buffers events sent while PostHog is still loading', async () => {
+    const { initAnalytics, track } = await load();
+    const ready = initAnalytics({
+      key: 'phc_x',
+      host: HOST,
+      doNotTrack: false,
+    });
+    track('app_opened');
+    expect(posthog.capture).not.toHaveBeenCalled();
+    await ready;
+    expect(posthog.capture).toHaveBeenCalledWith('app_opened', undefined);
   });
 });
 
 describe('captureError', () => {
   it('reports a sanitised error with its source', async () => {
     const { captureError, initAnalytics } = await load();
-    initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: false });
+    await initAnalytics({ key: 'phc_x', host: HOST, doNotTrack: false });
     captureError(new Error('boom for did:plc:abc'), { source: 'route' });
     expect(posthog.capture).toHaveBeenCalledWith('app_error', {
       name: 'Error',
@@ -82,5 +95,21 @@ describe('captureError', () => {
     const { captureError } = await load();
     captureError(new Error('boom'), { source: 'route' });
     expect(posthog.capture).not.toHaveBeenCalled();
+  });
+});
+
+describe('browserDoNotTrack', () => {
+  it('honours Do Not Track and Global Privacy Control', async () => {
+    const { browserDoNotTrack } = await load();
+    const set = (name: string, value: unknown) =>
+      Object.defineProperty(navigator, name, { value, configurable: true });
+    set('doNotTrack', '1');
+    expect(browserDoNotTrack()).toBe(true);
+    set('doNotTrack', '0');
+    expect(browserDoNotTrack()).toBe(false);
+    set('globalPrivacyControl', true);
+    expect(browserDoNotTrack()).toBe(true);
+    Reflect.deleteProperty(navigator, 'globalPrivacyControl');
+    Reflect.deleteProperty(navigator, 'doNotTrack');
   });
 });

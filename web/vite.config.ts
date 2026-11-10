@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from 'node:url';
 
 import { lingui } from '@lingui/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
+import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
@@ -10,6 +11,7 @@ import { oauthMetadataPlugin } from './plugins/oauthMetadata';
 
 export default defineConfig({
   plugins: [
+    tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
     lingui({ macroTransform: true }),
     tailwindcss(),
