@@ -22,3 +22,7 @@ Run everything from `web/`:
 | `npm run format`    | Prettier                                                |
 
 Copy `.env.example` to `.env.local` for local overrides.
+
+`npm run size` checks the initial JavaScript against the 200 KB gzipped
+budget after a build. If your environment ships its own Chromium, point the
+e2e tests at it with `PW_CHROMIUM_PATH=/path/to/chromium npm run e2e`.

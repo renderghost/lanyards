@@ -45,6 +45,8 @@ export default defineConfig({
     }),
   ],
   build: {
+    // Read by scripts/check-bundle-size.ts to enforce the JS budget.
+    manifest: true,
     rolldownOptions: {
       output: {
         codeSplitting: {

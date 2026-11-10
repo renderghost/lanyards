@@ -31,5 +31,10 @@ export default tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'warn',
     },
+  },
+  {
+    // Playwright fixtures call `use()`, which is not React's hook.
+    files: ['e2e/**'],
+    rules: { 'react-hooks/rules-of-hooks': 'off' },
   }
 );

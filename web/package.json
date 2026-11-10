@@ -17,7 +17,8 @@
     "e2e": "playwright test --trace off",
     "format": "prettier --write .",
     "i18n:extract": "lingui extract --clean",
-    "i18n:check": "lingui extract --clean && git diff --exit-code src/i18n/locales"
+    "i18n:check": "lingui extract --clean && git diff --exit-code src/i18n/locales",
+    "size": "tsx scripts/check-bundle-size.ts"
   },
   "dependencies": {
     "@atcute/bluesky": "^4.0.26",
@@ -42,9 +43,11 @@
     "tailwind-merge": "^3.7.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
     "@eslint/js": "^10.0.1",
     "@lingui/cli": "^6.12.0",
     "@lingui/vite-plugin": "^6.12.0",
+    "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/router-cli": "^1.168.0",
     "@tanstack/router-plugin": "^1.169.0",
@@ -66,6 +69,7 @@
     "msw": "^3.0.4",
     "prettier": "^3.9.10",
     "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.2",
     "vite": "^8.3.7",
