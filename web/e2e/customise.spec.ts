@@ -93,6 +93,58 @@ test.describe('lanyard customiser', () => {
     ).toEqual(['talks', 'links']);
   });
 
+  test('moves blocks without animation when motion is reduced', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await openCustomiser(page);
+    const editor = page.getByRole('region', { name: 'Blocks' });
+    await editor.getByRole('button', { name: 'Reorder Links' }).focus();
+    await page.keyboard.press('Space');
+    await expect(
+      page.getByText('Picked up Links, at position 1 of 12.')
+    ).toBeAttached();
+    await page.keyboard.press('ArrowDown');
+    await expect(
+      page.getByText('Links is over position 2 of 12.')
+    ).toBeAttached();
+    const animated = await editor.getByRole('listitem').evaluateAll((rows) =>
+      rows.filter((row) => {
+        const style = getComputedStyle(row);
+        return (
+          style.transitionProperty !== 'none' &&
+          style.transitionDuration
+            .split(',')
+            .some((duration) => Number.parseFloat(duration) > 0)
+        );
+      })
+    );
+    expect(animated).toHaveLength(0);
+    await page.keyboard.press('Space');
+    await expect(
+      page.getByText('Links moved to position 2 of 12')
+    ).toBeAttached();
+  });
+
+  test('gives every edit link a 44 px target', async ({ page }) => {
+    // An empty block shows its edit links in the editor as well.
+    await mockPerson(page, {
+      sifa: { presentations: [], presentationDeliveries: [] },
+    });
+    await openCustomiser(page);
+    const name = /^Edit (on|in) /;
+    const editor = page.getByRole('region', { name: 'Blocks' });
+    const preview = page.getByRole('region', { name: 'Preview' });
+    await expect(editor.getByRole('link', { name }).first()).toBeVisible();
+    await expect(preview.getByRole('link', { name }).first()).toBeVisible();
+    const heights = await page
+      .getByRole('link', { name })
+      .evaluateAll((links) =>
+        links.map((link) => link.getBoundingClientRect().height)
+      );
+    expect(Math.min(...heights)).toBeGreaterThanOrEqual(44);
+  });
+
   test('turns a block off and changes the accent, saving both', async ({
     page,
   }) => {

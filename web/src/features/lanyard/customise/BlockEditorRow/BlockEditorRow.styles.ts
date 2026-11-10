@@ -1,5 +1,6 @@
+// dnd-kit sets the move transition inline; motion-reduce overrides it.
 export const row =
-  'flex flex-col gap-3 rounded-md border border-border bg-surface p-3';
+  'flex flex-col gap-3 rounded-md border border-border bg-surface p-3 motion-reduce:transition-none!';
 
 export const dragging = 'relative z-10 shadow-lg ring-2 ring-foreground';
 
@@ -35,4 +36,4 @@ export const status = 'flex flex-wrap items-center gap-x-3 gap-y-1';
 export const statusText = 'text-sm leading-5 text-muted-foreground';
 
 export const editLink =
-  'text-sm leading-5 text-accent-text underline-offset-4 hover:underline';
+  'inline-flex min-h-11 items-center text-sm leading-5 text-accent-text underline-offset-4 hover:underline';
