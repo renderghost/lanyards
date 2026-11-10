@@ -3,6 +3,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { useSession } from '@/features/auth/session/useSession';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { safeReturnTo } from '@/lib/atproto/oauthConfig';
 
 import { SignInForm } from '../SignInForm/SignInForm';
@@ -14,6 +15,7 @@ export function LandingPage({ returnTo }: LandingPageProps) {
   const { t } = useLingui();
   const session = useSession();
   const router = useRouter();
+  useDocumentTitle(t`Sign in`);
   const safe = safeReturnTo(returnTo);
   const destination = safe === '/' ? SIGNED_IN_HOME : safe;
 

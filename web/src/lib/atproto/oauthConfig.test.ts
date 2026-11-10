@@ -71,6 +71,9 @@ describe('resolveBaseUrl', () => {
 describe('safeReturnTo', () => {
   it('keeps same-origin paths', () => {
     expect(safeReturnTo('/settings')).toBe('/settings');
+    expect(safeReturnTo('/settings?tab=data#top')).toBe(
+      '/settings?tab=data#top'
+    );
     expect(safeReturnTo('/e/did:plc:abc/3k?x=1')).toBe('/e/did:plc:abc/3k?x=1');
   });
 
@@ -84,7 +87,11 @@ describe('safeReturnTo', () => {
     '',
     'settings',
     '/' + 'a'.repeat(600),
-  ])('replaces %s with the home page', (bad) => {
+    '/\t/evil.com',
+    '/\n/evil.com',
+    '/ /evil.com',
+    '/\u0000x',
+  ])('replaces %j with the home page', (bad) => {
     expect(safeReturnTo(bad)).toBe('/');
   });
 });

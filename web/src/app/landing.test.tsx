@@ -34,6 +34,7 @@ describe('landing page', () => {
       })
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+    expect(document.title).toBe('Sign in · Lanyards');
   });
 
   it('sends a signed-in visitor to their account', async () => {

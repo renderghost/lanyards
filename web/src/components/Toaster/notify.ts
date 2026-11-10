@@ -9,6 +9,10 @@ const toActionOptions = (options?: NotifyOptions) =>
           label: options.action.label,
           onClick: () => options.action?.onClick(),
         },
+        // Action toasts stay until dismissed, with a close button, so nobody
+        // has to beat a timer to use them (WCAG 2.2.1).
+        duration: Number.POSITIVE_INFINITY,
+        closeButton: true,
       }
     : {};
 

@@ -96,6 +96,21 @@ describe('HandleCombobox', () => {
     );
   });
 
+  it('only reports itself expanded when suggestions are showing', async () => {
+    server.use(
+      http.get(TYPEAHEAD_URL, respondWith({ ali: { actors: [ALICE] } }))
+    );
+    renderWithProviders(<Harness />);
+    const input = screen.getByRole('combobox', { name: 'Your handle' });
+    await userEvent.type(input, 'zz');
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'ali');
+    await screen.findByRole('option', { name: /alice\.bsky\.social/ });
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('fills in the handle when a suggestion is chosen', async () => {
     server.use(
       http.get(TYPEAHEAD_URL, respondWith({ ali: { actors: [ALICE] } }))

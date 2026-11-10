@@ -17,6 +17,14 @@ export const DEV_BASE_URL = 'http://127.0.0.1:5173';
 
 const LOOPBACK_ORIGIN = /^http:\/\/127\.0\.0\.1:\d+$/;
 const MAX_RETURN_TO_LENGTH = 512;
+// Browsers strip tabs and newlines from URLs, so '/\t/evil.com' would
+// resolve off-origin. Reject control characters and spaces outright.
+const hasControlOrSpace = (value: string) =>
+  Array.from(value).some((char) => {
+    const code = char.charCodeAt(0);
+    return code <= 0x20 || code === 0x7f;
+  });
+const SAFE_BASE = 'https://lanyards.invalid';
 
 export type ClientMetadata = {
   client_id: string;
@@ -90,16 +98,27 @@ export function buildOAuthEnv(baseUrl: string, scope: string): OAuthEnv {
   };
 }
 
-/** Returns `value` only when it is a same-origin path; otherwise '/'. */
+/**
+ * Returns `value` only when it is a same-origin path (with optional query and
+ * fragment), normalised as a browser would resolve it; otherwise '/'.
+ */
 export function safeReturnTo(value: unknown): string {
   if (
     typeof value !== 'string' ||
     value.length > MAX_RETURN_TO_LENGTH ||
     !value.startsWith('/') ||
     value.startsWith('//') ||
-    value.includes('\\')
+    value.includes('\\') ||
+    hasControlOrSpace(value)
   ) {
     return '/';
   }
-  return value;
+  let url: URL;
+  try {
+    url = new URL(value, SAFE_BASE);
+  } catch {
+    return '/';
+  }
+  if (url.origin !== SAFE_BASE) return '/';
+  return `${url.pathname}${url.search}${url.hash}`;
 }

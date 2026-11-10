@@ -1,18 +1,27 @@
 import {
   createAuthorizationUrl,
   deleteStoredSession,
+  LoginError,
   finalizeAuthorization,
   getSession,
+  OAuthResponseError,
   TokenRefreshError,
 } from '@atcute/oauth-browser-client';
 import type { Did } from '@atcute/lexicons';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import {
+  DidNotFoundError,
+  DocumentNotFoundError,
+  FailedHandleResolutionError,
+} from '@atcute/identity-resolver';
 
 import { track } from '@/lib/analytics/analytics';
 
 import { DID_STORAGE_KEY } from './oauthConfig';
 import {
   completeSignIn,
+  isUnknownAccountError,
   OAuthCallbackError,
   restoreSession,
   signOut,
@@ -61,7 +70,8 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  vi.clearAllMocks();
+  // Reset, not just clear: unused one-time results must not leak between tests.
+  vi.resetAllMocks();
 });
 
 describe('startSignIn', () => {
@@ -78,6 +88,28 @@ describe('startSignIn', () => {
     });
     expect(assign).toHaveBeenCalledWith(url);
     expect(track).toHaveBeenCalledWith('sign_in_started');
+  });
+});
+
+describe('isUnknownAccountError', () => {
+  it('recognises handles and DIDs that do not exist', () => {
+    expect(
+      isUnknownAccountError(new DidNotFoundError('alise.bsky.social'))
+    ).toBe(true);
+    expect(
+      isUnknownAccountError(new DocumentNotFoundError('did:plc:abc' as Did))
+    ).toBe(true);
+  });
+
+  it('treats network failures as system errors', () => {
+    expect(
+      isUnknownAccountError(
+        new FailedHandleResolutionError('alice.bsky.social', {
+          cause: new TypeError('Failed to fetch'),
+        })
+      )
+    ).toBe(false);
+    expect(isUnknownAccountError(new Error('boom'))).toBe(false);
   });
 });
 
@@ -120,6 +152,16 @@ describe('completeSignIn', () => {
     expect(error).toBeInstanceOf(OAuthCallbackError);
     expect(error).toMatchObject({ code: 'failed' });
     expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'failed' });
+  });
+
+  it('reports a replayed or consumed callback as missing', async () => {
+    vi.mocked(finalizeAuthorization).mockRejectedValue(
+      new LoginError('unknown state provided')
+    );
+    await expect(completeSignIn('#code=abc&state=used')).rejects.toMatchObject({
+      code: 'missing',
+    });
+    expect(track).toHaveBeenCalledWith('sign_in_failed', { reason: 'missing' });
   });
 
   it('stores the DID and returns the requested path', async () => {
@@ -181,6 +223,58 @@ describe('restoreSession', () => {
     expect(getSession).toHaveBeenLastCalledWith(DID, { allowStale: true });
     expect(deleteStoredSession).not.toHaveBeenCalled();
     expect(localStorage.getItem(DID_STORAGE_KEY)).toBe(DID);
+  });
+});
+
+describe('restoreSession resilience', () => {
+  const oauthError = (status: number) =>
+    new OAuthResponseError(new Response(null, { status }), {
+      error: status >= 500 ? 'server_error' : 'invalid_request',
+    });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('treats blocked browser storage as signed out', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new DOMException('Storage is disabled', 'SecurityError');
+    });
+    await expect(restoreSession()).resolves.toEqual({ status: 'none' });
+  });
+
+  it('expires the session on a 4xx refresh error', async () => {
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession)
+      .mockRejectedValueOnce(oauthError(400))
+      .mockResolvedValueOnce(fakeSession);
+    await expect(restoreSession()).resolves.toEqual({ status: 'expired' });
+    expect(getSession).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem(DID_STORAGE_KEY)).toBeNull();
+  });
+
+  it('keeps the stale session when the server has a 5xx problem', async () => {
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession)
+      .mockRejectedValueOnce(oauthError(503))
+      .mockResolvedValueOnce(fakeSession);
+    const result = await restoreSession();
+    expect(result.status).toBe('restored');
+    expect(getSession).toHaveBeenLastCalledWith(DID, { allowStale: true });
+  });
+
+  it('stops waiting for a stalled refresh and keeps the stale session', async () => {
+    vi.useFakeTimers();
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession)
+      .mockReturnValueOnce(new Promise(() => undefined))
+      .mockResolvedValueOnce(fakeSession);
+    const pending = restoreSession();
+    await vi.advanceTimersByTimeAsync(8000);
+    const result = await pending;
+    expect(result.status).toBe('restored');
+    expect(getSession).toHaveBeenLastCalledWith(DID, { allowStale: true });
   });
 });
 

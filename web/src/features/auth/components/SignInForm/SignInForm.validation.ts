@@ -1,6 +1,7 @@
 import { isDid, isHandle } from '@atcute/lexicons/syntax';
 
-export type SignInError = 'required' | 'email' | 'invalid';
+/** Problems shown inline under the handle field. */
+export type SignInError = 'required' | 'email' | 'invalid' | 'notFound';
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

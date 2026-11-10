@@ -16,12 +16,20 @@ describe('OfflineBanner', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       "You're offline. Some things won't work until you reconnect."
     );
+    expect(screen.getByRole('status').className).toContain(
+      'env(safe-area-inset-bottom)'
+    );
     await expectNoAxeViolations(container);
   });
 
-  it('renders nothing while online', () => {
+  it('keeps an empty live region while online, so changes are announced', () => {
     vi.mocked(useOnlineStatus).mockReturnValue(true);
-    const { container } = renderWithProviders(<OfflineBanner />);
-    expect(container).toBeEmptyDOMElement();
+    const { rerender } = renderWithProviders(<OfflineBanner />);
+    const region = screen.getByRole('status');
+    expect(region).toBeEmptyDOMElement();
+    vi.mocked(useOnlineStatus).mockReturnValue(false);
+    rerender(<OfflineBanner />);
+    expect(screen.getByRole('status')).toBe(region);
+    expect(region).toHaveTextContent("You're offline");
   });
 });

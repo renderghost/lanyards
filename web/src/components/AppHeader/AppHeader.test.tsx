@@ -43,6 +43,18 @@ describe('AppHeader', () => {
     ).toHaveAttribute('href', '/settings');
   });
 
+  it('clears the top safe area in the installed app', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    vi.mocked(useProfile).mockReturnValue({ data: undefined } as never);
+    renderInRouter(<AppHeader />);
+    const header = await screen.findByRole('banner');
+    expect(header.className).toContain('env(safe-area-inset-top)');
+  });
+
   it('has no axe violations', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedIn',

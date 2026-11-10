@@ -9,10 +9,12 @@ import type { OfflineBannerProps } from './OfflineBanner.types';
 export function OfflineBanner({ className }: OfflineBannerProps) {
   const { t } = useLingui();
   const online = useOnlineStatus();
-  if (online) return null;
+  // The live region stays mounted so screen readers announce the change.
   return (
-    <p role="status" className={cn(styles.banner, className)}>
-      {t`You're offline. Some things won't work until you reconnect.`}
+    <p role="status" className={cn(!online && styles.banner, className)}>
+      {online
+        ? ''
+        : t`You're offline. Some things won't work until you reconnect.`}
     </p>
   );
 }

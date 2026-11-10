@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useEffect } from 'react';
 
 import { Button } from '@/components/Button/Button';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { captureError } from '@/lib/analytics/analytics';
 
 import * as styles from './AppError.styles';
@@ -9,6 +10,7 @@ import type { AppErrorProps } from './AppError.types';
 
 export function AppError({ error }: AppErrorProps) {
   const { t } = useLingui();
+  useDocumentTitle(t`Something went wrong`);
 
   useEffect(() => {
     captureError(error, { source: 'route' });

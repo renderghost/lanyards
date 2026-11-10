@@ -11,6 +11,7 @@ export function CallbackStatus({ status }: CallbackStatusProps) {
   if (status === 'working') {
     return (
       <section className={styles.page}>
+        <h1 className={styles.heading}>{t`Sign in`}</h1>
         <p role="status" aria-live="polite" className={styles.message}>
           {t`Signing you in…`}
         </p>
@@ -20,6 +21,7 @@ export function CallbackStatus({ status }: CallbackStatusProps) {
 
   return (
     <section className={styles.page}>
+      <h1 className={styles.heading}>{t`Sign in`}</h1>
       <p role="alert" className={styles.message}>
         {t(ERROR_COPY[status])}
       </p>

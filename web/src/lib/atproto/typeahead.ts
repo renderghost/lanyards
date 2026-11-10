@@ -17,7 +17,8 @@ export const TYPEAHEAD_MIN_LENGTH = 2;
 
 /**
  * Suggests accounts for a partially typed handle. Resolves to an empty list,
- * without a request, for queries shorter than two characters. Rejects on
+ * without a request, for queries shorter than two characters and for
+ * anything that looks like an email address or a DID. Rejects on
  * network errors, AppView errors and aborts.
  */
 export async function searchHandles(
@@ -26,6 +27,8 @@ export async function searchHandles(
 ): Promise<HandleSuggestion[]> {
   const q = query.trim().replace(/^@/, '');
   if (q.length < TYPEAHEAD_MIN_LENGTH) return [];
+  // Never send an email address or a DID to a third-party search.
+  if (q.includes('@') || q.startsWith('did:')) return [];
 
   const data = await ok(
     publicAppView.get('app.bsky.actor.searchActorsTypeahead', {

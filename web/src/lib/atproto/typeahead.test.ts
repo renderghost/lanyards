@@ -52,6 +52,15 @@ describe('searchHandles', () => {
     await expect(searchHandles(' ')).resolves.toEqual([]);
   });
 
+  it('never sends email addresses or DIDs to the AppView', async () => {
+    // Any request would be unhandled and fail the test.
+    await expect(searchHandles('me@example.com')).resolves.toEqual([]);
+    await expect(searchHandles('@me@example.com')).resolves.toEqual([]);
+    await expect(
+      searchHandles('did:plc:ewvi7nxzyoun6zhxrhs64oiz')
+    ).resolves.toEqual([]);
+  });
+
   it('rejects with an AbortError when aborted', async () => {
     server.use(
       http.get(TYPEAHEAD_URL, async () => {
