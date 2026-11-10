@@ -95,7 +95,7 @@ export function LanyardPage({
 
   return (
     <article className={cn(styles.page, className)}>
-      <BadgeHero hero={view.hero} />
+      <BadgeHero hero={view.hero} headingLevel={preview ? 2 : 1} />
       {!preview && (
         <>
           <SharedContextStrip

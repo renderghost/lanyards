@@ -137,9 +137,9 @@ function Customiser({
   return (
     <div className={cn(styles.page, className)}>
       <section aria-labelledby={headingId} className={styles.controls}>
-        <h2 id={headingId} className={styles.heading}>
+        <h1 id={headingId} className={styles.heading}>
           {t`Customise your lanyard`}
-        </h2>
+        </h1>
         {!canEdit && <PermissionNotice returnTo={CUSTOMISE_PATH} />}
         {lanyard.invalid && (
           <div role="status" className={styles.notice}>
@@ -207,16 +207,16 @@ function Customiser({
           disabled={!canKeep || kept.status !== 'success'}
         />
         <section aria-labelledby={linksId} className={styles.kept}>
-          <h3 id={linksId} className={styles.subheading}>
+          <h2 id={linksId} className={styles.subheading}>
             {t`Your links`}
-          </h3>
+          </h2>
           <WebLinkList links={kept.data?.webLinks ?? []} disabled={!canKeep} />
           <WebLinkForm disabled={!canKeep} />
         </section>
         <section aria-labelledby={mediaId} className={styles.kept}>
-          <h3 id={mediaId} className={styles.subheading}>
+          <h2 id={mediaId} className={styles.subheading}>
             {t`Your podcasts and videos`}
-          </h3>
+          </h2>
           <MediaList items={kept.data?.media ?? []} disabled={!canKeep} />
           <MediaForm disabled={!canKeep} />
         </section>

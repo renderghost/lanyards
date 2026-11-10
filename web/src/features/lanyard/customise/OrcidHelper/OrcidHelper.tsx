@@ -53,9 +53,9 @@ export function OrcidHelper({
         aria-labelledby={headingId}
         className={cn(styles.section, className)}
       >
-        <h3 id={headingId} className={styles.heading}>
+        <h2 id={headingId} className={styles.heading}>
           {t`ORCID iD`}
-        </h3>
+        </h2>
         <p className={styles.text}>
           {t`Add your ORCID iD on Sifa to show verified publications.`}
         </p>
@@ -99,9 +99,9 @@ export function OrcidHelper({
       aria-labelledby={headingId}
       className={cn(styles.section, className)}
     >
-      <h3 id={headingId} className={styles.heading}>
+      <h2 id={headingId} className={styles.heading}>
         {pending || verified ? t`ORCID iD` : t`Verify your ORCID iD`}
-      </h3>
+      </h2>
       {pending ? (
         <p className={styles.text}>{t`Checking your ORCID iD…`}</p>
       ) : verified ? (

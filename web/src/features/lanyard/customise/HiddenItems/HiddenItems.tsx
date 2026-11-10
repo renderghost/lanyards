@@ -30,9 +30,9 @@ export function HiddenItems({
       aria-labelledby={headingId}
       className={cn(styles.section, className)}
     >
-      <h3 id={headingId} className={styles.heading}>
+      <h2 id={headingId} className={styles.heading}>
         {t`Hidden items`}
-      </h3>
+      </h2>
       <ul className={styles.list}>
         {items.map((entry, index) => {
           const titleId = `${headingId}-${index}`;

@@ -80,7 +80,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(
       await within(region).findByRole(
         'heading',
-        { level: 1, name: 'Dr Ada Example' },
+        { level: 2, name: 'Dr Ada Example' },
         { timeout: 5000 }
       )
     ).toBeInTheDocument();
@@ -90,6 +90,20 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       })
     ).not.toHaveLength(0);
     expect(document.title).toBe('Your lanyard · Lanyards');
+  });
+
+  it('gives the page one level-one heading, its purpose', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const region = await preview();
+    await within(region).findByRole(
+      'heading',
+      { level: 2, name: 'Dr Ada Example' },
+      { timeout: 5000 }
+    );
+    expect(
+      screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)
+    ).toEqual(['Customise your lanyard']);
   });
 
   it('switches the preview to what visitors see', async () => {
@@ -291,7 +305,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const region = await preview();
     await within(region).findByRole(
       'heading',
-      { level: 1, name: 'Dr Ada Example' },
+      { level: 2, name: 'Dr Ada Example' },
       { timeout: 5000 }
     );
     await expectNoAxeViolations(container);

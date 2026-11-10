@@ -107,9 +107,9 @@ export function BlockEditor({
       aria-labelledby={headingId}
       className={cn(styles.section, className)}
     >
-      <h3 id={headingId} className={styles.heading}>
+      <h2 id={headingId} className={styles.heading}>
         {t`Blocks`}
-      </h3>
+      </h2>
       <p className={styles.hint}>
         {t`Choose which blocks your lanyard shows, in what order, and how many items each shows.`}
       </p>

@@ -179,8 +179,11 @@ test.describe('lanyard customiser', () => {
       await page.emulateMedia({ colorScheme });
       await openCustomiser(page);
       await expect(
-        page.getByRole('heading', { level: 1, name: 'Dr Ada Example' })
+        page.getByRole('heading', { level: 2, name: 'Dr Ada Example' })
       ).toBeVisible();
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(
+        'Customise your lanyard'
+      );
       const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
       expect(result.violations).toEqual([]);
     });
