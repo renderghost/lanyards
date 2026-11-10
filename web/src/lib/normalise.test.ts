@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { normaliseDoi, normaliseUrl, safeHref } from './normalise';
+import { hostOf, normaliseDoi, normaliseUrl, safeHref } from './normalise';
 
 describe('safeHref', () => {
   it.each([
@@ -61,5 +61,17 @@ describe('normaliseDoi', () => {
 
   it.each(['', 'abc', '11.1000/abc'])('rejects %s', (input) => {
     expect(normaliseDoi(input)).toBeNull();
+  });
+});
+
+describe('hostOf', () => {
+  it('names a URL by its host, without www', () => {
+    expect(hostOf('https://www.podcasts.example/ep/1')).toBe(
+      'podcasts.example'
+    );
+  });
+
+  it('returns anything that is not a URL as it is', () => {
+    expect(hostOf('not a url')).toBe('not a url');
   });
 });

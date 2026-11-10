@@ -65,6 +65,36 @@ describe('BlockSection', () => {
     ).toBeInTheDocument();
   });
 
+  it('links the owner to where each source is edited, not visitors', () => {
+    const editLinks = [
+      { label: 'Edit on Sifa', url: 'https://sifa.id/p/alice.test?edit=true' },
+      { label: 'Edit in Bluesky', url: 'https://bsky.app/profile/alice.test' },
+    ];
+    const { rerender } = renderWithProviders(
+      <BlockSection heading="Links" status="ready" owner editLinks={editLinks}>
+        <p>Items</p>
+      </BlockSection>
+    );
+    expect(screen.getByRole('link', { name: /Edit on Sifa/ })).toHaveAttribute(
+      'href',
+      'https://sifa.id/p/alice.test?edit=true'
+    );
+    expect(
+      screen.getByRole('link', { name: /Edit in Bluesky/ })
+    ).toHaveAttribute('href', 'https://bsky.app/profile/alice.test');
+    rerender(
+      <BlockSection
+        heading="Links"
+        status="ready"
+        owner={false}
+        editLinks={editLinks}
+      >
+        <p>Items</p>
+      </BlockSection>
+    );
+    expect(screen.queryByRole('link')).toBeNull();
+  });
+
   it('never shows failures to visitors', () => {
     renderWithProviders(
       <BlockSection

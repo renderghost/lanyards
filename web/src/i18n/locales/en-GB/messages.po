@@ -11,9 +11,21 @@ msgstr ""
 msgid "(opens in a new tab)"
 msgstr "(opens in a new tab)"
 
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:93
+msgid "{name} is over position {position} of {total}."
+msgstr "{name} is over position {position} of {total}."
+
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:65
+msgid "{name} moved to position {position} of {total}"
+msgstr "{name} moved to position {position} of {total}"
+
 #: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:31
 msgid "{others, plural, one {# other} other {# others}}"
 msgstr "{others, plural, one {# other} other {# others}}"
+
+#: src/features/lanyard/components/blocks/itemTitle.ts:21
+msgid "{title} at {eventName}"
+msgstr "{title} at {eventName}"
 
 #: src/hooks/usePwaUpdatePrompt.ts:21
 msgid "A new version of Lanyards is available"
@@ -27,6 +39,10 @@ msgstr "Accent colour"
 msgid "Account unavailable"
 msgstr "Account unavailable"
 
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:26
+msgid "An item that is no longer available"
+msgstr "An item that is no longer available"
+
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:8
 msgid "Anchor"
 msgstr "Anchor"
@@ -38,6 +54,10 @@ msgstr "Apple Podcasts"
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:12
 msgid "Being mentored"
 msgstr "Being mentored"
+
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:111
+msgid "Blocks"
+msgstr "Blocks"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:26
 msgid "Blog posts"
@@ -58,6 +78,10 @@ msgstr "Board positions"
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:38
 msgid "Check the spelling, or search for them."
 msgstr "Check the spelling, or search for them."
+
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:114
+msgid "Choose which blocks your lanyard shows, in what order, and how many items each shows."
+msgstr "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:31
 msgid "Code"
@@ -87,7 +111,11 @@ msgstr "Contract roles"
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:54
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:147
+msgid "Couldn't load {failed}"
+msgstr "Couldn't load {failed}"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:62
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
@@ -116,13 +144,21 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:64
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:116
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:34
 msgid "Details"
 msgstr "Details"
+
+#: src/lib/person/editLinks.ts:15
+msgid "Edit in Bluesky"
+msgstr "Edit in Bluesky"
+
+#: src/lib/person/editLinks.ts:10
+msgid "Edit on Sifa"
+msgstr "Edit on Sifa"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:30
 msgid "Education"
@@ -144,7 +180,7 @@ msgstr "Enter your handle, not your email — for example alice.bsky.social"
 msgid "Failed to follow. Please try again."
 msgstr "Failed to follow. Please try again."
 
-#: src/features/lanyard/hooks/useLanyardConfig.ts:95
+#: src/features/lanyard/hooks/useLanyardConfig.ts:107
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
@@ -208,6 +244,14 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:34
+msgid "Hidden items"
+msgstr "Hidden items"
+
+#: src/features/lanyard/customise/ItemMenu/ItemMenu.tsx:28
+msgid "Hide this item"
+msgstr "Hide this item"
+
 #: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:9
 msgid "Host"
 msgstr "Host"
@@ -220,11 +264,15 @@ msgstr "Indigo"
 msgid "Interview"
 msgstr "Interview"
 
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:111
+msgid "Items to show"
+msgstr "Items to show"
+
 #: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:6
 msgid "Keynote"
 msgstr "Keynote"
 
-#: src/features/lanyard/components/blocks/DetailsBlock/DetailsBlock.tsx:33
+#: src/features/lanyard/components/blocks/DetailsBlock/DetailsBlock.tsx:39
 msgid "Languages"
 msgstr "Languages"
 
@@ -237,7 +285,7 @@ msgstr "Lanyard"
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
-#: src/features/lanyard/hooks/useLanyardConfig.ts:91
+#: src/features/lanyard/hooks/useLanyardConfig.ts:103
 msgid "Lanyard updated"
 msgstr "Lanyard updated"
 
@@ -268,21 +316,38 @@ msgstr "Loading your profile…"
 
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:49
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:129
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:48
 msgid "Loading…"
 msgstr "Loading…"
 
-#: src/features/lanyard/components/blocks/DetailsBlock/DetailsBlock.tsx:27
+#: src/features/lanyard/components/blocks/DetailsBlock/DetailsBlock.tsx:33
 msgid "Location"
 msgstr "Location"
+
+#: src/features/lanyard/components/blocks/itemTitle.ts:37
+msgid "Location and languages"
+msgstr "Location and languages"
 
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:11
 msgid "Mentoring others"
 msgstr "Mentoring others"
 
+#: src/features/lanyard/customise/ItemMenu/ItemMenu.tsx:16
+msgid "More options for {title}"
+msgstr "More options for {title}"
+
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:12
 msgid "Moss"
 msgstr "Moss"
+
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:103
+msgid "Move down"
+msgstr "Move down"
+
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:94
+msgid "Move up"
+msgstr "Move up"
 
 #: src/components/AppHeader/AppHeader.tsx:26
 msgid "My lanyard"
@@ -292,6 +357,10 @@ msgstr "My lanyard"
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:31
 msgid "Not found"
 msgstr "Not found"
+
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:133
+msgid "Nothing to show yet"
+msgstr "Nothing to show yet"
 
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:14
 msgid "Ocean"
@@ -326,6 +395,10 @@ msgstr "Panellist"
 msgid "Part-time roles"
 msgstr "Part-time roles"
 
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:86
+msgid "Picked up {name}, at position {position} of {total}."
+msgstr "Picked up {name}, at position {position} of {total}."
+
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:9
 msgid "Plum"
 msgstr "Plum"
@@ -346,7 +419,7 @@ msgstr "Posts on Bluesky"
 msgid "Presentation"
 msgstr "Presentation"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:91
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:159
 msgid "Preview"
 msgstr "Preview"
 
@@ -359,9 +432,18 @@ msgstr "Publications"
 msgid "Reload"
 msgstr "Reload"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:57
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:72
+msgid "Reorder {name}"
+msgstr "Reorder {name}"
+
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:101
+msgid "Reordering cancelled. {name} stayed where it was."
+msgstr "Reordering cancelled. {name} stayed where it was."
+
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:65
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:118
-#: src/features/lanyard/hooks/useLanyardConfig.ts:96
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:149
+#: src/features/lanyard/hooks/useLanyardConfig.ts:108
 msgid "Retry"
 msgstr "Retry"
 
@@ -369,11 +451,11 @@ msgstr "Retry"
 msgid "Rose"
 msgstr "Rose"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:68
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:120
 msgid "Saved"
 msgstr "Saved"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:68
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:120
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -385,7 +467,15 @@ msgstr "Search for someone"
 msgid "Semble"
 msgstr "Semble"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:88
+#: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:85
+msgid "Show {name}"
+msgstr "Show {name}"
+
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:50
+msgid "Show again"
+msgstr "Show again"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:138
 msgid "Show current job on your badge"
 msgstr "Show current job on your badge"
 
@@ -504,6 +594,10 @@ msgstr "TikTok"
 msgid "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 msgstr "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 
+#: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:126
+msgid "To move a block, press Space or Enter to pick it up, use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel."
+msgstr "To move a block, press Space or Enter to pick it up, use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel."
+
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:37
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:52
 msgid "Try again"
@@ -521,15 +615,15 @@ msgstr "Twitch"
 msgid "Unfollowed @{handle}"
 msgstr "Unfollowed @{handle}"
 
-#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:35
+#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:41
 msgid "Verified on ORCID"
 msgstr "Verified on ORCID"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:102
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:170
 msgid "View as visitor"
 msgstr "View as visitor"
 
-#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:24
+#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:32
 msgid "View on Bluesky"
 msgstr "View on Bluesky"
 
@@ -607,7 +701,7 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:32
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:39
 msgid "Your lanyard"
 msgstr "Your lanyard"
 

@@ -13,11 +13,13 @@ import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 
 import {
   type BlockConfig,
+  DEFAULT_BLOCK_ORDER,
   itemLimit,
   type LanyardConfig,
   type RenderableBlockType,
 } from './config';
 import type {
+  BlockItem,
   BlockItems,
   BlockView,
   LinkItem,
@@ -222,19 +224,22 @@ function isHidden(key: string, hidden: Set<string>): boolean {
   return url !== null && hidden.has(url);
 }
 
-function composeBlock(
-  block: BlockConfig,
+type Gathered =
+  | { loading: true }
+  | { loading: false; items: { key: string }[]; failed: SourceName[] };
+
+/** Every item a block's sources offer, before hiding and limits. */
+function gather(
+  type: RenderableBlockType,
   sources: SourceSnapshot,
-  mode: ViewerMode,
-  orcidVerified: boolean,
-  hidden: Set<string>
-): BlockView | null {
-  const states = BLOCK_SOURCES[block.type].flatMap((key) => {
+  orcidVerified: boolean
+): Gathered {
+  const states = BLOCK_SOURCES[type].flatMap((key) => {
     const state = sources[key];
     return state ? [{ key, state }] : [];
   });
   if (states.some(({ state }) => state.status === 'loading')) {
-    return { type: block.type, status: 'loading' } as BlockView;
+    return { loading: true };
   }
 
   const failed = [
@@ -249,10 +254,33 @@ function composeBlock(
       state.status === 'ready' ? [[key, state.value]] : []
     )
   );
+  const items = BUILDERS[type](values, orcidVerified) as { key: string }[];
+  return { loading: false, items, failed };
+}
 
-  const items = (
-    BUILDERS[block.type](values, orcidVerified) as { key: string }[]
-  )
+/** Hidden keys, with each URL also in its normalised form. */
+function hiddenSet(hidden: readonly string[]): Set<string> {
+  return new Set(
+    hidden.flatMap((value) => {
+      const url = normaliseUrl(value);
+      return url ? [value, url] : [value];
+    })
+  );
+}
+
+function composeBlock(
+  block: BlockConfig,
+  sources: SourceSnapshot,
+  mode: ViewerMode,
+  orcidVerified: boolean,
+  hidden: Set<string>
+): BlockView | null {
+  const gathered = gather(block.type, sources, orcidVerified);
+  if (gathered.loading) {
+    return { type: block.type, status: 'loading' } as BlockView;
+  }
+  const { failed } = gathered;
+  const items = gathered.items
     .filter((item) => !isHidden(item.key, hidden))
     .slice(0, itemLimit(block));
 
@@ -281,12 +309,7 @@ export function composeBlocks(input: {
   mode: ViewerMode;
   orcidVerified: boolean;
 }): BlockView[] {
-  const hidden = new Set(
-    input.config.hidden.flatMap((value) => {
-      const url = normaliseUrl(value);
-      return url ? [value, url] : [value];
-    })
-  );
+  const hidden = hiddenSet(input.config.hidden);
   return input.config.blocks
     .filter((block) => block.visible)
     .flatMap((block) => {
@@ -299,4 +322,66 @@ export function composeBlocks(input: {
       );
       return view ? [view] : [];
     });
+}
+
+/** What a visible block has to show, for the owner's customiser. */
+export type BlockStatus =
+  | { status: 'loading' }
+  | { status: 'error'; sources: SourceName[] }
+  | { status: 'empty' }
+  | { status: 'ready'; count: number; failedSources: SourceName[] };
+
+type ComposeInput = {
+  config: LanyardConfig;
+  sources: SourceSnapshot;
+  orcidVerified: boolean;
+};
+
+/**
+ * Each visible block's status, including the empty ones the lanyard leaves
+ * out, so the customiser can say "Nothing to show yet" (spec §7.2).
+ */
+export function blockStatuses(
+  input: ComposeInput
+): Partial<Record<RenderableBlockType, BlockStatus>> {
+  const hidden = hiddenSet(input.config.hidden);
+  const statuses: Partial<Record<RenderableBlockType, BlockStatus>> = {};
+  for (const block of input.config.blocks) {
+    if (!block.visible) continue;
+    const gathered = gather(block.type, input.sources, input.orcidVerified);
+    if (gathered.loading) {
+      statuses[block.type] = { status: 'loading' };
+      continue;
+    }
+    const count = gathered.items.filter(
+      (item) => !isHidden(item.key, hidden)
+    ).length;
+    statuses[block.type] =
+      count > 0
+        ? { status: 'ready', count, failedSources: gathered.failed }
+        : gathered.failed.length
+          ? { status: 'error', sources: gathered.failed }
+          : { status: 'empty' };
+  }
+  return statuses;
+}
+
+/** A hidden key, with its block and item when a loaded source has it. */
+export type HiddenItem =
+  { key: string } | { key: string; type: RenderableBlockType; item: BlockItem };
+
+/** The owner's hidden items, for "Show again" (spec §7.4). */
+export function hiddenItems(input: ComposeInput): HiddenItem[] {
+  const gathered = DEFAULT_BLOCK_ORDER.flatMap((type) => {
+    const result = gather(type, input.sources, input.orcidVerified);
+    return result.loading ? [] : [{ type, items: result.items }];
+  });
+  return input.config.hidden.map((key) => {
+    const wanted = hiddenSet([key]);
+    for (const { type, items } of gathered) {
+      const item = items.find((candidate) => isHidden(candidate.key, wanted));
+      if (item) return { key, type, item: item as BlockItem };
+    }
+    return { key };
+  });
 }

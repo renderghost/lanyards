@@ -19,7 +19,11 @@ import { fetchSifaProfile } from '@/lib/sources/sifa/sifa';
 import { fetchBlogPosts } from '@/lib/sources/standardSite/standardSite';
 import { fetchRepos } from '@/lib/sources/tangled/tangled';
 
-import { composeBlocks } from './blocks';
+import {
+  blockStatuses,
+  composeBlocks,
+  hiddenItems as findHiddenItems,
+} from './blocks';
 import { type RenderableBlockType, resolveConfig } from './config';
 import { composeHero } from './hero';
 import type {
@@ -136,6 +140,9 @@ export function usePersonView(
     orcidWorks: toSourceState(works, enabled.orcid),
   };
 
+  const configUsable = configReady && !configError;
+  const orcidVerified = verified.data === true;
+
   const queries: Record<SourceKey, { refetch: () => unknown }> = {
     bluesky: profile,
     sifa,
@@ -158,15 +165,15 @@ export function usePersonView(
           config,
         })
       : undefined,
-    blocks:
-      configReady && !configError
-        ? composeBlocks({
-            config,
-            sources,
-            mode,
-            orcidVerified: verified.data === true,
-          })
-        : [],
+    blocks: configUsable
+      ? composeBlocks({ config, sources, mode, orcidVerified })
+      : [],
+    statuses: configUsable
+      ? blockStatuses({ config, sources, orcidVerified })
+      : {},
+    hiddenItems: configUsable
+      ? findHiddenItems({ config, sources, orcidVerified })
+      : [],
     config,
     configReady,
     configError,

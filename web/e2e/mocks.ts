@@ -190,3 +190,19 @@ export async function signIn(
     localStorage.setItem('lanyards:e2e-session', value);
   }, JSON.stringify(session));
 }
+
+/** Records the owner's putRecord writes from the customiser. */
+export async function mockOwnerWrites(page: Page): Promise<unknown[]> {
+  const saved: unknown[] = [];
+  await page.route(
+    'https://pds.e2e.test/xrpc/com.atproto.repo.putRecord',
+    (route) => {
+      saved.push(route.request().postDataJSON());
+      return json(route, {
+        uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
+        cid: CID,
+      });
+    }
+  );
+  return saved;
+}

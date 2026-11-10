@@ -122,6 +122,7 @@ export function LanyardPage({
       <LanyardBlocks
         blocks={view.blocks}
         owner={view.mode === 'owner'}
+        handle={view.hero.handle}
         onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
       />
     </article>

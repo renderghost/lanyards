@@ -16,7 +16,7 @@ export function BlockSection({
   failedSources = [],
   owner,
   onRetry,
-  editLink,
+  editLinks = [],
   children,
   className,
 }: BlockSectionProps) {
@@ -36,10 +36,18 @@ export function BlockSection({
         <h2 id={headingId} className={styles.heading}>
           {heading}
         </h2>
-        {owner && editLink && (
-          <ExternalLink href={editLink.url} className={styles.edit}>
-            {editLink.label}
-          </ExternalLink>
+        {owner && editLinks.length > 0 && (
+          <div className={styles.editLinks}>
+            {editLinks.map((link) => (
+              <ExternalLink
+                key={link.url}
+                href={link.url}
+                className={styles.edit}
+              >
+                {link.label}
+              </ExternalLink>
+            ))}
+          </div>
         )}
       </div>
       {status === 'loading' && (

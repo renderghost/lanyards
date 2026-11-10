@@ -181,6 +181,59 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(await accent('Teal')).toBeDisabled();
   });
 
+  it('saves a new block order', async () => {
+    servePerson();
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    const links = await screen.findByRole(
+      'listitem',
+      { name: 'Links' },
+      { timeout: 5000 }
+    );
+    const down = within(links).getByRole('button', { name: 'Move down' });
+    await waitFor(() => expect(down).toBeEnabled(), { timeout: 5000 });
+    await userEvent.click(down);
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    const record = saves[0]?.record as { blocks: { type: string }[] };
+    expect(record.blocks.slice(0, 2).map((block) => block.type)).toEqual([
+      'talks',
+      'links',
+    ]);
+  });
+
+  it('hides an item from the preview, then shows it again', async () => {
+    servePerson();
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    const region = await preview();
+    await userEvent.click(
+      await within(region).findByRole(
+        'button',
+        { name: 'More options for Building on ATProto at Example Conf 2024' },
+        { timeout: 8000 }
+      )
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: 'Hide this item' })
+    );
+    expect(within(region).queryByText(/Example Conf 2024/)).toBeNull();
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
+
+    const hidden = screen.getByRole('region', { name: 'Hidden items' });
+    await userEvent.click(
+      within(hidden).getByRole('button', {
+        name: 'Show again',
+        description: 'Building on ATProto at Example Conf 2024',
+      })
+    );
+    expect(
+      await within(region).findByText(/Example Conf 2024/)
+    ).toBeInTheDocument();
+    await waitFor(() => expect(saves).toHaveLength(2), { timeout: 3000 });
+    expect((saves[1]?.record as { hidden: string[] }).hidden).toEqual([]);
+  });
+
   it('has no accessibility violations', async () => {
     servePerson();
     const { container } = renderRoute('/lanyard');
