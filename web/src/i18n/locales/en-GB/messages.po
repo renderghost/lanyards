@@ -47,7 +47,7 @@ msgstr "Add link"
 msgid "Add media"
 msgstr "Add media"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:116
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:138
 msgid "Add this link to the Websites & social links section of your ORCID record:"
 msgstr "Add this link to the Websites & social links section of your ORCID record:"
 
@@ -103,7 +103,7 @@ msgstr "Bluesky isn't answering right now. Check your connection and try again."
 msgid "Board positions"
 msgstr "Board positions"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:137
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:108
 msgid "Check again"
 msgstr "Check again"
 
@@ -111,7 +111,7 @@ msgstr "Check again"
 msgid "Check the spelling, or search for them."
 msgstr "Check the spelling, or search for them."
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:107
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:122
 msgid "Checking your ORCID iD…"
 msgstr "Checking your ORCID iD…"
 
@@ -152,7 +152,7 @@ msgstr "Conference talk"
 msgid "Contract roles"
 msgstr "Contract roles"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:127
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:149
 #: src/features/qr/components/QrSheet/QrSheet.tsx:65
 msgid "Copy link"
 msgstr "Copy link"
@@ -161,7 +161,11 @@ msgstr "Copy link"
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:92
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:131
+msgid "Couldn't check your ORCID iD right now."
+msgstr "Couldn't check your ORCID iD right now."
+
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:94
 #: src/features/qr/components/QrSheet/QrSheet.tsx:38
 msgid "Couldn't copy the link. Please try again."
 msgstr "Couldn't copy the link. Please try again."
@@ -178,7 +182,7 @@ msgstr "Couldn't load {sources}"
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:74
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:76
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
@@ -426,7 +430,7 @@ msgstr "Lecture"
 msgid "Link added"
 msgstr "Link added"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:89
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:91
 #: src/features/qr/components/QrSheet/QrSheet.tsx:35
 msgid "Link copied"
 msgstr "Link copied"
@@ -435,7 +439,7 @@ msgstr "Link copied"
 msgid "Link deleted"
 msgstr "Link deleted"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:119
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:141
 msgid "Link to add"
 msgstr "Link to add"
 
@@ -507,7 +511,7 @@ msgstr "Not found"
 msgid "Not specified"
 msgstr "Not specified"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:81
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:83
 msgid "Not verified yet. ORCID can take a few minutes to update."
 msgstr "Not verified yet. ORCID can take a few minutes to update."
 
@@ -519,7 +523,7 @@ msgstr "Nothing to show yet"
 msgid "Ocean"
 msgstr "Ocean"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:130
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:152
 msgid "Open ORCID"
 msgstr "Open ORCID"
 
@@ -536,7 +540,7 @@ msgid "ORCID"
 msgstr "ORCID"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:57
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:104
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:118
 msgid "ORCID iD"
 msgstr "ORCID iD"
 
@@ -830,11 +834,11 @@ msgstr "Unfollowed @{handle}"
 msgid "Verified on ORCID"
 msgstr "Verified on ORCID"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:80
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:82
 msgid "Verified. Your publications now show the ORCID tick."
 msgstr "Verified. Your publications now show the ORCID tick."
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:104
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:119
 msgid "Verify your ORCID iD"
 msgstr "Verify your ORCID iD"
 
@@ -954,7 +958,7 @@ msgstr "Your Lanyards"
 msgid "Your links"
 msgstr "Your links"
 
-#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:111
+#: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:126
 msgid "Your ORCID iD is verified"
 msgstr "Your ORCID iD is verified"
 

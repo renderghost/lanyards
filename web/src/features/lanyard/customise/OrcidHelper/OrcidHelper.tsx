@@ -69,6 +69,8 @@ export function OrcidHelper({
   }
 
   async function checkAgain() {
+    // Cleared first, so a result the same as last time is read out again.
+    setAnnouncement('');
     const result = await check.refetch();
     if (result.isError) {
       setAnnouncement(t`Couldn't reach ORCID. Please try again.`);
@@ -95,13 +97,26 @@ export function OrcidHelper({
 
   const pending = check.status === 'pending';
   const verified = check.data === true;
+  // ORCID never answered, so whether the iD links back is unknown.
+  const unchecked = check.status === 'error' && check.data === undefined;
+  const checkAgainButton = (
+    <Button
+      variant="secondary"
+      loading={check.isFetching}
+      onClick={() => void checkAgain()}
+    >
+      {t`Check again`}
+    </Button>
+  );
   return (
     <section
       aria-labelledby={headingId}
       className={cn(styles.section, className)}
     >
       <h2 id={headingId} className={styles.heading}>
-        {pending || verified ? t`ORCID iD` : t`Verify your ORCID iD`}
+        {pending || verified || unchecked
+          ? t`ORCID iD`
+          : t`Verify your ORCID iD`}
       </h2>
       {pending ? (
         <p className={styles.text}>{t`Checking your ORCID iD…`}</p>
@@ -110,6 +125,13 @@ export function OrcidHelper({
           <BadgeCheck aria-hidden="true" className={styles.tick} />
           {t`Your ORCID iD is verified`}
         </p>
+      ) : unchecked ? (
+        <>
+          <p className={styles.text}>
+            {t`Couldn't check your ORCID iD right now.`}
+          </p>
+          <div className={styles.actions}>{checkAgainButton}</div>
+        </>
       ) : (
         <>
           <p className={styles.text}>
@@ -129,13 +151,7 @@ export function OrcidHelper({
             <ExternalLink href={ORCID_EDIT_URL} className={styles.link}>
               {t`Open ORCID`}
             </ExternalLink>
-            <Button
-              variant="secondary"
-              loading={check.isFetching}
-              onClick={() => void checkAgain()}
-            >
-              {t`Check again`}
-            </Button>
+            {checkAgainButton}
           </div>
         </>
       )}

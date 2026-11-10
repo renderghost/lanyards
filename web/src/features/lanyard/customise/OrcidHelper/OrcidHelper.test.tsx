@@ -136,6 +136,58 @@ describe('OrcidHelper', () => {
     expect(track).toHaveBeenCalledWith('orcid_checked', { verified: false });
   });
 
+  it('says it couldn’t check, not that the iD is unverified, when ORCID is down', async () => {
+    server.use(http.get(URLS, () => HttpResponse.json({}, { status: 500 })));
+    renderWithClient(helper(ORCID_ID));
+    expect(
+      await screen.findByText(
+        "Couldn't check your ORCID iD right now.",
+        {},
+        { timeout: 4000 }
+      )
+    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'ORCID iD' })).toBeVisible();
+    expect(
+      screen.queryByRole('textbox', { name: 'Link to add' })
+    ).not.toBeInTheDocument();
+
+    orcidAnswers(verified);
+    await userEvent.click(screen.getByRole('button', { name: 'Check again' }));
+    expect(
+      await screen.findByText('Your ORCID iD is verified')
+    ).toBeInTheDocument();
+  });
+
+  it('announces the same result again when checking again', async () => {
+    let calls = 0;
+    let answer: () => void = () => undefined;
+    server.use(
+      http.get(URLS, async () => {
+        calls += 1;
+        if (calls === 3) {
+          await new Promise<void>((resolve) => {
+            answer = resolve;
+          });
+        }
+        return HttpResponse.json(notVerified);
+      })
+    );
+    renderWithClient(helper(ORCID_ID));
+    const checkAgain = await screen.findByRole('button', {
+      name: 'Check again',
+    });
+    await userEvent.click(checkAgain);
+    const message = 'Not verified yet. ORCID can take a few minutes to update.';
+    const status = await screen.findByText(message);
+
+    await userEvent.click(checkAgain);
+    await waitFor(() => expect(calls).toBe(3));
+    // Cleared while checking, so the same words are read out again.
+    expect(status.textContent).toBe('');
+    answer();
+    await waitFor(() => expect(status.textContent).toBe(message));
+  });
+
   it('says when the iD is verified', async () => {
     orcidAnswers(verified);
     renderWithClient(helper(ORCID_ID));
