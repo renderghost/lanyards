@@ -24,6 +24,7 @@ import { track } from '@/lib/analytics/analytics';
 import { readE2eSession } from './e2eSession';
 import { BSKY_APPVIEW_AUD } from './endpoints';
 import { identityResolver } from './identity';
+import { parseGrantedScope } from './permissions';
 import {
   DID_STORAGE_KEY,
   FALLBACK_SCOPE,
@@ -132,7 +133,46 @@ type AuthorizationOptions = Omit<
  * when the authorisation server refuses them (for example a PDS without
  * permission-set support, or a permission set it cannot resolve yet).
  */
-async function authorizationUrl(options: AuthorizationOptions): Promise<URL> {
+/**
+ * Accounts whose server granted identity only, though granular scopes were
+ * requested: it dropped them silently (spec §10.6). Asking again would loop,
+ * so the next request for such an account uses the broad fallback.
+ */
+const fallbackKey = (did: string) => `lanyards:scope-fallback:${did}`;
+
+function grantsNothingGranular(scope: string): boolean {
+  const granted = parseGrantedScope(scope);
+  return !granted.generic && granted.repo.size === 0 && granted.rpc.size === 0;
+}
+
+function rememberScopeOutcome(did: string, scope: string): void {
+  try {
+    if (grantsNothingGranular(scope)) {
+      localStorage.setItem(fallbackKey(did), '1');
+    } else {
+      localStorage.removeItem(fallbackKey(did));
+    }
+  } catch {
+    // Storage blocked: the next sign-in simply asks for granular scopes.
+  }
+}
+
+function needsFallback(identifier: string): boolean {
+  try {
+    return localStorage.getItem(fallbackKey(identifier)) === '1';
+  } catch {
+    return false;
+  }
+}
+
+async function authorizationUrl(
+  options: AuthorizationOptions,
+  identifier?: string
+): Promise<URL> {
+  if (identifier && needsFallback(identifier)) {
+    track('oauth_scope_fallback');
+    return createAuthorizationUrl({ ...options, scope: FALLBACK_SCOPE });
+  }
   try {
     return await createAuthorizationUrl({ ...options, scope: GRANULAR_SCOPE });
   } catch (error) {
@@ -149,10 +189,13 @@ export async function startSignIn(
 ): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
   rememberReturnTo(state.returnTo);
-  const url = await authorizationUrl({
-    target: { type: 'account', identifier: identifier as ActorIdentifier },
-    state,
-  });
+  const url = await authorizationUrl(
+    {
+      target: { type: 'account', identifier: identifier as ActorIdentifier },
+      state,
+    },
+    identifier
+  );
   track('sign_in_started');
   await redirect(url);
 }
@@ -211,6 +254,7 @@ async function finishSignIn(
 
   const did = result.session.info.sub;
   localStorage.setItem(DID_STORAGE_KEY, did);
+  rememberScopeOutcome(did, result.session.token.scope);
   const state = result.state as Partial<SignInState> | null;
   return { did, returnTo: safeReturnTo(state?.returnTo) };
 }

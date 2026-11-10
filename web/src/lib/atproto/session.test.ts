@@ -390,3 +390,37 @@ describe('restoreSession in end-to-end builds', () => {
     await expect(restoreSession()).resolves.toEqual({ status: 'none' });
   });
 });
+
+describe('servers that silently drop granular scopes', () => {
+  const flag = `lanyards:scope-fallback:${DID}`;
+  const finish = (scope: string) =>
+    vi.mocked(finalizeAuthorization).mockResolvedValue({
+      session: { info: { sub: DID }, token: { scope } } as never,
+      state: { returnTo: '/' },
+    });
+
+  it('remembers when sign-in granted identity only', async () => {
+    finish('atproto');
+    await completeSignIn('#code=abc&state=xyz');
+    expect(localStorage.getItem(flag)).toBe('1');
+  });
+
+  it('forgets that once granular permissions are granted', async () => {
+    localStorage.setItem(flag, '1');
+    finish(GRANTED);
+    await completeSignIn('#code=abc&state=xyz');
+    expect(localStorage.getItem(flag)).toBeNull();
+  });
+
+  it('asks such an account for the broad fallback scope next time', async () => {
+    localStorage.setItem(flag, '1');
+    const url = new URL('https://pds.example/oauth/authorize');
+    vi.mocked(createAuthorizationUrl).mockResolvedValue(url);
+    await startSignIn(DID, '/@alice.example');
+    expect(createAuthorizationUrl).toHaveBeenCalledTimes(1);
+    expect(createAuthorizationUrl).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: FALLBACK_SCOPE })
+    );
+    expect(track).toHaveBeenCalledWith('oauth_scope_fallback');
+  });
+});
