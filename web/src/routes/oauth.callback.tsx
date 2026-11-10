@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react/macro';
 import {
   createFileRoute,
   useLocation,
@@ -8,6 +9,7 @@ import { useEffect, useRef, useState } from 'react';
 import { CallbackStatus } from '@/features/auth/components/CallbackStatus/CallbackStatus';
 import type { CallbackStatusValue } from '@/features/auth/components/CallbackStatus/CallbackStatus.types';
 import { useSession } from '@/features/auth/session/useSession';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { captureError } from '@/lib/analytics/analytics';
 import { REDIRECT_PATH } from '@/lib/atproto/oauthConfig';
 import { completeSignIn, OAuthCallbackError } from '@/lib/atproto/session';
@@ -17,6 +19,8 @@ export const Route = createFileRoute('/oauth/callback')({
 });
 
 function OAuthCallback() {
+  const { t } = useLingui();
+  useDocumentTitle(t`Signing in`);
   const router = useRouter();
   const hash = useLocation({ select: (location) => location.hash });
   const { refresh } = useSession();

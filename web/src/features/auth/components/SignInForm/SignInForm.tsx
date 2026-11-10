@@ -95,11 +95,10 @@ export function SignInForm({ returnTo }: SignInFormProps) {
         required
         inputRef={inputRef}
       />
-      {!online && (
-        <p role="status" className={styles.offline}>
-          {t`You're offline. Connect to sign in.`}
-        </p>
-      )}
+      {/* Always mounted, so going offline is announced. */}
+      <p role="status" className={online ? undefined : styles.offline}>
+        {online ? '' : t`You're offline. Connect to sign in.`}
+      </p>
       <div className={styles.actions}>
         <Button type="submit" size="lg" loading={submitting} disabled={!online}>
           {t`Sign in`}

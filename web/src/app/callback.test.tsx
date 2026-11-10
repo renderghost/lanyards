@@ -1,10 +1,14 @@
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { captureError } from '@/lib/analytics/analytics';
 import { completeSignIn, OAuthCallbackError } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
+import { TYPEAHEAD_URL } from '@/test/fixtures';
+import { server } from '@/test/msw';
 import { renderRoute } from '@/test/router';
 
 vi.mock('@/lib/atproto/session', async (importOriginal) => {
@@ -21,6 +25,7 @@ const refresh = vi.fn();
 
 beforeEach(() => {
   vi.clearAllMocks();
+  server.use(http.get(TYPEAHEAD_URL, () => HttpResponse.json({ actors: [] })));
   vi.mocked(useSession).mockReturnValue({
     status: 'signedOut',
     signOut: vi.fn(),
@@ -44,6 +49,25 @@ describe('OAuth callback', () => {
     expect(completeSignIn).toHaveBeenCalledWith('#error=access_denied');
     expect(router.state.location.hash).toBe('');
     expect(router.state.location.pathname).toBe('/oauth/callback');
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Sign in' })
+    ).toBeInTheDocument();
+    expect(document.title).toBe('Signing in · Lanyards');
+  });
+
+  it('moves focus to the new page heading after navigating', async () => {
+    vi.mocked(completeSignIn).mockRejectedValue(
+      new OAuthCallbackError('denied')
+    );
+    renderRoute('/oauth/callback#error=access_denied');
+    await userEvent.click(
+      await screen.findByRole('link', { name: 'Try again' })
+    );
+    const heading = await screen.findByRole('heading', {
+      level: 1,
+      name: 'Your conference lanyard, from your AT Protocol account',
+    });
+    await waitFor(() => expect(heading).toHaveFocus());
   });
 
   it('explains an expired or reused link', async () => {

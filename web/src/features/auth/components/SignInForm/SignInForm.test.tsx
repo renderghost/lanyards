@@ -113,6 +113,16 @@ describe('SignInForm', () => {
     ).toBeInTheDocument();
   });
 
+  it('keeps the offline status region mounted while online', () => {
+    const { rerender } = renderWithProviders(<SignInForm returnTo="/" />);
+    const region = screen.getByRole('status');
+    expect(region).toBeEmptyDOMElement();
+    vi.mocked(useOnlineStatus).mockReturnValue(false);
+    rerender(<SignInForm returnTo="/" />);
+    expect(screen.getByRole('status')).toBe(region);
+    expect(region).toHaveTextContent("You're offline. Connect to sign in.");
+  });
+
   it('offers account creation', async () => {
     vi.mocked(startSignUp).mockReturnValue(new Promise(() => undefined));
     renderWithProviders(<SignInForm returnTo="/settings" />);

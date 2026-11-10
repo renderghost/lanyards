@@ -1,5 +1,5 @@
 import { act, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithProviders } from '@/test/render';
@@ -7,7 +7,29 @@ import { renderWithProviders } from '@/test/render';
 import { notify } from './notify';
 import { Toaster } from './Toaster';
 
+afterEach(() => {
+  vi.useRealTimers();
+});
+
 describe('Toaster', () => {
+  it('keeps toasts with an action until dismissed, with a close button', async () => {
+    renderWithProviders(<Toaster />);
+    act(() => {
+      notify.info('A new version of Lanyards is available', {
+        action: { label: 'Reload', onClick: () => undefined },
+      });
+    });
+    await screen.findByText('A new version of Lanyards is available');
+    expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
+    vi.useFakeTimers();
+    act(() => {
+      vi.advanceTimersByTime(60_000);
+    });
+    expect(
+      screen.getByText('A new version of Lanyards is available')
+    ).toBeInTheDocument();
+  });
+
   it('announces success messages in a live region', async () => {
     renderWithProviders(<Toaster />);
     act(() => {

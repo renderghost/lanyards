@@ -27,6 +27,7 @@ describe('AppError', () => {
       screen.getByRole('heading', { name: 'Something went wrong' })
     ).toBeInTheDocument();
     expect(captureError).toHaveBeenCalledWith(error, { source: 'route' });
+    expect(document.title).toBe('Something went wrong · Lanyards');
     await userEvent.click(screen.getByRole('button', { name: 'Reload' }));
     expect(reload).toHaveBeenCalled();
     await expectNoAxeViolations(container);

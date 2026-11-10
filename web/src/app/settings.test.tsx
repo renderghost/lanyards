@@ -44,6 +44,7 @@ describe('/settings', () => {
       await screen.findByRole('heading', { name: 'Your account' })
     ).toBeInTheDocument();
     expect(await screen.findByText('@alice.bsky.social')).toBeInTheDocument();
+    expect(document.title).toBe('Your account · Lanyards');
   });
 });
 
@@ -61,5 +62,6 @@ describe('unknown pages', () => {
     expect(
       screen.getByRole('link', { name: 'Go to the home page' })
     ).toHaveAttribute('href', '/');
+    expect(document.title).toBe('Page not found · Lanyards');
   });
 });

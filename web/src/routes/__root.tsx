@@ -5,6 +5,7 @@ import { AppError } from '@/components/AppError/AppError';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { NotFound } from '@/components/NotFound/NotFound';
 import { OfflineBanner } from '@/components/OfflineBanner/OfflineBanner';
+import { useFocusOnNavigation } from '@/hooks/useFocusOnNavigation';
 import { usePwaUpdatePrompt } from '@/hooks/usePwaUpdatePrompt';
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -15,6 +16,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   usePwaUpdatePrompt();
+  useFocusOnNavigation();
   return (
     <div className="flex min-h-dvh flex-col">
       <AppHeader />

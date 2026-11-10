@@ -55,6 +55,7 @@ export function HandleCombobox({
   } = useCombobox<HandleSuggestion>({
     items,
     inputId: id,
+    menuId: `${id}-suggestions`,
     inputValue: value,
     itemToString: (item) => item?.handle ?? '',
     onInputValueChange: ({ inputValue }) => onChange(inputValue ?? ''),
@@ -90,6 +91,11 @@ export function HandleCombobox({
             'aria-invalid': error ? true : undefined,
             'aria-describedby': describedBy,
           })}
+          // Downshift opens on every keystroke; only say "expanded" when
+          // there is actually a list to show.
+          role="combobox"
+          aria-controls={`${id}-suggestions`}
+          aria-expanded={showMenu}
           className={cn(styles.input, error && styles.inputInvalid)}
         />
         <ul {...getMenuProps()} hidden={!showMenu} className={styles.menu}>
