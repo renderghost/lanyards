@@ -1,6 +1,10 @@
 import { Toaster as SonnerToaster } from 'sonner';
 
-import { TOAST_DURATION_MS } from './Toaster.constants';
+import {
+  TOAST_DURATION_MS,
+  TOAST_MOBILE_OFFSET,
+  TOAST_OFFSET,
+} from './Toaster.constants';
 import * as styles from './Toaster.styles';
 
 export function Toaster() {
@@ -9,6 +13,8 @@ export function Toaster() {
       position="bottom-center"
       theme="system"
       duration={TOAST_DURATION_MS}
+      offset={TOAST_OFFSET}
+      mobileOffset={TOAST_MOBILE_OFFSET}
       toastOptions={{
         unstyled: true,
         classNames: {

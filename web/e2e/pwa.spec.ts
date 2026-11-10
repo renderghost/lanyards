@@ -6,6 +6,7 @@ test('is installable and keeps working offline', async ({ page, context }) => {
   expect(href).toBeTruthy();
   const manifest = await (await page.request.get(href as string)).json();
   expect(manifest.name).toBe('Lanyards');
+  await expect(page.locator('meta[name="theme-color"]')).toHaveCount(1);
 
   await page.evaluate(async () => {
     await navigator.serviceWorker.ready;

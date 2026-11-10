@@ -16,6 +16,9 @@ describe('OfflineBanner', () => {
     expect(screen.getByRole('status')).toHaveTextContent(
       "You're offline. Some things won't work until you reconnect."
     );
+    expect(screen.getByRole('status').className).toContain(
+      'env(safe-area-inset-bottom)'
+    );
     await expectNoAxeViolations(container);
   });
 

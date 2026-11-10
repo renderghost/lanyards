@@ -76,7 +76,7 @@ msgstr "Sign out"
 msgid "Sign-in was cancelled."
 msgstr "Sign-in was cancelled."
 
-#: src/features/auth/session/SessionProvider.tsx:65
+#: src/features/auth/session/SessionProvider.tsx:80
 msgid "Signed out"
 msgstr "Signed out"
 

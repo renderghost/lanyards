@@ -30,6 +30,20 @@ describe('Toaster', () => {
     ).toBeInTheDocument();
   });
 
+  it('keeps toasts clear of the bottom safe area', async () => {
+    const { container } = renderWithProviders(<Toaster />);
+    act(() => {
+      notify.success('Signed out');
+    });
+    await screen.findByText('Signed out');
+    const toaster = container.ownerDocument.querySelector<HTMLElement>(
+      '[data-sonner-toaster]'
+    );
+    expect(toaster?.getAttribute('style')).toContain(
+      'env(safe-area-inset-bottom)'
+    );
+  });
+
   it('announces success messages in a live region', async () => {
     renderWithProviders(<Toaster />);
     act(() => {
