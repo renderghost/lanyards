@@ -5,6 +5,7 @@ import { Button } from '@/components/Button/Button';
 import { QrCode } from '@/components/QrCode/QrCode';
 import { notify } from '@/components/Toaster/notify';
 import { useWakeLock } from '@/hooks/useWakeLock';
+import { captureError } from '@/lib/analytics/analytics';
 import { useProfile } from '@/lib/atproto/useProfile';
 
 import { qrUrl } from '../../qrUrl';
@@ -32,7 +33,8 @@ export function QrSheet({
     try {
       await navigator.clipboard.writeText(url);
       notify.success(t`Link copied`);
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'copy-link' });
       notify.error(t`Couldn't copy the link. Please try again.`);
     }
   }

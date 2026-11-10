@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { expectNoAxeViolations } from '@/test/axe';
 import { mockDidDocument, mockGetRecord } from '@/test/handlers';
@@ -110,6 +110,9 @@ describe('HonorificForm', () => {
       )
     );
     expect(screen.getByRole('radio', { name: 'None' })).toBeChecked();
+    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
+      source: 'honorific',
+    });
   });
 
   it('has no axe violations', async () => {

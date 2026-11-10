@@ -10,7 +10,7 @@ import {
   PLATFORM_LABELS,
   TYPE_LABELS,
 } from '@/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { leavingForSubmit } from '@/lib/forms';
 import { cn } from '@/lib/utils';
 
@@ -104,7 +104,8 @@ export function MediaForm({ disabled = false, className }: MediaFormProps) {
       setValues(EMPTY_MEDIA);
       notify.success(kind === 'audio' ? t`Audio added` : t`Video added`);
       track('kept_record_saved', { kind });
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'media' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setSubmitting(false);

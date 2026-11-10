@@ -4,7 +4,7 @@ import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
 import { Button } from '@/components/Button/Button';
 import { TextField } from '@/components/TextField/TextField';
 import { notify } from '@/components/Toaster/notify';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { leavingForSubmit } from '@/lib/forms';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
@@ -66,7 +66,8 @@ export function WebLinkForm({ disabled = false, className }: WebLinkFormProps) {
       setValues(EMPTY_WEB_LINK);
       notify.success(t`Link added`);
       track('kept_record_saved', { kind: 'webLink' });
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'web-link' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setSubmitting(false);

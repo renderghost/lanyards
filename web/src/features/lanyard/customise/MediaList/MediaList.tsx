@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { notify } from '@/components/Toaster/notify';
+import { captureError } from '@/lib/analytics/analytics';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { hostOf } from '@/lib/normalise';
 import type { MediaLink } from '@/lib/sources/lanyards/lanyards.types';
@@ -50,7 +51,8 @@ export function MediaList({
       notify.success(
         item.kind === 'audio' ? t`Audio deleted` : t`Video deleted`
       );
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'media' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setDeleting(null);

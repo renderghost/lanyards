@@ -4,7 +4,7 @@ import { http, HttpResponse, type JsonBodyType } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import notVerified from '@/lib/sources/orcid/fixtures/researcher-urls.json';
 import verified from '@/lib/sources/orcid/fixtures/researcher-urls-verified.json';
 import { expectNoAxeViolations } from '@/test/axe';
@@ -88,6 +88,24 @@ describe('OrcidHelper', () => {
     await waitFor(() =>
       expect(notify.success).toHaveBeenCalledWith('Link copied')
     );
+  });
+
+  it('says so and reports it when copying fails', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(
+      new Error('Denied')
+    );
+    orcidAnswers(notVerified);
+    renderWithClient(helper(ORCID_ID));
+    await user.click(await screen.findByRole('button', { name: 'Copy link' }));
+    await waitFor(() =>
+      expect(notify.error).toHaveBeenCalledWith(
+        "Couldn't copy the link. Please try again."
+      )
+    );
+    expect(captureError).toHaveBeenCalledWith(new Error('Denied'), {
+      source: 'copy-link',
+    });
   });
 
   it('checks again and announces the verification', async () => {

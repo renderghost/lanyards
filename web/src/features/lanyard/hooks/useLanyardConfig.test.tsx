@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { putRecord } from '@/lib/atproto/writes';
 import { fetchLanyardConfig } from '@/lib/sources/lanyards/lanyards';
 import { queryKeys } from '@/lib/query/keys';
@@ -135,6 +135,9 @@ describe('useLanyardConfig', () => {
       'Failed to save. Please try again.',
       { action: { label: 'Retry', onClick: expect.any(Function) } }
     );
+    expect(captureError).toHaveBeenCalledWith(new Error('PDS down'), {
+      source: 'lanyard-settings',
+    });
 
     act(() => result.current.retry());
     await advance(0);

@@ -6,7 +6,7 @@ import { useMemo, useState } from 'react';
 
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import {
   canCall,
   canWrite,
@@ -91,7 +91,8 @@ export function useFollow(subject: Did, handle: string): UseFollow {
         notify.success(t`Followed @${handle}`);
         track('follow_created');
       })
-      .catch(() => {
+      .catch((cause: unknown) => {
+        captureError(cause, { source: 'follow' });
         notify.error(t`Failed to follow. Please try again.`);
         return recheck();
       })
@@ -109,7 +110,8 @@ export function useFollow(subject: Did, handle: string): UseFollow {
         notify.success(t`Unfollowed @${handle}`);
         track('follow_deleted');
       })
-      .catch(() => {
+      .catch((cause: unknown) => {
+        captureError(cause, { source: 'follow' });
         notify.error(t`Failed to unfollow. Please try again.`);
         return recheck();
       })

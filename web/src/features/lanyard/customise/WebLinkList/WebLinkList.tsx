@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { notify } from '@/components/Toaster/notify';
+import { captureError } from '@/lib/analytics/analytics';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { hostOf } from '@/lib/normalise';
 import type { WebLink } from '@/lib/sources/lanyards/lanyards.types';
@@ -48,7 +49,8 @@ export function WebLinkList({
       deletedAt.current = shown.indexOf(link);
       setDeleted((current) => new Set(current).add(link.key));
       notify.success(t`Link deleted`);
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'web-link' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setDeleting(null);

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ADA } from '@/test/people';
 import { servePerson, signedInSession } from '@/test/person';
@@ -77,6 +77,29 @@ describe('ShowQrButton', () => {
     await waitFor(() =>
       expect(notify.success).toHaveBeenCalledWith('Link copied')
     );
+  });
+
+  it('says so and reports it when copying fails', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(navigator.clipboard, 'writeText').mockRejectedValueOnce(
+      new Error('Denied')
+    );
+    renderWithClient(<ShowQrButton />);
+    await user.click(screen.getByRole('button', { name: 'Show QR' }));
+    await screen.findByRole(
+      'dialog',
+      { name: 'Ada Example' },
+      { timeout: 5000 }
+    );
+    await user.click(screen.getByRole('button', { name: 'Copy link' }));
+    await waitFor(() =>
+      expect(notify.error).toHaveBeenCalledWith(
+        "Couldn't copy the link. Please try again."
+      )
+    );
+    expect(captureError).toHaveBeenCalledWith(new Error('Denied'), {
+      source: 'copy-link',
+    });
   });
 
   it('closes on Escape and returns focus to the button', async () => {

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ADA } from '@/test/people';
@@ -146,6 +146,27 @@ describe('MediaForm', () => {
       );
     }
   );
+
+  it('keeps the form and reports the failure when the server fails', async () => {
+    captureWrites({ fail: ['createRecord'] });
+    renderWithClient(<MediaForm />);
+    const address = screen.getByRole('textbox', { name: 'Web address' });
+    await userEvent.type(address, 'https://media.example/1');
+    await userEvent.selectOptions(
+      screen.getByRole('combobox', { name: 'Platform' }),
+      'spotify'
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Add media' }));
+    await waitFor(() =>
+      expect(notify.error).toHaveBeenCalledWith(
+        'Failed to save. Please try again.'
+      )
+    );
+    expect(address).toHaveValue('https://media.example/1');
+    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
+      source: 'media',
+    });
+  });
 
   it('has no axe violations, including with errors', async () => {
     const { container } = renderWithClient(<MediaForm />);

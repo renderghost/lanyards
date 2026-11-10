@@ -7,7 +7,7 @@ import { Button } from '@/components/Button/Button';
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { TextField } from '@/components/TextField/TextField';
 import { notify } from '@/components/Toaster/notify';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { CANONICAL_ORIGIN } from '@/lib/atproto/endpoints';
 import { EDIT_LINKS } from '@/lib/person/editLinks';
 import { sourceQueryOptions } from '@/lib/person/sourceQuery';
@@ -87,7 +87,8 @@ export function OrcidHelper({
     try {
       await navigator.clipboard.writeText(backLink);
       notify.success(t`Link copied`);
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'copy-link' });
       notify.error(t`Couldn't copy the link. Please try again.`);
     }
   }

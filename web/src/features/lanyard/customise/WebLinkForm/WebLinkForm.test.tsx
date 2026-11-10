@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ADA } from '@/test/people';
@@ -112,6 +112,9 @@ describe('WebLinkForm', () => {
     );
     expect(address()).toHaveValue('https://ada.example/cv');
     expect(add()).toBeEnabled();
+    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
+      source: 'web-link',
+    });
   });
 
   it('has no axe violations, including with errors', async () => {

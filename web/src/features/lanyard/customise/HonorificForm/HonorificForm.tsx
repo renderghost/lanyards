@@ -4,7 +4,7 @@ import { type FormEvent, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { notify } from '@/components/Toaster/notify';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
@@ -59,7 +59,8 @@ export function HonorificForm({
       });
       notify.success(t`Honorific updated`);
       track('kept_record_saved', { kind: 'honorific' });
-    } catch {
+    } catch (cause) {
+      captureError(cause, { source: 'honorific' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setSaving(false);

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
+import { captureError } from '@/lib/analytics/analytics';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ADA } from '@/test/people';
 import { captureWrites, signedInSession } from '@/test/person';
@@ -12,6 +13,10 @@ import { renderWithClient } from '@/test/render';
 import { WebLinkList } from './WebLinkList';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
+vi.mock('@/lib/analytics/analytics', () => ({
+  captureError: vi.fn(),
+  track: vi.fn(),
+}));
 vi.mock('@/components/Toaster/notify', () => ({
   notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
 }));
@@ -66,6 +71,9 @@ describe('WebLinkList', () => {
       )
     );
     expect(screen.getByRole('button', { name: 'Delete CV' })).toBeEnabled();
+    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
+      source: 'web-link',
+    });
   });
 
   it('shows nothing without links', () => {
