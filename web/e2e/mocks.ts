@@ -200,18 +200,27 @@ export async function signIn(
   }, JSON.stringify(session));
 }
 
-/** Records the owner's putRecord writes from the customiser. */
-export async function mockOwnerWrites(page: Page): Promise<unknown[]> {
-  const saved: unknown[] = [];
-  await page.route(
-    'https://pds.e2e.test/xrpc/com.atproto.repo.putRecord',
-    (route) => {
-      saved.push(route.request().postDataJSON());
-      return json(route, {
-        uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
-        cid: CID,
-      });
-    }
-  );
-  return saved;
+export type OwnerWrite = {
+  method: 'createRecord' | 'putRecord' | 'deleteRecord';
+  body: { collection: string; rkey?: string; record?: Record<string, unknown> };
+};
+
+/** Records the owner's writes from the customiser, in order. */
+export async function mockOwnerWrites(page: Page): Promise<OwnerWrite[]> {
+  const writes: OwnerWrite[] = [];
+  for (const method of ['createRecord', 'putRecord', 'deleteRecord'] as const) {
+    await page.route(
+      `https://pds.e2e.test/xrpc/com.atproto.repo.${method}`,
+      (route) => {
+        const body = route.request().postDataJSON() as OwnerWrite['body'];
+        writes.push({ method, body });
+        if (method === 'deleteRecord') return json(route, {});
+        return json(route, {
+          uri: `at://${ADA.did}/${body.collection}/${body.rkey ?? '3mnewrecord'}`,
+          cid: CID,
+        });
+      }
+    );
+  }
+  return writes;
 }

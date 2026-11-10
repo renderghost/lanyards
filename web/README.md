@@ -31,6 +31,56 @@ Copy `.env.example` to `.env.local` for local overrides.
 budget after a build. If your environment ships its own Chromium, point the
 e2e tests at it with `PW_CHROMIUM_PATH=/path/to/chromium npm run e2e`.
 
+The app, CI and Vercel all run Node 26 (see `.nvmrc`).
+
+## The lanyard customiser (`/lanyard`)
+
+Signed-in people land on `/lanyard`: their lanyard's live preview beside
+the controls that change it. "View as visitor" switches the preview to what
+other people see.
+
+- **Settings** (accent, current-job line, block order, visibility, item
+  limits and hidden items) live in the `app.lanyards.actor.lanyard` record.
+  Changes show at once and save 800 ms after the last one, or straight away
+  when the page is hidden. Saving keeps everything the customiser doesn't
+  edit, such as per-event overrides, and never writes before the stored
+  settings have been read.
+- **Blocks** move by drag (pointer, or keyboard: Space, arrows, Space) or
+  with Move up and Move down. Every move is announced.
+- **Kept records** (honorific, web links, podcasts and videos) use forms
+  that follow CLAUDE.md's Form Standards and write their own records.
+- **Show QR** in the header opens a full-screen QR code for `/d/<did>`. It
+  keeps the screen awake and offers Copy link.
+- **ORCID**: the helper shows the link to add to the owner's ORCID record,
+  so their publications earn the ORCID tick.
+
+An identity-only session sees the permission notice instead of controls.
+
+## Manual accessibility checklist
+
+Automated checks (axe, in light and dark) run in CI. Before a release, also
+do these by hand with VoiceOver (iOS or macOS) and TalkBack (Android):
+
+1. **Public lanyard** (`/@handle`): the name is the only level-one heading,
+   each block is a labelled region, links say they open in a new tab, and
+   Follow announces its result.
+2. **Customiser** (`/lanyard`):
+   - every control has a name, and switches and radios say their state
+   - "Saving…" then "Saved" is announced after a change
+   - keyboard reordering announces "Picked up…", each new position, and
+     "… moved to position N of 12"
+   - Move up and Move down announce the new position
+   - item menus are named "More options for …"
+3. **Forms**: an invalid submit moves focus to the first problem, which is
+   read with its error. Success and failure toasts are announced.
+4. **QR sheet**: opening moves focus into the sheet, the name is read as
+   its title, Copy link announces "Link copied", and Escape returns focus
+   to Show QR.
+5. **Layout**: nothing scrolls sideways at 320 px or at 200% zoom, and every
+   control is at least 44 px (56 px in the QR sheet).
+6. **Timing**: from a signed-in home, Show QR shows a scannable code well
+   within 30 seconds, and scanning it from another phone opens `/d/<did>`.
+
 ## Lexicons
 
 - `lexicons/lanyards/` holds the `app.lanyards.*` lexicons we publish.

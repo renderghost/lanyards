@@ -5,6 +5,9 @@ import { ADA, mockPerson, signIn } from './mocks';
 
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
+/** The spec's exit criterion: signed in to a scannable QR in under 30 s. */
+const SIGN_IN_TO_QR_MS = 30_000;
+
 test.describe('QR sheet', () => {
   test.beforeEach(async ({ page }) => {
     await mockPerson(page);
@@ -12,9 +15,23 @@ test.describe('QR sheet', () => {
     await page.setViewportSize({ width: 320, height: 640 });
   });
 
-  test('opens from the header full screen, with large controls', async ({
+  test('goes from a signed-in home to a QR code in under 30 seconds', async ({
     page,
   }) => {
+    const started = Date.now();
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Show QR' }).click();
+    await expect(
+      page.getByRole('dialog', { name: 'Ada Example' })
+    ).toBeVisible();
+    expect(Date.now() - started).toBeLessThan(SIGN_IN_TO_QR_MS);
+  });
+
+  test('opens from the header full screen, copies the link and closes', async ({
+    page,
+    context,
+  }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto('/lanyard');
     const show = page.getByRole('button', { name: 'Show QR' });
     await expect(show).toBeVisible();
@@ -26,11 +43,10 @@ test.describe('QR sheet', () => {
     const sheet = page.getByRole('dialog', { name: 'Ada Example' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText('Scan to see my lanyard')).toBeVisible();
-    await expect(
-      sheet.getByRole('img', {
-        name: /^QR code for https?:\/\/.+\/d\/did:plc:/,
-      })
-    ).toBeVisible();
+    const qr = sheet.getByRole('img', {
+      name: /^QR code for https?:\/\/.+\/d\/did:plc:/,
+    });
+    await expect(qr).toBeVisible();
     for (const name of ['Copy link', 'Close']) {
       const box = await sheet.getByRole('button', { name }).boundingBox();
       expect(box?.height ?? 0).toBeGreaterThanOrEqual(56);
@@ -38,6 +54,11 @@ test.describe('QR sheet', () => {
 
     const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
     expect(result.violations).toEqual([]);
+
+    await sheet.getByRole('button', { name: 'Copy link' }).click();
+    await expect(page.getByText('Link copied')).toBeVisible();
+    const copied = await page.evaluate(() => navigator.clipboard.readText());
+    expect(copied).toMatch(new RegExp(`/d/${ADA.did}$`));
 
     await page.keyboard.press('Escape');
     await expect(sheet).toBeHidden();
