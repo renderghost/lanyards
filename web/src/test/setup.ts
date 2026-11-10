@@ -1,11 +1,23 @@
 import '@testing-library/jest-dom/vitest';
 
 import { cleanup } from '@testing-library/react';
-import { afterEach } from 'vitest';
+import { afterAll, afterEach } from 'vitest';
+
+import { server } from './msw';
 
 // Without Vitest globals, Testing Library cannot register its own cleanup.
 afterEach(() => {
   cleanup();
+});
+
+// Listen before any test module is imported: clients such as atcute's
+// simpleFetchHandler capture fetch when their module loads.
+server.listen({ onUnhandledFrame: 'error' });
+afterEach(() => {
+  server.resetHandlers();
+});
+afterAll(() => {
+  server.close();
 });
 
 // jsdom lacks matchMedia; components that follow the system colour scheme
