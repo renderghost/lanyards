@@ -15,8 +15,8 @@ import {
   finalizeAuthorization,
   getSession,
   LoginError,
+  OAuthResponseError,
   OAuthUserAgent,
-  TokenRefreshError,
 } from '@atcute/oauth-browser-client';
 
 import { track } from '@/lib/analytics/analytics';
@@ -31,6 +31,13 @@ import {
 
 /** Give the browser time to persist OAuth state before navigating away. */
 const REDIRECT_DELAY_MS = 200;
+
+/** A token refresh slower than this falls back to the stored session. */
+const RESTORE_TIMEOUT_MS = 8000;
+
+class RestoreTimeoutError extends Error {
+  override name = 'RestoreTimeoutError';
+}
 
 export type OAuthCallbackErrorCode = 'denied' | 'missing' | 'failed';
 
@@ -160,23 +167,24 @@ async function finishSignIn(
 }
 
 /**
- * Restores the signed-in account, refreshing its tokens when needed. Only a
- * revoked or deleted grant counts as expired: when the refresh fails for any
- * other reason (offline, network), the stored session is kept so the app
- * still works without signal and refreshes on the next request.
+ * Restores the signed-in account, refreshing its tokens when needed.
+ *
+ * Only failures that say nothing about the grant itself (offline, network
+ * errors, a 5xx, or a refresh slower than RESTORE_TIMEOUT_MS) keep the stored
+ * session, so the app works without signal and refreshes on the next
+ * request. A revoked grant or any other refusal expires it. Blocked browser
+ * storage reads as signed out.
  */
 export async function restoreSession(): Promise<RestoreResult> {
-  const stored = localStorage.getItem(DID_STORAGE_KEY);
+  const stored = readStoredDid();
   if (!stored) return { status: 'none' };
   const did = stored as Did;
 
   try {
-    return {
-      status: 'restored',
-      session: toHandle(did, await getSession(did)),
-    };
+    const fresh = await withTimeout(getSession(did), RESTORE_TIMEOUT_MS);
+    return { status: 'restored', session: toHandle(did, fresh) };
   } catch (error) {
-    if (!(error instanceof TokenRefreshError)) {
+    if (isTransient(error)) {
       try {
         const stale = await getSession(did, { allowStale: true });
         return { status: 'restored', session: toHandle(did, stale) };
@@ -184,8 +192,7 @@ export async function restoreSession(): Promise<RestoreResult> {
         // The stored record is unusable too; treat as expired below.
       }
     }
-    deleteStoredSession(did);
-    localStorage.removeItem(DID_STORAGE_KEY);
+    forget(did);
     return { status: 'expired' };
   }
 }
@@ -199,6 +206,45 @@ export async function signOut(session: SessionHandle): Promise<void> {
   } finally {
     localStorage.removeItem(DID_STORAGE_KEY);
   }
+}
+
+function readStoredDid(): string | null {
+  try {
+    return localStorage.getItem(DID_STORAGE_KEY);
+  } catch {
+    // Storage disabled (e.g. strict privacy settings): nobody is signed in.
+    return null;
+  }
+}
+
+function forget(did: Did): void {
+  deleteStoredSession(did);
+  try {
+    localStorage.removeItem(DID_STORAGE_KEY);
+  } catch {
+    // Nothing stored that we could remove.
+  }
+}
+
+const isTransient = (error: unknown) =>
+  error instanceof TypeError ||
+  error instanceof RestoreTimeoutError ||
+  (error instanceof OAuthResponseError && error.status >= 500);
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new RestoreTimeoutError()), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      (error: unknown) => {
+        clearTimeout(timer);
+        reject(error);
+      }
+    );
+  });
 }
 
 function toHandle(

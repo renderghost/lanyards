@@ -4,6 +4,7 @@ import {
   LoginError,
   finalizeAuthorization,
   getSession,
+  OAuthResponseError,
   TokenRefreshError,
 } from '@atcute/oauth-browser-client';
 import type { Did } from '@atcute/lexicons';
@@ -69,7 +70,8 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.unstubAllGlobals();
-  vi.clearAllMocks();
+  // Reset, not just clear: unused one-time results must not leak between tests.
+  vi.resetAllMocks();
 });
 
 describe('startSignIn', () => {
@@ -221,6 +223,58 @@ describe('restoreSession', () => {
     expect(getSession).toHaveBeenLastCalledWith(DID, { allowStale: true });
     expect(deleteStoredSession).not.toHaveBeenCalled();
     expect(localStorage.getItem(DID_STORAGE_KEY)).toBe(DID);
+  });
+});
+
+describe('restoreSession resilience', () => {
+  const oauthError = (status: number) =>
+    new OAuthResponseError(new Response(null, { status }), {
+      error: status >= 500 ? 'server_error' : 'invalid_request',
+    });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('treats blocked browser storage as signed out', async () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new DOMException('Storage is disabled', 'SecurityError');
+    });
+    await expect(restoreSession()).resolves.toEqual({ status: 'none' });
+  });
+
+  it('expires the session on a 4xx refresh error', async () => {
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession)
+      .mockRejectedValueOnce(oauthError(400))
+      .mockResolvedValueOnce(fakeSession);
+    await expect(restoreSession()).resolves.toEqual({ status: 'expired' });
+    expect(getSession).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem(DID_STORAGE_KEY)).toBeNull();
+  });
+
+  it('keeps the stale session when the server has a 5xx problem', async () => {
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession)
+      .mockRejectedValueOnce(oauthError(503))
+      .mockResolvedValueOnce(fakeSession);
+    const result = await restoreSession();
+    expect(result.status).toBe('restored');
+    expect(getSession).toHaveBeenLastCalledWith(DID, { allowStale: true });
+  });
+
+  it('stops waiting for a stalled refresh and keeps the stale session', async () => {
+    vi.useFakeTimers();
+    localStorage.setItem(DID_STORAGE_KEY, DID);
+    vi.mocked(getSession)
+      .mockReturnValueOnce(new Promise(() => undefined))
+      .mockResolvedValueOnce(fakeSession);
+    const pending = restoreSession();
+    await vi.advanceTimersByTimeAsync(8000);
+    const result = await pending;
+    expect(result.status).toBe('restored');
+    expect(getSession).toHaveBeenLastCalledWith(DID, { allowStale: true });
   });
 });
 

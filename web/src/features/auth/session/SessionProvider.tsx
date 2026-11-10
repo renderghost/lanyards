@@ -2,7 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { notify } from '@/components/Toaster/notify';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import {
   type RestoreResult,
   restoreSession,
@@ -42,9 +42,18 @@ export function SessionProvider({ children }: SessionProviderProps) {
   useEffect(() => {
     let active = true;
     const started = generation.current;
-    restoreSession().then((result) => {
-      if (active && started === generation.current) apply(result);
-    });
+    restoreSession().then(
+      (result) => {
+        if (active && started === generation.current) apply(result);
+      },
+      (error: unknown) => {
+        // Never leave the app stuck on "Loading…".
+        captureError(error, { source: 'session-restore' });
+        if (active && started === generation.current) {
+          apply({ status: 'none' });
+        }
+      }
+    );
     return () => {
       active = false;
     };
@@ -52,7 +61,13 @@ export function SessionProvider({ children }: SessionProviderProps) {
 
   const refresh = useCallback(async () => {
     const started = ++generation.current;
-    const result = await restoreSession();
+    let result: RestoreResult;
+    try {
+      result = await restoreSession();
+    } catch (error) {
+      captureError(error, { source: 'session-restore' });
+      result = { status: 'none' };
+    }
     if (started === generation.current) apply(result);
   }, [apply]);
 

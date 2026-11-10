@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { notify } from '@/components/Toaster/notify';
-import { track } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { restoreSession, signOut } from '@/lib/atproto/session';
 import { renderWithProviders } from '@/test/render';
 
@@ -71,6 +71,16 @@ describe('SessionProvider', () => {
       "You've been signed out. Please sign in again."
     );
     expect(track).toHaveBeenCalledWith('session_expired');
+  });
+
+  it('settles signed out if restoring the session throws', async () => {
+    const error = new DOMException('Storage is disabled', 'SecurityError');
+    vi.mocked(restoreSession).mockRejectedValue(error);
+    renderProvider();
+    expect(await screen.findByText('status: signedOut')).toBeInTheDocument();
+    expect(captureError).toHaveBeenCalledWith(error, {
+      source: 'session-restore',
+    });
   });
 
   it('stays quiet when nobody had signed in', async () => {
