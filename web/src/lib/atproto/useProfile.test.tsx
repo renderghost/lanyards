@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { describe, expect, it } from 'vitest';
 
-import { ALICE } from '@/test/fixtures';
+import { ALICE, ALICE_AVATAR_THUMBNAIL } from '@/test/fixtures';
 import { server } from '@/test/msw';
 
 import { useProfile } from './useProfile';
@@ -34,7 +34,7 @@ describe('useProfile', () => {
       did: ALICE.did,
       handle: ALICE.handle,
       displayName: ALICE.displayName,
-      avatar: ALICE.avatar,
+      avatar: ALICE_AVATAR_THUMBNAIL,
     });
   });
 

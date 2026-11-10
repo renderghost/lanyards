@@ -2,6 +2,7 @@ import type {} from '@atcute/bluesky';
 import { ok } from '@atcute/client';
 import type { Did, Handle } from '@atcute/lexicons';
 
+import { avatarThumbnail } from './avatar';
 import { publicAppView } from './identity';
 
 export type HandleSuggestion = {
@@ -37,6 +38,6 @@ export async function searchHandles(
     did,
     handle,
     ...(displayName ? { displayName } : {}),
-    ...(avatar ? { avatar } : {}),
+    ...(avatar ? { avatar: avatarThumbnail(avatar) } : {}),
   }));
 }

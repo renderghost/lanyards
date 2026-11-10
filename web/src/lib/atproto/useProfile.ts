@@ -3,6 +3,7 @@ import { ok } from '@atcute/client';
 import type { ActorIdentifier, Did, Handle } from '@atcute/lexicons';
 import { useQuery } from '@tanstack/react-query';
 
+import { avatarThumbnail } from './avatar';
 import { publicAppView } from './identity';
 
 export type ProfileSummary = {
@@ -31,7 +32,7 @@ export function useProfile(actor: string | undefined) {
         did: profile.did,
         handle: profile.handle,
         ...(profile.displayName ? { displayName: profile.displayName } : {}),
-        ...(profile.avatar ? { avatar: profile.avatar } : {}),
+        ...(profile.avatar ? { avatar: avatarThumbnail(profile.avatar) } : {}),
       };
     },
   });

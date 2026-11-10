@@ -1,7 +1,12 @@
 import { delay, http, HttpResponse } from 'msw';
 import { describe, expect, it } from 'vitest';
 
-import { ALICE, ALISON, TYPEAHEAD_URL } from '@/test/fixtures';
+import {
+  ALICE,
+  ALICE_AVATAR_THUMBNAIL,
+  ALISON,
+  TYPEAHEAD_URL,
+} from '@/test/fixtures';
 import { server } from '@/test/msw';
 
 import { searchHandles } from './typeahead';
@@ -21,7 +26,7 @@ describe('searchHandles', () => {
         did: ALICE.did,
         handle: ALICE.handle,
         displayName: ALICE.displayName,
-        avatar: ALICE.avatar,
+        avatar: ALICE_AVATAR_THUMBNAIL,
       },
       { did: ALISON.did, handle: ALISON.handle },
     ]);
