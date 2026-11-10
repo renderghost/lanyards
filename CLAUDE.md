@@ -9,18 +9,38 @@
 ## Instructions for Claude
 
 ### Issue Tracking
-Use GitHub Issues via the `gh` CLI for all task tracking:
+All work is tracked in GitHub Issues. Use the `gh` CLI or the GitHub MCP tools, whichever is available.
+- **ALWAYS** work against an issue. This covers bugs, features, docs and chores. If none exists, check for duplicates, then create one before starting.
 - **NEVER** use markdown files for to-do lists or tracking work
-- **ALWAYS** create issues for bugs and features before starting work
-- Reference issue numbers in commits and PRs
+- Split large work into sub-issues under an epic issue
+- Reference the issue number in every branch, commit and PR
 
 ### Git Workflow
-- **NEVER** commit without explicit user instruction
-- **NEVER** push without explicit user instruction
-- **NEVER** use `--force` or destructive git commands
-- You may run `git status`, `git diff`, `git log` freely
-- You may stage files with `git add` when explicitly asked
-- Leave version control decisions to the user
+
+**Branches**
+- **ALWAYS** work on a branch. **NEVER** commit or push directly to `main`.
+- Use one branch per issue, created from the latest `main`. Name it `<type>/issue-<number>-<short-description>`, where type is `feature`, `fix`, `docs` or `chore`.
+- If the environment assigns a branch (e.g. a Claude Code on the web session), use that branch. Reference the issue in its commits and PR.
+
+**Commits**
+- You may commit and push to your working branch autonomously, without asking first
+- Commit in small, coherent increments that each pass `npm run lint`, and the build and tests where they exist
+- Message format: `<type>: <description> (#<number>)`, e.g. `fix: handle empty skills list (#88)`
+- **NEVER** use `--force`, `reset --hard` or other destructive git commands
+- **NEVER** commit secrets, `.env` files or generated build output
+
+**Pull Requests**
+- Open a PR when the issue's work is complete and the Quality Checklist passes. Link it with `Closes #<number>`.
+- Use a draft PR for work in progress that needs early feedback
+- **Only the repository owner approves and merges PRs.** NEVER approve, merge, enable auto-merge, dismiss reviews or bypass branch protection.
+- Address review feedback with new commits on the same branch
+
+### Asking Questions
+- **ALWAYS** resolve open questions with a multiple-choice quiz (e.g. the AskUserQuestion tool), not open-ended prose
+- Group up to 4 related questions per round. When triaging a list of items, ask one question per item.
+- Put the recommended option first and mark it "(Rec.)". Give each option a one-line trade-off.
+- Make every question self-contained, because the user may see only the question dialog
+- Ask open-ended questions only when no sensible options exist
 
 ### Core Principles
 **1. No Stubs, No Shortcuts**
@@ -253,7 +273,7 @@ A lexicon is **not complete** until all of these exist:
 Schema → Types → Repository → API → Form → Dashboard → Public Display
 ```
 
-> [!IMORTANT]
+> [!IMPORTANT]
 > Each layer **must** be complete and tested before moving to the next.
 
 ---
@@ -289,7 +309,7 @@ gh issue create \
 
 ### For External Bug Reports
 
-Direct users to: https://github.com/barryprendergast/lanyards/issues/new
+Direct users to: https://github.com/renderghost/lanyards/issues/new
 
 ### Fixing Bugs from Issues
 
@@ -298,8 +318,9 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
    gh issue view <number>
    ```
 
-2. **Create a fix branch**
+2. **Create a fix branch** from the latest `main`
    ```bash
+   git checkout main && git pull
    git checkout -b fix/issue-<number>-<short-description>
    ```
 
@@ -308,22 +329,16 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
    - Run `npm run lint:fix`
    - Test locally with `npm run dev`
 
-4. **User verification** (REQUIRED before any commit)
-   - Present the fix to the user
-   - User reviews and tests the implementation
-   - User explicitly confirms the fix works as expected
-   - **NEVER commit until user has verified**
-
-5. **Commit with issue reference** (only after user verification)
+4. **Commit and push with issue reference** (autonomous, in small increments)
    ```bash
-   git commit -m "Fix #<number>: [description]"
+   git commit -m "fix: [description] (#<number>)"
+   git push -u origin fix/issue-<number>-<short-description>
    ```
 
-6. **Push and create PR** (when user approves)
+5. **Open a PR** once the fix is complete and the Quality Checklist passes
    ```bash
-   git push -u origin fix/issue-<number>-<short-description>
    gh pr create \
-     --title "Fix #<number>: [description]" \
+     --title "fix: [description] (#<number>)" \
      --body "## Summary
    [What was fixed and how]
 
@@ -333,6 +348,11 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
 
    Closes #<number>"
    ```
+
+6. **Owner review** (REQUIRED before merge)
+   - The repository owner reviews, tests and approves the PR
+   - Address feedback with new commits on the same branch
+   - **NEVER approve or merge the PR yourself**
 
 7. **After merge** - verify issue closes automatically via "Closes #N"
 
@@ -346,21 +366,19 @@ Direct users to: https://github.com/barryprendergast/lanyards/issues/new
 
 ## Feature Workflow
 
-1. **Create issue** with `enhancement` label first
-2. **Create feature branch**
+1. **Create issue** with `enhancement` label first (check for duplicates)
+2. **Create feature branch** from the latest `main`
    ```bash
+   git checkout main && git pull
    git checkout -b feature/issue-<number>-<description>
    ```
 3. **Implement the feature**
    - Follow component architecture
    - Run `npm run lint:fix`
    - Test locally with `npm run dev`
-4. **User verification** (REQUIRED before any commit)
-   - Present the implementation to the user
-   - User reviews and tests the feature
-   - User explicitly confirms it works as expected
-   - **NEVER commit until user has verified**
-5. **Commit, push, and create PR** (same as bug workflow)
+   - Commit and push in small increments (autonomous): `feat: [description] (#<number>)`
+4. **Open a PR** once the feature is complete and the Quality Checklist passes (same as bug workflow)
+5. **Owner review** - only the repository owner approves and merges
 
 ---
 
