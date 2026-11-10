@@ -1,9 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { globSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
 type Config = {
+  functions?: Record<string, { includeFiles?: string }>;
   rewrites: { source: string; destination: string }[];
   headers: { source: string; headers: { key: string; value: string }[] }[];
 };
@@ -20,6 +21,18 @@ describe('vercel.json', () => {
       { source: '/og/p/:did.png', destination: '/api/og?did=:did' },
       { source: '/og/default.png', destination: '/api/og' },
       { source: '/((?!api/).*)', destination: '/index.html' },
+    ]);
+  });
+
+  it('bundles the files each preview function reads at runtime', () => {
+    expect(config.functions?.['api/meta.ts']?.includeFiles).toBe(
+      'dist/index.html'
+    );
+    const og = config.functions?.['api/og.ts']?.includeFiles ?? '';
+    expect(globSync(og).sort()).toEqual([
+      'node_modules/@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2',
+      'node_modules/@fontsource/dm-sans/files/dm-sans-latin-700-normal.woff2',
+      'node_modules/@resvg/resvg-wasm/index_bg.wasm',
     ]);
   });
 

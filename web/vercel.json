@@ -4,6 +4,14 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "ignoreCommand": "[ -n \"$VERCEL_GIT_PREVIOUS_SHA\" ] && git diff --quiet \"$VERCEL_GIT_PREVIOUS_SHA\" HEAD -- .",
+  "functions": {
+    "api/meta.ts": {
+      "includeFiles": "dist/index.html"
+    },
+    "api/og.ts": {
+      "includeFiles": "node_modules/{@resvg/resvg-wasm/index_bg.wasm,@fontsource/dm-sans/files/dm-sans-latin-{400,700}-normal.woff2}"
+    }
+  },
   "rewrites": [
     {
       "source": "/@:handle",
