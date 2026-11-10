@@ -1,0 +1,52 @@
+{
+  "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+  "handle": "alice.test",
+  "displayName": "Ada Example",
+  "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiadaavatar@jpeg",
+  "associated": {
+    "lists": 1,
+    "feedgens": 2,
+    "starterPacks": 0,
+    "labeler": false,
+    "chat": {
+      "allowIncoming": "following"
+    },
+    "activitySubscription": {
+      "allowSubscriptions": "followers"
+    }
+  },
+  "labels": [],
+  "createdAt": "2023-11-24T10:01:30.201Z",
+  "description": "Research engineer working on open protocols.\n\nAlso: tea, trains and typography.",
+  "indexedAt": "2026-11-05T03:57:48.171Z",
+  "banner": "https://cdn.bsky.app/img/banner/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiadabanner@jpeg",
+  "followersCount": 247,
+  "followsCount": 112,
+  "postsCount": 1655,
+  "links": [
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.actor.link/3mfixturelink0",
+      "cid": "bafyreifixturelinkzeroaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "url": "https://ada.example/",
+      "icon": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreifixtureicon0@jpeg",
+      "labels": [],
+      "title": "Website"
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.actor.link/3mfixturelink1",
+      "cid": "bafyreifixturelinkoneaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "url": "https://github.com/ada-example",
+      "icon": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreifixtureicon1@jpeg",
+      "labels": []
+    },
+    {
+      "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.actor.link/3mfixturelink2",
+      "cid": "bafyreifixturelinktwoaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "url": "https://linkat.blue/alice.test",
+      "icon": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreifixtureicon2@jpeg",
+      "labels": [],
+      "title": "Linkat"
+    }
+  ],
+  "pronouns": "she/her"
+}

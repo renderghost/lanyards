@@ -1,0 +1,174 @@
+{
+  "feed": [
+    {
+      "post": {
+        "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.feed.post/3mfixturepost1",
+        "cid": "bafyreifixturepostthreemfixturepostoneaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+          "handle": "alice.test",
+          "displayName": "Ada Example",
+          "avatar": "https://cdn.bsky.app/img/avatar_thumbnail/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiavatar@jpeg",
+          "associated": {
+            "activitySubscription": {
+              "allowSubscriptions": "followers"
+            }
+          },
+          "labels": [],
+          "createdAt": "2025-11-14T10:25:36.450Z"
+        },
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2026-11-09T10:00:00.000Z",
+          "facets": [
+            {
+              "$type": "app.bsky.richtext.facet",
+              "features": [
+                {
+                  "$type": "app.bsky.richtext.facet#link",
+                  "uri": "https://ada.example/slides"
+                }
+              ],
+              "index": {
+                "byteStart": 28,
+                "byteEnd": 46
+              }
+            }
+          ],
+          "langs": ["en"],
+          "text": "Slides from my talk are up: ada.example/slides"
+        },
+        "bookmarkCount": 3,
+        "replyCount": 2,
+        "repostCount": 1,
+        "likeCount": 31,
+        "quoteCount": 2,
+        "indexedAt": "2026-11-09T10:00:00.000Z",
+        "labels": []
+      }
+    },
+    {
+      "post": {
+        "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.feed.post/3mfixturepost2",
+        "cid": "bafyreifixturepostthreemfixtureposttwoaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+          "handle": "alice.test",
+          "displayName": "Ada Example",
+          "avatar": "https://cdn.bsky.app/img/avatar_thumbnail/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiavatar@jpeg",
+          "associated": {
+            "activitySubscription": {
+              "allowSubscriptions": "followers"
+            }
+          },
+          "labels": [],
+          "createdAt": "2025-11-14T10:25:36.450Z"
+        },
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2026-11-08T10:00:00.000Z",
+          "facets": [
+            {
+              "$type": "app.bsky.richtext.facet",
+              "features": [
+                {
+                  "$type": "app.bsky.richtext.facet#mention",
+                  "did": "did:plc:fixturebeaaaaaaaaaaaaaaa"
+                }
+              ],
+              "index": {
+                "byteStart": 14,
+                "byteEnd": 23
+              }
+            }
+          ],
+          "langs": ["en"],
+          "text": "Great to meet @bea.test at the conference <b>today</b>"
+        },
+        "bookmarkCount": 3,
+        "replyCount": 2,
+        "repostCount": 1,
+        "likeCount": 31,
+        "quoteCount": 2,
+        "indexedAt": "2026-11-08T10:00:00.000Z",
+        "labels": []
+      }
+    },
+    {
+      "post": {
+        "uri": "at://did:plc:fixturecalaaaaaaaaaaaaaa/app.bsky.feed.post/3mfixturerepost",
+        "cid": "bafyreifixturepostthreemfixturerepostaaaaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "did": "did:plc:fixturecalaaaaaaaaaaaaaa",
+          "handle": "cal.test",
+          "displayName": "Cal Example",
+          "avatar": "https://cdn.bsky.app/img/avatar_thumbnail/plain/did:plc:fixturecalaaaaaaaaaaaaaa/bafkreiavatar@jpeg",
+          "associated": {
+            "activitySubscription": {
+              "allowSubscriptions": "followers"
+            }
+          },
+          "labels": [],
+          "createdAt": "2025-11-14T10:25:36.450Z"
+        },
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2026-11-07T10:00:00.000Z",
+          "langs": ["en"],
+          "text": "A post Ada reposted"
+        },
+        "bookmarkCount": 0,
+        "replyCount": 1,
+        "repostCount": 0,
+        "likeCount": 4,
+        "quoteCount": 0,
+        "indexedAt": "2026-11-07T10:00:00.000Z",
+        "labels": []
+      },
+      "reason": {
+        "$type": "app.bsky.feed.defs#reasonRepost",
+        "by": {
+          "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+          "handle": "alice.test",
+          "displayName": "Ada Example",
+          "labels": [],
+          "createdAt": "2024-01-01T00:00:00.000Z"
+        },
+        "indexedAt": "2026-11-07T11:00:00.000Z"
+      }
+    },
+    {
+      "post": {
+        "uri": "at://did:plc:fixturealiceaaaaaaaaaaaa/app.bsky.feed.post/3mfixturepost3",
+        "cid": "bafyreifixturepostthreemfixturepostthreeaaaaaaaaaaaaaaaaaaa",
+        "author": {
+          "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+          "handle": "alice.test",
+          "displayName": "Ada Example",
+          "avatar": "https://cdn.bsky.app/img/avatar_thumbnail/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiavatar@jpeg",
+          "associated": {
+            "activitySubscription": {
+              "allowSubscriptions": "followers"
+            }
+          },
+          "labels": [],
+          "createdAt": "2025-11-14T10:25:36.450Z"
+        },
+        "record": {
+          "$type": "app.bsky.feed.post",
+          "createdAt": "2026-11-06T10:00:00.000Z",
+          "langs": ["en"],
+          "text": "Plain post with no links."
+        },
+        "bookmarkCount": 0,
+        "replyCount": 1,
+        "repostCount": 0,
+        "likeCount": 4,
+        "quoteCount": 0,
+        "indexedAt": "2026-11-06T10:00:00.000Z",
+        "labels": []
+      }
+    }
+  ],
+  "cursor": "2026-11-06T10:00:00.000Z"
+}

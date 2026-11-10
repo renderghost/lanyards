@@ -1,0 +1,59 @@
+{
+  "subject": {
+    "did": "did:plc:fixturealiceaaaaaaaaaaaa",
+    "handle": "alice.test",
+    "displayName": "Ada Example",
+    "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiavatar@jpeg",
+    "labels": [],
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "indexedAt": "2024-01-01T00:00:00.000Z"
+  },
+  "followers": [
+    {
+      "did": "did:plc:fixturebeaaaaaaaaaaaaaaa",
+      "handle": "bea.test",
+      "displayName": "Bea Example",
+      "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturebeaaaaaaaaaaaaaaa/bafkreiavatar@jpeg",
+      "labels": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "indexedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "did": "did:plc:fixturecalaaaaaaaaaaaaaa",
+      "handle": "cal.test",
+      "displayName": "Cal Example",
+      "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturecalaaaaaaaaaaaaaa/bafkreiavatar@jpeg",
+      "labels": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "indexedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "did": "did:plc:fixturefollowerbaaaaaaaa",
+      "handle": "fb.test",
+      "displayName": "Follower b",
+      "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturefollowerbaaaaaaaa/bafkreiavatar@jpeg",
+      "labels": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "indexedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "did": "did:plc:fixturefollowercaaaaaaaa",
+      "handle": "fc.test",
+      "displayName": "Follower c",
+      "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturefollowercaaaaaaaa/bafkreiavatar@jpeg",
+      "labels": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "indexedAt": "2024-01-01T00:00:00.000Z"
+    },
+    {
+      "did": "did:plc:fixturefollowerdaaaaaaaa",
+      "handle": "fd.test",
+      "displayName": "Follower d",
+      "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturefollowerdaaaaaaaa/bafkreiavatar@jpeg",
+      "labels": [],
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "indexedAt": "2024-01-01T00:00:00.000Z"
+    }
+  ],
+  "cursor": "5"
+}

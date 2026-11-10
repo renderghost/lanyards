@@ -56,3 +56,39 @@ export async function requestJson(
     signal?.removeEventListener('abort', abort);
   }
 }
+
+type XrpcResponse =
+  | { ok: true; data: unknown; status: number }
+  | { ok: false; data: { error?: string }; status: number };
+
+/**
+ * Runs an atcute client call with the same timeout and error mapping as
+ * requestJson, for authenticated reads through the user's PDS.
+ */
+export async function requestXrpc<T>(
+  source: SourceName,
+  call: (signal: AbortSignal) => Promise<XrpcResponse>,
+  signal?: AbortSignal
+): Promise<Result<T>> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const abort = () => controller.abort();
+  if (signal?.aborted) controller.abort();
+  signal?.addEventListener('abort', abort, { once: true });
+
+  try {
+    const response = await call(controller.signal);
+    if (!response.ok) {
+      return err(source, kindForStatus(response.status), {
+        status: response.status,
+        code: response.data.error,
+      });
+    }
+    return ok(response.data as T);
+  } catch {
+    return err(source, controller.signal.aborted ? 'timeout' : 'network');
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', abort);
+  }
+}
