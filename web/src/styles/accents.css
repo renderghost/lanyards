@@ -1,0 +1,109 @@
+/* =============================================================================
+   ACCENT PALETTES
+   Selected with <html data-accent="…">; violet is the default.
+   Every pair is contrast-checked by src/design/accents.test.ts:
+   on-accent/accent ≥ 7:1, accent-text/background ≥ 7:1,
+   accent-text/accent-subtle ≥ 4.5:1, accent/background ≥ 3:1.
+   ============================================================================= */
+
+:root,
+:root[data-accent='violet'] {
+  --accent: oklch(0.451 0.258 275.99);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.451 0.258 275.99);
+  --accent-subtle: oklch(0.925 0.036 276);
+}
+:root[data-accent='indigo'] {
+  --accent: oklch(0.435 0.201 262);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.435 0.201 262);
+  --accent-subtle: oklch(0.925 0.036 262);
+}
+:root[data-accent='plum'] {
+  --accent: oklch(0.455 0.216 322);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.455 0.216 322);
+  --accent-subtle: oklch(0.925 0.045 322);
+}
+:root[data-accent='rose'] {
+  --accent: oklch(0.445 0.178 12);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.445 0.178 12);
+  --accent-subtle: oklch(0.925 0.039 12);
+}
+:root[data-accent='ember'] {
+  --accent: oklch(0.435 0.131 42);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.435 0.131 42);
+  --accent-subtle: oklch(0.925 0.04 42);
+}
+:root[data-accent='moss'] {
+  --accent: oklch(0.41 0.127 138);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.41 0.127 138);
+  --accent-subtle: oklch(0.925 0.045 138);
+}
+:root[data-accent='teal'] {
+  --accent: oklch(0.415 0.072 190);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.415 0.072 190);
+  --accent-subtle: oklch(0.925 0.045 190);
+}
+:root[data-accent='ocean'] {
+  --accent: oklch(0.42 0.09 236);
+  --on-accent: oklch(1 0 0);
+  --accent-text: oklch(0.42 0.09 236);
+  --accent-subtle: oklch(0.925 0.042 236);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root,
+  :root[data-accent='violet'] {
+    --accent: oklch(0.71 0.152 276);
+    --on-accent: oklch(0.16 0.05 276);
+    --accent-text: oklch(0.71 0.152 276);
+    --accent-subtle: oklch(0.26 0.06 276);
+  }
+  :root[data-accent='indigo'] {
+    --accent: oklch(0.705 0.154 262);
+    --on-accent: oklch(0.16 0.05 262);
+    --accent-text: oklch(0.705 0.154 262);
+    --accent-subtle: oklch(0.26 0.06 262);
+  }
+  :root[data-accent='plum'] {
+    --accent: oklch(0.72 0.16 322);
+    --on-accent: oklch(0.16 0.05 322);
+    --accent-text: oklch(0.72 0.16 322);
+    --accent-subtle: oklch(0.26 0.06 322);
+  }
+  :root[data-accent='rose'] {
+    --accent: oklch(0.72 0.16 12);
+    --on-accent: oklch(0.16 0.05 12);
+    --accent-text: oklch(0.72 0.16 12);
+    --accent-subtle: oklch(0.26 0.06 12);
+  }
+  :root[data-accent='ember'] {
+    --accent: oklch(0.72 0.16 42);
+    --on-accent: oklch(0.16 0.048 42);
+    --accent-text: oklch(0.72 0.16 42);
+    --accent-subtle: oklch(0.26 0.06 42);
+  }
+  :root[data-accent='moss'] {
+    --accent: oklch(0.69 0.16 138);
+    --on-accent: oklch(0.16 0.049 138);
+    --accent-text: oklch(0.69 0.16 138);
+    --accent-subtle: oklch(0.26 0.06 138);
+  }
+  :root[data-accent='teal'] {
+    --accent: oklch(0.69 0.119 190);
+    --on-accent: oklch(0.16 0.028 190);
+    --accent-text: oklch(0.69 0.119 190);
+    --accent-subtle: oklch(0.26 0.045 190);
+  }
+  :root[data-accent='ocean'] {
+    --accent: oklch(0.7 0.151 236);
+    --on-accent: oklch(0.16 0.034 236);
+    --accent-text: oklch(0.7 0.151 236);
+    --accent-subtle: oklch(0.26 0.056 236);
+  }
+}

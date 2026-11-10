@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/dm-sans';
+@import '@fontsource/dm-serif-text';
+@import '@fontsource/dm-mono';
+@import './tokens.css';
+@import './accents.css';
+
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-focus-ring: var(--focus-ring);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-subtle: var(--accent-subtle);
+  --font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'DM Serif Text', ui-serif, serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --radius-md: var(--radius);
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans leading-normal antialiased;
+  }
+
+  :focus-visible {
+    @apply outline-focus-ring outline-2 outline-offset-2;
+  }
+}
