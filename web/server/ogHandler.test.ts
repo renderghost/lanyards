@@ -25,7 +25,63 @@ const fetchImpl = vi.fn(async (input: RequestInfo | URL) => {
   return Response.json({ headline: 'Research Engineer' });
 }) as unknown as typeof fetch;
 
+/** Serves a profile whose avatar URL is `avatar`, and a thumbnail of `type`. */
+function cdn(avatar: string, type: string) {
+  const urls: string[] = [];
+  const impl = (async (input: RequestInfo | URL) => {
+    const url = String(input);
+    urls.push(url);
+    if (url.includes('app.bsky.actor.getProfile')) {
+      return Response.json({
+        did: DID,
+        handle: 'alice.test',
+        displayName: 'Ada Example',
+        avatar,
+        labels: [],
+      });
+    }
+    if (url.startsWith('https://cdn.bsky.app/')) {
+      return new Response(new Uint8Array([1, 2, 3]), {
+        headers: { 'content-type': type },
+      });
+    }
+    return Response.json({});
+  }) as typeof fetch;
+  return { impl, urls };
+}
+
 describe('OG image handler', () => {
+  it('asks the CDN for a JPEG thumbnail, whatever format the avatar URL names', async () => {
+    const render = vi.fn(async () => PNG);
+    const { impl, urls } = cdn(
+      `https://cdn.bsky.app/img/avatar/plain/${DID}/bafkreiavatar`,
+      'image/jpeg'
+    );
+    await createOgHandler({ fetchImpl: impl, render })(
+      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+    );
+    expect(urls).toContain(
+      `https://cdn.bsky.app/img/avatar_thumbnail/plain/${DID}/bafkreiavatar@jpeg`
+    );
+    expect(render).toHaveBeenCalledWith(
+      expect.objectContaining({ avatarDataUri: 'data:image/jpeg;base64,AQID' })
+    );
+  });
+
+  it('draws initials when the CDN sends a format satori cannot draw', async () => {
+    const render = vi.fn(async () => PNG);
+    const { impl } = cdn(
+      `https://cdn.bsky.app/img/avatar/plain/${DID}/bafkreiavatar@webp`,
+      'image/webp'
+    );
+    await createOgHandler({ fetchImpl: impl, render })(
+      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+    );
+    expect(render).toHaveBeenCalledWith(
+      expect.not.objectContaining({ avatarDataUri: expect.anything() })
+    );
+  });
+
   it('draws the person’s badge with their small avatar', async () => {
     const render = vi.fn(async () => PNG);
     const response = await createOgHandler({ fetchImpl, render })(
