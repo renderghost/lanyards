@@ -56,19 +56,27 @@ All work is tracked in GitHub Issues. Use the `gh` CLI or the GitHub MCP tools, 
 - Each increment of work must be complete and functional
 
 **3. Verify Your Work**
-- Run `npm run lint` after changes
-- Test locally with `npm run dev`
+- For the new app, from `web/`: `npm run lint`, `npm run typecheck`, `npm test` and `npm run e2e`
+- Test locally with `npm run dev` (in `web/`, served on `http://127.0.0.1:5173`)
 - Check the browser - don't assume it works
 
 ---
 
 ## Tech Stack
 
-- **Framework**: Next.js (App Router) + TypeScript
-- **Styling**: Tailwind CSS (no inline styles)
-- **Auth**: AT Protocol OAuth (`@atcute/oauth-browser-client`)
-- **Protocol**: AT Protocol (`@atproto/*` packages)
-- **Data**: ProfileRepository pattern wrapping AtpAgent
+The repository holds two apps during the rebuild (epic #94):
+
+**`web/`: the new app. All new work goes here.**
+- **Framework**: Vite + React + TypeScript; a front-end-only, installable PWA
+- **Routing and data**: TanStack Router (file-based) + TanStack Query
+- **Styling**: Tailwind CSS v4 (no inline styles), brand tokens in `web/src/styles/`
+- **Auth**: AT Protocol OAuth in the browser (`@atcute/oauth-browser-client`)
+- **Protocol**: `@atcute/*` packages (client, lexicons, identity resolver)
+- **Copy**: British English via Lingui (`web/src/i18n/`)
+- **Tests**: Vitest + Testing Library + MSW + axe-core; Playwright for e2e
+- **Hosting**: Vercel project with Root Directory `web`, serving `next.lanyards.app` until the swap
+
+**Repository root: the legacy Next.js app.** It is frozen and serves `lanyards.app` until Slice 1c (#103) swaps the domain and deletes it. Don't start new work on it.
 
 ---
 
@@ -82,16 +90,35 @@ RFC 8252 REQUIRES loopback IP addresses, NOT hostnames:
 
 AT Protocol OAuth will reject `localhost` with "invalid_request" error.
 
-**OAuth Client Configuration:**
-- Local development (`http://127.0.0.1`): Uses RFC 8252 loopback client format
-- Production/Staging (`https://`): Uses metadata URL format
-- Base URL is automatically derived from request - no environment variable needed
-- `SERVER_HOST = '127.0.0.1'` in `next.config.ts`
-- Access the app via `http://127.0.0.1:3000` (NOT localhost)
+**OAuth Client Configuration (`web/`):**
+- **Local development and e2e** (`http://127.0.0.1:5173` / `:4173`): uses the RFC 8252 loopback client. Its `client_id` is literally `http://localhost?redirect_uri=…&scope=…`; that's the only place `localhost` appears, and every redirect URI uses `127.0.0.1`.
+- **Production and preview** (`https://`): the client metadata is generated at build time into `oauth-client-metadata.json` from `PUBLIC_BASE_URL` (or Vercel's branch URL for previews), by `web/plugins/oauthMetadata.ts`.
+- Access the dev app via `http://127.0.0.1:5173` (NOT localhost)
 
 ---
 
 ## Project Structure
+
+**New app (`web/`):**
+
+```
+web/
+├── src/
+│   ├── routes/       # TanStack Router file routes
+│   ├── app/          # Router, providers, query client
+│   ├── features/     # Feature slices (auth, account, …): components, hooks
+│   ├── components/   # Shared components (strict 4-file structure)
+│   ├── lib/          # atproto (OAuth, session, identity), analytics, utils (cn)
+│   ├── design/       # Accent list and contrast helpers
+│   ├── styles/       # Tailwind entry, brand tokens, accent palettes
+│   ├── i18n/         # Lingui setup and en-GB catalogue
+│   └── test/         # Test setup, MSW server, axe helper
+├── plugins/          # Vite plugins (OAuth client metadata)
+├── e2e/              # Playwright specs
+└── scripts/          # Build checks (bundle budget)
+```
+
+**Legacy app (repository root, frozen):**
 
 ```
 src/
@@ -110,7 +137,7 @@ src/
     └── generated/    # Auto-generated from lexicons
 
 lexicons/             # AT Protocol schemas (*.json)
-docs/                 # Hugo documentation site
+docs/superpowers/     # Design specs and implementation plans (user docs live in the GitHub Wiki)
 ```
 
 ---
