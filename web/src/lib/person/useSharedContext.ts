@@ -37,6 +37,13 @@ export type SharedContext = {
   knownFollowers?: KnownFollowers;
   relationship?: Relationship;
   loading: boolean;
+  /**
+   * Still finding out whether either person blocks the other. The lanyard
+   * waits for this, so a blocked viewer never glimpses it. Sessions that
+   * can't read relationships (identity-only) skip the check, like signed-out
+   * visitors, because the lanyard is public.
+   */
+  checkingBlock: boolean;
 };
 
 /**
@@ -79,6 +86,7 @@ export function useSharedContext(did: Did): SharedContext {
     (followersEnabled && followers.isPending);
 
   return {
+    checkingBlock: relationshipEnabled && relationship.isPending,
     mutual: Boolean(
       relationship.data?.followUri && relationship.data.followedBy
     ),

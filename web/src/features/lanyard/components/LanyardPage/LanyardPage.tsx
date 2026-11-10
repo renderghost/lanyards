@@ -33,9 +33,21 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
   const signedOut = session.status !== 'signedIn';
   const viewer = signedOut ? 'signedOut' : view.mode;
   const hasHero = Boolean(view.hero);
+  const optedOut =
+    signedOut &&
+    view.profile.status === 'ready' &&
+    view.profile.value.labels.includes(NO_UNAUTHENTICATED);
+  const blocked = Boolean(shared.relationship?.blocked);
 
   useApplyAccent(view.configReady ? view.config.accent : DEFAULT_ACCENT);
-  useDocumentTitle(view.hero?.displayName ?? t`Lanyard`);
+  // Never put the name in the tab title (or history) when it isn't shown.
+  useDocumentTitle(
+    optedOut
+      ? t`Sign in to see this lanyard`
+      : blocked
+        ? t`Lanyard unavailable`
+        : (view.hero?.displayName ?? t`Lanyard`)
+  );
 
   useEffect(() => {
     if (hasHero) track('lanyard_viewed', { viewer });
@@ -51,11 +63,11 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
     );
   }
 
-  if (view.profile.status === 'loading' || !view.hero) {
+  if (view.profile.status === 'loading' || !view.hero || shared.checkingBlock) {
     return <LanyardSkeleton className={className} />;
   }
 
-  if (signedOut && view.profile.value.labels.includes(NO_UNAUTHENTICATED)) {
+  if (optedOut) {
     const returnTo = encodeURIComponent(location.pathname);
     return (
       <LanyardNotice heading={t`Sign in to see this lanyard`}>
@@ -69,7 +81,7 @@ export function LanyardPage({ did, handle, className }: LanyardPageProps) {
     );
   }
 
-  if (shared.relationship?.blocked) {
+  if (blocked) {
     return <LanyardNotice heading={t`This lanyard isn't available to you.`} />;
   }
 

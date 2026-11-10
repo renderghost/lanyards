@@ -129,6 +129,11 @@ describe('lanyard page states', () => {
       '/?returnTo=%2F%40alice.test'
     );
     expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
+    // The name must not leak through the tab title either.
+    await waitFor(() =>
+      expect(document.title).toBe('Sign in to see this lanyard · Lanyards')
+    );
+    expect(document.title).not.toContain('Ada');
     await expectNoAxeViolations(container);
   });
 
@@ -291,5 +296,47 @@ describe('visitor actions on the page', () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
     renderRoute('/@alice.test');
     expect(await screen.findByText('This is your lanyard')).toBeInTheDocument();
+  });
+});
+
+describe('blocks between viewer and owner', () => {
+  it('never shows the lanyard while it is still checking for a block', async () => {
+    servePerson();
+    let release: () => void = () => undefined;
+    const released = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    server.use(
+      http.get(
+        'https://pds.bea.test/xrpc/app.bsky.graph.getRelationships',
+        async () => {
+          await released;
+          return HttpResponse.json({
+            actor: BEA.did,
+            relationships: [
+              {
+                $type: 'app.bsky.graph.defs#relationship',
+                did: ADA.did,
+                blockedBy: `at://${ADA.did}/app.bsky.graph.block/3m`,
+              },
+            ],
+          });
+        }
+      ),
+      http.get(
+        'https://pds.bea.test/xrpc/app.bsky.graph.getKnownFollowers',
+        () => HttpResponse.json({ followers: [] })
+      )
+    );
+    vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
+    renderRoute('/@alice.test');
+    await new Promise((resolve) => setTimeout(resolve, 400));
+    expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
+    release();
+    expect(
+      await screen.findByText("This lanyard isn't available to you.")
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
+    await waitFor(() => expect(document.title).not.toContain('Ada'));
   });
 });

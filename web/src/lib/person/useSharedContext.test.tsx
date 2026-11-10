@@ -76,7 +76,11 @@ describe('useSharedContext', () => {
     const { result } = renderHook(() => useSharedContext(ADA.did), {
       wrapper,
     });
-    expect(result.current).toEqual({ mutual: false, loading: false });
+    expect(result.current).toEqual({
+      mutual: false,
+      loading: false,
+      checkingBlock: false,
+    });
     expect(calls).toBe(0);
   });
 
