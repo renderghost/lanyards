@@ -18,14 +18,27 @@ import {
   ItemActionsContext,
 } from '../../components/blocks/itemActions';
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
+import { useKeptRecords } from '../../hooks/useKeptRecords';
 import { useLanyardConfig } from '../../hooks/useLanyardConfig';
 import { AccentPicker } from '../AccentPicker/AccentPicker';
 import { BlockEditor } from '../BlockEditor/BlockEditor';
 import { HiddenItems } from '../HiddenItems/HiddenItems';
+import { HonorificForm } from '../HonorificForm/HonorificForm';
 import { ItemMenu } from '../ItemMenu/ItemMenu';
+import { MediaForm } from '../MediaForm/MediaForm';
+import { MediaList } from '../MediaList/MediaList';
+import { WebLinkForm } from '../WebLinkForm/WebLinkForm';
+import { WebLinkList } from '../WebLinkList/WebLinkList';
 import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
 import * as styles from './CustomisePage.styles';
 import type { CustomisePageProps } from './CustomisePage.types';
+
+/** Kept-record lists the owner adds to and deletes from. */
+const KEPT_LISTS = [
+  LANYARDS_NSID.webLink,
+  LANYARDS_NSID.audio,
+  LANYARDS_NSID.video,
+] as const;
 
 /**
  * `/lanyard`: the signed-in owner customises their lanyard beside a live
@@ -69,8 +82,11 @@ function Customiser({
 }) {
   const { t } = useLingui();
   const headingId = useId();
+  const linksId = useId();
+  const mediaId = useId();
   const lanyard = useLanyardConfig();
   const view = usePersonView(did, { mode: 'owner' });
+  const kept = useKeptRecords(did);
   const [viewAs, setViewAs] = useState<'owner' | 'visitor'>('owner');
 
   // "Saved" follows a save that finished without an error.
@@ -86,6 +102,14 @@ function Customiser({
     canWrite(granted, LANYARDS_NSID.lanyard, 'create') &&
     canWrite(granted, LANYARDS_NSID.lanyard, 'update');
   const disabled = !canEdit || !lanyard.ready;
+  const canKeep =
+    canWrite(granted, LANYARDS_NSID.honorific, 'create') &&
+    canWrite(granted, LANYARDS_NSID.honorific, 'update') &&
+    KEPT_LISTS.every(
+      (collection) =>
+        canWrite(granted, collection, 'create') &&
+        canWrite(granted, collection, 'delete')
+    );
   const { update } = lanyard;
 
   const itemActions = useMemo<ItemActions | null>(
@@ -155,6 +179,24 @@ function Customiser({
             }))
           }
         />
+        <HonorificForm
+          current={kept.data?.honorific ?? 'none'}
+          disabled={!canKeep || kept.status !== 'success'}
+        />
+        <section aria-labelledby={linksId} className={styles.kept}>
+          <h3 id={linksId} className={styles.subheading}>
+            {t`Your links`}
+          </h3>
+          <WebLinkList links={kept.data?.webLinks ?? []} disabled={!canKeep} />
+          <WebLinkForm disabled={!canKeep} />
+        </section>
+        <section aria-labelledby={mediaId} className={styles.kept}>
+          <h3 id={mediaId} className={styles.subheading}>
+            {t`Your podcasts and videos`}
+          </h3>
+          <MediaList items={kept.data?.media ?? []} disabled={!canKeep} />
+          <MediaForm disabled={!canKeep} />
+        </section>
       </section>
       <section aria-label={t`Preview`} className={styles.preview}>
         <div className={styles.previewBar}>

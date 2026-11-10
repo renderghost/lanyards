@@ -234,6 +234,31 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect((saves[1]?.record as { hidden: string[] }).hidden).toEqual([]);
   });
 
+  it('edits the kept records: honorific, links, podcasts and videos', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const honorific = await screen.findByRole(
+      'group',
+      { name: 'Honorific' },
+      { timeout: 5000 }
+    );
+    await waitFor(
+      () =>
+        expect(
+          within(honorific).getByRole('radio', { name: 'Dr' })
+        ).toBeChecked(),
+      { timeout: 5000 }
+    );
+    expect(
+      screen.getByRole('region', { name: 'Your links' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('region', { name: 'Your podcasts and videos' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Add link' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Add media' })).toBeEnabled();
+  });
+
   it('has no accessibility violations', async () => {
     servePerson();
     const { container } = renderRoute('/lanyard');

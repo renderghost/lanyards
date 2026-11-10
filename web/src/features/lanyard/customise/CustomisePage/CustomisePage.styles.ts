@@ -18,3 +18,7 @@ export const preview =
 export const previewBar = 'flex flex-wrap items-center justify-end gap-2';
 
 export const loading = 'px-4 py-6 text-base leading-6 text-muted-foreground';
+
+export const kept = 'flex flex-col gap-3';
+
+export const subheading = 'text-lg font-medium leading-7 text-foreground';

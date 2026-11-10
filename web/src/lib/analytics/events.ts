@@ -8,6 +8,7 @@ export type AnalyticsEvent =
   | 'oauth_scope_fallback'
   | 'lanyard_viewed'
   | 'lanyard_updated'
+  | 'kept_record_saved'
   | 'follow_created'
   | 'follow_deleted'
   | 'signed_out'
