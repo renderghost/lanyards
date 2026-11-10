@@ -15,14 +15,17 @@ export { PUBLIC_APPVIEW };
  * Resolves handles and DIDs. Browsers have no DNS access, so handles are
  * resolved through the public AppView.
  */
+/** Resolves did:plc and did:web documents. */
+export const didDocumentResolver = new CompositeDidDocumentResolver({
+  methods: {
+    plc: new PlcDidDocumentResolver(),
+    web: new WebDidDocumentResolver(),
+  },
+});
+
 export const identityResolver = new LocalActorResolver({
   handleResolver: new XrpcHandleResolver({ serviceUrl: PUBLIC_APPVIEW }),
-  didDocumentResolver: new CompositeDidDocumentResolver({
-    methods: {
-      plc: new PlcDidDocumentResolver(),
-      web: new WebDidDocumentResolver(),
-    },
-  }),
+  didDocumentResolver,
 });
 
 export const publicAppView = new Client({
