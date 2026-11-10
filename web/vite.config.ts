@@ -6,8 +6,15 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
+import { oauthMetadataPlugin } from './plugins/oauthMetadata';
+
 export default defineConfig({
-  plugins: [react(), lingui({ macroTransform: true }), tailwindcss()],
+  plugins: [
+    react(),
+    lingui({ macroTransform: true }),
+    tailwindcss(),
+    oauthMetadataPlugin(),
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

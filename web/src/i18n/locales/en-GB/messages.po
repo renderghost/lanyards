@@ -10,3 +10,11 @@ msgstr ""
 #: src/components/Logo/Logo.tsx:16
 msgid "Lanyards"
 msgstr "Lanyards"
+
+#: src/features/auth/session/SessionProvider.tsx:62
+msgid "Signed out"
+msgstr "Signed out"
+
+#: src/features/auth/session/SessionProvider.tsx:34
+msgid "You've been signed out. Please sign in again."
+msgstr "You've been signed out. Please sign in again."
