@@ -1,4 +1,4 @@
-import type { BadgeImageInput } from './badgeImage.tsx';
+import type { BadgeImageInput } from './badgeImage.ts';
 import { fetchPreviewProfile, UPSTREAM_TIMEOUT_MS } from './profileMeta.ts';
 
 const IMAGE_CACHE = 'public, s-maxage=86400, stale-while-revalidate=604800';

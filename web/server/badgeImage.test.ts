@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import { renderBadgePng } from './badgeImage.tsx';
+import { renderBadgePng } from './badgeImage.ts';
 
 /** Width and height from a PNG's IHDR chunk. */
 const size = (png: Uint8Array) => {
