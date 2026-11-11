@@ -16,20 +16,17 @@ export class ErrorBoundary extends Component<
     return { failed: true };
   }
 
+  override componentDidMount(): void {
+    if (!this.state.failed) this.props.onRendered?.();
+  }
+
   override componentDidCatch(error: unknown): void {
     this.props.onError?.(error);
   }
 
-  /** Renders the children again, after whatever broke them may be fixed. */
-  reset = (): void => {
-    this.setState({ failed: false });
-  };
-
   override render() {
-    const { fallback, children } = this.props;
-    if (!this.state.failed) return children;
-    return typeof fallback === 'function'
-      ? fallback(this.reset)
-      : (fallback ?? null);
+    return this.state.failed
+      ? (this.props.fallback ?? null)
+      : this.props.children;
   }
 }

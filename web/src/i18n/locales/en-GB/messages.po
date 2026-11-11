@@ -174,7 +174,7 @@ msgstr "Couldn't copy the link. Please try again."
 msgid "Couldn't load {failed}"
 msgstr "Couldn't load {failed}"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:66
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:114
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
@@ -190,7 +190,7 @@ msgstr "Couldn't open your QR code. Please try again."
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:65
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:113
 msgid "Couldn't show this block"
 msgstr "Couldn't show this block"
 
@@ -634,7 +634,7 @@ msgstr "Reordering cancelled. {name} stayed where it was."
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:70
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:122
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:119
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:181
 #: src/features/lanyard/hooks/useLanyardConfig.ts:187

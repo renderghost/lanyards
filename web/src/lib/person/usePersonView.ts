@@ -189,9 +189,11 @@ export function usePersonView(
     configReady,
     configError,
     mode,
-    retry: (source) => {
-      void queries[source].refetch();
-      if (source === 'lanyards') void configQuery.refetch();
+    retry: async (source) => {
+      await Promise.all([
+        queries[source].refetch(),
+        ...(source === 'lanyards' ? [configQuery.refetch()] : []),
+      ]);
     },
   };
 }

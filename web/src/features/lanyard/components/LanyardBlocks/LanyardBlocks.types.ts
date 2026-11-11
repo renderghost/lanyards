@@ -9,6 +9,7 @@ export type LanyardBlocksProps = {
    * links to edit their data on Sifa or Bluesky.
    */
   profile?: string;
-  onRetry(type: RenderableBlockType): void;
+  /** Fetches a block's sources again; settles once they have answered. */
+  onRetry(type: RenderableBlockType): Promise<unknown> | void;
   className?: string;
 };

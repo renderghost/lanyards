@@ -114,5 +114,5 @@ export type PersonViewState = {
   /** The owner's config couldn't be read, so no blocks are shown. */
   configError: boolean;
   mode: ViewerMode;
-  retry(source: SourceKey): void;
+  retry(source: SourceKey): Promise<void>;
 };

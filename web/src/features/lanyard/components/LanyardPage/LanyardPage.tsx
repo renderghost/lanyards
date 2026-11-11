@@ -124,7 +124,9 @@ export function LanyardPage({
         blocks={view.blocks}
         owner={view.mode === 'owner'}
         profile={profileId(did, view.hero.handle)}
-        onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
+        onRetry={(type) =>
+          Promise.allSettled(BLOCK_SOURCES[type].map(view.retry))
+        }
       />
     </article>
   );
