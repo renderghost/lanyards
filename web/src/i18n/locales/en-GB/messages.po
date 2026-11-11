@@ -55,7 +55,23 @@ msgstr "Add this link to the Websites & social links section of your ORCID recor
 msgid "Add your ORCID iD on Sifa to show verified publications."
 msgstr "Add your ORCID iD on Sifa to show verified publications."
 
-#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:53
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:65
+msgid "An item in {block} that is no longer available"
+msgstr "An item in {block} that is no longer available"
+
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:63
+msgid "An item in {block}, still loading"
+msgstr "An item in {block}, still loading"
+
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:61
+msgid "An item in {block}, which didn't load"
+msgstr "An item in {block}, which didn't load"
+
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:59
+msgid "An item in {block}, which is switched off"
+msgstr "An item in {block}, which is switched off"
+
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:55
 msgid "An item that is no longer available"
 msgstr "An item that is no longer available"
 
@@ -348,7 +364,7 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
-#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:61
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:75
 msgid "Hidden items"
 msgstr "Hidden items"
 
@@ -502,7 +518,7 @@ msgstr "Move {name} up"
 msgid "My lanyard"
 msgstr "My lanyard"
 
-#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:65
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:79
 msgid "No items are hidden."
 msgstr "No items are hidden."
 
@@ -677,7 +693,7 @@ msgstr "Semble"
 msgid "Show {name}"
 msgstr "Show {name}"
 
-#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:89
+#: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:103
 msgid "Show again"
 msgstr "Show again"
 

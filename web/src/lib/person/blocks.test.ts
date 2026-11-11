@@ -415,7 +415,33 @@ describe('hiddenItems', () => {
       },
       {
         key: 'at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/gone',
+        reason: 'gone',
       },
+    ]);
+  });
+
+  it('says why it can’t show a hidden item: block off, loading, failed or gone', () => {
+    const code = `at://${ADA.did}/org.tangled.repo.manifest/self`;
+    const blog = `at://${ADA.did}/site.standard.document/3mblog`;
+    const post = `at://${ADA.did}/app.bsky.feed.post/3mpost`;
+    const talk = sifaKey('presentationDelivery', 'deleted');
+    const config = showOnly(['talks', 'blogPosts', 'bskyPosts'], {
+      hidden: [code, blog, post, talk, 'mystery'],
+    });
+    const sources: SourceSnapshot = {
+      ...allSources,
+      standardSite: {
+        status: 'error',
+        error: new SourceError('standardSite', 'server'),
+      },
+      blueskyPosts: { status: 'loading' },
+    };
+    expect(hiddenItems({ config, sources, orcidVerified: false })).toEqual([
+      { key: code, type: 'code', reason: 'off' },
+      { key: blog, type: 'blogPosts', reason: 'failed' },
+      { key: post, type: 'bskyPosts', reason: 'loading' },
+      { key: talk, type: 'talks', reason: 'gone' },
+      { key: 'mystery', reason: 'gone' },
     ]);
   });
 });
