@@ -51,21 +51,25 @@ export function usePersonView(
 
   const profile = useQuery({
     queryKey: queryKeys.source('bluesky', did),
-    ...sourceQueryOptions((signal) => fetchProfile(did, signal)),
+    ...sourceQueryOptions('bluesky', (signal) => fetchProfile(did, signal)),
   });
   const sifa = useQuery({
     queryKey: queryKeys.source('sifa', did),
-    ...sourceQueryOptions((signal) => fetchSifaProfile(did, signal)),
+    ...sourceQueryOptions('sifa', (signal) => fetchSifaProfile(did, signal)),
   });
   const lanyards = useQuery({
     queryKey: queryKeys.source('lanyards', did),
-    ...sourceQueryOptions((signal) => fetchLanyardRecords(did, signal)),
+    ...sourceQueryOptions('lanyards', (signal) =>
+      fetchLanyardRecords(did, signal)
+    ),
   });
   // The owner's choices are read on their own: if they can't be read, no
   // blocks show at all, rather than the defaults undoing what they hid.
   const configQuery = useQuery({
     queryKey: queryKeys.source('lanyards', did, 'config'),
-    ...sourceQueryOptions((signal) => fetchLanyardConfig(did, signal)),
+    ...sourceQueryOptions('lanyards', (signal) =>
+      fetchLanyardConfig(did, signal)
+    ),
   });
 
   const configReady = configQuery.status !== 'pending';
@@ -95,36 +99,42 @@ export function usePersonView(
   const posts = useQuery({
     queryKey: queryKeys.source('blueskyPosts', did),
     enabled: enabled.blueskyPosts,
-    ...sourceQueryOptions((signal) => fetchPosts(did, FETCH_LIMIT, signal)),
+    ...sourceQueryOptions('bluesky', (signal) =>
+      fetchPosts(did, FETCH_LIMIT, signal)
+    ),
   });
   const blogPosts = useQuery({
     queryKey: queryKeys.source('standardSite', did),
     enabled: enabled.standardSite,
-    ...sourceQueryOptions((signal) => fetchBlogPosts(did, FETCH_LIMIT, signal)),
+    ...sourceQueryOptions('standardSite', (signal) =>
+      fetchBlogPosts(did, FETCH_LIMIT, signal)
+    ),
   });
   const repos = useQuery({
     queryKey: queryKeys.source('tangled', did, handle ?? ''),
     enabled: enabled.tangled,
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('tangled', (signal) =>
       fetchRepos(did, handle ?? '', FETCH_LIMIT, signal)
     ),
   });
   const collections = useQuery({
     queryKey: queryKeys.source('semble', did, handle ?? ''),
     enabled: enabled.semble,
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('semble', (signal) =>
       fetchCollections(did, handle ?? '', FETCH_LIMIT, signal)
     ),
   });
   const works = useQuery({
     queryKey: queryKeys.source('orcidWorks', did, orcidId ?? ''),
     enabled: enabled.orcid,
-    ...sourceQueryOptions((signal) => fetchOrcidWorks(orcidId ?? '', signal)),
+    ...sourceQueryOptions('orcid', (signal) =>
+      fetchOrcidWorks(orcidId ?? '', signal)
+    ),
   });
   const verified = useQuery({
     queryKey: queryKeys.source('orcid', did, orcidId ?? ''),
     enabled: enabled.orcid,
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('orcid', (signal) =>
       fetchOrcidVerified(orcidId ?? '', did, signal)
     ),
   });

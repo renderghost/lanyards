@@ -17,7 +17,9 @@ import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
 export function useKeptRecords(did: Did) {
   return useQuery({
     queryKey: queryKeys.source('lanyards', did),
-    ...sourceQueryOptions((signal) => fetchLanyardRecords(did, signal)),
+    ...sourceQueryOptions('lanyards', (signal) =>
+      fetchLanyardRecords(did, signal)
+    ),
   });
 }
 

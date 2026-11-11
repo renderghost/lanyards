@@ -86,7 +86,9 @@ export function useLanyardConfig(): UseLanyardConfig {
   const query = useQuery({
     queryKey: key,
     enabled: Boolean(writer),
-    ...sourceQueryOptions((signal) => fetchLanyardConfig(did, signal)),
+    ...sourceQueryOptions('lanyards', (signal) =>
+      fetchLanyardConfig(did, signal)
+    ),
   });
   const config = useMemo(
     () => resolveConfig(query.data?.value ?? null),

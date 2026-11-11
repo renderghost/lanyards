@@ -39,7 +39,7 @@ export function OrcidHelper({
   const check = useQuery({
     queryKey: queryKeys.source('orcid', did, orcidId ?? ''),
     enabled: Boolean(orcidId),
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('orcid', (signal) =>
       fetchOrcidVerified(orcidId ?? '', did, signal)
     ),
   });
