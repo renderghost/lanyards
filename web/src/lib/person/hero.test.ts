@@ -122,6 +122,28 @@ describe('composeHero', () => {
     expect(hero.headline).toBe(`${'x'.repeat(200)}…`);
   });
 
+  it('only shows avatars from Bluesky’s image CDN', () => {
+    const fromSifa = composeHero({
+      bluesky,
+      sifa: { ...emptySifa, avatar: 'https://tracker.example/ada.jpg' },
+      config: resolveConfig(null),
+    });
+    expect(fromSifa.avatar).toBe(bluesky.avatar);
+
+    for (const avatar of [
+      'https://tracker.example/ada.jpg',
+      'http://cdn.bsky.app/img/avatar_thumbnail/plain/bsky@jpeg',
+      'https://cdn.bsky.app.tracker.example/ada.jpg',
+    ]) {
+      const hero = composeHero({
+        bluesky: { ...bluesky, avatar },
+        sifa: null,
+        config: resolveConfig(null),
+      });
+      expect(hero.avatar).toBeUndefined();
+    }
+  });
+
   it('uses the handle when there is no display name anywhere', () => {
     const { displayName: _ignored, ...noName } = bluesky;
     expect(
