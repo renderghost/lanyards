@@ -45,17 +45,43 @@ export function MediaList({
   async function remove(item: MediaLink) {
     setDeleting(item.key);
     try {
-      await writer.remove(LANYARDS_NSID[item.kind], rkeyOf(item.key));
+      const removed = await writer.remove(
+        LANYARDS_NSID[item.kind],
+        rkeyOf(item.key)
+      );
       deletedAt.current = shown.indexOf(item);
       setDeleted((current) => new Set(current).add(item.key));
-      notify.success(
-        item.kind === 'audio' ? t`Audio deleted` : t`Video deleted`
-      );
+      const message =
+        item.kind === 'audio' ? t`Audio deleted` : t`Video deleted`;
+      if (removed) {
+        notify.success(message, {
+          action: { label: t`Undo`, onClick: () => void undo(item, removed) },
+        });
+      } else {
+        notify.success(message);
+      }
     } catch (cause) {
       captureError(cause, { source: 'media' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setDeleting(null);
+    }
+  }
+
+  async function undo(item: MediaLink, removed: Record<string, unknown>) {
+    try {
+      await writer.restore(LANYARDS_NSID[item.kind], rkeyOf(item.key), removed);
+      setDeleted((current) => {
+        const next = new Set(current);
+        next.delete(item.key);
+        return next;
+      });
+      notify.success(
+        item.kind === 'audio' ? t`Audio restored` : t`Video restored`
+      );
+    } catch (cause) {
+      captureError(cause, { source: 'media' });
+      notify.error(t`Couldn't restore it. Please try again.`);
     }
   }
 

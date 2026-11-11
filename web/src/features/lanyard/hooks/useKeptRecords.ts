@@ -2,6 +2,7 @@ import type { Did } from '@atcute/lexicons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useSession } from '@/features/auth/session/useSession';
+import { getRecord } from '@/lib/atproto/pds';
 import {
   createRecord,
   deleteRecord,
@@ -67,9 +68,32 @@ export function useKeptRecordWriter() {
       refresh(current.did);
       return reference;
     },
-    async remove(collection: WritableNsid, rkey: string): Promise<void> {
+    /**
+     * Deletes the record at `rkey`, returning what it held so `restore` can
+     * put it back exactly, or null when it couldn't be read first.
+     */
+    async remove(
+      collection: WritableNsid,
+      rkey: string
+    ): Promise<Record<string, unknown> | null> {
       const current = signedIn();
+      const stored = await getRecord('lanyards', current.did, collection, rkey);
       await deleteRecord(current, collection, rkey);
+      refresh(current.did);
+      const value = stored.ok ? stored.value?.value : null;
+      return value && typeof value === 'object'
+        ? (value as Record<string, unknown>)
+        : null;
+    },
+    /** Puts back a record `remove` deleted, at the same key. */
+    async restore(
+      collection: WritableNsid,
+      rkey: string,
+      value: Record<string, unknown>
+    ): Promise<void> {
+      const current = signedIn();
+      const { $type: _type, ...fields } = value;
+      await putRecord(current, collection, rkey, fields);
       refresh(current.did);
     },
   };

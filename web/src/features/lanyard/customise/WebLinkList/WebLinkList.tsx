@@ -45,15 +45,39 @@ export function WebLinkList({
   async function remove(link: WebLink) {
     setDeleting(link.key);
     try {
-      await writer.remove(LANYARDS_NSID.webLink, rkeyOf(link.key));
+      const removed = await writer.remove(
+        LANYARDS_NSID.webLink,
+        rkeyOf(link.key)
+      );
       deletedAt.current = shown.indexOf(link);
       setDeleted((current) => new Set(current).add(link.key));
-      notify.success(t`Link deleted`);
+      if (removed) {
+        notify.success(t`Link deleted`, {
+          action: { label: t`Undo`, onClick: () => void undo(link, removed) },
+        });
+      } else {
+        notify.success(t`Link deleted`);
+      }
     } catch (cause) {
       captureError(cause, { source: 'web-link' });
       notify.error(t`Failed to save. Please try again.`);
     } finally {
       setDeleting(null);
+    }
+  }
+
+  async function undo(link: WebLink, removed: Record<string, unknown>) {
+    try {
+      await writer.restore(LANYARDS_NSID.webLink, rkeyOf(link.key), removed);
+      setDeleted((current) => {
+        const next = new Set(current);
+        next.delete(link.key);
+        return next;
+      });
+      notify.success(t`Link restored`);
+    } catch (cause) {
+      captureError(cause, { source: 'web-link' });
+      notify.error(t`Couldn't restore the link. Please try again.`);
     }
   }
 

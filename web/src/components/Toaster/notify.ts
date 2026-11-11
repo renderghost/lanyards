@@ -20,8 +20,8 @@ const toActionOptions = (options?: NotifyOptions) => ({
 
 /** Shows toast notifications. Render <Toaster /> once at the app root. */
 export const notify = {
-  success(message: string): void {
-    toast.success(message);
+  success(message: string, options?: NotifyOptions): void {
+    toast.success(message, toActionOptions(options));
   },
   error(message: string, options?: NotifyOptions): void {
     toast.error(message, toActionOptions(options));

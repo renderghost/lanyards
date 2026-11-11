@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -6,6 +6,7 @@ import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { captureError } from '@/lib/analytics/analytics';
 import { expectNoAxeViolations } from '@/test/axe';
+import { mockDidDocument, mockGetRecord } from '@/test/handlers';
 import { ADA } from '@/test/people';
 import { captureWrites, signedInSession } from '@/test/person';
 import { renderWithClient } from '@/test/render';
@@ -59,6 +60,43 @@ describe('WebLinkList', () => {
     await waitFor(() =>
       expect(notify.success).toHaveBeenCalledWith('Link deleted')
     );
+  });
+
+  it('offers Undo, which puts the deleted link back as it was', async () => {
+    const stored = {
+      $type: 'app.lanyards.link.web',
+      url: 'https://ada.example/cv',
+      title: 'CV',
+      createdAt: '2026-01-02T03:04:05.000Z',
+    };
+    mockDidDocument(ADA.did, ADA.pds);
+    mockGetRecord(ADA.pds, ADA.did, 'app.lanyards.link.web', '3mcv', {
+      uri: `at://${ADA.did}/app.lanyards.link.web/3mcv`,
+      cid: `bafyrei${'a'.repeat(52)}`,
+      value: stored,
+    });
+    const writes = captureWrites();
+    renderWithClient(<WebLinkList links={links} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Delete CV' }));
+    await waitFor(() =>
+      expect(notify.success).toHaveBeenCalledWith('Link deleted', {
+        action: { label: 'Undo', onClick: expect.any(Function) },
+      })
+    );
+    expect(screen.queryByText('CV')).toBeNull();
+
+    const undo = vi.mocked(notify.success).mock.calls.at(-1)?.[1]?.action;
+    await act(async () => undo?.onClick());
+    expect(writes.put).toEqual([
+      {
+        repo: ADA.did,
+        collection: 'app.lanyards.link.web',
+        rkey: '3mcv',
+        record: stored,
+      },
+    ]);
+    expect(notify.success).toHaveBeenCalledWith('Link restored');
+    expect(screen.getByText('CV')).toBeInTheDocument();
   });
 
   it('keeps the link and says so when deleting fails', async () => {

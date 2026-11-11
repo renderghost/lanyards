@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -6,6 +6,7 @@ import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { captureError } from '@/lib/analytics/analytics';
 import { expectNoAxeViolations } from '@/test/axe';
+import { mockDidDocument, mockGetRecord } from '@/test/handlers';
 import { ADA } from '@/test/people';
 import { captureWrites, signedInSession } from '@/test/person';
 import { renderWithClient } from '@/test/render';
@@ -67,6 +68,50 @@ describe('MediaList', () => {
       await waitFor(() => expect(notify.success).toHaveBeenCalledWith(toast));
     }
   );
+
+  it('offers Undo, which puts the deleted item back as it was', async () => {
+    const stored = {
+      $type: 'app.lanyards.link.media.audio',
+      url: 'https://podcasts.example/ep12',
+      platform: 'apple-podcasts',
+      title: 'Talking protocols',
+      createdAt: '2026-01-02T03:04:05.000Z',
+    };
+    mockDidDocument(ADA.did, ADA.pds);
+    mockGetRecord(
+      ADA.pds,
+      ADA.did,
+      'app.lanyards.link.media.audio',
+      '3maudio',
+      {
+        uri: `at://${ADA.did}/app.lanyards.link.media.audio/3maudio`,
+        cid: `bafyrei${'a'.repeat(52)}`,
+        value: stored,
+      }
+    );
+    const writes = captureWrites();
+    renderWithClient(<MediaList items={items} />);
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Delete Talking protocols' })
+    );
+    await waitFor(() =>
+      expect(notify.success).toHaveBeenCalledWith('Audio deleted', {
+        action: { label: 'Undo', onClick: expect.any(Function) },
+      })
+    );
+    const undo = vi.mocked(notify.success).mock.calls.at(-1)?.[1]?.action;
+    await act(async () => undo?.onClick());
+    expect(writes.put).toEqual([
+      {
+        repo: ADA.did,
+        collection: 'app.lanyards.link.media.audio',
+        rkey: '3maudio',
+        record: stored,
+      },
+    ]);
+    expect(notify.success).toHaveBeenCalledWith('Audio restored');
+    expect(screen.getByText('Talking protocols')).toBeInTheDocument();
+  });
 
   it('keeps the item and says so when deleting fails', async () => {
     captureWrites({ fail: ['deleteRecord'] });
