@@ -65,6 +65,30 @@ test.describe('QR sheet', () => {
     await expect(show).toBeFocused();
   });
 
+  test('keeps the code large and on screen in phone landscape', async ({
+    page,
+  }) => {
+    const viewport = { width: 844, height: 390 };
+    await page.setViewportSize(viewport);
+    await page.goto('/lanyard');
+    await page.getByRole('button', { name: 'Show QR' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Ada Example' });
+    const qr = sheet.getByRole('img', { name: /^QR code for / });
+    await expect(qr).toBeVisible();
+    const code = await qr.boundingBox();
+    expect(code?.height ?? 0).toBeGreaterThanOrEqual(280);
+    for (const box of [
+      code,
+      await sheet.getByRole('button', { name: 'Copy link' }).boundingBox(),
+      await sheet.getByRole('button', { name: 'Close' }).boundingBox(),
+    ]) {
+      expect(box?.y ?? -1).toBeGreaterThanOrEqual(0);
+      expect((box?.y ?? 0) + (box?.height ?? 0)).toBeLessThanOrEqual(
+        viewport.height
+      );
+    }
+  });
+
   test('stays black on white in dark mode', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/lanyard');
