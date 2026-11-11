@@ -1,5 +1,6 @@
 import type { Did, Handle } from '@atcute/lexicons';
 
+import { profileId } from '@/lib/atproto/profileId';
 import { TANGLED_APPVIEW } from '@/lib/atproto/endpoints';
 import { listRecords } from '@/lib/atproto/pds';
 import { validateRecord } from '@/lib/lexicons/validate';
@@ -16,8 +17,8 @@ type Manifest = {
   createdAt: string;
 };
 
-const repoUrl = (handle: string, name: string) =>
-  `https://tangled.org/${handle}/${encodeURIComponent(name)}`;
+const repoUrl = (did: Did, handle: string, name: string) =>
+  `https://tangled.org/${profileId(did, handle)}/${encodeURIComponent(name)}`;
 
 const newestFirst = (a: CodeRepo, b: CodeRepo) =>
   (b.createdAt ?? '').localeCompare(a.createdAt ?? '');
@@ -45,7 +46,7 @@ async function fromAppView(
           ...(manifest.description
             ? { description: manifest.description }
             : {}),
-          url: repoUrl(handle, manifest.declaration.name),
+          url: repoUrl(did, handle, manifest.declaration.name),
           createdAt: manifest.createdAt,
         },
       ];
@@ -76,7 +77,14 @@ async function fromDeclarations(
       const name = record.uri.split('/').pop() ?? '';
       const { createdAt } = result.value as { createdAt: string };
       return name
-        ? [{ key: record.uri, name, url: repoUrl(handle, name), createdAt }]
+        ? [
+            {
+              key: record.uri,
+              name,
+              url: repoUrl(did, handle, name),
+              createdAt,
+            },
+          ]
         : [];
     })
   );

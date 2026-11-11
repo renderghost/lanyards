@@ -42,6 +42,14 @@ describe('fetchRepos', () => {
     });
   });
 
+  it('links to repositories by DID when the handle doesn’t verify', async () => {
+    server.use(http.get(LIST_REPOS, () => HttpResponse.json(listRepos)));
+    const result = await fetchRepos(ADA.did, 'handle.invalid', 10);
+    expect(result.ok && result.value[0]?.url).toBe(
+      `https://tangled.org/${ADA.did}/notes`
+    );
+  });
+
   it('returns at most the limit', async () => {
     server.use(http.get(LIST_REPOS, () => HttpResponse.json(listRepos)));
     const result = await fetchRepos(ADA.did, 'alice.test', 1);

@@ -303,6 +303,29 @@ describe('visitor actions on the page', () => {
     ).toBeInTheDocument();
   });
 
+  it('gives owners edit links by DID when their handle doesn’t verify', async () => {
+    servePerson({ profile: { handle: 'handle.invalid' } });
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    renderRoute(`/d/${ADA.did}`);
+    const links = await screen.findByRole(
+      'region',
+      { name: 'Links' },
+      { timeout: 5000 }
+    );
+    expect(
+      within(links).getByRole('link', { name: /^Edit in Bluesky/ })
+    ).toHaveAttribute(
+      'href',
+      `https://bsky.app/profile/${encodeURIComponent(ADA.did)}`
+    );
+    expect(
+      within(links).getByRole('link', { name: /^Edit on Sifa/ })
+    ).toHaveAttribute(
+      'href',
+      `https://sifa.id/p/${encodeURIComponent(ADA.did)}?edit=true#other-profiles`
+    );
+  });
+
   it('tells owners it is their own lanyard', async () => {
     servePerson();
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));

@@ -17,7 +17,7 @@ import type { LanyardBlocksProps } from './LanyardBlocks.types';
 export function LanyardBlocks({
   blocks,
   owner,
-  handle,
+  profile,
   onRetry,
   className,
 }: LanyardBlocksProps) {
@@ -46,8 +46,8 @@ export function LanyardBlocks({
               }
               owner={owner}
               editLinks={
-                owner && handle
-                  ? EDIT_LINKS[block.type](handle).map((link) => ({
+                owner && profile
+                  ? EDIT_LINKS[block.type](profile).map((link) => ({
                       label: i18n._(link.label),
                       url: link.url,
                     }))

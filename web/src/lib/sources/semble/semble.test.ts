@@ -63,6 +63,13 @@ describe('fetchCollections', () => {
     });
   });
 
+  it('links to collections by DID when the handle doesn’t verify', async () => {
+    const result = await fetchCollections(ADA.did, 'handle.invalid', 10);
+    expect(result.ok && result.value[0]?.url).toBe(
+      `https://semble.so/profile/${ADA.did}/collections/3mcolone`
+    );
+  });
+
   it('returns at most the limit of collections', async () => {
     const result = await fetchCollections(ADA.did, 'alice.test', 1);
     expect(result.ok && result.value.map((c) => c.name)).toEqual([

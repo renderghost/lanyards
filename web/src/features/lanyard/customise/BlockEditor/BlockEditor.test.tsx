@@ -31,7 +31,7 @@ function Harness({
     <BlockEditor
       config={config}
       statuses={statuses}
-      handle="alice.test"
+      profile="alice.test"
       disabled={disabled}
       onChange={(patch) =>
         setConfig((current) => {

@@ -26,7 +26,7 @@ import type { OrcidHelperProps } from './OrcidHelper.types';
  */
 export function OrcidHelper({
   did,
-  handle,
+  profile,
   orcidId,
   className,
 }: OrcidHelperProps) {
@@ -47,7 +47,7 @@ export function OrcidHelper({
   if (orcidId === undefined) return null;
 
   if (orcidId === null) {
-    const [sifa] = EDIT_LINKS.links(handle);
+    const [sifa] = EDIT_LINKS.links(profile);
     return (
       <section
         aria-labelledby={headingId}

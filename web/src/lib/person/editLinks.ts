@@ -6,14 +6,14 @@ export type EditLink = { label: ReturnType<typeof msg>; url: string };
 
 const sifa =
   (anchor?: string) =>
-  (handle: string): EditLink => ({
+  (profile: string): EditLink => ({
     label: msg`Edit on Sifa`,
-    url: `https://sifa.id/p/${encodeURIComponent(handle)}?edit=true${anchor ? `#${anchor}` : ''}`,
+    url: `https://sifa.id/p/${encodeURIComponent(profile)}?edit=true${anchor ? `#${anchor}` : ''}`,
   });
 
-const bluesky = (handle: string): EditLink => ({
+const bluesky = (profile: string): EditLink => ({
   label: msg`Edit in Bluesky`,
-  url: `https://bsky.app/profile/${encodeURIComponent(handle)}`,
+  url: `https://bsky.app/profile/${encodeURIComponent(profile)}`,
 });
 
 const none = (): EditLink[] => [];
@@ -22,20 +22,21 @@ const none = (): EditLink[] => [];
  * Where the owner edits each block's data, for blocks whose data lives on
  * Sifa or Bluesky (spec §7.4). Links come from both. Blocks Lanyards keeps
  * itself (media) or other apps own (code, collections, blog posts) have
- * none here.
+ * none here. Each takes the owner's profile, or DID when it doesn't verify
+ * (see profileId).
  */
 export const EDIT_LINKS: Record<
   RenderableBlockType,
-  (handle: string) => EditLink[]
+  (profile: string) => EditLink[]
 > = {
-  links: (handle) => [sifa('other-profiles')(handle), bluesky(handle)],
-  talks: (handle) => [sifa('presentations')(handle)],
-  openTo: (handle) => [sifa('career')(handle)],
-  publications: (handle) => [sifa('publications')(handle)],
-  skills: (handle) => [sifa('skills')(handle)],
-  education: (handle) => [sifa('education')(handle)],
-  details: (handle) => [sifa()(handle)],
-  bskyPosts: (handle) => [bluesky(handle)],
+  links: (profile) => [sifa('other-profiles')(profile), bluesky(profile)],
+  talks: (profile) => [sifa('presentations')(profile)],
+  openTo: (profile) => [sifa('career')(profile)],
+  publications: (profile) => [sifa('publications')(profile)],
+  skills: (profile) => [sifa('skills')(profile)],
+  education: (profile) => [sifa('education')(profile)],
+  details: (profile) => [sifa()(profile)],
+  bskyPosts: (profile) => [bluesky(profile)],
   blogPosts: none,
   code: none,
   collections: none,
