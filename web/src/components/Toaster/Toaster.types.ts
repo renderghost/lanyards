@@ -4,5 +4,7 @@ export type NotifyAction = {
 };
 
 export type NotifyOptions = {
+  /** A toast shown again with the same id replaces the earlier one. */
+  id?: string;
   action?: NotifyAction;
 };

@@ -21,7 +21,7 @@ vi.mock('@/lib/analytics/analytics', () => ({
   track: vi.fn(),
 }));
 vi.mock('@/components/Toaster/notify', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
+  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn(), dismiss: vi.fn() },
 }));
 vi.mock('@/lib/sources/lanyards/lanyards', () => ({
   fetchLanyardConfig: vi.fn(),
@@ -133,7 +133,10 @@ describe('useLanyardConfig', () => {
     expect(result.current.config.accent).toBe('teal');
     expect(notify.error).toHaveBeenCalledWith(
       'Failed to save. Please try again.',
-      { action: { label: 'Retry', onClick: expect.any(Function) } }
+      {
+        id: 'lanyard-settings-save',
+        action: { label: 'Retry', onClick: expect.any(Function) },
+      }
     );
     expect(captureError).toHaveBeenCalledWith(new Error('PDS down'), {
       source: 'lanyard-settings',
@@ -145,6 +148,7 @@ describe('useLanyardConfig', () => {
     expect(saved()[1]?.fields).toMatchObject({ accent: 'teal' });
     expect(result.current.error).toBe(false);
     expect(notify.success).toHaveBeenCalledWith('Lanyard updated');
+    expect(notify.dismiss).toHaveBeenCalledWith('lanyard-settings-save');
   });
 
   it('retries from the toast’s Retry action', async () => {

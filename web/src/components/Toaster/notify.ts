@@ -2,8 +2,9 @@ import { toast } from 'sonner';
 
 import type { NotifyOptions } from './Toaster.types';
 
-const toActionOptions = (options?: NotifyOptions) =>
-  options?.action
+const toActionOptions = (options?: NotifyOptions) => ({
+  ...(options?.id ? { id: options.id } : {}),
+  ...(options?.action
     ? {
         action: {
           label: options.action.label,
@@ -14,7 +15,8 @@ const toActionOptions = (options?: NotifyOptions) =>
         duration: Number.POSITIVE_INFINITY,
         closeButton: true,
       }
-    : {};
+    : {}),
+});
 
 /** Shows toast notifications. Render <Toaster /> once at the app root. */
 export const notify = {
@@ -26,5 +28,9 @@ export const notify = {
   },
   info(message: string, options?: NotifyOptions): void {
     toast.info(message, toActionOptions(options));
+  },
+  /** Removes the toast shown with this id, if it is still showing. */
+  dismiss(id: string): void {
+    toast.dismiss(id);
   },
 };

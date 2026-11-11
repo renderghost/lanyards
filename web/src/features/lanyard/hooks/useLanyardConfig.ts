@@ -29,6 +29,9 @@ import type { LanyardConfigRecord } from '@/lib/sources/lanyards/lanyards.types'
 /** Changes this close together are saved as one write (spec §7.4). */
 export const SAVE_DELAY_MS = 800;
 
+/** One failure toast, however many saves fail in a row. */
+const SAVE_FAILED_TOAST = 'lanyard-settings-save';
+
 type RecordValue = Record<string, unknown>;
 
 export type UseLanyardConfig = {
@@ -174,6 +177,7 @@ export function useLanyardConfig(): UseLanyardConfig {
         server.current = { value: changes, cid: reference.cid, valid: true };
         if (unsaved.current === changes) unsaved.current = null;
         setError(false);
+        notify.dismiss(SAVE_FAILED_TOAST);
         notify.success(t`Lanyard updated`);
         track('lanyard_updated');
       } catch (cause) {
@@ -184,6 +188,7 @@ export function useLanyardConfig(): UseLanyardConfig {
         }
         setError(true);
         notify.error(t`Failed to save. Please try again.`, {
+          id: SAVE_FAILED_TOAST,
           action: { label: t`Retry`, onClick: () => saveLater.current() },
         });
       } finally {
