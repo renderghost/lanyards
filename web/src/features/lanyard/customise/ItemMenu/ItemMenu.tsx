@@ -12,7 +12,8 @@ import type { ItemMenuProps } from './ItemMenu.types';
 export function ItemMenu({ title, onHide, className }: ItemMenuProps) {
   const { t } = useLingui();
   // Hiding removes this menu's button, so focus goes where the customiser
-  // sends it (the item's Show again) instead of back to the trigger.
+  // sends it (the item's Show again) instead of back to the trigger. If
+  // the item couldn't be hidden, focus returns to the trigger as usual.
   const hiding = useRef(false);
   return (
     <DropdownMenu.Root>
@@ -35,8 +36,7 @@ export function ItemMenu({ title, onHide, className }: ItemMenuProps) {
         >
           <DropdownMenu.Item
             onSelect={() => {
-              hiding.current = true;
-              onHide();
+              hiding.current = onHide();
             }}
             className={styles.item}
           >

@@ -1,6 +1,7 @@
 import { ACCENTS, type Accent, DEFAULT_ACCENT } from '@/design/accents';
 import { LANYARDS_NSID, type BlockType } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
+import { tooLong } from '@/lib/validation';
 
 /** `events` needs the calendar adapter (Slice 2), so it never renders yet. */
 export type RenderableBlockType = Exclude<BlockType, 'events'>;
@@ -28,6 +29,26 @@ export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
 
 export const DEFAULT_ITEM_LIMIT = 3;
 export const MAX_LINKS = 20;
+
+/** The lexicon's limits on hidden items: how many, and each key's bytes. */
+export const MAX_HIDDEN = 500;
+const MAX_HIDDEN_KEY_BYTES = 2048;
+
+export type HideProblem = 'tooMany' | 'tooLong';
+
+/**
+ * Why `key` can't join the hidden items, or null when it can. A record
+ * past the lexicon's limits would fail every later save.
+ */
+export function hideProblem(
+  config: Pick<LanyardConfig, 'hidden'>,
+  key: string
+): HideProblem | null {
+  if (config.hidden.includes(key)) return null;
+  if (tooLong(key, MAX_HIDDEN_KEY_BYTES)) return 'tooLong';
+  if (config.hidden.length >= MAX_HIDDEN) return 'tooMany';
+  return null;
+}
 
 export type BlockConfig = {
   type: RenderableBlockType;

@@ -2,7 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import { validateRecord } from '@/lib/lexicons/validate';
 
-import { itemLimit, resolveConfig, serialiseConfig } from './config';
+import {
+  hideProblem,
+  itemLimit,
+  resolveConfig,
+  serialiseConfig,
+} from './config';
 
 const ALL_TYPES = [
   'links',
@@ -149,5 +154,27 @@ describe('serialiseConfig', () => {
         ...fields,
       }).ok
     ).toBe(true);
+  });
+});
+
+describe('hideProblem', () => {
+  const config = (hidden: string[]) => ({ ...resolveConfig(null), hidden });
+
+  it('allows hiding an ordinary item, or one already hidden', () => {
+    expect(hideProblem(config([]), 'at://did:plc:a/x.y/1')).toBeNull();
+    expect(
+      hideProblem(config(['at://did:plc:a/x.y/1']), 'at://did:plc:a/x.y/1')
+    ).toBeNull();
+  });
+
+  it('refuses a 501st hidden item, as the lexicon allows 500', () => {
+    const full = Array.from({ length: 500 }, (_, index) => `k${index}`);
+    expect(hideProblem(config(full), 'k500')).toBe('tooMany');
+    expect(hideProblem(config(full.slice(1)), 'k500')).toBeNull();
+  });
+
+  it('refuses a key over the lexicon’s 2,048 bytes, counting UTF-8', () => {
+    expect(hideProblem(config([]), 'é'.repeat(1025))).toBe('tooLong');
+    expect(hideProblem(config([]), 'e'.repeat(2048))).toBeNull();
   });
 });
