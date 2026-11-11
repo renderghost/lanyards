@@ -1,5 +1,6 @@
 import {
   createRootRouteWithContext,
+  notFound,
   Outlet,
   redirect,
 } from '@tanstack/react-router';
@@ -18,9 +19,13 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   beforeLoad: ({ location }) => {
     // Some apps percent-encode the @ in shared lanyard links.
     if (location.pathname.toLowerCase().startsWith(ENCODED_AT)) {
-      const handle = decodeURIComponent(
-        location.pathname.slice(ENCODED_AT.length)
-      );
+      let handle: string;
+      try {
+        handle = decodeURIComponent(location.pathname.slice(ENCODED_AT.length));
+      } catch {
+        // A malformed escape (a stray %) names nobody.
+        throw notFound();
+      }
       throw redirect({ href: `/@${handle}${location.searchStr}` });
     }
   },

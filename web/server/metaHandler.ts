@@ -19,8 +19,15 @@ function subject(url: URL): { handle?: string; did?: string } {
     url.searchParams.get('handle') ?? /^\/@([^/]+)$/.exec(url.pathname)?.[1];
   const did =
     url.searchParams.get('did') ?? /^\/d\/([^/]+)$/.exec(url.pathname)?.[1];
-  const clean = (value?: string) =>
-    value ? decodeURIComponent(value).trim() : undefined;
+  const clean = (value?: string) => {
+    if (!value) return undefined;
+    try {
+      return decodeURIComponent(value).trim();
+    } catch {
+      // A malformed escape (a stray %) names nobody.
+      return undefined;
+    }
+  };
   const asHandle = clean(handle)?.toLowerCase();
   const asDid = clean(did);
   if (asDid && DID.test(asDid)) return { did: asDid };

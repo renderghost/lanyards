@@ -70,6 +70,18 @@ describe('public lanyard routes', () => {
     expect(await hero()).toBeInTheDocument();
   });
 
+  it.each(['/%40alice%', '/@alice%'])(
+    'shows the not-found page, not an error, for a malformed escape in %s',
+    async (path) => {
+      renderRoute(path);
+      expect(
+        await screen.findByRole('heading', {
+          name: "We couldn't find that page",
+        })
+      ).toBeInTheDocument();
+    }
+  );
+
   it('shows the not-found page for a malformed DID', async () => {
     renderRoute('/d/not-a-did');
     expect(
