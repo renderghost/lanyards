@@ -38,7 +38,7 @@ function orcidAnswers(...bodies: JsonBodyType[]) {
 }
 
 const helper = (orcidId: string | null | undefined) => (
-  <OrcidHelper did={ADA.did} handle="alice.test" orcidId={orcidId} />
+  <OrcidHelper did={ADA.did} profile="alice.test" orcidId={orcidId} />
 );
 
 beforeEach(() => {

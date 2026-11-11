@@ -1,3 +1,4 @@
+import { cdnImage } from '@/lib/atproto/avatar';
 import { normaliseDoi, normaliseUrl, safeHref } from '@/lib/normalise';
 import type {
   BlueskyProfile,
@@ -85,7 +86,7 @@ function mergeLinks(values: Values): LinkItem[] {
       url: link.url,
       title: link.title,
       rank: 1,
-      iconUrl: link.iconUrl,
+      iconUrl: cdnImage(link.iconUrl),
     })),
     ...(values.lanyards?.webLinks ?? []).map((link) => ({
       url: link.url,

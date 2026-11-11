@@ -44,4 +44,21 @@ describe('CollectionsBlock', () => {
     expect(container.querySelector('img')).toBeNull();
     await expectNoAxeViolations(container);
   });
+
+  it('clamps a very long description to three lines', () => {
+    renderWithProviders(
+      <CollectionsBlock
+        items={[
+          {
+            key: 'k',
+            name: 'Reading',
+            description: 'z'.repeat(5000),
+            url: 'https://semble.so/profile/alice.test/collections/3m',
+            links: [],
+          },
+        ]}
+      />
+    );
+    expect(screen.getByText('z'.repeat(5000))).toHaveClass('line-clamp-3');
+  });
 });

@@ -151,6 +151,25 @@ const compose = (
 ) => composeBlocks({ config, sources, mode, orcidVerified });
 
 describe('composeBlocks: links', () => {
+  it('only shows link icons from Bluesky’s image CDN', () => {
+    const [links] = compose(showOnly(['links']), {
+      ...allSources,
+      bluesky: ready({
+        ...bluesky,
+        links: [
+          {
+            key: `at://${ADA.did}/app.bsky.actor.link/1`,
+            url: 'https://ada.example/',
+            iconUrl: 'https://tracker.example/icon.png',
+          },
+        ],
+      }),
+    });
+    const site = links?.status === 'ready' ? links.items[0] : undefined;
+    expect(site).toMatchObject({ url: 'https://ada.example/' });
+    expect(site).not.toHaveProperty('iconUrl');
+  });
+
   it('merges every source, de-duplicates by URL and prefers the owner’s titles', () => {
     const [links] = compose(showOnly(['links']));
     expect(links).toEqual({

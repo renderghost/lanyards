@@ -8,6 +8,7 @@ import { PermissionNotice } from '@/features/auth/components/PermissionNotice/Pe
 import { useSession } from '@/features/auth/session/useSession';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
+import { profileId } from '@/lib/atproto/profileId';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { BLOCK_SOURCES } from '@/lib/person/blocks';
 import { usePersonView } from '@/lib/person/usePersonView';
@@ -187,7 +188,7 @@ function Customiser({
         <BlockEditor
           config={lanyard.config}
           statuses={view.statuses}
-          handle={view.hero?.handle ?? did}
+          profile={profileId(did, view.hero?.handle)}
           disabled={disabled}
           onChange={update}
           onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
@@ -206,7 +207,7 @@ function Customiser({
         />
         <OrcidHelper
           did={did}
-          handle={view.hero?.handle ?? did}
+          profile={profileId(did, view.hero?.handle)}
           orcidId={view.orcidId}
         />
         <HonorificForm

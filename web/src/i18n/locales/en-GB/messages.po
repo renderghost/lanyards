@@ -174,11 +174,11 @@ msgstr "Couldn't copy the link. Please try again."
 msgid "Couldn't load {failed}"
 msgstr "Couldn't load {failed}"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:62
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:114
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:116
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:117
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
@@ -190,7 +190,11 @@ msgstr "Couldn't open your QR code. Please try again."
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:42
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:113
+msgid "Couldn't show this block"
+msgstr "Couldn't show this block"
+
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:43
 msgid "Couldn't start account creation. Please try again."
 msgstr "Couldn't start account creation. Please try again."
 
@@ -203,7 +207,7 @@ msgstr "Couldn't start creating an account. Please try again."
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
 
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:58
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:59
 msgid "Create account"
 msgstr "Create account"
 
@@ -211,7 +215,7 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:146
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:147
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -280,7 +284,7 @@ msgstr "Failed to follow. Please try again."
 #: src/features/lanyard/customise/MediaList/MediaList.tsx:56
 #: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:71
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:54
-#: src/features/lanyard/hooks/useLanyardConfig.ts:184
+#: src/features/lanyard/hooks/useLanyardConfig.ts:186
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
@@ -292,7 +296,7 @@ msgstr "Failed to unfollow. Please try again."
 msgid "Follow"
 msgstr "Follow"
 
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:52
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:53
 msgid "Follow on Bluesky"
 msgstr "Follow on Bluesky"
 
@@ -404,16 +408,16 @@ msgstr "Kind of content"
 msgid "Languages"
 msgstr "Languages"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:57
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:58
 msgid "Lanyard"
 msgstr "Lanyard"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:56
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:57
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:34
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
-#: src/features/lanyard/hooks/useLanyardConfig.ts:175
+#: src/features/lanyard/hooks/useLanyardConfig.ts:177
 msgid "Lanyard updated"
 msgstr "Lanyard updated"
 
@@ -462,7 +466,7 @@ msgstr "Loading your profile…"
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:157
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:62
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:63
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -597,7 +601,7 @@ msgstr "Posts on Bluesky"
 msgid "Presentation"
 msgstr "Presentation"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:249
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:250
 msgid "Preview"
 msgstr "Preview"
 
@@ -626,14 +630,14 @@ msgstr "Reorder {name}"
 msgid "Reordering cancelled. {name} stayed where it was."
 msgstr "Reordering cancelled. {name} stayed where it was."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:162
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:163
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:65
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:118
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:122
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:119
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:181
-#: src/features/lanyard/hooks/useLanyardConfig.ts:185
+#: src/features/lanyard/hooks/useLanyardConfig.ts:187
 msgid "Retry"
 msgstr "Retry"
 
@@ -649,11 +653,11 @@ msgstr "Rose"
 msgid "Save honorific"
 msgstr "Save honorific"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:167
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:168
 msgid "Saved"
 msgstr "Saved"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:167
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:168
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -677,7 +681,7 @@ msgstr "Show {name}"
 msgid "Show again"
 msgstr "Show again"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:185
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:186
 msgid "Show current job on your badge"
 msgstr "Show current job on your badge"
 
@@ -697,13 +701,13 @@ msgstr "Sifa"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:86
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:55
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:87
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:56
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:54
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:81
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:55
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:82
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -772,7 +776,7 @@ msgstr "Teal"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:155
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:156
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -780,15 +784,15 @@ msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting
 msgid "This account isn't available"
 msgstr "This account isn't available"
 
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:28
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:29
 msgid "This is your lanyard"
 msgstr "This is your lanyard"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:93
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:94
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:83
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:84
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 
@@ -858,7 +862,7 @@ msgstr "Video added"
 msgid "Video deleted"
 msgstr "Video deleted"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:260
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:261
 msgid "View as visitor"
 msgstr "View as visitor"
 
@@ -902,7 +906,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:152
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:153
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
@@ -949,7 +953,7 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:54
 #: src/features/qr/components/QrSheet/QrSheet.tsx:28
 msgid "Your lanyard"
 msgstr "Your lanyard"
@@ -958,7 +962,7 @@ msgstr "Your lanyard"
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:223
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:224
 msgid "Your links"
 msgstr "Your links"
 
@@ -966,7 +970,7 @@ msgstr "Your links"
 msgid "Your ORCID iD is verified"
 msgstr "Your ORCID iD is verified"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:239
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:240
 msgid "Your podcasts and videos"
 msgstr "Your podcasts and videos"
 

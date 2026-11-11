@@ -5,6 +5,7 @@ import { Button } from '@/components/Button/Button';
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
+import { profileId } from '@/lib/atproto/profileId';
 import { startSignUp } from '@/lib/atproto/session';
 import { cn } from '@/lib/utils';
 
@@ -46,7 +47,7 @@ export function VisitorActions({
   return (
     <div className={cn(styles.actions, className)}>
       <ExternalLink
-        href={`https://bsky.app/profile/${handle}`}
+        href={`https://bsky.app/profile/${profileId(did, handle)}`}
         className={styles.link}
       >
         {t`Follow on Bluesky`}

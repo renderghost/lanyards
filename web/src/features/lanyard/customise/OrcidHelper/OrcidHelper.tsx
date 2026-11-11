@@ -26,7 +26,7 @@ import type { OrcidHelperProps } from './OrcidHelper.types';
  */
 export function OrcidHelper({
   did,
-  handle,
+  profile,
   orcidId,
   className,
 }: OrcidHelperProps) {
@@ -39,7 +39,7 @@ export function OrcidHelper({
   const check = useQuery({
     queryKey: queryKeys.source('orcid', did, orcidId ?? ''),
     enabled: Boolean(orcidId),
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('orcid', (signal) =>
       fetchOrcidVerified(orcidId ?? '', did, signal)
     ),
   });
@@ -47,7 +47,7 @@ export function OrcidHelper({
   if (orcidId === undefined) return null;
 
   if (orcidId === null) {
-    const [sifa] = EDIT_LINKS.links(handle);
+    const [sifa] = EDIT_LINKS.links(profile);
     return (
       <section
         aria-labelledby={headingId}

@@ -35,7 +35,7 @@ import type { BlockEditorProps } from './BlockEditor.types';
 export function BlockEditor({
   config,
   statuses,
-  handle,
+  profile,
   disabled = false,
   onChange,
   onRetry,
@@ -137,7 +137,7 @@ export function BlockEditor({
                 index={index}
                 total={total}
                 status={statuses[block.type]}
-                editLinks={EDIT_LINKS[block.type](handle).map((link) => ({
+                editLinks={EDIT_LINKS[block.type](profile).map((link) => ({
                   label: i18n._(link.label),
                   url: link.url,
                 }))}

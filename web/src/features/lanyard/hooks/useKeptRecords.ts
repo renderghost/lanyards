@@ -7,8 +7,8 @@ import {
   deleteRecord,
   putRecord,
   type Reference,
+  type WritableNsid,
 } from '@/lib/atproto/writes';
-import type { KnownRecordNsid } from '@/lib/lexicons/validate';
 import { sourceQueryOptions } from '@/lib/person/sourceQuery';
 import { queryKeys } from '@/lib/query/keys';
 import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
@@ -17,7 +17,9 @@ import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
 export function useKeptRecords(did: Did) {
   return useQuery({
     queryKey: queryKeys.source('lanyards', did),
-    ...sourceQueryOptions((signal) => fetchLanyardRecords(did, signal)),
+    ...sourceQueryOptions('lanyards', (signal) =>
+      fetchLanyardRecords(did, signal)
+    ),
   });
 }
 
@@ -47,7 +49,7 @@ export function useKeptRecordWriter() {
   return {
     did: writer?.did,
     async create(
-      collection: KnownRecordNsid,
+      collection: WritableNsid,
       fields: Record<string, unknown>
     ): Promise<Reference> {
       const current = signedIn();
@@ -56,7 +58,7 @@ export function useKeptRecordWriter() {
       return reference;
     },
     async put(
-      collection: KnownRecordNsid,
+      collection: WritableNsid,
       rkey: string,
       fields: Record<string, unknown>
     ): Promise<Reference> {
@@ -65,7 +67,7 @@ export function useKeptRecordWriter() {
       refresh(current.did);
       return reference;
     },
-    async remove(collection: KnownRecordNsid, rkey: string): Promise<void> {
+    async remove(collection: WritableNsid, rkey: string): Promise<void> {
       const current = signedIn();
       await deleteRecord(current, collection, rkey);
       refresh(current.did);

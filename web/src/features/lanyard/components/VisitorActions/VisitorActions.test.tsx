@@ -40,6 +40,18 @@ beforeEach(() => {
 });
 
 describe('VisitorActions when signed out', () => {
+  it('links to Bluesky by DID when the handle doesn’t verify', async () => {
+    renderInRouter(
+      <VisitorActions did={ADA.did} handle="handle.invalid" owner={false} />,
+      `/d/${ADA.did}`
+    );
+    expect(
+      await screen.findByRole('link', {
+        name: 'Follow on Bluesky (opens in a new tab)',
+      })
+    ).toHaveAttribute('href', `https://bsky.app/profile/${ADA.did}`);
+  });
+
   it.each(['/@alice.test', `/d/${ADA.did}`])(
     'offers Bluesky, sign-in and sign-up on %s',
     async (path) => {

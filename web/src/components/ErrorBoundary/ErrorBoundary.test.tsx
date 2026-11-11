@@ -24,4 +24,25 @@ describe('ErrorBoundary', () => {
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
     vi.mocked(console.error).mockRestore();
   });
+
+  it('says when its children have rendered, and not when they fail', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const onRendered = vi.fn();
+    const { unmount } = render(
+      <ErrorBoundary onRendered={onRendered}>
+        <p>Fine</p>
+      </ErrorBoundary>
+    );
+    expect(onRendered).toHaveBeenCalledTimes(1);
+    unmount();
+
+    onRendered.mockClear();
+    render(
+      <ErrorBoundary onRendered={onRendered}>
+        <Broken />
+      </ErrorBoundary>
+    );
+    expect(onRendered).not.toHaveBeenCalled();
+    vi.mocked(console.error).mockRestore();
+  });
 });

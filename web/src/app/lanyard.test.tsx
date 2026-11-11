@@ -70,6 +70,18 @@ describe('public lanyard routes', () => {
     expect(await hero()).toBeInTheDocument();
   });
 
+  it.each(['/%40alice%', '/@alice%'])(
+    'shows the not-found page, not an error, for a malformed escape in %s',
+    async (path) => {
+      renderRoute(path);
+      expect(
+        await screen.findByRole('heading', {
+          name: "We couldn't find that page",
+        })
+      ).toBeInTheDocument();
+    }
+  );
+
   it('shows the not-found page for a malformed DID', async () => {
     renderRoute('/d/not-a-did');
     expect(
@@ -289,6 +301,29 @@ describe('visitor actions on the page', () => {
     expect(
       screen.getByRole('button', { name: 'Create account' })
     ).toBeInTheDocument();
+  });
+
+  it('gives owners edit links by DID when their handle doesn’t verify', async () => {
+    servePerson({ profile: { handle: 'handle.invalid' } });
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    renderRoute(`/d/${ADA.did}`);
+    const links = await screen.findByRole(
+      'region',
+      { name: 'Links' },
+      { timeout: 5000 }
+    );
+    expect(
+      within(links).getByRole('link', { name: /^Edit in Bluesky/ })
+    ).toHaveAttribute(
+      'href',
+      `https://bsky.app/profile/${encodeURIComponent(ADA.did)}`
+    );
+    expect(
+      within(links).getByRole('link', { name: /^Edit on Sifa/ })
+    ).toHaveAttribute(
+      'href',
+      `https://sifa.id/p/${encodeURIComponent(ADA.did)}?edit=true#other-profiles`
+    );
   });
 
   it('tells owners it is their own lanyard', async () => {

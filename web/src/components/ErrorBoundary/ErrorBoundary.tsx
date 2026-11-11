@@ -16,6 +16,10 @@ export class ErrorBoundary extends Component<
     return { failed: true };
   }
 
+  override componentDidMount(): void {
+    if (!this.state.failed) this.props.onRendered?.();
+  }
+
   override componentDidCatch(error: unknown): void {
     this.props.onError?.(error);
   }

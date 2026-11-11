@@ -72,6 +72,20 @@ describe('meta handler', () => {
     );
   });
 
+  it.each([
+    'https://next.lanyards.app/@ada%',
+    'https://next.lanyards.app/@x?handle=ada%25',
+    'https://next.lanyards.app/d/did%3Aplc%3Aa%',
+  ])('serves default meta for a malformed escape in %s', async (url) => {
+    const fetchImpl = vi.fn(profileFetch);
+    const response = await handler(fetchImpl as unknown as typeof fetch)(
+      new Request(url)
+    );
+    expect(response.status).toBe(200);
+    expect(fetchImpl).not.toHaveBeenCalled();
+    expect(await response.text()).toContain('<title>Lanyards</title>');
+  });
+
   it('never looks up something that is not a handle or DID', async () => {
     const fetchImpl = vi.fn(profileFetch);
     const response = await handler(fetchImpl as unknown as typeof fetch)(

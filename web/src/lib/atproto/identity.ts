@@ -11,10 +11,6 @@ import { PUBLIC_APPVIEW } from './endpoints';
 
 export { PUBLIC_APPVIEW };
 
-/**
- * Resolves handles and DIDs. Browsers have no DNS access, so handles are
- * resolved through the public AppView.
- */
 /** Resolves did:plc and did:web documents. */
 export const didDocumentResolver = new CompositeDidDocumentResolver({
   methods: {
@@ -23,6 +19,10 @@ export const didDocumentResolver = new CompositeDidDocumentResolver({
   },
 });
 
+/**
+ * Resolves handles and DIDs. Browsers have no DNS access, so handles are
+ * resolved through the public AppView.
+ */
 export const identityResolver = new LocalActorResolver({
   handleResolver: new XrpcHandleResolver({ serviceUrl: PUBLIC_APPVIEW }),
   didDocumentResolver,

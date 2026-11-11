@@ -26,7 +26,7 @@ export function relationshipQueryOptions(
 ) {
   return {
     queryKey: queryKeys.relationship(viewer, subject),
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('bluesky', (signal) =>
       fetchRelationship(appview, viewer, subject, signal)
     ),
   };
@@ -76,7 +76,7 @@ export function useSharedContext(did: Did): SharedContext {
   const followers = useQuery({
     queryKey: queryKeys.knownFollowers(viewer ?? '', did),
     enabled: followersEnabled,
-    ...sourceQueryOptions((signal) =>
+    ...sourceQueryOptions('bluesky', (signal) =>
       fetchKnownFollowers(signedIn!.appview, did, signal)
     ),
   });

@@ -1,6 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
 
-import { ErrorBoundary } from '@/components/ErrorBoundary/ErrorBoundary';
 import { captureError } from '@/lib/analytics/analytics';
 import { EDIT_LINKS } from '@/lib/person/editLinks';
 import { cn } from '@/lib/utils';
@@ -11,13 +10,13 @@ import * as styles from './LanyardBlocks.styles';
 import type { LanyardBlocksProps } from './LanyardBlocks.types';
 
 /**
- * The lanyard's blocks, each behind its own error boundary, so one broken
- * block never takes the page down (spec §12.3).
+ * The lanyard's blocks. Each block contains its own rendering failures
+ * (see BlockSection), so one broken block never takes the page down.
  */
 export function LanyardBlocks({
   blocks,
   owner,
-  handle,
+  profile,
   onRetry,
   className,
 }: LanyardBlocksProps) {
@@ -28,38 +27,35 @@ export function LanyardBlocks({
       {blocks.map((block) => {
         const Items = BLOCK_COMPONENTS[block.type];
         return (
-          <ErrorBoundary
+          <BlockSection
             key={block.type}
-            onError={(error) =>
+            heading={i18n._(BLOCK_HEADINGS[block.type])}
+            status={block.status}
+            failedSources={
+              block.status === 'error'
+                ? block.sources
+                : block.status === 'ready'
+                  ? block.failedSources
+                  : []
+            }
+            owner={owner}
+            editLinks={
+              owner && profile
+                ? EDIT_LINKS[block.type](profile).map((link) => ({
+                    label: i18n._(link.label),
+                    url: link.url,
+                  }))
+                : undefined
+            }
+            onRetry={() => onRetry(block.type)}
+            onCrash={(error) =>
               captureError(error, { source: `block:${block.type}` })
             }
           >
-            <BlockSection
-              heading={i18n._(BLOCK_HEADINGS[block.type])}
-              status={block.status}
-              failedSources={
-                block.status === 'error'
-                  ? block.sources
-                  : block.status === 'ready'
-                    ? block.failedSources
-                    : []
-              }
-              owner={owner}
-              editLinks={
-                owner && handle
-                  ? EDIT_LINKS[block.type](handle).map((link) => ({
-                      label: i18n._(link.label),
-                      url: link.url,
-                    }))
-                  : undefined
-              }
-              onRetry={() => onRetry(block.type)}
-            >
-              {block.status === 'ready' && (
-                <Items items={block.items as never[]} />
-              )}
-            </BlockSection>
-          </ErrorBoundary>
+            {block.status === 'ready' && (
+              <Items items={block.items as never[]} />
+            )}
+          </BlockSection>
         );
       })}
     </div>

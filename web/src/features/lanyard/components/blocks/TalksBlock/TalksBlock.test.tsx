@@ -26,9 +26,8 @@ describe('TalksBlock', () => {
     expect(
       screen.getByRole('link', { name: 'Talk title (opens in a new tab)' })
     ).toBeInTheDocument();
-    expect(
-      screen.getByText('Event name · 7 Mar 2024 · Keynote')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Event name')).toBeInTheDocument();
+    expect(screen.getByText('7 Mar 2024 · Keynote')).toBeInTheDocument();
     expect(screen.getByText('Untitled panel')).toBeInTheDocument();
     expect(screen.getByText('Panellist')).toBeInTheDocument();
     await expectNoAxeViolations(container);
@@ -39,5 +38,25 @@ describe('TalksBlock', () => {
       <TalksBlock items={[{ key: 'k', title: 'x'.repeat(5000) }]} />
     );
     expect(screen.getByText('x'.repeat(5000))).toHaveClass('line-clamp-3');
+  });
+
+  it('clamps a very long event name, keeping the date and role visible', () => {
+    renderWithProviders(
+      <TalksBlock
+        items={[
+          {
+            key: 'k',
+            title: 'Talk',
+            eventName: 'y'.repeat(5000),
+            date: '2024-03-07',
+            role: 'keynote',
+          },
+        ]}
+      />
+    );
+    expect(screen.getByText('y'.repeat(5000))).toHaveClass('line-clamp-2');
+    expect(screen.getByText('7 Mar 2024 · Keynote')).not.toHaveClass(
+      'line-clamp-2'
+    );
   });
 });

@@ -7,6 +7,7 @@ import { DEFAULT_ACCENT } from '@/design/accents';
 import { useSession } from '@/features/auth/session/useSession';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { profileId } from '@/lib/atproto/profileId';
 import { track } from '@/lib/analytics/analytics';
 import { BLOCK_SOURCES } from '@/lib/person/blocks';
 import { usePersonView } from '@/lib/person/usePersonView';
@@ -122,8 +123,10 @@ export function LanyardPage({
       <LanyardBlocks
         blocks={view.blocks}
         owner={view.mode === 'owner'}
-        handle={view.hero.handle}
-        onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
+        profile={profileId(did, view.hero.handle)}
+        onRetry={(type) =>
+          Promise.allSettled(BLOCK_SOURCES[type].map(view.retry))
+        }
       />
     </article>
   );

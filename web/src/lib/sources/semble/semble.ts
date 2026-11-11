@@ -1,5 +1,6 @@
 import type { Did, Handle } from '@atcute/lexicons';
 
+import { profileId } from '@/lib/atproto/profileId';
 import { listRecords } from '@/lib/atproto/pds';
 import { validRecords } from '@/lib/lexicons/validate';
 import { safeHref } from '@/lib/normalise';
@@ -107,7 +108,7 @@ export async function fetchCollections(
       key: uri,
       name: value.name,
       ...(value.description ? { description: value.description } : {}),
-      url: `https://semble.so/profile/${handle}/collections/${rkeyOf(uri)}`,
+      url: `https://semble.so/profile/${profileId(did, handle)}/collections/${rkeyOf(uri)}`,
       links: (linksByCollection.get(uri) ?? [])
         .sort((a, b) => b.addedAt.localeCompare(a.addedAt))
         .slice(0, LINKS_PER_COLLECTION)

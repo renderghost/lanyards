@@ -3,9 +3,24 @@ import type { Client } from '@atcute/client';
 import type { Did } from '@atcute/lexicons';
 import { now as tidNow } from '@atcute/tid';
 
-import { type KnownRecordNsid, validateRecord } from '@/lib/lexicons/validate';
+import { AUTH_FULL_COLLECTIONS } from '@/lib/lexicons/nsids';
+import { validateRecord } from '@/lib/lexicons/validate';
 
 import { canWrite, parseGrantedScope, type RepoAction } from './permissions';
+
+/**
+ * The only collections Lanyards writes: its own records and Bluesky
+ * follows. A broad (transition:generic) session could write anything, so
+ * this is checked at run time as well as by the types.
+ */
+export const WRITABLE_COLLECTIONS = [
+  ...AUTH_FULL_COLLECTIONS,
+  'app.bsky.graph.follow',
+] as const;
+
+export type WritableNsid = (typeof WRITABLE_COLLECTIONS)[number];
+
+const writable: ReadonlySet<string> = new Set(WRITABLE_COLLECTIONS);
 
 /** What a write needs from the signed-in session. */
 export type WriteSession = { did: Did; scope: string; rpc: Client };
@@ -27,9 +42,12 @@ export class WriteFailedError extends Error {
 
 function allow(
   session: WriteSession,
-  collection: KnownRecordNsid,
+  collection: WritableNsid,
   action: RepoAction
 ): void {
+  if (!writable.has(collection)) {
+    throw new MissingPermissionError(`Lanyards doesn't write ${collection}`);
+  }
   if (!canWrite(parseGrantedScope(session.scope), collection, action)) {
     throw new MissingPermissionError(
       `No ${action} permission for ${collection}`
@@ -38,7 +56,7 @@ function allow(
 }
 
 function typed(
-  collection: KnownRecordNsid,
+  collection: WritableNsid,
   fields: Record<string, unknown>
 ): Record<string, unknown> {
   const record = { $type: collection, ...fields };
@@ -52,7 +70,7 @@ export type Reference = { uri: string; cid: string };
 /** Adds a record with a new TID key to the signed-in person's repository. */
 export async function createRecord(
   session: WriteSession,
-  collection: KnownRecordNsid,
+  collection: WritableNsid,
   fields: Record<string, unknown>
 ): Promise<Reference> {
   allow(session, collection, 'create');
@@ -67,7 +85,7 @@ export async function createRecord(
 /** Creates or replaces the record at `rkey`. */
 export async function putRecord(
   session: WriteSession,
-  collection: KnownRecordNsid,
+  collection: WritableNsid,
   rkey: string,
   fields: Record<string, unknown>
 ): Promise<Reference> {
@@ -83,7 +101,7 @@ export async function putRecord(
 /** Removes the record at `rkey`. */
 export async function deleteRecord(
   session: WriteSession,
-  collection: KnownRecordNsid,
+  collection: WritableNsid,
   rkey: string
 ): Promise<void> {
   allow(session, collection, 'delete');

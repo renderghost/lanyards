@@ -18,7 +18,7 @@ export function useResolveHandle(handle: string): {
   const queryClient = useQueryClient();
   const query = useQuery({
     queryKey: ['resolveHandle', handle],
-    ...sourceQueryOptions(async (signal) => {
+    ...sourceQueryOptions('bluesky', async (signal) => {
       const profile = await fetchProfile(handle, signal);
       if (!profile.ok) return profile;
       queryClient.setQueryData(
