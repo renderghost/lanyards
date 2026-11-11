@@ -82,10 +82,12 @@ export async function fetchOrcidWorks(
     const summary = group['work-summary']?.[0];
     const title = text(summary?.title?.title);
     if (!summary || !title) return [];
+    // Only the work's own DOI: part-of names its journal or book, and
+    // version-of another version (a preprint's published paper).
     const doiId = summary['external-ids']?.['external-id']?.find(
       (item) =>
         item['external-id-type'] === 'doi' &&
-        item['external-id-relationship'] !== 'part-of'
+        item['external-id-relationship'] === 'self'
     );
     const doiValue = doiId?.['external-id-value'];
     const doi =

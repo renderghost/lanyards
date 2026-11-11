@@ -94,6 +94,58 @@ describe('fetchOrcidWorks', () => {
     expect(result.ok && result.value).toHaveLength(5);
   });
 
+  it('takes only the work’s own DOI, not one of another version', async () => {
+    const summary = (
+      ids: { type: string; value: string; relationship: string }[]
+    ) => ({
+      'put-code': 1,
+      title: { title: { value: 'A preprint' } },
+      'external-ids': {
+        'external-id': ids.map((id) => ({
+          'external-id-type': id.type,
+          'external-id-value': id.value,
+          'external-id-relationship': id.relationship,
+        })),
+      },
+    });
+    server.use(
+      http.get(`${API}/works`, () =>
+        HttpResponse.json({
+          group: [
+            {
+              'work-summary': [
+                summary([
+                  {
+                    type: 'doi',
+                    value: '10.1/published',
+                    relationship: 'version-of',
+                  },
+                ]),
+              ],
+            },
+            {
+              'work-summary': [
+                summary([
+                  {
+                    type: 'doi',
+                    value: '10.1/published',
+                    relationship: 'version-of',
+                  },
+                  { type: 'doi', value: '10.1/preprint', relationship: 'self' },
+                ]),
+              ],
+            },
+          ],
+        })
+      )
+    );
+    const result = await fetchOrcidWorks(ID);
+    expect(result.ok && result.value.map((work) => work.doi)).toEqual([
+      undefined,
+      '10.1/preprint',
+    ]);
+  });
+
   it('reports an unknown iD as not found', async () => {
     server.use(
       http.get(`${API}/works`, () =>
