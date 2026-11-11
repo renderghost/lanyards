@@ -3,6 +3,15 @@ import { gzipSync } from 'node:zlib';
 /** Spec §2: initial JS of at most 200 KB, gzipped. */
 export const INITIAL_JS_BUDGET_BYTES = 200 * 1024;
 
+/**
+ * Every route that shows a public lanyard. Each must fit the budget on its
+ * own (spec §2: initial JS for the public lanyard route ≤ 200 KB gzipped).
+ */
+export const PUBLIC_LANYARD_ROUTES = [
+  'routes/@{$handle}.tsx',
+  'routes/d.$did.tsx',
+] as const;
+
 export type ManifestChunk = {
   file: string;
   isEntry?: boolean;
@@ -52,4 +61,19 @@ export function initialJsFiles(
 
 export function gzipSize(contents: Buffer): number {
   return gzipSync(contents, { level: 9 }).length;
+}
+
+export type RouteSize = { route: string; files: string[]; total: number };
+
+/** The initial JS each route needs on its own, with its total size. */
+export function routeSizes(
+  manifest: Record<string, ManifestChunk>,
+  routes: readonly string[],
+  sizeOf: (file: string) => number
+): RouteSize[] {
+  return routes.map((route) => {
+    const files = initialJsFiles(manifest, [route]);
+    const total = files.reduce((sum, file) => sum + sizeOf(file), 0);
+    return { route, files, total };
+  });
 }

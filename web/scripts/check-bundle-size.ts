@@ -4,8 +4,9 @@ import { resolve } from 'node:path';
 import {
   gzipSize,
   INITIAL_JS_BUDGET_BYTES,
-  initialJsFiles,
   type ManifestChunk,
+  PUBLIC_LANYARD_ROUTES,
+  routeSizes,
 } from './bundleSize.ts';
 
 const dist = resolve(import.meta.dirname, '../dist');
@@ -14,23 +15,25 @@ const manifest = JSON.parse(
 ) as Record<string, ManifestChunk>;
 
 const kb = (bytes: number) => `${(bytes / 1024).toFixed(1)} KB`;
-let total = 0;
-// The public lanyard route must fit too (spec §2: initial JS for the
-// public lanyard route ≤ 200 KB gzipped).
-const LANYARD_ROUTES = ['routes/@{$handle}.tsx'];
+const sizeOf = (file: string) => gzipSize(readFileSync(resolve(dist, file)));
 
-for (const file of initialJsFiles(manifest, LANYARD_ROUTES)) {
-  const size = gzipSize(readFileSync(resolve(dist, file)));
-  total += size;
-  console.log(`${kb(size).padStart(10)}  ${file}`);
-}
-console.log(
-  `${kb(total).padStart(10)}  initial JS for the lanyard route, gzipped (budget ${kb(INITIAL_JS_BUDGET_BYTES)})`
-);
-
-if (total > INITIAL_JS_BUDGET_BYTES) {
-  console.error(
-    `Over budget by ${kb(total - INITIAL_JS_BUDGET_BYTES)}. Split or lazy-load something.`
+let over = false;
+for (const { route, files, total } of routeSizes(
+  manifest,
+  PUBLIC_LANYARD_ROUTES,
+  sizeOf
+)) {
+  for (const file of files) {
+    console.log(`${kb(sizeOf(file)).padStart(10)}  ${file}`);
+  }
+  console.log(
+    `${kb(total).padStart(10)}  initial JS for ${route}, gzipped (budget ${kb(INITIAL_JS_BUDGET_BYTES)})\n`
   );
-  process.exit(1);
+  if (total > INITIAL_JS_BUDGET_BYTES) {
+    console.error(
+      `${route} is over budget by ${kb(total - INITIAL_JS_BUDGET_BYTES)}. Split or lazy-load something.`
+    );
+    over = true;
+  }
 }
+if (over) process.exit(1);
