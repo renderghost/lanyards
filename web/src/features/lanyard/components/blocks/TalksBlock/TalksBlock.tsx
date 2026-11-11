@@ -10,7 +10,7 @@ import { ROLE_LABELS } from './TalksBlock.constants';
 import * as styles from './TalksBlock.styles';
 import type { TalksBlockProps } from './TalksBlock.types';
 
-/** Talks from Sifa: newest first, with event, date and role. */
+/** Talks from Sifa: newest first, with the event, then date and role. */
 export function TalksBlock({ items, className }: TalksBlockProps) {
   const { i18n } = useLingui();
   return (
@@ -18,7 +18,6 @@ export function TalksBlock({ items, className }: TalksBlockProps) {
       {items.map((talk) => {
         const role = talk.role ? ROLE_LABELS[talk.role] : undefined;
         const meta = [
-          talk.eventName,
           talk.date ? formatPartialDate(talk.date) : undefined,
           role ? i18n._(role) : undefined,
         ].filter(Boolean);
@@ -34,6 +33,9 @@ export function TalksBlock({ items, className }: TalksBlockProps) {
                 </ExternalLink>
               ) : (
                 <p className={styles.title}>{talk.title}</p>
+              )}
+              {talk.eventName && (
+                <p className={styles.event}>{talk.eventName}</p>
               )}
               {meta.length > 0 && (
                 <p className={styles.meta}>{meta.join(' · ')}</p>
