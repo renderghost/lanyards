@@ -11,6 +11,7 @@ import {
   InvalidRecordError,
   MissingPermissionError,
   putRecord,
+  WRITABLE_COLLECTIONS,
 } from './writes';
 
 const NOW = '2026-11-10T09:00:00.000Z';
@@ -113,5 +114,39 @@ describe('deleteRecord', () => {
     await expect(
       deleteRecord(session('atproto'), 'app.bsky.graph.follow', '3mold')
     ).rejects.toBeInstanceOf(MissingPermissionError);
+  });
+});
+
+describe('writable collections', () => {
+  it('are the six Lanyards writes', () => {
+    expect([...WRITABLE_COLLECTIONS].sort()).toEqual([
+      'app.bsky.graph.follow',
+      'app.lanyards.actor.biography.honorific',
+      'app.lanyards.actor.lanyard',
+      'app.lanyards.link.media.audio',
+      'app.lanyards.link.media.video',
+      'app.lanyards.link.web',
+    ]);
+  });
+
+  it('refuses any other collection, even with broad permission', async () => {
+    const bodies = capture('createRecord');
+    await expect(
+      createRecord(
+        session('atproto transition:generic'),
+        // @ts-expect-error: Sifa's records are Sifa's to write.
+        'id.sifa.profile.skill',
+        { name: 'Protocols', createdAt: NOW }
+      )
+    ).rejects.toBeInstanceOf(MissingPermissionError);
+    await expect(
+      deleteRecord(
+        session('atproto transition:generic'),
+        // @ts-expect-error: Sifa's records are Sifa's to delete.
+        'id.sifa.profile.skill',
+        '3m'
+      )
+    ).rejects.toBeInstanceOf(MissingPermissionError);
+    expect(bodies).toEqual([]);
   });
 });
