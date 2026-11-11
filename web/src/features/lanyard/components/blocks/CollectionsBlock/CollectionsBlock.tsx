@@ -23,7 +23,7 @@ export function CollectionsBlock({ items, className }: CollectionsBlockProps) {
               {collection.name}
             </ExternalLink>
             {collection.description && (
-              <p className={styles.meta}>{collection.description}</p>
+              <p className={styles.description}>{collection.description}</p>
             )}
             {collection.links.length > 0 && (
               <ul className={styles.links}>

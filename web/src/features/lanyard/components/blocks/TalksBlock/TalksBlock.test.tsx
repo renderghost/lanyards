@@ -40,4 +40,13 @@ describe('TalksBlock', () => {
     );
     expect(screen.getByText('x'.repeat(5000))).toHaveClass('line-clamp-3');
   });
+
+  it('clamps a very long event name to two lines', () => {
+    renderWithProviders(
+      <TalksBlock
+        items={[{ key: 'k', title: 'Talk', eventName: 'y'.repeat(5000) }]}
+      />
+    );
+    expect(screen.getByText('y'.repeat(5000))).toHaveClass('line-clamp-2');
+  });
 });
