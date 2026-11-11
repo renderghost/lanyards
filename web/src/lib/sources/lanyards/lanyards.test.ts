@@ -90,6 +90,25 @@ describe('fetchLanyardRecords', () => {
     });
   });
 
+  it('reads every web link, not just the first 20', async () => {
+    mockListRecords(
+      ADA.pds,
+      ADA.did,
+      'app.lanyards.link.web',
+      Array.from({ length: 150 }, (_, index) => ({
+        uri: `at://${ADA.did}/app.lanyards.link.web/3m${index}`,
+        cid: `bafyrei${'a'.repeat(52)}`,
+        value: {
+          $type: 'app.lanyards.link.web',
+          url: `https://ada.example/${index}`,
+          createdAt: '2026-01-01T00:00:00.000Z',
+        },
+      }))
+    );
+    const result = await fetchLanyardRecords(ADA.did);
+    expect(result.ok && result.value.webLinks).toHaveLength(150);
+  });
+
   it('treats the honorific none as no honorific', async () => {
     serve({ honorific: 'none' });
     const result = await fetchLanyardRecords(ADA.did);
