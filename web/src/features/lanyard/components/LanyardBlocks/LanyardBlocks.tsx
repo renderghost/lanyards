@@ -33,6 +33,23 @@ export function LanyardBlocks({
             onError={(error) =>
               captureError(error, { source: `block:${block.type}` })
             }
+            // Visitors never see a failure; the owner can try again.
+            fallback={
+              owner
+                ? (reset) => (
+                    <BlockSection
+                      heading={i18n._(BLOCK_HEADINGS[block.type])}
+                      status="error"
+                      owner
+                      crashed
+                      onRetry={() => {
+                        onRetry(block.type);
+                        reset();
+                      }}
+                    />
+                  )
+                : null
+            }
           >
             <BlockSection
               heading={i18n._(BLOCK_HEADINGS[block.type])}

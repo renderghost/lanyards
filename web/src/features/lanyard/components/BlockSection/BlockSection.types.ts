@@ -9,6 +9,8 @@ export type BlockSectionProps = {
   failedSources?: SourceName[];
   /** The owner sees failures, retry and edit links. */
   owner: boolean;
+  /** The block's content failed to render; the owner can retry. */
+  crashed?: boolean;
   onRetry?(): void;
   /** Where the owner edits this block's data (Sifa, Bluesky). */
   editLinks?: { label: string; url: string }[];

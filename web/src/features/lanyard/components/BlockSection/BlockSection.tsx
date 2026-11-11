@@ -15,6 +15,7 @@ export function BlockSection({
   status,
   failedSources = [],
   owner,
+  crashed = false,
   onRetry,
   editLinks = [],
   children,
@@ -23,7 +24,7 @@ export function BlockSection({
   const { t, i18n } = useLingui();
   const headingId = useId();
   const failed = failedSources.map((source) => i18n._(SOURCE_LABELS[source]));
-  const showProblem = owner && failed.length > 0;
+  const showProblem = owner && (crashed || failed.length > 0);
   const sources = failed.join(', ');
 
   return (
@@ -59,7 +60,11 @@ export function BlockSection({
       {status === 'ready' && children}
       {showProblem && (
         <div className={styles.problem}>
-          <p className={styles.problemText}>{t`Couldn't load ${sources}`}</p>
+          <p className={styles.problemText}>
+            {crashed
+              ? t`Couldn't show this block`
+              : t`Couldn't load ${sources}`}
+          </p>
           {onRetry && (
             <Button variant="secondary" onClick={onRetry}>
               {t`Retry`}
