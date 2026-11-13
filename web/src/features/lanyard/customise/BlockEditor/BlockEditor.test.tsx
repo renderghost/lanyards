@@ -81,6 +81,12 @@ describe('BlockEditor', () => {
     expect(
       within(row('Details')).getByRole('button', { name: 'Move Details down' })
     ).toHaveAttribute('aria-disabled', 'true');
+    // Details is a single item, so there's nothing to limit.
+    expect(
+      within(row('Details')).queryByRole('combobox', {
+        name: 'Items to show for Details',
+      })
+    ).not.toBeInTheDocument();
   });
 
   it('moves a block down, saves and announces where it went', async () => {

@@ -367,22 +367,94 @@ export function blockStatuses(
   return statuses;
 }
 
-/** A hidden key, with its block and item when a loaded source has it. */
+/** Why a hidden item can't be shown in the list of hidden items. */
+export type HiddenItemReason =
+  /** Its block is switched off, so its source wasn't read. */
+  | 'off'
+  | 'loading'
+  /** Its block's source couldn't be read. */
+  | 'failed'
+  /** Its source was read and no longer has it. */
+  | 'gone';
+
+/**
+ * A hidden key: with its block and item when a loaded source has it, or
+ * else the block it belongs to (when the key says) and why it's missing.
+ */
 export type HiddenItem =
-  { key: string } | { key: string; type: RenderableBlockType; item: BlockItem };
+  | { key: string; type: RenderableBlockType; item: BlockItem }
+  | { key: string; type?: RenderableBlockType; reason: HiddenItemReason };
+
+/** The collection of each record that a block shows, by item key. */
+const COLLECTION_BLOCKS: Record<string, RenderableBlockType> = {
+  'app.bsky.feed.post': 'bskyPosts',
+  'id.sifa.profile.presentation': 'talks',
+  'id.sifa.profile.presentationDelivery': 'talks',
+  'id.sifa.profile.publication': 'publications',
+  'id.sifa.profile.skill': 'skills',
+  'id.sifa.profile.education': 'education',
+  'site.standard.document': 'blogPosts',
+  'org.tangled.repo.manifest': 'code',
+  'org.tangled.repo.declaration': 'code',
+  'network.cosmik.collection': 'collections',
+  'app.lanyards.link.media.audio': 'media',
+  'app.lanyards.link.media.video': 'media',
+};
+
+/** The block an item key belongs to, read from the key itself. */
+function blockOfKey(key: string): RenderableBlockType | undefined {
+  if (key === 'details') return 'details';
+  if (key.startsWith('orcid:')) return 'publications';
+  if (key.startsWith('openTo:')) return 'openTo';
+  if (key.startsWith('at://'))
+    return COLLECTION_BLOCKS[key.split('/')[3] ?? ''];
+  // Links are keyed by their normalised URL.
+  if (/^https?:\/\//i.test(key)) return 'links';
+  return undefined;
+}
+
+/** Sources read only once the Bluesky profile has given the handle. */
+const NEEDS_HANDLE: ReadonlySet<SourceKey> = new Set(['tangled', 'semble']);
 
 /** The owner's hidden items, for "Show again" (spec §7.4). */
 export function hiddenItems(input: ComposeInput): HiddenItem[] {
-  const gathered = DEFAULT_BLOCK_ORDER.flatMap((type) => {
-    const result = gather(type, input.sources, input.orcidVerified);
-    return result.loading ? [] : [{ type, items: result.items }];
-  });
-  return input.config.hidden.map((key) => {
+  const results = new Map(
+    DEFAULT_BLOCK_ORDER.map((type) => [
+      type,
+      gather(type, input.sources, input.orcidVerified),
+    ])
+  );
+  return input.config.hidden.map((key): HiddenItem => {
     const wanted = hiddenSet([key]);
-    for (const { type, items } of gathered) {
-      const item = items.find((candidate) => isHidden(candidate.key, wanted));
+    for (const [type, result] of results) {
+      if (result.loading) continue;
+      const item = result.items.find((candidate) =>
+        isHidden(candidate.key, wanted)
+      );
       if (item) return { key, type, item: item as BlockItem };
     }
-    return { key };
+    const type = blockOfKey(key);
+    if (!type) return { key, reason: 'gone' };
+    const visible = input.config.blocks.some(
+      (block) => block.type === type && block.visible
+    );
+    const result = results.get(type);
+    const profile = input.sources.bluesky?.status;
+    // Until the profile gives the handle, these sources aren't read at all.
+    const waitingOnProfile =
+      BLOCK_SOURCES[type].some((source) => NEEDS_HANDLE.has(source)) &&
+      profile !== 'ready';
+    const reason: HiddenItemReason = !visible
+      ? 'off'
+      : waitingOnProfile
+        ? profile === 'error'
+          ? 'failed'
+          : 'loading'
+        : !result || result.loading
+          ? 'loading'
+          : result.failed.length > 0
+            ? 'failed'
+            : 'gone';
+    return { key, type, reason };
   });
 }

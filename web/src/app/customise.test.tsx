@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { expectNoAxeViolations } from '@/test/axe';
 import { server } from '@/test/msw';
@@ -246,6 +247,36 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
     await waitFor(() => expect(saves).toHaveLength(2), { timeout: 3000 });
     expect((saves[1]?.record as { hidden: string[] }).hidden).toEqual([]);
+  });
+
+  it('refuses to hide a 501st item, saying why', async () => {
+    const failed = vi.spyOn(notify, 'error');
+    servePerson({
+      config: {
+        hidden: Array.from({ length: 500 }, (_, index) => `k${index}`),
+      },
+    });
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    const region = await preview();
+    await userEvent.click(
+      await within(region).findByRole(
+        'button',
+        { name: 'More options for Building on ATProto at Example Conf 2024' },
+        { timeout: 8000 }
+      )
+    );
+    await userEvent.click(
+      await screen.findByRole('menuitem', { name: 'Hide this item' })
+    );
+    await waitFor(() =>
+      expect(failed).toHaveBeenCalledWith(
+        'You can hide up to 500 items. Show some again first.'
+      )
+    );
+    expect(within(region).getByText(/Example Conf 2024/)).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(saves).toEqual([]);
   });
 
   it('edits the kept records: honorific, links, podcasts and videos', async () => {

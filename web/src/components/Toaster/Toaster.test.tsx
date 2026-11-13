@@ -30,6 +30,25 @@ describe('Toaster', () => {
     ).toBeInTheDocument();
   });
 
+  it('replaces a toast shown again with the same id', async () => {
+    renderWithProviders(<Toaster />);
+    const fail = () =>
+      notify.error('Failed to save. Please try again.', {
+        id: 'save',
+        action: { label: 'Retry', onClick: () => undefined },
+      });
+    act(fail);
+    await screen.findByText('Failed to save. Please try again.');
+    await act(async () => {
+      fail();
+      // Give the toaster time to add a second toast, if it would.
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
+    expect(
+      screen.getAllByText('Failed to save. Please try again.')
+    ).toHaveLength(1);
+  });
+
   it('keeps toasts clear of the bottom safe area', async () => {
     const { container } = renderWithProviders(<Toaster />);
     act(() => {

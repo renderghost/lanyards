@@ -11,7 +11,7 @@ import { SOURCE_LABELS } from '@/features/lanyard/components/BlockSection/BlockS
 import { itemLimit } from '@/lib/person/config';
 import { cn } from '@/lib/utils';
 
-import { LIMIT_OPTIONS } from './BlockEditorRow.constants';
+import { LIMIT_OPTIONS, SINGLE_ITEM_BLOCKS } from './BlockEditorRow.constants';
 import * as styles from './BlockEditorRow.styles';
 import type { BlockEditorRowProps } from './BlockEditorRow.types';
 
@@ -134,22 +134,24 @@ export function BlockEditorRow({
         >
           <ArrowDown aria-hidden="true" className={styles.icon} />
         </button>
-        <label className={styles.limit}>
-          <span>{t`Items to show`}</span>
-          <select
-            aria-label={t`Items to show for ${name}`}
-            value={itemLimit(block)}
-            disabled={disabled}
-            onChange={(event) => onLimit(Number(event.target.value))}
-            className={styles.select}
-          >
-            {LIMIT_OPTIONS.map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </label>
+        {!SINGLE_ITEM_BLOCKS.has(block.type) && (
+          <label className={styles.limit}>
+            <span>{t`Items to show`}</span>
+            <select
+              aria-label={t`Items to show for ${name}`}
+              value={itemLimit(block)}
+              disabled={disabled}
+              onChange={(event) => onLimit(Number(event.target.value))}
+              className={styles.select}
+            >
+              {LIMIT_OPTIONS.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
       {block.visible && status && status.status !== 'ready' && (
         <div className={styles.status}>
