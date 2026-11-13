@@ -247,6 +247,23 @@ describe('useLanyardConfig', () => {
     });
   });
 
+  it('offers Reset when another device saved settings it can’t read', async () => {
+    vi.mocked(putRecord).mockRejectedValueOnce(
+      new RecordChangedError('InvalidSwap')
+    );
+    vi.mocked(fetchLanyardConfig).mockResolvedValue({
+      ok: true,
+      value: { value: { ...STORED, accent: 42 }, cid: OTHER, valid: false },
+    });
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await advance(800);
+    expect(putRecord).toHaveBeenCalledTimes(1);
+    expect(result.current.invalid).toBe(true);
+    expect(result.current.error).toBe(false);
+    expect(notify.error).not.toHaveBeenCalled();
+  });
+
   it('gives up with Retry if the settings change again meanwhile', async () => {
     vi.mocked(putRecord).mockRejectedValue(
       new RecordChangedError('InvalidSwap')

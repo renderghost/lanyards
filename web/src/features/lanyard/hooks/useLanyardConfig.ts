@@ -205,8 +205,20 @@ export function useLanyardConfig(): UseLanyardConfig {
           // from that version, as does everything else it holds (such as
           // per-event overrides). Then save once more.
           const fresh = await fetchLanyardConfig(current.did);
-          if (!fresh.ok || fresh.value?.valid === false) throw cause;
+          if (!fresh.ok) throw cause;
           server.current = fresh.value;
+          if (fresh.value?.valid === false) {
+            // Saved elsewhere in a form Lanyards can't read: show that,
+            // with its Reset, rather than a Retry that can never succeed.
+            unsaved.current = null;
+            queryClient.setQueryData<LanyardConfigRecord | null>(
+              key,
+              fresh.value
+            );
+            setError(false);
+            notify.dismiss(SAVE_FAILED_TOAST);
+            return;
+          }
           record = {
             $type: LANYARDS_NSID.lanyard,
             ...serialiseConfig(
