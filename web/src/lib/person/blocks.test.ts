@@ -420,6 +420,35 @@ describe('hiddenItems', () => {
     ]);
   });
 
+  it('knows the Details item, and waits on the profile for Code and Collections', () => {
+    const code = `at://${ADA.did}/org.tangled.repo.manifest/self`;
+    const collection = `at://${ADA.did}/network.cosmik.collection/3mcol`;
+    const config = showOnly(['code', 'collections'], {
+      hidden: ['details', code, collection],
+    });
+    // Without a handle, Tangled and Semble are never asked.
+    const { tangled: _t, semble: _s, ...rest } = allSources;
+    const loading: SourceSnapshot = { ...rest, bluesky: { status: 'loading' } };
+    expect(
+      hiddenItems({ config, sources: loading, orcidVerified: false })
+    ).toEqual([
+      // Sifa has it, so it's found even though Details is switched off.
+      { key: 'details', type: 'details', item: expect.anything() },
+      { key: code, type: 'code', reason: 'loading' },
+      { key: collection, type: 'collections', reason: 'loading' },
+    ]);
+    const failed: SourceSnapshot = {
+      ...rest,
+      bluesky: { status: 'error', error: new SourceError('bluesky', 'server') },
+      sifa: { status: 'error', error: new SourceError('sifa', 'server') },
+    };
+    expect(
+      hiddenItems({ config, sources: failed, orcidVerified: false }).map(
+        (entry) => ('reason' in entry ? entry.reason : null)
+      )
+    ).toEqual(['off', 'failed', 'failed']);
+  });
+
   it('says why it can’t show a hidden item: block off, loading, failed or gone', () => {
     const code = `at://${ADA.did}/org.tangled.repo.manifest/self`;
     const blog = `at://${ADA.did}/site.standard.document/3mblog`;

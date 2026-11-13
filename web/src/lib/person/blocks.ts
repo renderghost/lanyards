@@ -403,6 +403,7 @@ const COLLECTION_BLOCKS: Record<string, RenderableBlockType> = {
 
 /** The block an item key belongs to, read from the key itself. */
 function blockOfKey(key: string): RenderableBlockType | undefined {
+  if (key === 'details') return 'details';
   if (key.startsWith('orcid:')) return 'publications';
   if (key.startsWith('openTo:')) return 'openTo';
   if (key.startsWith('at://'))
@@ -411,6 +412,9 @@ function blockOfKey(key: string): RenderableBlockType | undefined {
   if (/^https?:\/\//i.test(key)) return 'links';
   return undefined;
 }
+
+/** Sources read only once the Bluesky profile has given the handle. */
+const NEEDS_HANDLE: ReadonlySet<SourceKey> = new Set(['tangled', 'semble']);
 
 /** The owner's hidden items, for "Show again" (spec §7.4). */
 export function hiddenItems(input: ComposeInput): HiddenItem[] {
@@ -435,13 +439,22 @@ export function hiddenItems(input: ComposeInput): HiddenItem[] {
       (block) => block.type === type && block.visible
     );
     const result = results.get(type);
+    const profile = input.sources.bluesky?.status;
+    // Until the profile gives the handle, these sources aren't read at all.
+    const waitingOnProfile =
+      BLOCK_SOURCES[type].some((source) => NEEDS_HANDLE.has(source)) &&
+      profile !== 'ready';
     const reason: HiddenItemReason = !visible
       ? 'off'
-      : !result || result.loading
-        ? 'loading'
-        : result.failed.length > 0
+      : waitingOnProfile
+        ? profile === 'error'
           ? 'failed'
-          : 'gone';
+          : 'loading'
+        : !result || result.loading
+          ? 'loading'
+          : result.failed.length > 0
+            ? 'failed'
+            : 'gone';
     return { key, type, reason };
   });
 }
