@@ -23,6 +23,7 @@ import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
 import {
   type LanyardConfig,
+  mergeConfig,
   resolveConfig,
   serialiseConfig,
 } from '@/lib/person/config';
@@ -200,16 +201,20 @@ export function useLanyardConfig(): UseLanyardConfig {
         } catch (cause) {
           if (!(cause instanceof RecordChangedError)) throw cause;
           // Another device saved the settings since this change was built
-          // on them. Apply the owner's customiser settings over that
-          // version, keeping everything else it holds (such as per-event
-          // overrides), and save once more.
+          // on them. Merge: the settings changed here win, the rest come
+          // from that version, as does everything else it holds (such as
+          // per-event overrides). Then save once more.
           const fresh = await fetchLanyardConfig(current.did);
           if (!fresh.ok || fresh.value?.valid === false) throw cause;
           server.current = fresh.value;
           record = {
             $type: LANYARDS_NSID.lanyard,
             ...serialiseConfig(
-              resolveConfig(changes),
+              mergeConfig(
+                resolveConfig(base.current?.value ?? null),
+                resolveConfig(changes),
+                resolveConfig(fresh.value?.value ?? null)
+              ),
               fresh.value?.value ?? null,
               new Date().toISOString()
             ),

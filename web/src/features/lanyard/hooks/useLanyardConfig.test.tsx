@@ -230,6 +230,23 @@ describe('useLanyardConfig', () => {
     expect(notify.success).toHaveBeenCalledWith('Lanyard updated');
   });
 
+  it('keeps another device’s changes to settings this one didn’t touch', async () => {
+    vi.mocked(putRecord).mockRejectedValueOnce(
+      new RecordChangedError('InvalidSwap')
+    );
+    vi.mocked(fetchLanyardConfig).mockResolvedValue({
+      ok: true,
+      value: { value: { ...STORED, accent: 'teal' }, cid: OTHER, valid: true },
+    });
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, hidden: ['k1'] })));
+    await advance(800);
+    expect(saved()[1]?.fields).toMatchObject({
+      accent: 'teal',
+      hidden: ['k1'],
+    });
+  });
+
   it('gives up with Retry if the settings change again meanwhile', async () => {
     vi.mocked(putRecord).mockRejectedValue(
       new RecordChangedError('InvalidSwap')

@@ -30,6 +30,27 @@ export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
 export const DEFAULT_ITEM_LIMIT = 3;
 export const MAX_LINKS = 20;
 
+const CONFIG_FIELDS = ['accent', 'showJob', 'blocks', 'hidden'] as const;
+
+/**
+ * A three-way merge of the customiser's settings, for when another device
+ * saved since `base` was read: each field this side changed from `base`
+ * takes this side's value, and every other field keeps `theirs`.
+ */
+export function mergeConfig(
+  base: LanyardConfig,
+  ours: LanyardConfig,
+  theirs: LanyardConfig
+): LanyardConfig {
+  const merged = { ...theirs };
+  for (const field of CONFIG_FIELDS) {
+    if (JSON.stringify(ours[field]) !== JSON.stringify(base[field])) {
+      Object.assign(merged, { [field]: ours[field] });
+    }
+  }
+  return merged;
+}
+
 /** The lexicon's limits on hidden items: how many, and each key's bytes. */
 export const MAX_HIDDEN = 500;
 const MAX_HIDDEN_KEY_BYTES = 2048;
