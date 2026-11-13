@@ -114,6 +114,18 @@ describe('putRecord', () => {
     expect(bodies[0]).toMatchObject({ rkey: 'self', swapRecord: CID });
   });
 
+  it('creates only if no record exists, given a null swap', async () => {
+    const bodies = capture('putRecord');
+    await putRecord(
+      session(),
+      'app.lanyards.actor.lanyard',
+      'self',
+      { createdAt: NOW },
+      { swapRecord: null }
+    );
+    expect(bodies[0]).toMatchObject({ swapRecord: null });
+  });
+
   it('says so when the record changed since it was read', async () => {
     server.use(
       http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.putRecord`, () =>

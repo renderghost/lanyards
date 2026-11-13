@@ -173,6 +173,34 @@ describe('useLanyardConfig', () => {
     });
   });
 
+  it('creates the record only if none was saved meanwhile', async () => {
+    client.setQueryData(queryKeys.source('lanyards', ADA.did, 'config'), null);
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await advance(800);
+    expect(vi.mocked(putRecord).mock.calls[0]?.[4]).toEqual({
+      swapRecord: null,
+    });
+  });
+
+  it('swaps against the version it saved, after leaving and coming back', async () => {
+    vi.mocked(putRecord).mockResolvedValueOnce({
+      uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
+      cid: OTHER,
+    });
+    const first = render();
+    act(() => first.result.current.update((c) => ({ ...c, accent: 'teal' })));
+    await advance(800);
+    first.unmount();
+
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, showJob: false })));
+    await advance(800);
+    expect(vi.mocked(putRecord).mock.calls[1]?.[4]).toEqual({
+      swapRecord: OTHER,
+    });
+  });
+
   it('builds on what another device saved meanwhile, then saves again', async () => {
     const elsewhere = {
       ...STORED,

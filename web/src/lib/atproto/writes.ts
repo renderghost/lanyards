@@ -92,15 +92,16 @@ export async function createRecord(
 
 /**
  * Creates or replaces the record at `rkey`. With `swapRecord` (the CID of
- * the version that was read), it replaces only that version, and throws
- * RecordChangedError if the record has changed since.
+ * the version that was read, or null when there was none), it replaces
+ * only that version, and throws RecordChangedError if the record has
+ * changed since.
  */
 export async function putRecord(
   session: WriteSession,
   collection: WritableNsid,
   rkey: string,
   fields: Record<string, unknown>,
-  options: { swapRecord?: string } = {}
+  options: { swapRecord?: string | null } = {}
 ): Promise<Reference> {
   allow(session, collection, 'update');
   const record = typed(collection, fields);
@@ -110,7 +111,9 @@ export async function putRecord(
       collection,
       rkey,
       record,
-      ...(options.swapRecord ? { swapRecord: options.swapRecord } : {}),
+      ...(options.swapRecord !== undefined
+        ? { swapRecord: options.swapRecord }
+        : {}),
     },
   });
   if (!response.ok) {

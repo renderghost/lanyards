@@ -312,7 +312,7 @@ msgstr "Failed to follow. Please try again."
 #: src/features/lanyard/customise/MediaList/MediaList.tsx:65
 #: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:71
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:63
-#: src/features/lanyard/hooks/useLanyardConfig.ts:232
+#: src/features/lanyard/hooks/useLanyardConfig.ts:244
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
@@ -445,7 +445,7 @@ msgstr "Lanyard"
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
-#: src/features/lanyard/hooks/useLanyardConfig.ts:223
+#: src/features/lanyard/hooks/useLanyardConfig.ts:235
 msgid "Lanyard updated"
 msgstr "Lanyard updated"
 
@@ -670,7 +670,7 @@ msgstr "Reset to defaults"
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:122
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:119
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:183
-#: src/features/lanyard/hooks/useLanyardConfig.ts:234
+#: src/features/lanyard/hooks/useLanyardConfig.ts:246
 msgid "Retry"
 msgstr "Retry"
 

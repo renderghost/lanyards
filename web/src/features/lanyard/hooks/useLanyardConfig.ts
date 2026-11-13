@@ -114,8 +114,13 @@ export function useLanyardConfig(): UseLanyardConfig {
   const unsaved = useRef<RecordValue | null>(null);
   /** The record as the server last returned or confirmed it. */
   const server = useRef<LanyardConfigRecord | null | undefined>(undefined);
-  /** The CID of the stored version the unsaved changes were built on. */
-  const base = useRef<string | undefined>(undefined);
+  /**
+   * The stored version the unsaved changes were built on: its CID (null
+   * when there was no record) and value, for swapping and merging.
+   */
+  const base = useRef<{ cid: string | null; value: unknown } | undefined>(
+    undefined
+  );
   const mounted = useRef(true);
   // Read when a save runs or a change arrives, so both use the latest
   // session and load state. Kept current before any event can fire.
@@ -175,20 +180,23 @@ export function useLanyardConfig(): UseLanyardConfig {
         const current = latest.current.writer;
         if (!current) throw new Error('Not signed in');
         // Replaces only the stored version the record was built on.
-        const send = (value: RecordValue, swapRecord: string | undefined) => {
+        const send = (
+          value: RecordValue,
+          swapRecord: string | null | undefined
+        ) => {
           const { $type: _type, ...fields } = value;
           return putRecord(
             current,
             LANYARDS_NSID.lanyard,
             'self',
             { ...fields, updatedAt: new Date().toISOString() },
-            swapRecord ? { swapRecord } : {}
+            swapRecord === undefined ? {} : { swapRecord }
           );
         };
         let record = changes;
         let reference: Reference;
         try {
-          reference = await send(changes, base.current);
+          reference = await send(changes, base.current?.cid);
         } catch (cause) {
           if (!(cause instanceof RecordChangedError)) throw cause;
           // Another device saved the settings since this change was built
@@ -206,17 +214,21 @@ export function useLanyardConfig(): UseLanyardConfig {
               new Date().toISOString()
             ),
           };
-          reference = await send(record, fresh.value?.cid);
+          reference = await send(record, fresh.value?.cid ?? null);
         }
         server.current = { value: record, cid: reference.cid, valid: true };
         if (unsaved.current === changes) {
           unsaved.current = null;
-          // A merged save holds more than was shown: show what's stored.
-          if (record !== changes) show(record);
+          // Show what's stored, with its CID, so a later visit builds on
+          // (and swaps against) this version.
+          queryClient.setQueryData<LanyardConfigRecord | null>(
+            key,
+            server.current
+          );
         } else if (record === changes) {
           // Later changes were built on what was just saved. (After a
           // merge they weren't, so they keep the old base and merge too.)
-          base.current = reference.cid;
+          base.current = { cid: reference.cid, value: record };
         }
         setError(false);
         notify.dismiss(SAVE_FAILED_TOAST);
@@ -237,12 +249,20 @@ export function useLanyardConfig(): UseLanyardConfig {
         setInFlight((count) => count - 1);
       }
     });
-  }, [t, restore, show]);
+  }, [t, restore, queryClient, key]);
 
   const schedule = useCallback(
     (value: RecordValue) => {
       // A new run of changes builds on the stored version now shown.
-      if (!unsaved.current) base.current = server.current?.cid || undefined;
+      if (!unsaved.current) {
+        base.current =
+          server.current === undefined
+            ? undefined
+            : {
+                cid: server.current?.cid || null,
+                value: server.current?.value ?? null,
+              };
+      }
       unsaved.current = value;
       show(value);
       setPending(true);
