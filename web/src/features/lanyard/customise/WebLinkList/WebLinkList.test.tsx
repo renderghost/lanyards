@@ -80,6 +80,8 @@ describe('WebLinkList', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Delete CV' }));
     await waitFor(() =>
       expect(notify.success).toHaveBeenCalledWith('Link deleted', {
+        // One Undo toast for the list: a later delete replaces it.
+        id: 'web-link-deleted',
         action: { label: 'Undo', onClick: expect.any(Function) },
       })
     );
@@ -96,7 +98,7 @@ describe('WebLinkList', () => {
       },
     ]);
     expect(notify.success).toHaveBeenCalledWith('Link restored');
-    expect(screen.getByText('CV')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Delete CV' })).toHaveFocus();
   });
 
   it('keeps the link and says so when deleting fails', async () => {

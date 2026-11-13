@@ -91,11 +91,11 @@ msgstr "Audio"
 msgid "Audio added"
 msgstr "Audio added"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:55
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:66
 msgid "Audio deleted"
 msgstr "Audio deleted"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:80
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:94
 msgid "Audio restored"
 msgstr "Audio restored"
 
@@ -210,11 +210,11 @@ msgstr "Couldn't open your QR code. Please try again."
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:84
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:98
 msgid "Couldn't restore it. Please try again."
 msgstr "Couldn't restore it. Please try again."
 
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:80
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:94
 msgid "Couldn't restore the link. Please try again."
 msgstr "Couldn't restore the link. Please try again."
 
@@ -247,13 +247,13 @@ msgstr "Create an account"
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:109
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:105
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:123
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:119
 msgid "Delete"
 msgstr "Delete"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:104
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:100
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:118
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:114
 msgid "Delete {name}"
 msgstr "Delete {name}"
 
@@ -309,9 +309,9 @@ msgstr "Failed to follow. Please try again."
 
 #: src/features/lanyard/customise/HonorificForm/HonorificForm.tsx:64
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:109
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:65
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:78
 #: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:71
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:63
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:76
 #: src/features/lanyard/hooks/useLanyardConfig.ts:261
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
@@ -471,12 +471,12 @@ msgstr "Link added"
 msgid "Link copied"
 msgstr "Link copied"
 
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:55
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:59
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:66
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:72
 msgid "Link deleted"
 msgstr "Link deleted"
 
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:77
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:91
 msgid "Link restored"
 msgstr "Link restored"
 
@@ -871,8 +871,8 @@ msgstr "Twitch"
 msgid "Type of media"
 msgstr "Type of media"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:58
-#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:56
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:71
+#: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:69
 msgid "Undo"
 msgstr "Undo"
 
@@ -900,11 +900,11 @@ msgstr "Video"
 msgid "Video added"
 msgstr "Video added"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:55
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:66
 msgid "Video deleted"
 msgstr "Video deleted"
 
-#: src/features/lanyard/customise/MediaList/MediaList.tsx:80
+#: src/features/lanyard/customise/MediaList/MediaList.tsx:94
 msgid "Video restored"
 msgstr "Video restored"
 

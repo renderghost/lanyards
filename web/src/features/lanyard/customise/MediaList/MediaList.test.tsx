@@ -96,6 +96,7 @@ describe('MediaList', () => {
     );
     await waitFor(() =>
       expect(notify.success).toHaveBeenCalledWith('Audio deleted', {
+        id: 'media-deleted',
         action: { label: 'Undo', onClick: expect.any(Function) },
       })
     );
@@ -110,7 +111,9 @@ describe('MediaList', () => {
       },
     ]);
     expect(notify.success).toHaveBeenCalledWith('Audio restored');
-    expect(screen.getByText('Talking protocols')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Delete Talking protocols' })
+    ).toHaveFocus();
   });
 
   it('keeps the item and says so when deleting fails', async () => {

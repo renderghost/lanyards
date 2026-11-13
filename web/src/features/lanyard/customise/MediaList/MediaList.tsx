@@ -28,6 +28,8 @@ export function MediaList({
   const buttons = useRef(new Map<string, HTMLButtonElement>());
   /** Where the item just deleted sat, to focus its neighbour. */
   const deletedAt = useRef<number | null>(null);
+  /** The item Undo just put back, to focus once it shows again. */
+  const restored = useRef<string | null>(null);
 
   // Deleting removes the focused button: move focus to the next item, the
   // previous one, or (once the list is empty) wherever the page says.
@@ -39,6 +41,15 @@ export function MediaList({
     if (next) buttons.current.get(next.key)?.focus();
     else onEmptied?.();
   }, [shown, onEmptied]);
+
+  // Undo closes its toast, so focus goes to the item it put back.
+  useEffect(() => {
+    const key = restored.current;
+    const button = key ? buttons.current.get(key) : undefined;
+    if (!button) return;
+    restored.current = null;
+    button.focus();
+  }, [shown]);
 
   if (shown.length === 0) return null;
 
@@ -55,6 +66,8 @@ export function MediaList({
         item.kind === 'audio' ? t`Audio deleted` : t`Video deleted`;
       if (removed) {
         notify.success(message, {
+          // One Undo toast for the list: a later delete replaces it.
+          id: 'media-deleted',
           action: { label: t`Undo`, onClick: () => void undo(item, removed) },
         });
       } else {
@@ -71,6 +84,7 @@ export function MediaList({
   async function undo(item: MediaLink, removed: Record<string, unknown>) {
     try {
       await writer.restore(LANYARDS_NSID[item.kind], rkeyOf(item.key), removed);
+      restored.current = item.key;
       setDeleted((current) => {
         const next = new Set(current);
         next.delete(item.key);
