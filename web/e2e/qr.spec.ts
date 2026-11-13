@@ -89,6 +89,44 @@ test.describe('QR sheet', () => {
     }
   });
 
+  test('fits a nearly square landscape window without spilling', async ({
+    page,
+  }) => {
+    const viewport = { width: 430, height: 390 };
+    await page.setViewportSize(viewport);
+    await page.goto('/lanyard');
+    await page.getByRole('button', { name: 'Show QR' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Ada Example' });
+    await expect(sheet).toBeVisible();
+    // Nothing spills or scrolls, in either direction.
+    const overflow = await sheet.evaluate((element) => ({
+      x: element.scrollWidth - element.clientWidth,
+      y: element.scrollHeight - element.clientHeight,
+    }));
+    expect(overflow).toEqual({ x: 0, y: 0 });
+    // The code is whole and still a good size.
+    const code = await sheet
+      .getByRole('img', { name: /^QR code for / })
+      .boundingBox();
+    expect(code?.height ?? 0).toBeGreaterThanOrEqual(200);
+    expect(code?.y ?? -1).toBeGreaterThanOrEqual(0);
+    expect((code?.y ?? 0) + (code?.height ?? 0)).toBeLessThanOrEqual(
+      viewport.height
+    );
+    // Each button's label fits inside it.
+    for (const name of ['Copy link', 'Close']) {
+      const button = sheet.getByRole('button', { name });
+      const fits = await button.evaluate(
+        (element) => element.scrollWidth <= element.clientWidth
+      );
+      expect(fits).toBe(true);
+      const box = await button.boundingBox();
+      expect((box?.x ?? 0) + (box?.width ?? 0)).toBeLessThanOrEqual(
+        viewport.width
+      );
+    }
+  });
+
   test('stays black on white in dark mode', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/lanyard');
