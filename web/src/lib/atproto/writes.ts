@@ -40,6 +40,14 @@ export class WriteFailedError extends Error {
   override name = 'WriteFailedError';
 }
 
+/**
+ * The record changed since it was read (another device saved it), so a
+ * write that named the version it replaces was refused.
+ */
+export class RecordChangedError extends WriteFailedError {
+  override name = 'RecordChangedError';
+}
+
 function allow(
   session: WriteSession,
   collection: WritableNsid,
@@ -82,19 +90,35 @@ export async function createRecord(
   return { uri: response.data.uri, cid: response.data.cid };
 }
 
-/** Creates or replaces the record at `rkey`. */
+/**
+ * Creates or replaces the record at `rkey`. With `swapRecord` (the CID of
+ * the version that was read), it replaces only that version, and throws
+ * RecordChangedError if the record has changed since.
+ */
 export async function putRecord(
   session: WriteSession,
   collection: WritableNsid,
   rkey: string,
-  fields: Record<string, unknown>
+  fields: Record<string, unknown>,
+  options: { swapRecord?: string } = {}
 ): Promise<Reference> {
   allow(session, collection, 'update');
   const record = typed(collection, fields);
   const response = await session.rpc.post('com.atproto.repo.putRecord', {
-    input: { repo: session.did, collection, rkey, record },
+    input: {
+      repo: session.did,
+      collection,
+      rkey,
+      record,
+      ...(options.swapRecord ? { swapRecord: options.swapRecord } : {}),
+    },
   });
-  if (!response.ok) throw new WriteFailedError(response.data.error);
+  if (!response.ok) {
+    if (response.data.error === 'InvalidSwap') {
+      throw new RecordChangedError(response.data.error);
+    }
+    throw new WriteFailedError(response.data.error);
+  }
   return { uri: response.data.uri, cid: response.data.cid };
 }
 

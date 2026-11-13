@@ -13,7 +13,12 @@ import {
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { captureError, track } from '@/lib/analytics/analytics';
-import { putRecord, type WriteSession } from '@/lib/atproto/writes';
+import {
+  putRecord,
+  RecordChangedError,
+  type Reference,
+  type WriteSession,
+} from '@/lib/atproto/writes';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
 import {
@@ -109,6 +114,8 @@ export function useLanyardConfig(): UseLanyardConfig {
   const unsaved = useRef<RecordValue | null>(null);
   /** The record as the server last returned or confirmed it. */
   const server = useRef<LanyardConfigRecord | null | undefined>(undefined);
+  /** The CID of the stored version the unsaved changes were built on. */
+  const base = useRef<string | undefined>(undefined);
   const mounted = useRef(true);
   // Read when a save runs or a change arrives, so both use the latest
   // session and load state. Kept current before any event can fire.
@@ -167,15 +174,50 @@ export function useLanyardConfig(): UseLanyardConfig {
       try {
         const current = latest.current.writer;
         if (!current) throw new Error('Not signed in');
-        const { $type: _type, ...fields } = changes;
-        const reference = await putRecord(
-          current,
-          LANYARDS_NSID.lanyard,
-          'self',
-          { ...fields, updatedAt: new Date().toISOString() }
-        );
-        server.current = { value: changes, cid: reference.cid, valid: true };
-        if (unsaved.current === changes) unsaved.current = null;
+        // Replaces only the stored version the record was built on.
+        const send = (value: RecordValue, swapRecord: string | undefined) => {
+          const { $type: _type, ...fields } = value;
+          return putRecord(
+            current,
+            LANYARDS_NSID.lanyard,
+            'self',
+            { ...fields, updatedAt: new Date().toISOString() },
+            swapRecord ? { swapRecord } : {}
+          );
+        };
+        let record = changes;
+        let reference: Reference;
+        try {
+          reference = await send(changes, base.current);
+        } catch (cause) {
+          if (!(cause instanceof RecordChangedError)) throw cause;
+          // Another device saved the settings since this change was built
+          // on them. Apply the owner's customiser settings over that
+          // version, keeping everything else it holds (such as per-event
+          // overrides), and save once more.
+          const fresh = await fetchLanyardConfig(current.did);
+          if (!fresh.ok || fresh.value?.valid === false) throw cause;
+          server.current = fresh.value;
+          record = {
+            $type: LANYARDS_NSID.lanyard,
+            ...serialiseConfig(
+              resolveConfig(changes),
+              fresh.value?.value ?? null,
+              new Date().toISOString()
+            ),
+          };
+          reference = await send(record, fresh.value?.cid);
+        }
+        server.current = { value: record, cid: reference.cid, valid: true };
+        if (unsaved.current === changes) {
+          unsaved.current = null;
+          // A merged save holds more than was shown: show what's stored.
+          if (record !== changes) show(record);
+        } else if (record === changes) {
+          // Later changes were built on what was just saved. (After a
+          // merge they weren't, so they keep the old base and merge too.)
+          base.current = reference.cid;
+        }
         setError(false);
         notify.dismiss(SAVE_FAILED_TOAST);
         notify.success(t`Lanyard updated`);
@@ -195,10 +237,12 @@ export function useLanyardConfig(): UseLanyardConfig {
         setInFlight((count) => count - 1);
       }
     });
-  }, [t, restore]);
+  }, [t, restore, show]);
 
   const schedule = useCallback(
     (value: RecordValue) => {
+      // A new run of changes builds on the stored version now shown.
+      if (!unsaved.current) base.current = server.current?.cid || undefined;
       unsaved.current = value;
       show(value);
       setPending(true);
