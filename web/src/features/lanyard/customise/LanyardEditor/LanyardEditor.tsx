@@ -31,7 +31,6 @@ import {
 import { BLOCK_HEADINGS } from '@/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants';
 import { LanyardProblem } from '@/features/lanyard/components/LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/LanyardSkeleton';
-import { LanyardSurface } from '@/features/lanyard/components/LanyardSurface/LanyardSurface';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { profileId } from '@/lib/atproto/profileId';
 import {
@@ -191,20 +190,14 @@ export function LanyardEditor({
 
   if (view.profile.status === 'error') {
     return (
-      <LanyardSurface variant="card">
-        <LanyardProblem
-          error={view.profile.error}
-          onRetry={() => view.retry('bluesky')}
-        />
-      </LanyardSurface>
+      <LanyardProblem
+        error={view.profile.error}
+        onRetry={() => view.retry('bluesky')}
+      />
     );
   }
   if (!view.hero) {
-    return (
-      <LanyardSurface variant="card">
-        <LanyardSkeleton />
-      </LanyardSurface>
-    );
+    return <LanyardSkeleton />;
   }
 
   const profile = profileId(did, view.hero.handle);
@@ -238,106 +231,101 @@ export function LanyardEditor({
   };
 
   return (
-    <LanyardSurface variant="card">
-      <div className={styles.page}>
-        <BadgeHero hero={view.hero} headingLevel={2} />
-        {view.configError && (
-          <div role="status" className={styles.notice}>
-            <p className={styles.noticeText}>
-              {t`Couldn't load your lanyard settings`}
-            </p>
-            <Button variant="secondary" onClick={() => view.retry('lanyards')}>
-              {t`Retry`}
-            </Button>
-          </div>
-        )}
-        <p aria-live="polite" className={styles.announcer}>
-          {announcement}
-        </p>
-        <ItemActionsContext value={itemActions}>
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={onDragEnd}
-            accessibility={{
-              announcements,
-              screenReaderInstructions: {
-                draggable: t`To move a block, press Space or Enter to pick it up, use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel.`,
-              },
+    <div className={styles.page}>
+      <BadgeHero hero={view.hero} headingLevel={2} />
+      {view.configError && (
+        <div role="status" className={styles.notice}>
+          <p className={styles.noticeText}>
+            {t`Couldn't load your lanyard settings`}
+          </p>
+          <Button variant="secondary" onClick={() => view.retry('lanyards')}>
+            {t`Retry`}
+          </Button>
+        </div>
+      )}
+      <p aria-live="polite" className={styles.announcer}>
+        {announcement}
+      </p>
+      <ItemActionsContext value={itemActions}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={onDragEnd}
+          accessibility={{
+            announcements,
+            screenReaderInstructions: {
+              draggable: t`To move a block, press Space or Enter to pick it up, use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel.`,
+            },
+          }}
+        >
+          <SortableContext items={order} strategy={verticalListSortingStrategy}>
+            <ul
+              ref={list}
+              tabIndex={-1}
+              aria-label={t`Blocks`}
+              className={styles.list}
+            >
+              {view.editorBlocks.map((block, index) => (
+                <EditableBlock
+                  key={block.type}
+                  block={block}
+                  index={index}
+                  total={total}
+                  profile={profile}
+                  disabled={disabled}
+                  onMove={(to) => {
+                    move(index, to);
+                    setAnnouncement(moved(block.type, to));
+                  }}
+                  onVisibleChange={(visible) =>
+                    setBlock(block.type, { visible })
+                  }
+                  onLimitChange={(limit) => setBlock(block.type, { limit })}
+                  onRetry={() =>
+                    Promise.allSettled(
+                      BLOCK_SOURCES[block.type].map(view.retry)
+                    )
+                  }
+                  {...slotsOf(block)}
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
+      </ItemActionsContext>
+      {count > 0 && (
+        <div className={styles.notice}>
+          <p className={styles.noticeText}>
+            {plural(count, {
+              one: '# hidden item is no longer on your lanyard',
+              other: '# hidden items are no longer on your lanyard',
+            })}
+          </p>
+          <Button
+            variant="secondary"
+            size="sm"
+            disabled={disabled}
+            onClick={() => {
+              const gone = new Set(orphans);
+              onChange((current) => ({
+                ...current,
+                hidden: current.hidden.filter((key) => !gone.has(key)),
+              }));
+              // Clear goes away with the line: say what happened, and
+              // keep focus in the editor.
+              setAnnouncement(
+                plural(count, {
+                  one: 'Cleared # hidden item from your settings',
+                  other: 'Cleared # hidden items from your settings',
+                })
+              );
+              list.current?.focus();
             }}
           >
-            <SortableContext
-              items={order}
-              strategy={verticalListSortingStrategy}
-            >
-              <ul
-                ref={list}
-                tabIndex={-1}
-                aria-label={t`Blocks`}
-                className={styles.list}
-              >
-                {view.editorBlocks.map((block, index) => (
-                  <EditableBlock
-                    key={block.type}
-                    block={block}
-                    index={index}
-                    total={total}
-                    profile={profile}
-                    disabled={disabled}
-                    onMove={(to) => {
-                      move(index, to);
-                      setAnnouncement(moved(block.type, to));
-                    }}
-                    onVisibleChange={(visible) =>
-                      setBlock(block.type, { visible })
-                    }
-                    onLimitChange={(limit) => setBlock(block.type, { limit })}
-                    onRetry={() =>
-                      Promise.allSettled(
-                        BLOCK_SOURCES[block.type].map(view.retry)
-                      )
-                    }
-                    {...slotsOf(block)}
-                  />
-                ))}
-              </ul>
-            </SortableContext>
-          </DndContext>
-        </ItemActionsContext>
-        {count > 0 && (
-          <div className={styles.notice}>
-            <p className={styles.noticeText}>
-              {plural(count, {
-                one: '# hidden item is no longer on your lanyard',
-                other: '# hidden items are no longer on your lanyard',
-              })}
-            </p>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={disabled}
-              onClick={() => {
-                const gone = new Set(orphans);
-                onChange((current) => ({
-                  ...current,
-                  hidden: current.hidden.filter((key) => !gone.has(key)),
-                }));
-                // Clear goes away with the line: say what happened, and
-                // keep focus in the editor.
-                setAnnouncement(
-                  plural(count, {
-                    one: 'Cleared # hidden item from your settings',
-                    other: 'Cleared # hidden items from your settings',
-                  })
-                );
-                list.current?.focus();
-              }}
-            >
-              {t`Clear`}
-            </Button>
-          </div>
-        )}
-      </div>
-    </LanyardSurface>
+            {t`Clear`}
+          </Button>
+        </div>
+      )}
+    </div>
   );
 }

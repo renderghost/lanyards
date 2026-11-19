@@ -63,13 +63,10 @@ export function LanyardPage({
     if (hasHero && !preview) track('lanyard_viewed', { viewer });
   }, [did, viewer, hasHero, preview]);
 
-  // The lanyard keeps its own ground: the whole page when public, a framed
-  // card in the customiser's preview (#118).
-  const frame = (content: ReactNode) => (
-    <LanyardSurface variant={preview ? 'card' : 'page'}>
-      {content}
-    </LanyardSurface>
-  );
+  // The lanyard keeps its own ground: the whole page when public; in the
+  // customiser's preview, the canvas around it is that ground (#122).
+  const frame = (content: ReactNode) =>
+    preview ? content : <LanyardSurface>{content}</LanyardSurface>;
 
   if (view.profile.status === 'error') {
     return frame(

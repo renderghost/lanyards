@@ -31,7 +31,7 @@ function HandleLanyard() {
   // Until LanyardPage takes over, the lanyard's own ground stays put, so
   // the page doesn't flash the app's neutral canvas (#118).
   return (
-    <LanyardSurface variant="page">
+    <LanyardSurface>
       {state.status === 'error' ? (
         <LanyardProblem error={state.error} handle={handle} onRetry={retry} />
       ) : (
