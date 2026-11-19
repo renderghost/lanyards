@@ -22,6 +22,8 @@ describe('BlockSection', () => {
       </BlockSection>
     );
     const region = screen.getByRole('region', { name: 'Links' });
+    // Opaque, so a block being dragged never shows the one beneath.
+    expect(region).toHaveClass('bg-background');
     const header = region.querySelector<HTMLElement>('[data-block-header]');
     expect(header).not.toBeNull();
     const order = [

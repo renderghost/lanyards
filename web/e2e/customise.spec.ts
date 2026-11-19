@@ -392,6 +392,22 @@ test.describe('lanyard customiser', () => {
     expect(clipped).toEqual([]);
   });
 
+  test('pill links in the editor are 44 px targets at 390 px', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    const heights = await page
+      .locator('[data-block="links"] [data-hidden], [data-block="links"] li a')
+      .evaluateAll((links) =>
+        links
+          .filter((link) => link.tagName === 'A')
+          .map((link) => link.getBoundingClientRect().height)
+      );
+    expect(heights.length).toBeGreaterThan(0);
+    expect(Math.min(...heights)).toBeGreaterThanOrEqual(44);
+  });
+
   test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);

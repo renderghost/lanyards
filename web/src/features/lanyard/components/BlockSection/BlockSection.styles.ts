@@ -1,6 +1,8 @@
 // Every block is framed, so its bounds are clear (#122).
+// Opaque on the lanyard's ground, so a block being dragged never shows the
+// one beneath it.
 export const section =
-  'flex flex-col gap-3 rounded-2xl border border-border p-4';
+  'flex flex-col gap-3 rounded-2xl border border-border bg-background p-4';
 
 // Hidden from visitors: only its header row, in a dashed frame.
 export const collapsed = 'border-dashed py-2';

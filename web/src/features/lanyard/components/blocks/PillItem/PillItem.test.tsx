@@ -49,6 +49,8 @@ describe('PillItem', () => {
     expect(link.contains(toggle)).toBe(false);
     expect(link.parentElement).toBe(toggle.parentElement);
     expect(link.parentElement).toHaveClass('rounded-full');
+    // The link fills the pill's height and its left padding: a 44 px target.
+    expect(link).toHaveClass('self-stretch', 'pl-4');
   });
 
   it('hidden: dashed, with "(hidden)" for screen readers', () => {
