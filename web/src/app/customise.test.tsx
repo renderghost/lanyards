@@ -93,6 +93,19 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(document.title).toBe('Your lanyard · Lanyards');
   });
 
+  it('leaves the preview’s background to the customiser', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const region = await preview();
+    const name = await within(region).findByRole(
+      'heading',
+      { level: 2, name: 'Dr Ada Example' },
+      { timeout: 5000 }
+    );
+    // The public page's own backdrop (#118) stays off in the preview.
+    expect(name.closest('.bg-background')).toBe(region);
+  });
+
   it('gives the page one level-one heading, its purpose', async () => {
     servePerson();
     renderRoute('/lanyard');

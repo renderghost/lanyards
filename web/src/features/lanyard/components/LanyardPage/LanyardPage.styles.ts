@@ -1,3 +1,7 @@
+/** The lanyard's own ground on its public page, apart from the app chrome. */
+export const backdrop =
+  'flex w-full flex-1 flex-col bg-background text-foreground';
+
 export const page =
   'flex w-full max-w-2xl flex-col gap-6 self-center px-4 py-8';
 

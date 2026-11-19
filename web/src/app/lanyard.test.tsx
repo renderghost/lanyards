@@ -53,6 +53,14 @@ describe('public lanyard routes', () => {
     await waitFor(() => expect(document.title).toBe('Ada Example · Lanyards'));
   });
 
+  it("keeps the lanyard's own background on its public page", async () => {
+    servePerson();
+    renderRoute('/@alice.test');
+    const name = await hero();
+    // The app chrome is neutral (#118); the lanyard keeps its brand ground.
+    expect(name.closest('.bg-background')).not.toBeNull();
+  });
+
   it('shows the badge for a DID', async () => {
     servePerson();
     renderRoute(`/d/${ADA.did}`);
