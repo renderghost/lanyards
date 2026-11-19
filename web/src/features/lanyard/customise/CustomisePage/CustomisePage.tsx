@@ -5,7 +5,6 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { Button } from '@/components/Button/Button';
-import { notify } from '@/components/Toaster/notify';
 import { PermissionNotice } from '@/features/auth/components/PermissionNotice/PermissionNotice';
 import { useSession } from '@/features/auth/session/useSession';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -13,28 +12,20 @@ import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
 import { profileId } from '@/lib/atproto/profileId';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
-import { BLOCK_SOURCES, hiddenMatcher } from '@/lib/person/blocks';
-import { hideProblem } from '@/lib/person/config';
 import { usePersonView } from '@/lib/person/usePersonView';
 import { cn } from '@/lib/utils';
 
-import {
-  type ItemActions,
-  ItemActionsContext,
-} from '../../components/blocks/itemActions';
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
 import { useKeptRecords } from '../../hooks/useKeptRecords';
 import { useLanyardDraft } from '../../hooks/useLanyardDraft';
-import { BlockEditor } from '../BlockEditor/BlockEditor';
 import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
-import { HiddenItems } from '../HiddenItems/HiddenItems';
 import { HonorificForm } from '../HonorificForm/HonorificForm';
 import { MediaForm } from '../MediaForm/MediaForm';
 import { MediaList } from '../MediaList/MediaList';
 import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
-import { RecordToggle } from '../RecordToggle/RecordToggle';
+import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
 import { WebLinkForm } from '../WebLinkForm/WebLinkForm';
@@ -110,8 +101,6 @@ function Customiser({
   /** On phones, the style sheet opened from the bottom toolbar. */
   const [styleOpen, setStyleOpen] = useState(false);
   const styleButton = useRef<HTMLButtonElement>(null);
-  /** The item just hidden, whose Show again takes focus. */
-  const [justHidden, setJustHidden] = useState<string | undefined>();
 
   const granted = useMemo(() => parseGrantedScope(scope), [scope]);
   const canEdit =
@@ -126,51 +115,12 @@ function Customiser({
         canWrite(granted, collection, 'create') &&
         canWrite(granted, collection, 'delete')
     );
-  const { update, config } = lanyard;
+  const { update } = lanyard;
   const editing = viewAs === 'edit';
   useUnsavedChangesGuard(
     lanyard.dirty,
     t`You have unsaved changes. Leave without saving?`
   );
-
-  const itemActions = useMemo<ItemActions | null>(() => {
-    if (!editing) return null;
-    const isHidden = hiddenMatcher(config.hidden);
-    return {
-      isHidden,
-      renderToggle: (itemKey, title) => (
-        <RecordToggle
-          title={title}
-          hidden={isHidden(itemKey)}
-          disabled={disabled}
-          onToggle={() => {
-            if (isHidden(itemKey)) {
-              const shown = hiddenMatcher([itemKey]);
-              update((current) => ({
-                ...current,
-                hidden: current.hidden.filter((key) => !shown(key)),
-              }));
-              return;
-            }
-            const problem = hideProblem(config, itemKey);
-            if (problem) {
-              notify.error(
-                problem === 'tooMany'
-                  ? t`You can hide up to 500 items. Show some again first.`
-                  : t`This item can't be hidden.`
-              );
-              return;
-            }
-            update((current) => ({
-              ...current,
-              hidden: [...current.hidden, itemKey],
-            }));
-            setJustHidden(itemKey);
-          }}
-        />
-      ),
-    };
-  }, [editing, disabled, update, config, t]);
 
   return (
     <>
@@ -227,12 +177,16 @@ function Customiser({
               )}
             </div>
             <section aria-label={t`Preview`} className={styles.frame}>
-              <ItemActionsContext value={itemActions}>
-                <LanyardPage
+              {editing ? (
+                <LanyardEditor
                   did={did}
-                  preview={editing ? 'owner' : 'visitor'}
+                  config={lanyard.config}
+                  onChange={update}
+                  disabled={disabled}
                 />
-              </ItemActionsContext>
+              ) : (
+                <LanyardPage did={did} preview="visitor" />
+              )}
             </section>
             {editing && (
               <section aria-labelledby={moreId} className={styles.more}>
@@ -241,29 +195,9 @@ function Customiser({
                     {t`More settings`}
                   </h2>
                   <p className={styles.moreHint}>
-                    {t`Block settings save with Save. Your links, podcasts, videos and title save as soon as you change them.`}
+                    {t`Your links, podcasts, videos and honorific save as soon as you change them.`}
                   </p>
                 </div>
-                <BlockEditor
-                  config={lanyard.config}
-                  statuses={view.statuses}
-                  profile={profileId(did, view.hero?.handle)}
-                  disabled={disabled}
-                  onChange={update}
-                  onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
-                />
-                <HiddenItems
-                  items={view.hiddenItems}
-                  disabled={disabled}
-                  focusKey={justHidden}
-                  onFocused={() => setJustHidden(undefined)}
-                  onShow={(key) =>
-                    update((config) => ({
-                      ...config,
-                      hidden: config.hidden.filter((hidden) => hidden !== key),
-                    }))
-                  }
-                />
                 <OrcidHelper
                   did={did}
                   profile={profileId(did, view.hero?.handle)}

@@ -48,9 +48,11 @@ test.describe('lanyard customiser', () => {
     await signIn(page, { did: ADA.did, scope: GRANULAR });
   });
 
-  test('moves a block with Move down and saves the order', async ({ page }) => {
+  test('moves a block with Move down and saves the order on Save', async ({
+    page,
+  }) => {
     await openCustomiser(page);
-    const editor = page.getByRole('region', { name: 'Blocks' });
+    const editor = page.getByRole('list', { name: 'Blocks' });
     await editor
       .getByRole('listitem', { name: 'Links' })
       .getByRole('button', { name: 'Move Links down' })
@@ -72,7 +74,7 @@ test.describe('lanyard customiser', () => {
 
   test('reorders blocks with the keyboard alone', async ({ page }) => {
     await openCustomiser(page);
-    const editor = page.getByRole('region', { name: 'Blocks' });
+    const editor = page.getByRole('list', { name: 'Blocks' });
     await editor.getByRole('button', { name: 'Reorder Links' }).focus();
     // Each step waits for its announcement, as a screen-reader user would.
     await page.keyboard.press('Space');
@@ -105,7 +107,7 @@ test.describe('lanyard customiser', () => {
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await openCustomiser(page);
-    const editor = page.getByRole('region', { name: 'Blocks' });
+    const editor = page.getByRole('list', { name: 'Blocks' });
     await editor.getByRole('button', { name: 'Reorder Links' }).focus();
     await page.keyboard.press('Space');
     await expect(
@@ -140,9 +142,7 @@ test.describe('lanyard customiser', () => {
     });
     await openCustomiser(page);
     const name = /^Edit (on|in) /;
-    const editor = page.getByRole('region', { name: 'Blocks' });
     const preview = page.getByRole('region', { name: 'Preview' });
-    await expect(editor.getByRole('link', { name }).first()).toBeVisible();
     await expect(preview.getByRole('link', { name }).first()).toBeVisible();
     const heights = await page
       .getByRole('link', { name })
@@ -215,31 +215,78 @@ test.describe('lanyard customiser', () => {
     ).toMatchObject({ url: 'https://ada.example/talks', title: 'Talks' });
   });
 
-  test('hides an item from the preview and shows it again', async ({
-    page,
-  }) => {
+  test('hides a record in place, then shows it again', async ({ page }) => {
     await openCustomiser(page);
-    const preview = page.getByRole('region', { name: 'Preview' });
-    await preview
+    const talks = page.locator('[data-block="talks"]');
+    await talks
       .getByRole('button', {
         name: 'Hide Building on ATProto at Example Conf 2024',
       })
       .click();
-    await expect(preview.getByText(/Example Conf 2024/)).toBeHidden();
-    const hidden = page.getByRole('region', { name: 'Hidden items' });
-    const showAgain = hidden.getByRole('button', { name: 'Show again' });
-    await expect(showAgain).toBeFocused();
+    await expect(talks.getByText(/Example Conf 2024/)).toBeVisible();
+    await expect(talks.getByText('Hidden', { exact: true })).toBeVisible();
+    const show = talks.getByRole('button', {
+      name: 'Show Building on ATProto at Example Conf 2024',
+    });
+    await expect(show).toBeFocused();
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
     expect(lanyardSaves(writes)[0]?.hidden).toHaveLength(1);
 
-    await showAgain.focus();
+    await show.focus();
     await page.keyboard.press('Enter');
-    await expect(preview.getByText(/Example Conf 2024/)).toBeVisible();
-    await expect(hidden.getByText('No items are hidden.')).toBeFocused();
+    await expect(talks.getByText('Hidden', { exact: true })).toBeHidden();
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(2);
     expect(lanyardSaves(writes)[1]?.hidden).toEqual([]);
+  });
+
+  test('hides a block in place and saves it', async ({ page }) => {
+    await openCustomiser(page);
+    const talks = page.locator('[data-block="talks"]');
+    const toggle = talks.getByRole('switch', { name: 'Show Talks' });
+    await toggle.focus();
+    await page.keyboard.press('Space');
+    await expect(talks.getByText('Hidden from visitors')).toBeVisible();
+    await expect(talks.getByText(/Example Conf 2024/)).toBeHidden();
+    await expect(toggle).toBeFocused();
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(
+      lanyardSaves(writes)[0]?.blocks.find((block) => block.type === 'talks')
+    ).toEqual({ type: 'talks', visible: false });
+  });
+
+  test('changes a counted block’s count', async ({ page }) => {
+    await openCustomiser(page);
+    await page
+      .getByRole('combobox', { name: 'Items to show for Posts on Bluesky' })
+      .selectOption('5');
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(
+      lanyardSaves(writes)[0]?.blocks.find(
+        (block) => block.type === 'bskyPosts'
+      )
+    ).toMatchObject({ type: 'bskyPosts', limit: 5 });
+    await expect(
+      page.locator('[data-block="talks"]').getByRole('combobox')
+    ).toHaveCount(0);
+  });
+
+  test('clears hidden entries that are no longer on the lanyard', async ({
+    page,
+  }) => {
+    const gone = `at://${ADA.did}/id.sifa.profile.presentationDelivery/deleted`;
+    await mockPerson(page, { config: { hidden: [gone] } });
+    await openCustomiser(page);
+    const line = page.getByText('1 hidden item is no longer on your lanyard');
+    await expect(line).toBeVisible();
+    await page.getByRole('button', { name: 'Clear', exact: true }).click();
+    await expect(line).toBeHidden();
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(lanyardSaves(writes)[0]?.hidden).toEqual([]);
   });
 
   test('switches to View as public and back', async ({ page }) => {
@@ -336,6 +383,28 @@ test.describe('lanyard customiser', () => {
       await page.evaluate(() => document.documentElement.scrollWidth)
     ).toBeLessThanOrEqual(390);
   });
+
+  for (const colorScheme of ['light', 'dark'] as const) {
+    test(`stays accessible with hidden records and blocks (${colorScheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await openCustomiser(page);
+      const talks = page.locator('[data-block="talks"]');
+      await talks
+        .getByRole('button', {
+          name: 'Hide Building on ATProto at Example Conf 2024',
+        })
+        .click();
+      await expect(talks.getByText('Hidden', { exact: true })).toBeVisible();
+      await page.getByRole('switch', { name: 'Show Links' }).click();
+      await expect(
+        page.locator('[data-block="links"]').getByText('Hidden from visitors')
+      ).toBeVisible();
+      const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+      expect(result.violations).toEqual([]);
+    });
+  }
 
   for (const colorScheme of ['light', 'dark'] as const) {
     test(`has no accessibility violations (${colorScheme})`, async ({

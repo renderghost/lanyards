@@ -28,7 +28,6 @@ export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
 ]);
 
 export const DEFAULT_ITEM_LIMIT = 3;
-export const MAX_LINKS = 20;
 
 const CONFIG_FIELDS = ['accent', 'showJob', 'blocks', 'hidden'] as const;
 
