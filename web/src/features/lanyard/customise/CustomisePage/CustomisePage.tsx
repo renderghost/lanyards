@@ -13,7 +13,7 @@ import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
 import { profileId } from '@/lib/atproto/profileId';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
-import { BLOCK_SOURCES } from '@/lib/person/blocks';
+import { BLOCK_SOURCES, hiddenMatcher } from '@/lib/person/blocks';
 import { hideProblem } from '@/lib/person/config';
 import { usePersonView } from '@/lib/person/usePersonView';
 import { cn } from '@/lib/utils';
@@ -31,10 +31,10 @@ import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
 import { HiddenItems } from '../HiddenItems/HiddenItems';
 import { HonorificForm } from '../HonorificForm/HonorificForm';
-import { ItemMenu } from '../ItemMenu/ItemMenu';
 import { MediaForm } from '../MediaForm/MediaForm';
 import { MediaList } from '../MediaList/MediaList';
 import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
+import { RecordToggle } from '../RecordToggle/RecordToggle';
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
 import { WebLinkForm } from '../WebLinkForm/WebLinkForm';
@@ -133,37 +133,44 @@ function Customiser({
     t`You have unsaved changes. Leave without saving?`
   );
 
-  const itemActions = useMemo<ItemActions | null>(
-    () =>
-      editing && !disabled
-        ? {
-            renderMenu: (itemKey, title) => (
-              <ItemMenu
-                title={title}
-                onHide={() => {
-                  const problem = hideProblem(config, itemKey);
-                  if (problem) {
-                    notify.error(
-                      problem === 'tooMany'
-                        ? t`You can hide up to 500 items. Show some again first.`
-                        : t`This item can't be hidden.`
-                    );
-                    return false;
-                  }
-                  update((current) =>
-                    current.hidden.includes(itemKey)
-                      ? current
-                      : { ...current, hidden: [...current.hidden, itemKey] }
-                  );
-                  setJustHidden(itemKey);
-                  return true;
-                }}
-              />
-            ),
-          }
-        : null,
-    [editing, disabled, update, config, t]
-  );
+  const itemActions = useMemo<ItemActions | null>(() => {
+    if (!editing) return null;
+    const isHidden = hiddenMatcher(config.hidden);
+    return {
+      isHidden,
+      renderToggle: (itemKey, title) => (
+        <RecordToggle
+          title={title}
+          hidden={isHidden(itemKey)}
+          disabled={disabled}
+          onToggle={() => {
+            if (isHidden(itemKey)) {
+              const shown = hiddenMatcher([itemKey]);
+              update((current) => ({
+                ...current,
+                hidden: current.hidden.filter((key) => !shown(key)),
+              }));
+              return;
+            }
+            const problem = hideProblem(config, itemKey);
+            if (problem) {
+              notify.error(
+                problem === 'tooMany'
+                  ? t`You can hide up to 500 items. Show some again first.`
+                  : t`This item can't be hidden.`
+              );
+              return;
+            }
+            update((current) => ({
+              ...current,
+              hidden: [...current.hidden, itemKey],
+            }));
+            setJustHidden(itemKey);
+          }}
+        />
+      ),
+    };
+  }, [editing, disabled, update, config, t]);
 
   return (
     <>

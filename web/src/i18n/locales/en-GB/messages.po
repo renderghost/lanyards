@@ -112,7 +112,7 @@ msgstr "Badge"
 msgid "Being mentored"
 msgstr "Being mentored"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:237
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:244
 msgid "Block settings save with Save. Your links, podcasts, videos and title save as soon as you change them."
 msgstr "Block settings save with Save. Your links, podcasts, videos and title save as soon as you change them."
 
@@ -261,7 +261,7 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:196
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:203
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -407,9 +407,17 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/features/lanyard/components/blocks/ItemFrame/ItemFrame.tsx:33
+msgid "Hidden"
+msgstr "Hidden"
+
 #: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:75
 msgid "Hidden items"
 msgstr "Hidden items"
+
+#: src/features/lanyard/customise/RecordToggle/RecordToggle.tsx:23
+msgid "Hide {title}"
+msgstr "Hide {title}"
 
 #: src/features/lanyard/customise/ItemMenu/ItemMenu.tsx:43
 msgid "Hide this item"
@@ -550,7 +558,7 @@ msgstr "Mentoring others"
 msgid "More options for {title}"
 msgstr "More options for {title}"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:234
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:241
 msgid "More settings"
 msgstr "More settings"
 
@@ -669,7 +677,7 @@ msgstr "Posts on Bluesky"
 msgid "Presentation"
 msgstr "Presentation"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:222
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:229
 msgid "Preview"
 msgstr "Preview"
 
@@ -711,7 +719,7 @@ msgstr "Reordering cancelled. {name} stayed where it was."
 msgid "Reset"
 msgstr "Reset"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:212
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:219
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
@@ -757,6 +765,10 @@ msgstr "Semble"
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:98
 msgid "Show {name}"
 msgstr "Show {name}"
+
+#: src/features/lanyard/customise/RecordToggle/RecordToggle.tsx:23
+msgid "Show {title}"
+msgstr "Show {title}"
 
 #: src/features/lanyard/customise/HiddenItems/HiddenItems.tsx:103
 msgid "Show again"
@@ -863,7 +875,7 @@ msgstr "Teal"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:205
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:212
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -875,7 +887,7 @@ msgstr "This account isn't available"
 msgid "This is your lanyard"
 msgstr "This is your lanyard"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:149
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:160
 msgid "This item can't be hidden."
 msgstr "This item can't be hidden."
 
@@ -1010,7 +1022,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:202
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:209
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
@@ -1027,7 +1039,7 @@ msgstr "What you share"
 msgid "Workshop"
 msgstr "Workshop"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:148
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:159
 msgid "You can hide up to 500 items. Show some again first."
 msgstr "You can hide up to 500 items. Show some again first."
 
@@ -1047,7 +1059,7 @@ msgstr "You're offline. Connect to sign in."
 msgid "You're offline. Some things won't work until you reconnect."
 msgstr "You're offline. Some things won't work until you reconnect."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:218
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:225
 msgid "You’re seeing your lanyard as the public sees it."
 msgstr "You’re seeing your lanyard as the public sees it."
 
@@ -1071,7 +1083,7 @@ msgstr "Your handle"
 
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:63
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:72
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:171
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:178
 #: src/features/qr/components/QrSheet/QrSheet.tsx:28
 msgid "Your lanyard"
 msgstr "Your lanyard"
@@ -1080,7 +1092,7 @@ msgstr "Your lanyard"
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:276
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:283
 msgid "Your links"
 msgstr "Your links"
 
@@ -1088,7 +1100,7 @@ msgstr "Your links"
 msgid "Your ORCID iD is verified"
 msgstr "Your ORCID iD is verified"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:292
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:299
 msgid "Your podcasts and videos"
 msgstr "Your podcasts and videos"
 

@@ -15,6 +15,7 @@ import {
   composeBlocks,
   composeEditorBlocks,
   hiddenItems,
+  hiddenMatcher,
   orphanedHiddenKeys,
 } from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
@@ -630,5 +631,17 @@ describe('composeEditorBlocks', () => {
     ]);
     expect(blocks[1]?.failedSources).toEqual(['standardSite']);
     expect(titles(blocks[0]?.items.map(({ item }) => item))).toHaveLength(4);
+  });
+});
+
+describe('hiddenMatcher', () => {
+  it('knows a hidden key, and a link hidden by any form of its URL', () => {
+    const isHidden = hiddenMatcher([
+      'https://ada.example',
+      sifaKey('presentationDelivery', 'd1'),
+    ]);
+    expect(isHidden('https://ada.example/')).toBe(true);
+    expect(isHidden(sifaKey('presentationDelivery', 'd1'))).toBe(true);
+    expect(isHidden(sifaKey('presentationDelivery', 'd2'))).toBe(false);
   });
 });

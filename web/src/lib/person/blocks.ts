@@ -270,6 +270,14 @@ function hiddenSet(hidden: readonly string[]): Set<string> {
   );
 }
 
+/** Whether a key is among `hidden`, a link by any form of its URL. */
+export function hiddenMatcher(
+  hidden: readonly string[]
+): (key: string) => boolean {
+  const set = hiddenSet(hidden);
+  return (key) => isHidden(key, set);
+}
+
 function composeBlock(
   block: BlockConfig,
   sources: SourceSnapshot,

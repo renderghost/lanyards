@@ -162,7 +162,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const region = await preview();
     await within(region).findByRole(
       'button',
-      { name: 'More options for Building on ATProto at Example Conf 2024' },
+      { name: 'Hide Building on ATProto at Example Conf 2024' },
       { timeout: 8000 }
     );
     await userEvent.click(
@@ -175,7 +175,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
     expect(
       within(await preview()).queryByRole('button', {
-        name: /^More options for/,
+        name: /^(Hide|Show) /,
       })
     ).toBeNull();
     await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
@@ -354,12 +354,9 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await userEvent.click(
       await within(region).findByRole(
         'button',
-        { name: 'More options for Building on ATProto at Example Conf 2024' },
+        { name: 'Hide Building on ATProto at Example Conf 2024' },
         { timeout: 8000 }
       )
-    );
-    await userEvent.click(
-      await screen.findByRole('menuitem', { name: 'Hide this item' })
     );
     expect(within(region).queryByText(/Example Conf 2024/)).toBeNull();
     const hidden = screen.getByRole('region', { name: 'Hidden items' });
@@ -394,12 +391,9 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await userEvent.click(
       await within(region).findByRole(
         'button',
-        { name: 'More options for Building on ATProto at Example Conf 2024' },
+        { name: 'Hide Building on ATProto at Example Conf 2024' },
         { timeout: 8000 }
       )
-    );
-    await userEvent.click(
-      await screen.findByRole('menuitem', { name: 'Hide this item' })
     );
     await waitFor(() =>
       expect(failed).toHaveBeenCalledWith(

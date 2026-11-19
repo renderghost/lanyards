@@ -222,10 +222,9 @@ test.describe('lanyard customiser', () => {
     const preview = page.getByRole('region', { name: 'Preview' });
     await preview
       .getByRole('button', {
-        name: 'More options for Building on ATProto at Example Conf 2024',
+        name: 'Hide Building on ATProto at Example Conf 2024',
       })
       .click();
-    await page.getByRole('menuitem', { name: 'Hide this item' }).click();
     await expect(preview.getByText(/Example Conf 2024/)).toBeHidden();
     const hidden = page.getByRole('region', { name: 'Hidden items' });
     const showAgain = hidden.getByRole('button', { name: 'Show again' });
