@@ -1,6 +1,7 @@
 export const page = 'flex w-full flex-col gap-6 px-4 py-8';
 
-export const list = 'flex flex-col gap-8';
+// Focusable from script only, as a landing place after Clear.
+export const list = 'flex flex-col gap-8 focus-visible:outline-offset-4';
 
 export const announcer = 'sr-only';
 

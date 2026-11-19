@@ -138,6 +138,26 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
     await userEvent.click(screen.getByRole('button', { name: 'Clear' }));
     expect(line).not.toBeInTheDocument();
     expect(screen.getByTestId('hidden').textContent).toBe('');
+    // The button is gone: focus lands on the blocks, and the change is said.
+    expect(screen.getByRole('list', { name: 'Blocks' })).toHaveFocus();
+    expect(
+      screen.getByText('Cleared 1 hidden item from your settings')
+    ).toBeInTheDocument();
+  });
+
+  it('says when the Bluesky profile can’t be read, offering Try again', async () => {
+    servePerson({
+      profileError: { error: 'InternalServerError', status: 500 },
+    });
+    renderInRouter(<Harness />);
+    expect(
+      await screen.findByRole(
+        'button',
+        { name: 'Try again' },
+        { timeout: 15_000 }
+      )
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Loading lanyard…')).toBeNull();
   });
 
   it('has no axe violations', async () => {

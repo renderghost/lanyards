@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
+import { normaliseUrl } from '@/lib/normalise';
 import type {
   BlueskyProfile,
   BskyPost,
@@ -11,7 +12,6 @@ import type { SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { ADA } from '@/test/people';
 
 import {
-  blockStatuses,
   composeBlocks,
   composeEditorBlocks,
   hiddenItems,
@@ -20,6 +20,12 @@ import {
 } from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
 import type { SourceSnapshot } from './personView.types';
+
+// Counted, to keep hiddenItems' cost in step with the list's length.
+vi.mock('@/lib/normalise', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/lib/normalise')>();
+  return { ...actual, normaliseUrl: vi.fn(actual.normaliseUrl) };
+});
 
 const sifaKey = (collection: string, rkey: string) =>
   `at://${ADA.did}/id.sifa.profile.${collection}/${rkey}`;
@@ -354,53 +360,6 @@ describe('composeBlocks: loading and failures', () => {
   });
 });
 
-describe('blockStatuses', () => {
-  const statuses = (config: LanyardConfig, sources = allSources) =>
-    blockStatuses({ config, sources, orcidVerified: false });
-
-  it('counts what each visible block would show, after hidden items', () => {
-    expect(
-      statuses(
-        showOnly(['talks', 'links'], {
-          hidden: [sifaKey('presentationDelivery', 'd1')],
-        })
-      )
-    ).toEqual({
-      talks: { status: 'ready', count: 3, failedSources: [] },
-      links: { status: 'ready', count: 5, failedSources: [] },
-    });
-  });
-
-  it('reports an empty block, which the lanyard itself leaves out', () => {
-    expect(
-      statuses(showOnly(['skills']), { sifa: ready({ ...sifa, skills: [] }) })
-    ).toEqual({ skills: { status: 'empty' } });
-  });
-
-  it('reports a failed source and a loading one', () => {
-    expect(
-      statuses(showOnly(['talks', 'publications']), {
-        sifa: failed('sifa'),
-        orcidWorks: { status: 'loading' },
-      })
-    ).toEqual({
-      talks: { status: 'error', sources: ['sifa'] },
-      publications: { status: 'loading' },
-    });
-  });
-
-  it('says nothing about blocks the owner turned off', () => {
-    const config: LanyardConfig = {
-      ...resolveConfig(null),
-      blocks: [
-        { type: 'talks', visible: false },
-        { type: 'skills', visible: true },
-      ],
-    };
-    expect(Object.keys(statuses(config))).toEqual(['skills']);
-  });
-});
-
 describe('hiddenItems', () => {
   it('finds each hidden item with its block, so the owner can show it again', () => {
     const config = showOnly(['talks'], {
@@ -643,5 +602,23 @@ describe('hiddenMatcher', () => {
     expect(isHidden('https://ada.example/')).toBe(true);
     expect(isHidden(sifaKey('presentationDelivery', 'd1'))).toBe(true);
     expect(isHidden(sifaKey('presentationDelivery', 'd2'))).toBe(false);
+  });
+});
+
+describe('hiddenItems at scale', () => {
+  it('normalises each candidate and each hidden key about once', () => {
+    const hidden = Array.from(
+      { length: 200 },
+      (_, index) => `https://gone.example/${index}`
+    );
+    vi.mocked(normaliseUrl).mockClear();
+    const found = hiddenItems({
+      config: showOnly(['links', 'talks', 'publications'], { hidden }),
+      sources: allSources,
+      orcidVerified: false,
+    });
+    expect(found).toHaveLength(200);
+    // Was one call per hidden key per candidate: thousands.
+    expect(vi.mocked(normaliseUrl).mock.calls.length).toBeLessThan(1000);
   });
 });

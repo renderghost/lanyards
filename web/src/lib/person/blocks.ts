@@ -347,35 +347,6 @@ export type ComposeInput = {
   orcidVerified: boolean;
 };
 
-/**
- * Each visible block's status, including the empty ones the lanyard leaves
- * out, so the customiser can say "Nothing to show yet" (spec §7.2).
- */
-export function blockStatuses(
-  input: ComposeInput
-): Partial<Record<RenderableBlockType, BlockStatus>> {
-  const hidden = hiddenSet(input.config.hidden);
-  const statuses: Partial<Record<RenderableBlockType, BlockStatus>> = {};
-  for (const block of input.config.blocks) {
-    if (!block.visible) continue;
-    const gathered = gather(block.type, input.sources, input.orcidVerified);
-    if (gathered.loading) {
-      statuses[block.type] = { status: 'loading' };
-      continue;
-    }
-    const count = gathered.items.filter(
-      (item) => !isHidden(item.key, hidden)
-    ).length;
-    statuses[block.type] =
-      count > 0
-        ? { status: 'ready', count, failedSources: gathered.failed }
-        : gathered.failed.length
-          ? { status: 'error', sources: gathered.failed }
-          : { status: 'empty' };
-  }
-  return statuses;
-}
-
 /** Why a hidden item can't be shown in the list of hidden items. */
 export type HiddenItemReason =
   /** Its block is switched off, so its source wasn't read. */
@@ -433,15 +404,28 @@ export function hiddenItems(input: ComposeInput): HiddenItem[] {
       gather(type, input.sources, input.orcidVerified),
     ])
   );
-  return input.config.hidden.map((key): HiddenItem => {
-    const wanted = hiddenSet([key]);
-    for (const [type, result] of results) {
-      if (result.loading) continue;
-      const item = result.items.find((candidate) =>
-        isHidden(candidate.key, wanted)
-      );
-      if (item) return { key, type, item: item as BlockItem };
+  // Every loaded item, by its key and its normalised URL, first in block
+  // order winning: one pass, however long the hidden list.
+  const index = new Map<
+    string,
+    { order: number; type: RenderableBlockType; item: BlockItem }
+  >();
+  let order = 0;
+  for (const [type, result] of results) {
+    if (result.loading) continue;
+    for (const item of result.items) {
+      const entry = { order: order++, type, item: item as BlockItem };
+      for (const form of [item.key, normaliseUrl(item.key)]) {
+        if (form !== null && !index.has(form)) index.set(form, entry);
+      }
     }
+  }
+  return input.config.hidden.map((key): HiddenItem => {
+    const match = [key, normaliseUrl(key)]
+      .flatMap((form) => (form === null ? [] : [index.get(form)]))
+      .filter((entry) => entry !== undefined)
+      .sort((a, b) => a.order - b.order)[0];
+    if (match) return { key, type: match.type, item: match.item };
     const type = blockOfKey(key);
     if (!type) return { key, reason: 'gone' };
     const visible = input.config.blocks.some(

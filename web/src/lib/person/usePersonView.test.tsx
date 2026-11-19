@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -12,6 +12,7 @@ import {
   mockGetRecord,
   mockListRecords,
 } from '@/test/handlers';
+import { queryKeys } from '@/lib/query/keys';
 import { server } from '@/test/msw';
 import { ADA } from '@/test/people';
 
@@ -208,6 +209,45 @@ describe(
           ]),
         { timeout: 5000 }
       );
+    });
+
+    it('keeps the blocks, and says so, when a refetch of the config fails', async () => {
+      serveLanyards({ blocks: [{ type: 'skills', visible: true }] });
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      });
+      const local = ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      );
+      const { result } = renderHook(
+        () => usePersonView(ADA.did, { mode: 'owner' }),
+        { wrapper: local }
+      );
+      await waitFor(
+        () => expect(result.current.blocks[0]?.type).toBe('skills'),
+        { timeout: 5000 }
+      );
+      const before = result.current.blocks.map((block) => block.type);
+      server.use(
+        http.get(`${ADA.pds}/xrpc/com.atproto.repo.getRecord`, ({ request }) =>
+          new URL(request.url).searchParams.get('collection') ===
+          'app.lanyards.actor.lanyard'
+            ? HttpResponse.json({}, { status: 500 })
+            : undefined
+        )
+      );
+      await act(async () => {
+        await client
+          .refetchQueries({
+            queryKey: queryKeys.source('lanyards', ADA.did, 'config'),
+          })
+          .catch(() => undefined);
+      });
+      await waitFor(() => expect(result.current.configError).toBe(true), {
+        timeout: 8000,
+      });
+      expect(result.current.blocks.map((block) => block.type)).toEqual(before);
+      expect(result.current.editorBlocks.length).toBeGreaterThan(0);
     });
 
     it('shows no blocks, rather than the defaults, when the config cannot be read', async () => {

@@ -363,6 +363,33 @@ test.describe('lanyard customiser', () => {
     expect(hidden).toEqual([]);
   });
 
+  test('names every block in full on its bar at 390 px', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    // A hidden counted block: the longest bar, with "Hidden from visitors".
+    await page.getByRole('switch', { name: 'Show Publications' }).click();
+    const clipped = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('[data-block]')].flatMap(
+        (block) => {
+          const bar = block.firstElementChild as HTMLElement;
+          const [label, controls] = [...bar.children].slice(1) as HTMLElement[];
+          const texts = [...(label?.querySelectorAll('span') ?? [])];
+          const cut = texts.filter(
+            (text) => text.scrollWidth > text.clientWidth + 1
+          );
+          const a = label!.getBoundingClientRect();
+          const b = controls!.getBoundingClientRect();
+          const overlap =
+            a.right > b.left + 1 &&
+            a.bottom > b.top + 1 &&
+            b.bottom > a.top + 1;
+          return cut.length > 0 || overlap ? [block.dataset.block] : [];
+        }
+      )
+    );
+    expect(clipped).toEqual([]);
+  });
+
   test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);
@@ -422,4 +449,62 @@ test.describe('lanyard customiser', () => {
       expect(result.violations).toEqual([]);
     });
   }
+});
+
+test.describe('lanyard customiser on a touch screen', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test.beforeEach(async ({ page }) => {
+    await mockPerson(page);
+    await mockOwnerWrites(page);
+    await signIn(page, { did: ADA.did, scope: GRANULAR });
+  });
+
+  test('a swipe from a handle moves nothing; press and hold drags', async ({
+    page,
+  }) => {
+    await openCustomiser(page);
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (
+      type: 'touchStart' | 'touchMove' | 'touchEnd',
+      x?: number,
+      y?: number
+    ) =>
+      cdp.send('Input.dispatchTouchEvent', {
+        type,
+        touchPoints: x === undefined || y === undefined ? [] : [{ x, y }],
+      });
+    const handle = page.getByRole('button', { name: 'Reorder Links' });
+    await handle.scrollIntoViewIfNeeded();
+    const box = (await handle.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+
+    // A quick swipe that starts on the handle picks nothing up.
+    await touch('touchStart', x, y);
+    for (let step = 1; step <= 6; step += 1) {
+      await touch('touchMove', x, y - step * 30);
+    }
+    await touch('touchEnd');
+    await expect(page.getByText(/^Picked up/)).toHaveCount(0);
+
+    // Press and hold, then drag Links down the page.
+    await touch('touchStart', x, y);
+    await page.waitForTimeout(400);
+    for (let step = 1; step <= 10; step += 1) {
+      await touch('touchMove', x, y + step * 20);
+      await page.waitForTimeout(16);
+    }
+    await touch('touchEnd');
+    await expect(
+      page.getByText(/^Links moved to position \d+ of 12$/)
+    ).toBeAttached();
+    const order = await page
+      .getByRole('list', { name: 'Blocks' })
+      .evaluate((list) =>
+        [...list.children].map((child) => (child as HTMLElement).dataset.block)
+      );
+    expect(order[0]).not.toBe('links');
+    expect(order).toContain('links');
+  });
 });

@@ -4,7 +4,8 @@ import {
   DndContext,
   type DragEndEvent,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   type UniqueIdentifier,
   useSensor,
   useSensors,
@@ -28,6 +29,7 @@ import {
   ItemActionsContext,
 } from '@/features/lanyard/components/blocks/itemActions';
 import { BLOCK_HEADINGS } from '@/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants';
+import { LanyardProblem } from '@/features/lanyard/components/LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/LanyardSkeleton';
 import { LanyardSurface } from '@/features/lanyard/components/LanyardSurface/LanyardSurface';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
@@ -38,6 +40,7 @@ import { usePersonView } from '@/lib/person/usePersonView';
 
 import { EditableBlock } from '../EditableBlock/EditableBlock';
 import { RecordToggle } from '../RecordToggle/RecordToggle';
+import { MOUSE_DRAG, TOUCH_DRAG } from './LanyardEditor.constants';
 import * as styles from './LanyardEditor.styles';
 import type { LanyardEditorProps } from './LanyardEditor.types';
 
@@ -58,8 +61,13 @@ export function LanyardEditor({
   // Where the dragged block was last announced, so the pickup isn't
   // drowned out by "over its own position", and repeats stay quiet.
   const lastOver = useRef<UniqueIdentifier | null>(null);
+  /** The block list: where focus goes when the button pressed goes away. */
+  const list = useRef<HTMLUListElement>(null);
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    // A click or a scroll that starts on a handle isn't a drag: the mouse
+    // must move a little, and a finger must hold first.
+    useSensor(MouseSensor, { activationConstraint: MOUSE_DRAG }),
+    useSensor(TouchSensor, { activationConstraint: TOUCH_DRAG }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -111,10 +119,14 @@ export function LanyardEditor({
       const position = positionOf(over.id);
       return t`${name} is over position ${position} of ${total}.`;
     },
-    onDragEnd: ({ active, over }) =>
-      over
-        ? moved(active.id as RenderableBlockType, positionOf(over.id) - 1)
-        : undefined,
+    onDragEnd: ({ active, over }) => {
+      if (!over) return undefined;
+      if (over.id === active.id) {
+        const name = nameOf(active.id as RenderableBlockType);
+        return t`${name} stayed where it was.`;
+      }
+      return moved(active.id as RenderableBlockType, positionOf(over.id) - 1);
+    },
     onDragCancel: ({ active }) => {
       const name = nameOf(active.id as RenderableBlockType);
       return t`Reordering cancelled. ${name} stayed where it was.`;
@@ -163,6 +175,16 @@ export function LanyardEditor({
     };
   }, [config, disabled, onChange, t]);
 
+  if (view.profile.status === 'error') {
+    return (
+      <LanyardSurface variant="card">
+        <LanyardProblem
+          error={view.profile.error}
+          onRetry={() => view.retry('bluesky')}
+        />
+      </LanyardSurface>
+    );
+  }
   if (!view.hero) {
     return (
       <LanyardSurface variant="card">
@@ -208,7 +230,12 @@ export function LanyardEditor({
               items={order}
               strategy={verticalListSortingStrategy}
             >
-              <ul aria-label={t`Blocks`} className={styles.list}>
+              <ul
+                ref={list}
+                tabIndex={-1}
+                aria-label={t`Blocks`}
+                className={styles.list}
+              >
                 {view.editorBlocks.map((block, index) => (
                   <EditableBlock
                     key={block.type}
@@ -254,6 +281,15 @@ export function LanyardEditor({
                   ...current,
                   hidden: current.hidden.filter((key) => !gone.has(key)),
                 }));
+                // Clear goes away with the line: say what happened, and
+                // keep focus in the editor.
+                setAnnouncement(
+                  plural(count, {
+                    one: 'Cleared # hidden item from your settings',
+                    other: 'Cleared # hidden items from your settings',
+                  })
+                );
+                list.current?.focus();
               }}
             >
               {t`Clear`}
