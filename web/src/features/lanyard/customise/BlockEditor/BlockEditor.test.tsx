@@ -14,7 +14,7 @@ type Statuses = Partial<
   Record<LanyardConfig['blocks'][number]['type'], BlockStatus>
 >;
 
-/** Applies each change, as useLanyardConfig does, and records them. */
+/** Applies each change, as useLanyardDraft does, and records them. */
 function Harness({
   statuses = {},
   onSave = vi.fn(),

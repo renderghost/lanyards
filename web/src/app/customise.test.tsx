@@ -59,6 +59,10 @@ const preview = () =>
 
 const accent = (name: string) => screen.findByRole('radio', { name });
 
+/** Presses the customiser's Save. */
+const saveChanges = () =>
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
   document.documentElement.dataset.accent = 'violet';
@@ -146,8 +150,11 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(teal);
     expect(document.documentElement.dataset.accent).toBe('teal');
-    const status = screen.getByText('Saving…');
+    const status = screen.getByText('Unsaved changes');
     expect(status.closest('[aria-live="polite"]')).not.toBeNull();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(saves).toEqual([]);
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     expect(saves[0]).toMatchObject({
       repo: ADA.did,
@@ -156,6 +163,27 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       record: { $type: 'app.lanyards.actor.lanyard', accent: 'teal' },
     });
     expect(await screen.findByText('Saved')).toBeInTheDocument();
+  });
+
+  it('resets unsaved changes to the last save, writing nothing', async () => {
+    servePerson();
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    const teal = await accent('Teal');
+    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
+    const save = screen.getByRole('button', { name: 'Save' });
+    const reset = screen.getByRole('button', { name: 'Reset' });
+    expect(save).toHaveAttribute('aria-disabled', 'true');
+    expect(reset).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(teal);
+    expect(save).not.toHaveAttribute('aria-disabled');
+    await userEvent.click(reset);
+    expect(document.documentElement.dataset.accent).toBe('violet');
+    expect(await accent('Violet')).toBeChecked();
+    expect(reset).toHaveFocus();
+    expect(reset).toHaveAttribute('aria-disabled', 'true');
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(saves).toEqual([]);
   });
 
   it('saves the current-job switch', async () => {
@@ -168,6 +196,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await waitFor(() => expect(job).toBeEnabled(), { timeout: 5000 });
     expect(job).toBeChecked();
     await userEvent.click(job);
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     expect(saves[0]).toMatchObject({ record: { showJob: false } });
   });
@@ -224,6 +253,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const down = within(links).getByRole('button', { name: 'Move Links down' });
     await waitFor(() => expect(down).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(down);
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     const record = saves[0]?.record as { blocks: { type: string }[] };
     expect(record.blocks.slice(0, 2).map((block) => block.type)).toEqual([
@@ -248,19 +278,21 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       await screen.findByRole('menuitem', { name: 'Hide this item' })
     );
     expect(within(region).queryByText(/Example Conf 2024/)).toBeNull();
-    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
-    expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
-
     const hidden = screen.getByRole('region', { name: 'Hidden items' });
     const showAgain = within(hidden).getByRole('button', {
       name: 'Show again',
       description: 'Building on ATProto at Example Conf 2024',
     });
     await waitFor(() => expect(showAgain).toHaveFocus());
+    await saveChanges();
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
+
     await userEvent.click(showAgain);
     expect(
       await within(region).findByText(/Example Conf 2024/)
     ).toBeInTheDocument();
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(2), { timeout: 3000 });
     expect((saves[1]?.record as { hidden: string[] }).hidden).toEqual([]);
   });

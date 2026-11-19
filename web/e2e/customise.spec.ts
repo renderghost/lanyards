@@ -26,6 +26,11 @@ const lanyardSaves = (writes: OwnerWrite[]) =>
     .filter((write) => write.body.collection === LANYARD)
     .map((write) => write.body.record as unknown as Lanyard);
 
+/** Presses the customiser's Save. */
+async function saveChanges(page: Page) {
+  await page.getByRole('button', { name: 'Save', exact: true }).click();
+}
+
 /** Opens the customiser once its controls can save. */
 async function openCustomiser(page: Page) {
   await page.goto('/lanyard');
@@ -56,6 +61,7 @@ test.describe('lanyard customiser', () => {
     await expect(
       editor.getByRole('button', { name: 'Move Links down' })
     ).toBeFocused();
+    await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
     expect(
       lanyardSaves(writes)[0]
@@ -85,6 +91,7 @@ test.describe('lanyard customiser', () => {
       'data-block',
       'talks'
     );
+    await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
     expect(
       lanyardSaves(writes)[0]
@@ -152,6 +159,8 @@ test.describe('lanyard customiser', () => {
     await page.getByRole('switch', { name: 'Show Talks' }).click();
     await page.getByRole('radio', { name: 'Teal' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
+    await expect(page.getByText('Unsaved changes')).toBeVisible();
+    await saveChanges(page);
     await expect(page.getByText('Saved', { exact: true })).toBeVisible();
     const saves = lanyardSaves(writes);
     expect(saves).toHaveLength(1);
@@ -218,15 +227,18 @@ test.describe('lanyard customiser', () => {
       .click();
     await page.getByRole('menuitem', { name: 'Hide this item' }).click();
     await expect(preview.getByText(/Example Conf 2024/)).toBeHidden();
-    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
-    expect(lanyardSaves(writes)[0]?.hidden).toHaveLength(1);
-
     const hidden = page.getByRole('region', { name: 'Hidden items' });
     const showAgain = hidden.getByRole('button', { name: 'Show again' });
     await expect(showAgain).toBeFocused();
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(lanyardSaves(writes)[0]?.hidden).toHaveLength(1);
+
+    await showAgain.focus();
     await page.keyboard.press('Enter');
     await expect(preview.getByText(/Example Conf 2024/)).toBeVisible();
     await expect(hidden.getByText('No items are hidden.')).toBeFocused();
+    await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(2);
     expect(lanyardSaves(writes)[1]?.hidden).toEqual([]);
   });

@@ -22,7 +22,7 @@ import {
 } from '../../components/blocks/itemActions';
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
 import { useKeptRecords } from '../../hooks/useKeptRecords';
-import { useLanyardConfig } from '../../hooks/useLanyardConfig';
+import { useLanyardDraft } from '../../hooks/useLanyardDraft';
 import { AccentPicker } from '../AccentPicker/AccentPicker';
 import { BlockEditor } from '../BlockEditor/BlockEditor';
 import { HiddenItems } from '../HiddenItems/HiddenItems';
@@ -90,7 +90,7 @@ function Customiser({
   const mediaId = useId();
   const linksHeading = useRef<HTMLHeadingElement>(null);
   const mediaHeading = useRef<HTMLHeadingElement>(null);
-  const lanyard = useLanyardConfig();
+  const lanyard = useLanyardDraft();
   const view = usePersonView(did, { mode: 'owner' });
   const kept = useKeptRecords(did);
   const [viewAs, setViewAs] = useState<'owner' | 'visitor'>('owner');
@@ -99,10 +99,10 @@ function Customiser({
 
   // "Saved" follows a save that finished without an error.
   const [wasSaving, setWasSaving] = useState(lanyard.saving);
-  const [saved, setSaved] = useState(false);
+  const [justSaved, setJustSaved] = useState(false);
   if (lanyard.saving !== wasSaving) {
     setWasSaving(lanyard.saving);
-    setSaved(!lanyard.saving && !lanyard.error);
+    setJustSaved(!lanyard.saving && !lanyard.error);
   }
 
   const granted = useMemo(() => parseGrantedScope(scope), [scope]);
@@ -170,15 +170,48 @@ function Customiser({
             <Button
               variant="secondary"
               disabled={!canEdit}
-              onClick={lanyard.reset}
+              onClick={lanyard.resetInvalid}
             >
               {t`Reset to defaults`}
             </Button>
           </div>
         )}
-        <p aria-live="polite" className={styles.status}>
-          {lanyard.saving ? t`Saving…` : saved ? t`Saved` : ''}
-        </p>
+        <div className={styles.saveBar}>
+          <p aria-live="polite" className={styles.status}>
+            {lanyard.saving
+              ? t`Saving…`
+              : lanyard.dirty
+                ? t`Unsaved changes`
+                : justSaved
+                  ? t`Saved`
+                  : ''}
+          </p>
+          {/* Unavailable rather than disabled when there's nothing to save,
+              so pressing one never drops keyboard focus. */}
+          <div className={styles.saveActions}>
+            <Button
+              size="sm"
+              variant="secondary"
+              aria-disabled={!lanyard.dirty || lanyard.saving || undefined}
+              onClick={() => {
+                if (lanyard.dirty && !lanyard.saving) lanyard.discard();
+              }}
+            >
+              {t`Reset`}
+            </Button>
+            <Button
+              size="sm"
+              disabled={!canEdit}
+              aria-disabled={!lanyard.dirty || undefined}
+              loading={lanyard.saving}
+              onClick={() => {
+                if (lanyard.dirty) void lanyard.save();
+              }}
+            >
+              {t`Save`}
+            </Button>
+          </div>
+        </div>
         <AccentPicker
           value={lanyard.config.accent}
           onChange={(accent) => update((config) => ({ ...config, accent }))}

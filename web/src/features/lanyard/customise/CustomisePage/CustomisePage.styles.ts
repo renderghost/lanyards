@@ -8,6 +8,10 @@ export const heading =
 
 export const status = 'min-h-6 text-sm leading-6 text-ui-text-muted';
 
+export const saveBar = 'flex flex-wrap items-center justify-between gap-3';
+
+export const saveActions = 'flex gap-2';
+
 export const checkboxRow =
   'flex min-h-11 cursor-pointer items-center gap-3 text-[15px] leading-[22px] text-ui-text has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60';
 

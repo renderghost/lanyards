@@ -32,32 +32,49 @@ import { queryKeys } from '@/lib/query/keys';
 import { fetchLanyardConfig } from '@/lib/sources/lanyards/lanyards';
 import type { LanyardConfigRecord } from '@/lib/sources/lanyards/lanyards.types';
 
-/** Changes this close together are saved as one write (spec §7.4). */
-export const SAVE_DELAY_MS = 800;
-
 /** One failure toast, however many saves fail in a row. */
 const SAVE_FAILED_TOAST = 'lanyard-settings-save';
 
+/** The settings a draft can change, each counted once in `changes`. */
+const SETTINGS = ['accent', 'showJob', 'blocks', 'hidden'] as const;
+
 type RecordValue = Record<string, unknown>;
 
-export type UseLanyardConfig = {
+export type UseLanyardDraft = {
+  /** The draft: the last save with the owner's unsaved changes on top. */
   config: LanyardConfig;
-  /** The stored settings have been read; until then nothing is saved. */
+  /** The settings as last saved. */
+  saved: LanyardConfig;
+  /** The stored settings have been read; until then nothing changes. */
   ready: boolean;
   /**
    * The stored record exists but doesn't pass its lexicon, so it can't be
-   * edited safely; `reset` replaces it with the defaults.
+   * edited safely; `resetInvalid` replaces it with the defaults.
    */
   invalid: boolean;
+  /** The draft differs from the last save. */
+  dirty: boolean;
+  /** How many settings differ from the last save. */
+  changes: number;
   update(patch: (config: LanyardConfig) => LanyardConfig): void;
+  /** Writes the draft; resolves true once it is saved (or had nothing). */
+  save(): Promise<boolean>;
+  /** Drops the draft, back to the last save. */
+  discard(): void;
   /** Replaces an unreadable record with the defaults, keeping createdAt. */
-  reset(): void;
-  /** A change is waiting to be saved, or being saved. */
+  resetInvalid(): void;
+  /** A save is under way. */
   saving: boolean;
-  /** The last save failed; the change is kept for `retry`. */
+  /** The last save failed; the draft is kept for another try. */
   error: boolean;
-  retry(): void;
 };
+
+/** How many of the settings differ between two configs. */
+export function countChanges(a: LanyardConfig, b: LanyardConfig): number {
+  return SETTINGS.filter(
+    (setting) => JSON.stringify(a[setting]) !== JSON.stringify(b[setting])
+  ).length;
+}
 
 /** The stored createdAt, when it is still a valid record timestamp. */
 function keptCreatedAt(value: unknown): string | null {
@@ -72,18 +89,19 @@ function keptCreatedAt(value: unknown): string | null {
 }
 
 /**
- * The signed-in owner's lanyard settings, edited optimistically.
+ * The signed-in owner's lanyard settings, as a draft until Save (#118).
  *
- * - Each change shows at once (the preview reads the same query) and is
- *   kept as an unsaved overlay until a save succeeds, so a refetch of the
- *   settings can never undo it.
- * - Saves go to the app.lanyards.actor.lanyard record 800 ms after the
- *   last change, or straight away when the page is hidden or closed.
- * - Leaving after a failed save puts the stored settings back in the
- *   shared cache, so the public lanyard never shows unsaved settings.
+ * - Each change shows at once (the preview reads the same query) and stays
+ *   an unsaved overlay until Save succeeds, so a refetch of the settings
+ *   never undoes it.
+ * - Save writes the app.lanyards.actor.lanyard record once, swapping
+ *   against the version the draft was built on and merging with what
+ *   another device saved meanwhile (#114).
+ * - Closing the customiser with a draft puts the stored settings back in
+ *   the shared cache, so the public lanyard never shows unsaved settings.
  * - A record that fails its lexicon is never edited, only reset on request.
  */
-export function useLanyardConfig(): UseLanyardConfig {
+export function useLanyardDraft(): UseLanyardDraft {
   const { t } = useLingui();
   const queryClient = useQueryClient();
   const session = useSession();
@@ -106,15 +124,17 @@ export function useLanyardConfig(): UseLanyardConfig {
   const invalid = query.status === 'success' && query.data?.valid === false;
   const ready = query.status === 'success' && !invalid;
 
-  const [pending, setPending] = useState(false);
   const [inFlight, setInFlight] = useState(0);
   const [error, setError] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const queue = useRef<Promise<void>>(Promise.resolve());
-  /** The record with the owner's changes not yet confirmed saved. */
+  const queue = useRef<Promise<unknown>>(Promise.resolve());
+  /** The record with the owner's changes not yet saved. */
   const unsaved = useRef<RecordValue | null>(null);
   /** The record as the server last returned or confirmed it. */
   const server = useRef<LanyardConfigRecord | null | undefined>(undefined);
+  // Mirrors of the two refs above, so `saved`, `dirty` and `changes`
+  // render when they change.
+  const [draft, setDraft] = useState<RecordValue | null>(null);
+  const [stored, setStored] = useState<LanyardConfigRecord | null>(null);
   /**
    * The stored version the unsaved changes were built on: its CID (null
    * when there was no record) and value, for swapping and merging.
@@ -135,6 +155,16 @@ export function useLanyardConfig(): UseLanyardConfig {
   // The failure toast's Retry outlives the render that showed it.
   const saveLater = useRef<() => void>(() => undefined);
 
+  const keepUnsaved = useCallback((value: RecordValue | null) => {
+    unsaved.current = value;
+    setDraft(value);
+  }, []);
+
+  const keepServer = useCallback((value: LanyardConfigRecord | null) => {
+    server.current = value;
+    setStored(value);
+  }, []);
+
   const show = useCallback(
     (value: RecordValue) => {
       const shown: LanyardConfigRecord = {
@@ -147,40 +177,37 @@ export function useLanyardConfig(): UseLanyardConfig {
     [queryClient, key]
   );
 
-  /** Puts the stored settings back, dropping changes that weren't saved. */
+  /** Puts the stored settings back, dropping the draft. */
   const restore = useCallback(() => {
-    unsaved.current = null;
+    keepUnsaved(null);
     if (server.current !== undefined) {
       queryClient.setQueryData<LanyardConfigRecord | null>(key, server.current);
     }
-  }, [queryClient, key]);
+  }, [queryClient, key, keepUnsaved]);
 
   // A fetch of the settings (a retry, a refocus) brings the server's
-  // record; keep it, but keep showing the owner's unsaved changes on top.
+  // record; keep it as the last save, but keep showing the draft on top.
   useEffect(() => {
     const watched = hashKey(key);
     return queryClient.getQueryCache().subscribe((event) => {
       if (event.type !== 'updated' || event.action.type !== 'success') return;
       if ('manual' in event.action && event.action.manual) return;
       if (event.query.queryHash !== watched) return;
-      server.current = event.query.state.data as LanyardConfigRecord | null;
+      keepServer(event.query.state.data as LanyardConfigRecord | null);
       if (unsaved.current) show(unsaved.current);
     });
-  }, [queryClient, key, show]);
+  }, [queryClient, key, show, keepServer]);
 
-  /** Sends the unsaved changes, after any save already under way. */
-  const save = useCallback((): void => {
-    clearTimeout(timer.current);
-    timer.current = undefined;
-    setPending(false);
+  /** Writes the draft, after any save already under way. */
+  const save = useCallback((): Promise<boolean> => {
     const changes = unsaved.current;
-    if (!changes) return;
+    if (!changes) return Promise.resolve(true);
     setInFlight((count) => count + 1);
-    queue.current = queue.current.then(async () => {
+    const run = queue.current.then(async (): Promise<boolean> => {
       try {
         const current = latest.current.writer;
         if (!current) throw new Error('Not signed in');
-        // Replaces only the stored version the record was built on.
+        // Replaces only the stored version the draft was built on.
         const send = (
           value: RecordValue,
           swapRecord: string | null | undefined
@@ -200,24 +227,24 @@ export function useLanyardConfig(): UseLanyardConfig {
           reference = await send(changes, base.current?.cid);
         } catch (cause) {
           if (!(cause instanceof RecordChangedError)) throw cause;
-          // Another device saved the settings since this change was built
+          // Another device saved the settings since this draft was built
           // on them. Merge: the settings changed here win, the rest come
           // from that version, as does everything else it holds (such as
           // per-event overrides). Then save once more.
           const fresh = await fetchLanyardConfig(current.did);
           if (!fresh.ok) throw cause;
-          server.current = fresh.value;
+          keepServer(fresh.value);
           if (fresh.value?.valid === false) {
             // Saved elsewhere in a form Lanyards can't read: show that,
             // with its Reset, rather than a Retry that can never succeed.
-            unsaved.current = null;
+            keepUnsaved(null);
             queryClient.setQueryData<LanyardConfigRecord | null>(
               key,
               fresh.value
             );
             setError(false);
             notify.dismiss(SAVE_FAILED_TOAST);
-            return;
+            return false;
           }
           record = {
             $type: LANYARDS_NSID.lanyard,
@@ -233,11 +260,12 @@ export function useLanyardConfig(): UseLanyardConfig {
           };
           reference = await send(record, fresh.value?.cid ?? null);
         }
-        server.current = { value: record, cid: reference.cid, valid: true };
-        if (unsaved.current === changes) {
-          unsaved.current = null;
-          // Show what's stored, with its CID, so a later visit builds on
-          // (and swaps against) this version.
+        keepServer({ value: record, cid: reference.cid, valid: true });
+        if (unsaved.current === changes || unsaved.current === null) {
+          // Nothing changed meanwhile (or the draft was dropped): show
+          // what's stored, with its CID, so later changes build on (and
+          // swap against) this version.
+          keepUnsaved(null);
           queryClient.setQueryData<LanyardConfigRecord | null>(
             key,
             server.current
@@ -251,26 +279,31 @@ export function useLanyardConfig(): UseLanyardConfig {
         notify.dismiss(SAVE_FAILED_TOAST);
         notify.success(t`Lanyard updated`);
         track('lanyard_updated');
+        return true;
       } catch (cause) {
         captureError(cause, { source: 'lanyard-settings' });
         if (!mounted.current) {
           restore();
-          return;
+          return false;
         }
         setError(true);
         notify.error(t`Failed to save. Please try again.`, {
           id: SAVE_FAILED_TOAST,
           action: { label: t`Retry`, onClick: () => saveLater.current() },
         });
+        return false;
       } finally {
         setInFlight((count) => count - 1);
       }
     });
-  }, [t, restore, queryClient, key]);
+    queue.current = run;
+    return run;
+  }, [t, restore, queryClient, key, keepServer, keepUnsaved]);
 
-  const schedule = useCallback(
+  /** Makes `value` the draft, or drops the draft if it matches the save. */
+  const keepDraft = useCallback(
     (value: RecordValue) => {
-      // A new run of changes builds on the stored version now shown.
+      // A new draft builds on the stored version now shown.
       if (!unsaved.current) {
         base.current =
           server.current === undefined
@@ -279,14 +312,17 @@ export function useLanyardConfig(): UseLanyardConfig {
                 cid: server.current?.cid || null,
                 value: server.current?.value ?? null,
               };
+        setStored(server.current ?? null);
       }
-      unsaved.current = value;
+      const last = resolveConfig(server.current?.value ?? null);
+      if (countChanges(resolveConfig(value), last) === 0) {
+        restore();
+        return;
+      }
+      keepUnsaved(value);
       show(value);
-      setPending(true);
-      clearTimeout(timer.current);
-      timer.current = setTimeout(save, SAVE_DELAY_MS);
     },
-    [show, save]
+    [show, restore, keepUnsaved]
   );
 
   const update = useCallback(
@@ -301,59 +337,73 @@ export function useLanyardConfig(): UseLanyardConfig {
         previous,
         new Date().toISOString()
       );
-      schedule({ $type: LANYARDS_NSID.lanyard, ...fields });
+      keepDraft({ $type: LANYARDS_NSID.lanyard, ...fields });
     },
-    [queryClient, key, schedule]
+    [queryClient, key, keepDraft]
   );
 
-  const reset = useCallback((): void => {
+  const discard = useCallback((): void => {
+    restore();
+    setError(false);
+    notify.dismiss(SAVE_FAILED_TOAST);
+  }, [restore]);
+
+  const resetInvalid = useCallback((): void => {
     if (!latest.current.invalid) return;
-    const stored = queryClient.getQueryData<LanyardConfigRecord | null>(key);
-    const createdAt = keptCreatedAt(stored?.value);
+    const current = queryClient.getQueryData<LanyardConfigRecord | null>(key);
+    const createdAt = keptCreatedAt(current?.value);
     const fields = serialiseConfig(
       resolveConfig(null),
       createdAt ? { createdAt } : null,
       new Date().toISOString()
     );
-    schedule({ $type: LANYARDS_NSID.lanyard, ...fields });
-    save();
-  }, [queryClient, key, schedule, save]);
+    // Saved at once: the owner asked for it, and the unreadable record
+    // can't be edited as a draft.
+    base.current =
+      server.current === undefined
+        ? undefined
+        : {
+            cid: server.current?.cid || null,
+            value: server.current?.value ?? null,
+          };
+    const value = { $type: LANYARDS_NSID.lanyard, ...fields };
+    keepUnsaved(value);
+    show(value);
+    void save();
+  }, [queryClient, key, keepUnsaved, show, save]);
 
   useLayoutEffect(() => {
-    saveLater.current = save;
+    saveLater.current = () => void save();
   }, [save]);
 
-  // Save a waiting change before the page goes away, the app goes into the
-  // background (phones often skip pagehide) or the customiser closes.
+  // Closing the customiser drops the draft: everyone, the public lanyard
+  // included, sees the stored settings again.
   useEffect(() => {
     mounted.current = true;
-    const flush = () => {
-      if (timer.current !== undefined) save();
-    };
-    const onVisibility = () => {
-      if (document.visibilityState === 'hidden') flush();
-    };
-    window.addEventListener('pagehide', flush);
-    document.addEventListener('visibilitychange', onVisibility);
     return () => {
       mounted.current = false;
-      window.removeEventListener('pagehide', flush);
-      document.removeEventListener('visibilitychange', onVisibility);
-      if (timer.current !== undefined) save();
-      // A change whose save already failed won't be saved now: show
-      // everyone the stored settings again.
-      else if (unsaved.current) restore();
+      if (unsaved.current) restore();
     };
-  }, [save, restore]);
+  }, [restore]);
+
+  const saved = useMemo(
+    () => (draft ? resolveConfig(stored?.value ?? null) : config),
+    [draft, stored, config]
+  );
+  const changes = draft ? countChanges(config, saved) : 0;
 
   return {
     config,
+    saved,
     ready,
     invalid,
+    dirty: changes > 0,
+    changes,
     update,
-    reset,
-    saving: pending || inFlight > 0,
+    save,
+    discard,
+    resetInvalid,
+    saving: inFlight > 0,
     error,
-    retry: save,
   };
 }
