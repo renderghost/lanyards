@@ -22,7 +22,9 @@ import { fetchRepos } from '@/lib/sources/tangled/tangled';
 import {
   blockStatuses,
   composeBlocks,
+  composeEditorBlocks,
   hiddenItems as findHiddenItems,
+  orphanedHiddenKeys,
 } from './blocks';
 import { type RenderableBlockType, resolveConfig } from './config';
 import { composeHero } from './hero';
@@ -184,6 +186,14 @@ export function usePersonView(
     hiddenItems: configUsable
       ? findHiddenItems({ config, sources, orcidVerified })
       : [],
+    editorBlocks:
+      configUsable && mode === 'owner'
+        ? composeEditorBlocks({ config, sources, orcidVerified })
+        : [],
+    orphanedHidden:
+      configUsable && mode === 'owner'
+        ? orphanedHiddenKeys({ config, sources, orcidVerified })
+        : [],
     orcidId: sifa.status === 'success' ? (orcidId ?? null) : undefined,
     config,
     configReady,
