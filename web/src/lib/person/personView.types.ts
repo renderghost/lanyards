@@ -16,7 +16,7 @@ import type {
 import type { BlogPost } from '@/lib/sources/standardSite/standardSite.types';
 import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 
-import type { BlockStatus, HiddenItem } from './blocks';
+import type { EditorBlock } from './blocks';
 import type { LanyardConfig, RenderableBlockType } from './config';
 import type { Platform } from './platform';
 
@@ -102,10 +102,10 @@ export type PersonViewState = {
   profile: SourceState<BlueskyProfile>;
   hero?: BadgeHero;
   blocks: BlockView[];
-  /** Each visible block's status, including empty ones, for the customiser. */
-  statuses: Partial<Record<RenderableBlockType, BlockStatus>>;
-  /** The owner's hidden items, for "Show again". */
-  hiddenItems: HiddenItem[];
+  /** For the owner: every block, hidden items flagged in place (#118). */
+  editorBlocks: EditorBlock[];
+  /** For the owner: hidden keys no longer on the lanyard, for "Clear". */
+  orphanedHidden: string[];
   /** The ORCID iD on Sifa: null when there is none, undefined until Sifa answers. */
   orcidId: string | null | undefined;
   config: LanyardConfig;

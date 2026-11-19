@@ -141,8 +141,10 @@ export function useLanyardDraft(): UseLanyardDraft {
     () => resolveConfig(query.data?.value ?? null),
     [query.data]
   );
-  const invalid = query.status === 'success' && query.data?.valid === false;
-  const ready = query.status === 'success' && !invalid;
+  // Read settings stay editable when a later refetch fails.
+  const loaded = query.data !== undefined;
+  const invalid = loaded && query.data?.valid === false;
+  const ready = loaded && !invalid;
 
   const [inFlight, setInFlight] = useState(0);
   /** Saves under way, for event handlers (the state lags a render). */

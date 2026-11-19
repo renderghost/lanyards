@@ -20,9 +20,9 @@ import { fetchBlogPosts } from '@/lib/sources/standardSite/standardSite';
 import { fetchRepos } from '@/lib/sources/tangled/tangled';
 
 import {
-  blockStatuses,
   composeBlocks,
-  hiddenItems as findHiddenItems,
+  composeEditorBlocks,
+  orphanedHiddenKeys,
 } from './blocks';
 import { type RenderableBlockType, resolveConfig } from './config';
 import { composeHero } from './hero';
@@ -74,12 +74,15 @@ export function usePersonView(
 
   const configReady = configQuery.status !== 'pending';
   const configError = configQuery.status === 'error';
+  // Settings once read stay usable when a later refetch fails: the error
+  // is shown beside them, never instead of them.
+  const configUsable = configQuery.data !== undefined;
   const config = useMemo(
     () => resolveConfig(configQuery.data?.value ?? null),
     [configQuery.data]
   );
   const visible = new Set<RenderableBlockType>(
-    configReady && !configError
+    configUsable
       ? config.blocks.filter((block) => block.visible).map((b) => b.type)
       : []
   );
@@ -150,7 +153,6 @@ export function usePersonView(
     orcidWorks: toSourceState(works, enabled.orcid),
   };
 
-  const configUsable = configReady && !configError;
   const orcidVerified = verified.data === true;
 
   const queries: Record<SourceKey, { refetch: () => unknown }> = {
@@ -178,12 +180,14 @@ export function usePersonView(
     blocks: configUsable
       ? composeBlocks({ config, sources, mode, orcidVerified })
       : [],
-    statuses: configUsable
-      ? blockStatuses({ config, sources, orcidVerified })
-      : {},
-    hiddenItems: configUsable
-      ? findHiddenItems({ config, sources, orcidVerified })
-      : [],
+    editorBlocks:
+      configUsable && mode === 'owner'
+        ? composeEditorBlocks({ config, sources, orcidVerified })
+        : [],
+    orphanedHidden:
+      configUsable && mode === 'owner'
+        ? orphanedHiddenKeys({ config, sources, orcidVerified })
+        : [],
     orcidId: sifa.status === 'success' ? (orcidId ?? null) : undefined,
     config,
     configReady,

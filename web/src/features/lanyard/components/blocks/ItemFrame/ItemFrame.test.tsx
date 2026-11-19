@@ -3,8 +3,15 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
 
-import { ItemActionsContext } from '../itemActions';
+import { type ItemActions, ItemActionsContext } from '../itemActions';
 import { ItemFrame } from './ItemFrame';
+
+const actions = (hidden: string[]): ItemActions => ({
+  isHidden: (key) => hidden.includes(key),
+  renderToggle: (key, title) => (
+    <button type="button">{`Toggle ${title} (${key})`}</button>
+  ),
+});
 
 describe('ItemFrame', () => {
   it('renders just the item outside the customiser', () => {
@@ -20,20 +27,36 @@ describe('ItemFrame', () => {
     expect(container.querySelector('li')?.innerHTML).toBe('<p>Keynote</p>');
   });
 
-  it('adds the customiser’s menu beside the item', () => {
-    const renderMenu = vi.fn((key: string, title: string) => (
-      <button type="button">{`Menu for ${title} (${key})`}</button>
-    ));
+  it('adds the customiser’s show/hide control beside the item', () => {
+    const renderToggle = vi.fn(actions([]).renderToggle);
     renderWithProviders(
-      <ItemActionsContext value={{ renderMenu }}>
+      <ItemActionsContext value={{ ...actions([]), renderToggle }}>
         <ItemFrame itemKey="k1" title="Keynote">
           <p>Keynote</p>
         </ItemFrame>
       </ItemActionsContext>
     );
     expect(
-      screen.getByRole('button', { name: 'Menu for Keynote (k1)' })
+      screen.getByRole('button', { name: 'Toggle Keynote (k1)' })
     ).toBeInTheDocument();
-    expect(screen.getByText('Keynote')).toBeInTheDocument();
+    expect(screen.queryByText('Hidden')).toBeNull();
+  });
+
+  it('marks a hidden item and keeps it in place', () => {
+    renderWithProviders(
+      <ItemActionsContext value={actions(['k1'])}>
+        <ul>
+          <li>
+            <ItemFrame itemKey="k1" title="Keynote">
+              <p>Keynote</p>
+            </ItemFrame>
+          </li>
+        </ul>
+      </ItemActionsContext>
+    );
+    const item = screen.getByText('Keynote');
+    expect(screen.getByText('Hidden')).toBeInTheDocument();
+    expect(item.closest('li')).not.toBeNull();
+    expect(item.closest('[data-hidden="true"]')).not.toBeNull();
   });
 });

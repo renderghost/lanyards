@@ -148,11 +148,14 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(
       within(sidebar).getByRole('button', { name: 'Accent colour' })
     ).toHaveAttribute('aria-expanded', 'true');
-    expect(await preview()).toBeInTheDocument();
-    // Until blocks and records are edited in place (#118, PRs 3–4).
+    // Blocks are edited on the lanyard itself.
+    expect(
+      within(await preview()).getByRole('list', { name: 'Blocks' })
+    ).toBeInTheDocument();
+    // Until kept records are edited in place too (#118, PR 4).
     const more = screen.getByRole('region', { name: 'More settings' });
     expect(
-      within(more).getByRole('region', { name: 'Blocks' })
+      within(more).getByRole('region', { name: 'Your links' })
     ).toBeInTheDocument();
   });
 
@@ -162,7 +165,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const region = await preview();
     await within(region).findByRole(
       'button',
-      { name: 'More options for Building on ATProto at Example Conf 2024' },
+      { name: 'Hide Building on ATProto at Example Conf 2024' },
       { timeout: 8000 }
     );
     await userEvent.click(
@@ -175,7 +178,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
     expect(
       within(await preview()).queryByRole('button', {
-        name: /^More options for/,
+        name: /^(Hide|Show) /,
       })
     ).toBeNull();
     await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
@@ -346,36 +349,28 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ]);
   });
 
-  it('hides an item from the preview, then shows it again', async () => {
+  it('hides a record in place, then shows it again', async () => {
     servePerson();
     const saves = captureSaves();
     renderRoute('/lanyard');
     const region = await preview();
-    await userEvent.click(
-      await within(region).findByRole(
-        'button',
-        { name: 'More options for Building on ATProto at Example Conf 2024' },
-        { timeout: 8000 }
-      )
+    const hide = await within(region).findByRole(
+      'button',
+      { name: 'Hide Building on ATProto at Example Conf 2024' },
+      { timeout: 8000 }
     );
-    await userEvent.click(
-      await screen.findByRole('menuitem', { name: 'Hide this item' })
-    );
-    expect(within(region).queryByText(/Example Conf 2024/)).toBeNull();
-    const hidden = screen.getByRole('region', { name: 'Hidden items' });
-    const showAgain = within(hidden).getByRole('button', {
-      name: 'Show again',
-      description: 'Building on ATProto at Example Conf 2024',
+    await userEvent.click(hide);
+    // Still there, marked Hidden, with focus on its toggle.
+    expect(within(region).getByText(/Example Conf 2024/)).toBeInTheDocument();
+    const show = within(region).getByRole('button', {
+      name: 'Show Building on ATProto at Example Conf 2024',
     });
-    await waitFor(() => expect(showAgain).toHaveFocus());
+    expect(show).toHaveFocus();
     await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
 
-    await userEvent.click(showAgain);
-    expect(
-      await within(region).findByText(/Example Conf 2024/)
-    ).toBeInTheDocument();
+    await userEvent.click(show);
     await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(2), { timeout: 3000 });
     expect((saves[1]?.record as { hidden: string[] }).hidden).toEqual([]);
@@ -394,12 +389,9 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await userEvent.click(
       await within(region).findByRole(
         'button',
-        { name: 'More options for Building on ATProto at Example Conf 2024' },
+        { name: 'Hide Building on ATProto at Example Conf 2024' },
         { timeout: 8000 }
       )
-    );
-    await userEvent.click(
-      await screen.findByRole('menuitem', { name: 'Hide this item' })
     );
     await waitFor(() =>
       expect(failed).toHaveBeenCalledWith(

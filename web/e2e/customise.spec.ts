@@ -48,9 +48,11 @@ test.describe('lanyard customiser', () => {
     await signIn(page, { did: ADA.did, scope: GRANULAR });
   });
 
-  test('moves a block with Move down and saves the order', async ({ page }) => {
+  test('moves a block with Move down and saves the order on Save', async ({
+    page,
+  }) => {
     await openCustomiser(page);
-    const editor = page.getByRole('region', { name: 'Blocks' });
+    const editor = page.getByRole('list', { name: 'Blocks' });
     await editor
       .getByRole('listitem', { name: 'Links' })
       .getByRole('button', { name: 'Move Links down' })
@@ -72,7 +74,7 @@ test.describe('lanyard customiser', () => {
 
   test('reorders blocks with the keyboard alone', async ({ page }) => {
     await openCustomiser(page);
-    const editor = page.getByRole('region', { name: 'Blocks' });
+    const editor = page.getByRole('list', { name: 'Blocks' });
     await editor.getByRole('button', { name: 'Reorder Links' }).focus();
     // Each step waits for its announcement, as a screen-reader user would.
     await page.keyboard.press('Space');
@@ -105,7 +107,7 @@ test.describe('lanyard customiser', () => {
   }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await openCustomiser(page);
-    const editor = page.getByRole('region', { name: 'Blocks' });
+    const editor = page.getByRole('list', { name: 'Blocks' });
     await editor.getByRole('button', { name: 'Reorder Links' }).focus();
     await page.keyboard.press('Space');
     await expect(
@@ -140,9 +142,7 @@ test.describe('lanyard customiser', () => {
     });
     await openCustomiser(page);
     const name = /^Edit (on|in) /;
-    const editor = page.getByRole('region', { name: 'Blocks' });
     const preview = page.getByRole('region', { name: 'Preview' });
-    await expect(editor.getByRole('link', { name }).first()).toBeVisible();
     await expect(preview.getByRole('link', { name }).first()).toBeVisible();
     const heights = await page
       .getByRole('link', { name })
@@ -215,32 +215,78 @@ test.describe('lanyard customiser', () => {
     ).toMatchObject({ url: 'https://ada.example/talks', title: 'Talks' });
   });
 
-  test('hides an item from the preview and shows it again', async ({
-    page,
-  }) => {
+  test('hides a record in place, then shows it again', async ({ page }) => {
     await openCustomiser(page);
-    const preview = page.getByRole('region', { name: 'Preview' });
-    await preview
+    const talks = page.locator('[data-block="talks"]');
+    await talks
       .getByRole('button', {
-        name: 'More options for Building on ATProto at Example Conf 2024',
+        name: 'Hide Building on ATProto at Example Conf 2024',
       })
       .click();
-    await page.getByRole('menuitem', { name: 'Hide this item' }).click();
-    await expect(preview.getByText(/Example Conf 2024/)).toBeHidden();
-    const hidden = page.getByRole('region', { name: 'Hidden items' });
-    const showAgain = hidden.getByRole('button', { name: 'Show again' });
-    await expect(showAgain).toBeFocused();
+    await expect(talks.getByText(/Example Conf 2024/)).toBeVisible();
+    await expect(talks.getByText('Hidden', { exact: true })).toBeVisible();
+    const show = talks.getByRole('button', {
+      name: 'Show Building on ATProto at Example Conf 2024',
+    });
+    await expect(show).toBeFocused();
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
     expect(lanyardSaves(writes)[0]?.hidden).toHaveLength(1);
 
-    await showAgain.focus();
+    await show.focus();
     await page.keyboard.press('Enter');
-    await expect(preview.getByText(/Example Conf 2024/)).toBeVisible();
-    await expect(hidden.getByText('No items are hidden.')).toBeFocused();
+    await expect(talks.getByText('Hidden', { exact: true })).toBeHidden();
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(2);
     expect(lanyardSaves(writes)[1]?.hidden).toEqual([]);
+  });
+
+  test('hides a block in place and saves it', async ({ page }) => {
+    await openCustomiser(page);
+    const talks = page.locator('[data-block="talks"]');
+    const toggle = talks.getByRole('switch', { name: 'Show Talks' });
+    await toggle.focus();
+    await page.keyboard.press('Space');
+    await expect(talks.getByText('Hidden from visitors')).toBeVisible();
+    await expect(talks.getByText(/Example Conf 2024/)).toBeHidden();
+    await expect(toggle).toBeFocused();
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(
+      lanyardSaves(writes)[0]?.blocks.find((block) => block.type === 'talks')
+    ).toEqual({ type: 'talks', visible: false });
+  });
+
+  test('changes a counted block’s count', async ({ page }) => {
+    await openCustomiser(page);
+    await page
+      .getByRole('combobox', { name: 'Items to show for Posts on Bluesky' })
+      .selectOption('5');
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(
+      lanyardSaves(writes)[0]?.blocks.find(
+        (block) => block.type === 'bskyPosts'
+      )
+    ).toMatchObject({ type: 'bskyPosts', limit: 5 });
+    await expect(
+      page.locator('[data-block="talks"]').getByRole('combobox')
+    ).toHaveCount(0);
+  });
+
+  test('clears hidden entries that are no longer on the lanyard', async ({
+    page,
+  }) => {
+    const gone = `at://${ADA.did}/id.sifa.profile.presentationDelivery/deleted`;
+    await mockPerson(page, { config: { hidden: [gone] } });
+    await openCustomiser(page);
+    const line = page.getByText('1 hidden item is no longer on your lanyard');
+    await expect(line).toBeVisible();
+    await page.getByRole('button', { name: 'Clear', exact: true }).click();
+    await expect(line).toBeHidden();
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(lanyardSaves(writes)[0]?.hidden).toEqual([]);
   });
 
   test('switches to View as public and back', async ({ page }) => {
@@ -317,6 +363,33 @@ test.describe('lanyard customiser', () => {
     expect(hidden).toEqual([]);
   });
 
+  test('names every block in full on its bar at 390 px', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    // A hidden counted block: the longest bar, with "Hidden from visitors".
+    await page.getByRole('switch', { name: 'Show Publications' }).click();
+    const clipped = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('[data-block]')].flatMap(
+        (block) => {
+          const bar = block.firstElementChild as HTMLElement;
+          const [label, controls] = [...bar.children].slice(1) as HTMLElement[];
+          const texts = [...(label?.querySelectorAll('span') ?? [])];
+          const cut = texts.filter(
+            (text) => text.scrollWidth > text.clientWidth + 1
+          );
+          const a = label!.getBoundingClientRect();
+          const b = controls!.getBoundingClientRect();
+          const overlap =
+            a.right > b.left + 1 &&
+            a.bottom > b.top + 1 &&
+            b.bottom > a.top + 1;
+          return cut.length > 0 || overlap ? [block.dataset.block] : [];
+        }
+      )
+    );
+    expect(clipped).toEqual([]);
+  });
+
   test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);
@@ -339,6 +412,28 @@ test.describe('lanyard customiser', () => {
   });
 
   for (const colorScheme of ['light', 'dark'] as const) {
+    test(`stays accessible with hidden records and blocks (${colorScheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await openCustomiser(page);
+      const talks = page.locator('[data-block="talks"]');
+      await talks
+        .getByRole('button', {
+          name: 'Hide Building on ATProto at Example Conf 2024',
+        })
+        .click();
+      await expect(talks.getByText('Hidden', { exact: true })).toBeVisible();
+      await page.getByRole('switch', { name: 'Show Links' }).click();
+      await expect(
+        page.locator('[data-block="links"]').getByText('Hidden from visitors')
+      ).toBeVisible();
+      const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+      expect(result.violations).toEqual([]);
+    });
+  }
+
+  for (const colorScheme of ['light', 'dark'] as const) {
     test(`has no accessibility violations (${colorScheme})`, async ({
       page,
     }) => {
@@ -354,4 +449,62 @@ test.describe('lanyard customiser', () => {
       expect(result.violations).toEqual([]);
     });
   }
+});
+
+test.describe('lanyard customiser on a touch screen', () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+
+  test.beforeEach(async ({ page }) => {
+    await mockPerson(page);
+    await mockOwnerWrites(page);
+    await signIn(page, { did: ADA.did, scope: GRANULAR });
+  });
+
+  test('a swipe from a handle moves nothing; press and hold drags', async ({
+    page,
+  }) => {
+    await openCustomiser(page);
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (
+      type: 'touchStart' | 'touchMove' | 'touchEnd',
+      x?: number,
+      y?: number
+    ) =>
+      cdp.send('Input.dispatchTouchEvent', {
+        type,
+        touchPoints: x === undefined || y === undefined ? [] : [{ x, y }],
+      });
+    const handle = page.getByRole('button', { name: 'Reorder Links' });
+    await handle.scrollIntoViewIfNeeded();
+    const box = (await handle.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+
+    // A quick swipe that starts on the handle picks nothing up.
+    await touch('touchStart', x, y);
+    for (let step = 1; step <= 6; step += 1) {
+      await touch('touchMove', x, y - step * 30);
+    }
+    await touch('touchEnd');
+    await expect(page.getByText(/^Picked up/)).toHaveCount(0);
+
+    // Press and hold, then drag Links down the page.
+    await touch('touchStart', x, y);
+    await page.waitForTimeout(400);
+    for (let step = 1; step <= 10; step += 1) {
+      await touch('touchMove', x, y + step * 20);
+      await page.waitForTimeout(16);
+    }
+    await touch('touchEnd');
+    await expect(
+      page.getByText(/^Links moved to position \d+ of 12$/)
+    ).toBeAttached();
+    const order = await page
+      .getByRole('list', { name: 'Blocks' })
+      .evaluate((list) =>
+        [...list.children].map((child) => (child as HTMLElement).dataset.block)
+      );
+    expect(order[0]).not.toBe('links');
+    expect(order).toContain('links');
+  });
 });

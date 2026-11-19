@@ -15,6 +15,7 @@ import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 import {
   type BlockConfig,
   DEFAULT_BLOCK_ORDER,
+  COUNTED_BLOCKS,
   itemLimit,
   type LanyardConfig,
   type RenderableBlockType,
@@ -269,6 +270,14 @@ function hiddenSet(hidden: readonly string[]): Set<string> {
   );
 }
 
+/** Whether a key is among `hidden`, a link by any form of its URL. */
+export function hiddenMatcher(
+  hidden: readonly string[]
+): (key: string) => boolean {
+  const set = hiddenSet(hidden);
+  return (key) => isHidden(key, set);
+}
+
 function composeBlock(
   block: BlockConfig,
   sources: SourceSnapshot,
@@ -332,40 +341,11 @@ export type BlockStatus =
   | { status: 'empty' }
   | { status: 'ready'; count: number; failedSources: SourceName[] };
 
-type ComposeInput = {
+export type ComposeInput = {
   config: LanyardConfig;
   sources: SourceSnapshot;
   orcidVerified: boolean;
 };
-
-/**
- * Each visible block's status, including the empty ones the lanyard leaves
- * out, so the customiser can say "Nothing to show yet" (spec §7.2).
- */
-export function blockStatuses(
-  input: ComposeInput
-): Partial<Record<RenderableBlockType, BlockStatus>> {
-  const hidden = hiddenSet(input.config.hidden);
-  const statuses: Partial<Record<RenderableBlockType, BlockStatus>> = {};
-  for (const block of input.config.blocks) {
-    if (!block.visible) continue;
-    const gathered = gather(block.type, input.sources, input.orcidVerified);
-    if (gathered.loading) {
-      statuses[block.type] = { status: 'loading' };
-      continue;
-    }
-    const count = gathered.items.filter(
-      (item) => !isHidden(item.key, hidden)
-    ).length;
-    statuses[block.type] =
-      count > 0
-        ? { status: 'ready', count, failedSources: gathered.failed }
-        : gathered.failed.length
-          ? { status: 'error', sources: gathered.failed }
-          : { status: 'empty' };
-  }
-  return statuses;
-}
 
 /** Why a hidden item can't be shown in the list of hidden items. */
 export type HiddenItemReason =
@@ -424,15 +404,28 @@ export function hiddenItems(input: ComposeInput): HiddenItem[] {
       gather(type, input.sources, input.orcidVerified),
     ])
   );
-  return input.config.hidden.map((key): HiddenItem => {
-    const wanted = hiddenSet([key]);
-    for (const [type, result] of results) {
-      if (result.loading) continue;
-      const item = result.items.find((candidate) =>
-        isHidden(candidate.key, wanted)
-      );
-      if (item) return { key, type, item: item as BlockItem };
+  // Every loaded item, by its key and its normalised URL, first in block
+  // order winning: one pass, however long the hidden list.
+  const index = new Map<
+    string,
+    { order: number; type: RenderableBlockType; item: BlockItem }
+  >();
+  let order = 0;
+  for (const [type, result] of results) {
+    if (result.loading) continue;
+    for (const item of result.items) {
+      const entry = { order: order++, type, item: item as BlockItem };
+      for (const form of [item.key, normaliseUrl(item.key)]) {
+        if (form !== null && !index.has(form)) index.set(form, entry);
+      }
     }
+  }
+  return input.config.hidden.map((key): HiddenItem => {
+    const match = [key, normaliseUrl(key)]
+      .flatMap((form) => (form === null ? [] : [index.get(form)]))
+      .filter((entry) => entry !== undefined)
+      .sort((a, b) => a.order - b.order)[0];
+    if (match) return { key, type: match.type, item: match.item };
     const type = blockOfKey(key);
     if (!type) return { key, reason: 'gone' };
     const visible = input.config.blocks.some(
@@ -456,5 +449,60 @@ export function hiddenItems(input: ComposeInput): HiddenItem[] {
             ? 'failed'
             : 'gone';
     return { key, type, reason };
+  });
+}
+
+/** Hidden entries that no longer exist where they were read: "Clear". */
+export function orphanedHiddenKeys(input: ComposeInput): string[] {
+  return hiddenItems(input).flatMap((entry) =>
+    'reason' in entry && entry.reason === 'gone' ? [entry.key] : []
+  );
+}
+
+/** A block as the owner edits it on the lanyard (#118). */
+export type EditorBlock = {
+  type: RenderableBlockType;
+  visible: boolean;
+  /** For counted blocks only. */
+  limit?: number;
+  status: BlockStatus['status'];
+  /** Every item it shows, with the hidden ones in their places. */
+  items: { item: BlockItem; hidden: boolean }[];
+  failedSources: SourceName[];
+};
+
+/**
+ * Every block in the owner's order, switched-off ones included, with each
+ * item it would show and the hidden ones flagged where they'd be. Counted
+ * blocks stop at their count of shown items.
+ */
+export function composeEditorBlocks(input: ComposeInput): EditorBlock[] {
+  const hidden = hiddenSet(input.config.hidden);
+  return input.config.blocks.map((block): EditorBlock => {
+    const limit = itemLimit(block);
+    const shape = {
+      type: block.type,
+      visible: block.visible,
+      ...(COUNTED_BLOCKS.has(block.type) ? { limit } : {}),
+    };
+    const gathered = gather(block.type, input.sources, input.orcidVerified);
+    if (gathered.loading) {
+      return { ...shape, status: 'loading', items: [], failedSources: [] };
+    }
+    const items: EditorBlock['items'] = [];
+    let shown = 0;
+    for (const item of gathered.items) {
+      if (shown >= limit) break;
+      const isItemHidden = isHidden(item.key, hidden);
+      items.push({ item: item as BlockItem, hidden: isItemHidden });
+      if (!isItemHidden) shown += 1;
+    }
+    const status: EditorBlock['status'] =
+      items.length > 0
+        ? 'ready'
+        : gathered.failed.length > 0
+          ? 'error'
+          : 'empty';
+    return { ...shape, status, items, failedSources: gathered.failed };
   });
 }

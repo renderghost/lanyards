@@ -28,7 +28,6 @@ export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
 ]);
 
 export const DEFAULT_ITEM_LIMIT = 3;
-export const MAX_LINKS = 20;
 
 const CONFIG_FIELDS = ['accent', 'showJob', 'blocks', 'hidden'] as const;
 
@@ -134,12 +133,26 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
   };
 }
 
-/** How many items a block shows: 3 by default, all links up to 20. */
+/**
+ * Blocks that keep a "Show N" count (#118): the feeds, which can run long
+ * and don't come from Sifa, and Publications, which pulls every ORCID work.
+ */
+export const COUNTED_BLOCKS: ReadonlySet<RenderableBlockType> = new Set([
+  'bskyPosts',
+  'blogPosts',
+  'code',
+  'collections',
+  'publications',
+]);
+
+/**
+ * How many items a block shows: a counted block its count (3 by default);
+ * every other block all that aren't hidden, whatever limit was stored.
+ */
 export function itemLimit(block: BlockConfig): number {
-  if (block.type === 'links') {
-    return Math.min(block.limit ?? MAX_LINKS, MAX_LINKS);
-  }
-  return block.limit ?? DEFAULT_ITEM_LIMIT;
+  return COUNTED_BLOCKS.has(block.type)
+    ? (block.limit ?? DEFAULT_ITEM_LIMIT)
+    : Infinity;
 }
 
 type StoredFields = Record<string, unknown>;

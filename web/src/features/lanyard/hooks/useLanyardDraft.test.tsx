@@ -495,6 +495,28 @@ describe('useLanyardDraft', () => {
     expect(saved()[0]?.fields).toMatchObject({ accent: 'teal' });
   });
 
+  it('stays ready, keeping the draft, when a refetch of the settings fails', async () => {
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    vi.mocked(fetchLanyardConfig).mockRejectedValue(new Error('PDS down'));
+    let refetched: Promise<unknown> = Promise.resolve();
+    act(() => {
+      refetched = client
+        .refetchQueries({ queryKey: key() })
+        .catch(() => undefined);
+    });
+    // Let the source's own retries run out.
+    await advance(120_000);
+    await act(async () => {
+      await refetched;
+    });
+    expect(client.getQueryState(key())?.status).toBe('error');
+    expect(result.current.ready).toBe(true);
+    expect(result.current.config.accent).toBe('teal');
+    act(() => result.current.update((c) => ({ ...c, showJob: false })));
+    expect(result.current.config.showJob).toBe(false);
+  });
+
   it('keeps a change whose save failed when the settings are fetched again', async () => {
     vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
     const { result } = render();
