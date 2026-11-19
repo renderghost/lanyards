@@ -1,32 +1,28 @@
 import { useLingui } from '@lingui/react/macro';
 
-import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { CardItem } from '../CardItem/CardItem';
+import { CardLink } from '../CardLink/CardLink';
 import { itemTitle } from '../itemTitle';
 import * as styles from './CodeBlock.styles';
 import type { CodeBlockProps } from './CodeBlock.types';
 
-/** Recent repositories on Tangled. */
+/** Code repositories from Tangled, as cards opening each one (#122). */
 export function CodeBlock({ items, className }: CodeBlockProps) {
   const { i18n } = useLingui();
   return (
     <ul className={cn(styles.list, className)}>
       {items.map((repo) => (
-        <li key={repo.key} className={styles.item}>
-          <ItemFrame itemKey={repo.key} title={itemTitle('code', repo, i18n)}>
-            <ExternalLink
-              tone="accent"
-              href={repo.url}
-              className={styles.title}
-            >
+        <li key={repo.key}>
+          <CardItem itemKey={repo.key} title={itemTitle('code', repo, i18n)}>
+            <CardLink href={repo.url} className={styles.title}>
               {repo.name}
-            </ExternalLink>
+            </CardLink>
             {repo.description && (
               <p className={styles.meta}>{repo.description}</p>
             )}
-          </ItemFrame>
+          </CardItem>
         </li>
       ))}
     </ul>

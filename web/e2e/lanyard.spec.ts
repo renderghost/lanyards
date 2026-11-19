@@ -233,3 +233,35 @@ test.describe('pills at 320 px', () => {
     ).toBeLessThanOrEqual(320);
   });
 });
+
+test.describe('cards', () => {
+  test('Tab reaches one link per card, and the card shows the focus ring', async ({
+    page,
+  }) => {
+    await mockPerson(page);
+    await page.goto('/@alice.test');
+    const talks = page.getByRole('region', { name: 'Talks' });
+    await expect(talks).toBeVisible();
+    // Every card holds at most one link.
+    const perCard = await talks
+      .locator('[data-card]')
+      .evaluateAll((cards) =>
+        cards.map((card) => card.querySelectorAll('a').length)
+      );
+    expect(perCard.length).toBeGreaterThan(1);
+    expect(Math.max(...perCard)).toBeLessThanOrEqual(1);
+    const links = talks.locator('[data-card] a');
+    const count = await links.count();
+    expect(count).toBeGreaterThan(1);
+    await links.first().focus();
+    for (let index = 1; index < count; index += 1) {
+      await page.keyboard.press('Tab');
+      await expect(links.nth(index)).toBeFocused();
+    }
+    const outline = await links.first().evaluate((link) => {
+      (link as HTMLElement).focus();
+      return getComputedStyle(link.closest('[data-card]')!).outlineStyle;
+    });
+    expect(outline).not.toBe('none');
+  });
+});

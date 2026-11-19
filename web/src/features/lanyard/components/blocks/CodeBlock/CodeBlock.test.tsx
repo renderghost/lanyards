@@ -26,4 +26,21 @@ describe('CodeBlock', () => {
       screen.getByText('Tools for conference lanyards')
     ).toBeInTheDocument();
   });
+
+  it('is a card opening the repository, with one link', () => {
+    renderWithProviders(
+      <CodeBlock
+        items={[
+          {
+            key: 'r',
+            name: 'lanyards',
+            url: 'https://tangled.org/ada/lanyards',
+            description: 'A lanyard for conferences',
+          },
+        ]}
+      />
+    );
+    expect(document.querySelectorAll('[data-card]')).toHaveLength(1);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
 });

@@ -59,4 +59,20 @@ describe('TalksBlock', () => {
       'line-clamp-2'
     );
   });
+
+  it('is a card: a talk with a page opens it; one without has no link', () => {
+    renderWithProviders(
+      <TalksBlock
+        items={[
+          { key: 'a', title: 'With page', url: 'https://talks.example/a' },
+          { key: 'b', title: 'Without page', eventName: 'Example Conf' },
+        ]}
+      />
+    );
+    const cards = [...document.querySelectorAll('[data-card]')];
+    expect(cards).toHaveLength(2);
+    expect(cards[0]!.querySelectorAll('a')).toHaveLength(1);
+    expect(cards[1]!.querySelectorAll('a')).toHaveLength(0);
+    expect(cards[1]).not.toHaveClass('cursor-pointer');
+  });
 });

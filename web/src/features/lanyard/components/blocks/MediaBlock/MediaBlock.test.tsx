@@ -32,4 +32,26 @@ describe('MediaBlock', () => {
       screen.getByRole('link', { name: 'youtube.com (opens in a new tab)' })
     ).toBeInTheDocument();
   });
+
+  it('is a card opening the media in a new tab, with one link', () => {
+    renderWithProviders(
+      <MediaBlock
+        items={[
+          {
+            key: 'm',
+            kind: 'audio',
+            url: 'https://pod.example/1',
+            platform: 'spotify',
+            title: 'Episode one',
+          },
+        ]}
+      />
+    );
+    expect(document.querySelectorAll('[data-card]')).toHaveLength(1);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.getByRole('link', { name: /Episode one/ })).toHaveAttribute(
+      'target',
+      '_blank'
+    );
+  });
 });

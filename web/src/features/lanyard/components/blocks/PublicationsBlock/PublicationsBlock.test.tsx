@@ -33,4 +33,27 @@ describe('PublicationsBlock', () => {
     expect(screen.getByText('Unverified work')).toBeInTheDocument();
     await expectNoAxeViolations(container);
   });
+
+  it('is a card opening its DOI, with one link', () => {
+    renderWithProviders(
+      <PublicationsBlock
+        items={[
+          {
+            key: 'p',
+            title: 'A paper',
+            doi: '10.1234/x',
+            venue: 'Journal',
+            year: '2024',
+            orcidVerified: true,
+          },
+        ]}
+      />
+    );
+    expect(document.querySelectorAll('[data-card]')).toHaveLength(1);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.getByRole('link', { name: /A paper/ })).toHaveAttribute(
+      'href',
+      'https://doi.org/10.1234/x'
+    );
+  });
 });

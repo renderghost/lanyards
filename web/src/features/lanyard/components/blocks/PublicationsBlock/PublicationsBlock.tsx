@@ -1,15 +1,15 @@
 import { useLingui } from '@lingui/react/macro';
 import { BadgeCheck } from 'lucide-react';
 
-import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { CardItem } from '../CardItem/CardItem';
+import { CardLink } from '../CardLink/CardLink';
 import { itemTitle } from '../itemTitle';
 import * as styles from './PublicationsBlock.styles';
 import type { PublicationsBlockProps } from './PublicationsBlock.types';
 
-/** Publications from ORCID and Sifa, with a tick for verified ORCID works. */
+/** Publications, as cards opening their DOI or page (#122). */
 export function PublicationsBlock({
   items,
   className,
@@ -22,20 +22,16 @@ export function PublicationsBlock({
           publication.url ??
           (publication.doi ? `https://doi.org/${publication.doi}` : undefined);
         return (
-          <li key={publication.key} className={styles.item}>
-            <ItemFrame
+          <li key={publication.key}>
+            <CardItem
               itemKey={publication.key}
               title={itemTitle('publications', publication, i18n)}
             >
               <div className={styles.heading}>
                 {href ? (
-                  <ExternalLink
-                    tone="accent"
-                    href={href}
-                    className={styles.title}
-                  >
+                  <CardLink href={href} className={styles.title}>
                     {publication.title}
-                  </ExternalLink>
+                  </CardLink>
                 ) : (
                   <p className={styles.title}>{publication.title}</p>
                 )}
@@ -57,7 +53,7 @@ export function PublicationsBlock({
                   .filter(Boolean)
                   .join(' · ')}
               </p>
-            </ItemFrame>
+            </CardItem>
           </li>
         );
       })}

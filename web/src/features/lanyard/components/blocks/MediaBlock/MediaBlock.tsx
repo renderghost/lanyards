@@ -1,16 +1,19 @@
 import { useLingui } from '@lingui/react/macro';
 
-import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { hostOf } from '@/lib/normalise';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { CardItem } from '../CardItem/CardItem';
+import { CardLink } from '../CardLink/CardLink';
 import { itemTitle } from '../itemTitle';
 import { PLATFORM_LABELS, TYPE_LABELS } from './MediaBlock.constants';
 import * as styles from './MediaBlock.styles';
 import type { MediaBlockProps } from './MediaBlock.types';
 
-/** Podcasts, videos and interviews from the person's Lanyards records. */
+/**
+ * Podcasts, videos and interviews from the person's Lanyards records, as
+ * cards opening each in a new tab (#122).
+ */
 export function MediaBlock({ items, className }: MediaBlockProps) {
   const { i18n } = useLingui();
   const label = (labels: typeof TYPE_LABELS, value?: string) => {
@@ -25,22 +28,18 @@ export function MediaBlock({ items, className }: MediaBlockProps) {
           label(PLATFORM_LABELS, media.platform),
         ].filter(Boolean);
         return (
-          <li key={media.key} className={styles.item}>
-            <ItemFrame
+          <li key={media.key}>
+            <CardItem
               itemKey={media.key}
               title={itemTitle('media', media, i18n)}
             >
-              <ExternalLink
-                tone="accent"
-                href={media.url}
-                className={styles.title}
-              >
+              <CardLink href={media.url} className={styles.title}>
                 {media.title ?? hostOf(media.url)}
-              </ExternalLink>
+              </CardLink>
               {meta.length > 0 && (
                 <p className={styles.meta}>{meta.join(' · ')}</p>
               )}
-            </ItemFrame>
+            </CardItem>
           </li>
         );
       })}
