@@ -48,6 +48,11 @@ export type LinkItem = {
   title: string;
   platform: Platform;
   iconUrl?: string;
+  /**
+   * The Lanyards web-link record this link comes from, which the owner can
+   * edit. Links only from Sifa or Bluesky have none.
+   */
+  ownKey?: string;
 };
 
 export type PublicationItem = {

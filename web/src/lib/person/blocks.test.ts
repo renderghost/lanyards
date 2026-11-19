@@ -19,7 +19,7 @@ import {
   orphanedHiddenKeys,
 } from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
-import type { SourceSnapshot } from './personView.types';
+import type { LinkItem, SourceSnapshot } from './personView.types';
 
 // Counted, to keep hiddenItems' cost in step with the list's length.
 vi.mock('@/lib/normalise', async (importOriginal) => {
@@ -199,6 +199,7 @@ describe('composeBlocks: links', () => {
           title: "Ada's site",
           platform: 'website',
           iconUrl: 'https://cdn.bsky.app/icon-site',
+          ownKey: `at://${ADA.did}/app.lanyards.link.web/1`,
         },
         {
           key: 'https://github.com/ada-example',
@@ -212,6 +213,7 @@ describe('composeBlocks: links', () => {
           url: 'https://ada.example/cv',
           title: 'CV',
           platform: 'website',
+          ownKey: `at://${ADA.did}/app.lanyards.link.web/2`,
         },
         {
           key: 'https://orcid.org/0000-0002-1825-0097',
@@ -620,5 +622,18 @@ describe('hiddenItems at scale', () => {
     expect(found).toHaveLength(200);
     // Was one call per hidden key per candidate: thousands.
     expect(vi.mocked(normaliseUrl).mock.calls.length).toBeLessThan(1000);
+  });
+});
+
+describe('mergeLinks: own links', () => {
+  it('marks Lanyards’ own links with ownKey', () => {
+    const [links] = compose(showOnly(['links']));
+    const items = (links?.status === 'ready' ? links.items : []) as LinkItem[];
+    const own = items.find((item) => item.url.includes('ada.example/cv'));
+    expect(own).toMatchObject({
+      ownKey: `at://${ADA.did}/app.lanyards.link.web/2`,
+    });
+    const fromSifa = items.find((item) => item.url.includes('mastodon'));
+    expect(fromSifa).not.toHaveProperty('ownKey');
   });
 });

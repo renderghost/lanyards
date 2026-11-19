@@ -81,6 +81,8 @@ function mergeLinks(values: Values): LinkItem[] {
     rank: number;
     hint?: string;
     iconUrl?: string;
+    /** The Lanyards web-link record it comes from. */
+    ownKey?: string;
   };
   const candidates: Candidate[] = [
     ...(values.bluesky?.links ?? []).map((link) => ({
@@ -93,6 +95,7 @@ function mergeLinks(values: Values): LinkItem[] {
       url: link.url,
       title: link.title,
       rank: 0,
+      ownKey: link.key,
     })),
     ...(values.sifa?.externalAccounts ?? []).map((account) => ({
       url: account.url,
@@ -104,7 +107,13 @@ function mergeLinks(values: Values): LinkItem[] {
 
   const merged = new Map<
     string,
-    { url: string; titles: Candidate[]; hint?: string; iconUrl?: string }
+    {
+      url: string;
+      titles: Candidate[];
+      hint?: string;
+      iconUrl?: string;
+      ownKey?: string;
+    }
   >();
   for (const candidate of candidates) {
     const key = normaliseUrl(candidate.url);
@@ -113,6 +122,7 @@ function mergeLinks(values: Values): LinkItem[] {
     entry.titles.push(candidate);
     entry.hint ??= candidate.hint;
     entry.iconUrl ??= candidate.iconUrl;
+    entry.ownKey ??= candidate.ownKey;
     merged.set(key, entry);
   }
 
@@ -126,6 +136,7 @@ function mergeLinks(values: Values): LinkItem[] {
       title: titled?.title ?? hostOf(entry.url),
       platform: detectPlatform(entry.url, entry.hint),
       ...(entry.iconUrl ? { iconUrl: entry.iconUrl } : {}),
+      ...(entry.ownKey ? { ownKey: entry.ownKey } : {}),
     };
   });
 }
