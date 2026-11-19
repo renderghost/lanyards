@@ -25,7 +25,7 @@
   - Axe passes in light and dark, and keyboard reordering keeps its announcements.
 - **Bundle:** the public lanyard routes stay ≤ 200 KB of gzipped initial JS (`npm run size`). Radix Accordion/ToggleGroup/Dialog-as-sheet and dnd-kit may only be imported by `/lanyard` code.
 - **Settings save:** keep #114's `swapRecord`, the three-way `mergeConfig` and the stable failure-toast id (`lanyard-settings-save`).
-- **Feed blocks** (`bskyPosts`, `blogPosts`, `code`, `collections`) keep an item count. Every other block shows all records that aren't hidden, and any stored `limit` on them is ignored.
+- **Counted blocks** (`bskyPosts`, `blogPosts`, `code`, `collections`, `publications`) keep an item count. Every other block (Sifa blocks, Links, Media) shows all records that aren't hidden, and any stored `limit` on them is ignored.
 - **Colours:**
   - brand primary for chrome: `#4020DF` (the existing `--color-purple-vivid-500`);
   - unsaved dot: amber.
@@ -218,20 +218,23 @@
     saving: boolean;
     onSave(): void;
     onReset(): void;
-    onOpenStyle?(): void;
   }
   ```
 
   - The ToggleGroup is labelled "Preview mode", with options "Edit" and "View as public".
   - The status is a `role="status"` paragraph: "Unsaved changes" (with an amber dot) or "All changes saved".
   - Reset (secondary) and Save (primary, `loading={saving}`) are `aria-disabled` when not dirty.
-  - A "Style" Button shows only below `md` (`md:hidden`) and calls `onOpenStyle`.
   - Reset asks `window.confirm("Discard your unsaved changes?")` when `changes > 1`.
+  - From `md` up it also shows `ShowQrButton` and the account link (avatar → `/settings`), as the app header does today.
+  - Below `md`, it shows only the toggle (options "Edit" and "Public") and Save. The rest moves to `CustomiserToolbar`.
+- `CustomiserToolbarProps = { onOpenStyle(): void; onReset(): void; dirty: boolean; changes: number }`, a phone-only (`md:hidden`) bottom toolbar (`role="toolbar"`, labelled "Customiser") with Style, Reset (same confirm rule) and `ShowQrButton`.
+- File: `web/src/features/lanyard/customise/CustomiserToolbar/` (4 files and a test).
 
 - [ ] **Step 1: Write the failing tests:**
   - AppHeader: "renders a title and actions when given".
   - Root: "a route with ownHeader shows only its own header": one `banner` landmark on `/lanyard`.
-  - CustomiserActions: toggle `aria-pressed`; the status text in both states; Save and Reset unavailable when clean; Save calls `onSave`; Reset with `changes` 2 and confirm false doesn't call `onReset`, while confirm true does; axe.
+  - CustomiserActions: toggle `aria-pressed`; the status text in both states; Save and Reset unavailable when clean; Save calls `onSave`; Reset with `changes` 2 and confirm false doesn't call `onReset`, while confirm true does; it shows Show QR and the account link; axe.
+  - CustomiserToolbar: a toolbar named "Customiser" with Style, Reset and Show QR; axe.
 - [ ] **Step 2: Run.** Expected: FAIL.
 - [ ] **Step 3: Implement.**
 - [ ] **Step 4: Run.** Expected: PASS.
@@ -302,15 +305,16 @@
 - Test: `web/src/lib/person/blocks.test.ts`, `web/src/lib/person/config.test.ts`
 
 **Interfaces:**
-- `config.ts`: `export const FEED_BLOCKS: ReadonlySet<RenderableBlockType>` (`bskyPosts`, `blogPosts`, `code`, `collections`).
-- `itemLimit(block)` returns `Infinity` for non-feed blocks.
+- `config.ts`: `export const COUNTED_BLOCKS: ReadonlySet<RenderableBlockType>` (`bskyPosts`, `blogPosts`, `code`, `collections`, `publications`).
+- `itemLimit(block)` returns `Infinity` for uncounted blocks.
+- `blocks.ts`: `orphanedHiddenKeys(input: ComposeInput): string[]`, the keys of `hiddenItems(input)` whose reason is `'gone'` (#114's reasons).
 - `blocks.ts`: `composeEditorBlocks(input: ComposeInput): EditorBlock[]`:
 
   ```ts
   export type EditorBlock = {
     type: RenderableBlockType;
     visible: boolean;
-    /** For feed blocks only. */
+    /** For counted blocks only. */
     limit?: number;
     status: BlockStatus['status'];
     items: { item: BlockItem; hidden: boolean }[];
@@ -319,11 +323,12 @@
   ```
 
   - It covers every block in config order, hidden ones included, with every item (hidden ones flagged).
-  - Feeds are cut to `limit` among non-hidden items, with hidden items kept in place.
+  - Counted blocks are cut to `limit` among non-hidden items, with hidden items kept in place.
 
 - [ ] **Step 1: Write the failing tests:**
   - "shows every talk, whatever limit was stored": config Talks `limit: 1` with two talks → both composed (public `composeBlocks`).
-  - "feeds still stop at their count": bskyPosts `limit: 2` with 3 posts → 2.
+  - "counted blocks still stop at their count": bskyPosts `limit: 2` with 3 posts → 2, and publications likewise.
+  - "orphanedHiddenKeys lists only entries that are gone": a deleted record's key is listed; a key in a failed or switched-off block isn't.
   - "composeEditorBlocks keeps hidden blocks and flags hidden items": a hidden Talks block → `visible: false`; a hidden link → `hidden: true`, in its original position.
 - [ ] **Step 2: Run.** Expected: FAIL.
 - [ ] **Step 3: Implement.**
@@ -372,17 +377,19 @@
   }
   ```
 
-  It holds a drag handle ("Reorder {name}"), "Move {name} up/down" (`aria-disabled` at the ends), `Switch` "Show {name}", and a "Show N" select for feeds (`LIMIT_OPTIONS`).
+  It holds a drag handle ("Reorder {name}"), "Move {name} up/down" (`aria-disabled` at the ends), `Switch` "Show {name}", and a "Show N" select for counted blocks (`LIMIT_OPTIONS`).
 - `EditableBlockProps = { block: EditorBlock; profile: string; ... BlockBarProps handlers }`.
   - Visible: the bar above a `BlockSection` with the block's items.
   - Hidden: only the bar, with `opacity-60 border-dashed` and the label "Hidden from visitors".
 - `LanyardEditorProps = { did: Did; config: LanyardConfig; onChange(patch): void; disabled: boolean }`. It renders BadgeHero (`headingLevel={2}`), then a `SortableContext` of EditableBlocks, inside an `ItemActionsContext` whose `isHidden` and `renderToggle` read and write `config.hidden`.
+- At the end, while `orphanedHiddenKeys` is non-empty, it shows "{n} hidden items are no longer on your lanyard" with a "Clear" Button that removes those keys from `config.hidden`.
 
 - [ ] **Step 1: Write the failing tests** (moving today's BlockEditor tests here):
   - "moves a block with Move down and announces it";
   - "keeps focus on Move down after moving";
   - "hiding a block collapses it in place and keeps focus on its switch" (Review Focus 3);
-  - "a feed block offers Show N; Talks doesn't";
+  - "a counted block offers Show N; Talks doesn't";
+  - "Clear removes hidden entries that are no longer on the lanyard";
   - "hiding a record marks it Hidden in place";
   - axe.
 - [ ] **Step 2: Run.** Expected: FAIL.
@@ -398,14 +405,15 @@
 - Modify: `web/src/app/customise.test.tsx`, `web/e2e/customise.spec.ts`
 
 **Interfaces:**
-- Consumes: Tasks 9–11. `hiddenItems()` in `blocks.ts` loses its last caller: delete it, its types and its tests.
+- Consumes: Tasks 9–11. Keep `hiddenItems()` in `blocks.ts`: `orphanedHiddenKeys` uses it.
 
 - [ ] **Step 1: Update the e2e tests:**
   - "moves a block with Move down and saves the order on Save";
   - "reorders blocks with the keyboard alone" (announcements kept);
   - "hides a block in place and saves it";
   - "hides a record in place, then shows it again";
-  - "changes a feed's count".
+  - "changes a counted block's count";
+  - "clears hidden entries that are no longer on the lanyard".
 - [ ] **Step 2: Run.** Expected: FAIL.
 - [ ] **Step 3: Implement** the wiring and deletions; run `npm run i18n:extract`.
 - [ ] **Step 4: Run** the full verification, e2e and `npm run size`. Expected: PASS, with the public routes ≤ 200 KB.

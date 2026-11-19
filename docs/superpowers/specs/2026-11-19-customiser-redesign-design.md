@@ -69,7 +69,8 @@ lanyard itself (which keeps its own branded look).
     `aria-pressed`), the save status ("Unsaved changes" with a dot, or "All
     changes saved", in a live region), **Reset** (secondary) and **Save**
     (primary, brand violet), both unavailable when nothing has changed, then
-    the account menu.
+    **Show QR** and the account link (to Settings), as today. There is no
+    new account menu.
 - **Sidebar (about 300 px, pinned left, full height under the top bar):**
   - a "Style" heading and two accordion sections, each a heading with a
     disclosure button (`aria-expanded`, `aria-controls`);
@@ -83,10 +84,12 @@ lanyard itself (which keeps its own branded look).
   hidden blocks and records aren't shown, so the canvas shows exactly what
   visitors see. A short note says so. Save and Reset stay in the top bar.
 - **Phones (below about 768 px):**
-  - the top bar keeps the toggle ("Edit" / "Public"), Reset and Save;
-  - the lanyard fills the screen;
-  - a "Style" button opens the same accordion in a bottom sheet (a modal
-    dialog with a title, a close button, and focus moved in and back).
+  - the top bar keeps the logo, the toggle ("Edit" / "Public") and Save;
+  - a bottom toolbar holds **Style**, **Reset** and **Show QR** (owner
+    decision);
+  - the lanyard fills the screen between them;
+  - Style opens the same accordion in a bottom sheet (a modal dialog with a
+    title, a close button, and focus moved in and back).
 
 ### Blocks (option A: block bars)
 
@@ -116,8 +119,16 @@ lanyard itself (which keeps its own branded look).
   blocks are ignored from now on.
 - **Feed blocks keep a count:** Posts on Bluesky, Blog posts, Code and
   Collections can run long and don't come from Sifa, so each keeps a "Show N"
-  control in its bar (owner decision). Records in feeds can still be hidden
-  one by one.
+  control in its bar (owner decision). **Publications** also keeps a count,
+  because it pulls every work from ORCID (owner decision). Records in counted
+  blocks can still be hidden one by one. Podcasts and videos (the owner's own
+  records) and every other block show everything.
+- **Hidden entries that can't be shown in place:** records that were deleted,
+  or feed items older than those fetched, still sit in the hidden list and
+  count towards its 500 limit. In edit mode, a line at the end of the lanyard
+  says "3 hidden items are no longer on your lanyard" with **Clear**, which
+  removes them from the draft (owner decision). Nothing is dropped
+  silently.
 
 ### Editing kept records in place
 
@@ -187,7 +198,7 @@ lanyard itself (which keeps its own branded look).
 | PR | Contents |
 |---|---|
 | **1. Design language** | Tokens, primitives, and the restyle of all chrome screens (no behaviour change) |
-| **2. Customiser shell** | Pinned sidebar with accordion; canvas; top bar toggle; draft model with Save/Reset/leave-guard for **settings**; View as public; phone bottom sheet |
+| **2. Customiser shell** | Pinned sidebar with accordion; canvas; top bar toggle; draft model with Save/Reset/leave-guard for **settings**; View as public; phone bottom sheet and toolbar. Until PR 4, the existing kept-record forms sit below the lanyard and still save at once (owner accepted this short mixed period) |
 | **3. Blocks in place** | Block bars; hidden blocks collapsed in place; per-record show/hide; feed counts; ignoring stored limits on other blocks; removing the old block editor, item menu and hidden-items list |
 | **4. Records in place** | Links, media and honorific edited in place as draft changes; ORCID helper in Publications; removing the old forms beside the preview |
 
@@ -213,7 +224,12 @@ floating toolbar on the focused block) for discoverability and touch.
 - A draft until Save, for settings and kept records alike.
 - A bottom sheet on phones.
 - The new design language for all app chrome; the lanyard keeps its look.
-- No count on Sifa blocks; a count only on feed blocks.
+- No count on Sifa blocks or media; a count on feed blocks and
+  Publications.
+- Show QR and the account link stay in the top bar; on phones, Style, Reset
+  and Show QR sit in a bottom toolbar.
+- The interim of mixed saving in PRs 2–3 is acceptable.
+- Orphaned hidden entries get a "Clear" line.
 - The look in the mockups is the right direction.
 
 ## My calls (correctable)
