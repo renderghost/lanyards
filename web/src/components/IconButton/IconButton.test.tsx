@@ -3,9 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
+import { hitHeight } from '@/test/hitArea';
+import { cn } from '@/lib/utils';
 import { renderWithProviders } from '@/test/render';
 
 import { IconButton } from './IconButton';
+import * as styles from './IconButton.styles';
 
 const ICON = <svg data-testid="icon" />;
 
@@ -39,6 +42,12 @@ describe('IconButton', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: 'Move up' }));
     expect(onClick).toHaveBeenCalledOnce();
+  });
+
+  it('has a hit area at least 44px tall', () => {
+    expect(
+      hitHeight(cn(styles.base, styles.variants.outline))
+    ).toBeGreaterThanOrEqual(44);
   });
 
   it('has no axe violations', async () => {

@@ -4,9 +4,11 @@ import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
+import { hitHeight } from '@/test/hitArea';
 import { renderWithProviders } from '@/test/render';
 
 import { ToggleGroup } from './ToggleGroup';
+import * as styles from './ToggleGroup.styles';
 
 type Mode = 'edit' | 'public';
 
@@ -48,12 +50,12 @@ describe('ToggleGroup', () => {
     expect(option('Edit')).toHaveAttribute('aria-pressed', 'false');
   });
 
-  it('is one tab stop, and the arrow keys move between options', async () => {
+  it('puts every option in the tab order, pressed with Enter', async () => {
     const onChange = vi.fn();
     renderWithProviders(<Harness onChange={onChange} />);
     await userEvent.tab();
     expect(option('Edit')).toHaveFocus();
-    await userEvent.keyboard('{ArrowRight}');
+    await userEvent.tab();
     expect(option('View as public')).toHaveFocus();
     expect(onChange).not.toHaveBeenCalled();
     await userEvent.keyboard('{Enter}');
@@ -66,6 +68,10 @@ describe('ToggleGroup', () => {
     await userEvent.click(option('Edit'));
     expect(onChange).not.toHaveBeenCalled();
     expect(option('Edit')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('has a hit area at least 44px tall', () => {
+    expect(hitHeight(styles.item)).toBeGreaterThanOrEqual(44);
   });
 
   it('has no axe violations', async () => {

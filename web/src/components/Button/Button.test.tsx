@@ -1,10 +1,13 @@
 import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { cn } from '@/lib/utils';
 import { expectNoAxeViolations } from '@/test/axe';
+import { hitHeight } from '@/test/hitArea';
 import { renderWithProviders } from '@/test/render';
 
 import { Button } from './Button';
+import { base, sizes, tones } from './Button.styles';
 
 describe('Button', () => {
   it('meets the 44px minimum touch target at the default size', () => {
@@ -35,12 +38,27 @@ describe('Button', () => {
     expect(button.className).not.toContain('bg-ui-primary');
   });
 
-  it('is 36px tall at the small size, with a 44px hit area', () => {
+  it('is 36px tall at the small size', () => {
     renderWithProviders(<Button size="sm">Reset</Button>);
-    const { className } = screen.getByRole('button', { name: 'Reset' });
-    expect(className).toContain('min-h-9');
-    expect(className).toContain('before:-inset-y-1');
+    expect(screen.getByRole('button', { name: 'Reset' }).className).toContain(
+      'min-h-9'
+    );
   });
+
+  it.each(
+    (['ui', 'accent'] as const).flatMap((tone) =>
+      (['primary', 'secondary', 'ghost'] as const).flatMap((variant) =>
+        (['sm', 'md', 'lg'] as const).map((size) => ({ tone, variant, size }))
+      )
+    )
+  )(
+    'has a hit area at least 44px tall ($tone $variant $size)',
+    ({ tone, variant, size }) => {
+      expect(
+        hitHeight(cn(base, tones[tone][variant], sizes[size]))
+      ).toBeGreaterThanOrEqual(44);
+    }
+  );
 
   it('is unavailable and marked busy while loading, keeping focus', () => {
     const onClick = vi.fn();

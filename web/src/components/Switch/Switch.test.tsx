@@ -3,9 +3,11 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
+import { hitHeight } from '@/test/hitArea';
 import { renderWithProviders } from '@/test/render';
 
 import { Switch } from './Switch';
+import * as styles from './Switch.styles';
 
 describe('Switch', () => {
   it('is a switch named by its label, whose state follows checked', () => {
@@ -46,6 +48,10 @@ describe('Switch', () => {
     expect(toggle).toBeDisabled();
     await userEvent.click(toggle);
     expect(onCheckedChange).not.toHaveBeenCalled();
+  });
+
+  it('has a hit area at least 44px tall', () => {
+    expect(hitHeight(styles.root)).toBeGreaterThanOrEqual(44);
   });
 
   it('has no axe violations', async () => {

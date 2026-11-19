@@ -4,12 +4,12 @@ import * as styles from './ToggleGroup.styles';
 import type { ToggleGroupProps } from './ToggleGroup.types';
 
 /**
- * A named group of toggle buttons where exactly one is pressed: one tab
- * stop, arrow keys between options, Enter or Space to press.
+ * A named group of toggle buttons where exactly one is pressed. Each option
+ * is its own tab stop, pressed with Enter or Space.
  *
  * Radix exposes single-choice groups as radios, but its arrow keys only move
  * focus, which radios never do; plain pressed/unpressed buttons describe
- * what actually happens (spec #118).
+ * what actually happens (spec #118), and like any buttons each takes Tab.
  */
 export function ToggleGroup<T extends string>({
   value,
@@ -28,6 +28,7 @@ export function ToggleGroup<T extends string>({
       }}
       role="group"
       aria-label={label}
+      rovingFocus={false}
       className={styles.root}
     >
       {options.map((option) => (
