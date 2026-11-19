@@ -69,7 +69,7 @@ msgstr "Account unavailable"
 msgid "Add a podcast or video"
 msgstr "Add a podcast or video"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:196
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:200
 msgid "Add media"
 msgstr "Add media"
 
@@ -129,7 +129,7 @@ msgstr "Bluesky isn't answering right now. Check your connection and try again."
 msgid "Board positions"
 msgstr "Board positions"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:200
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:204
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -146,7 +146,7 @@ msgid "Checking your ORCID iD…"
 msgstr "Checking your ORCID iD…"
 
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:68
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:157
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:161
 msgid "Choose a platform"
 msgstr "Choose a platform"
 
@@ -154,7 +154,7 @@ msgstr "Choose a platform"
 msgid "Clear"
 msgstr "Clear"
 
-#: src/components/Dialog/Dialog.tsx:62
+#: src/components/Dialog/Dialog.tsx:63
 #: src/components/Sheet/Sheet.tsx:58
 #: src/features/qr/components/QrSheet/QrSheet.tsx:71
 msgid "Close"
@@ -256,7 +256,7 @@ msgstr "Customiser"
 msgid "Delete {title}"
 msgstr "Delete {title}"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:177
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:181
 msgid "Description"
 msgstr "Description"
 
@@ -422,7 +422,7 @@ msgstr "Keep the title to 200 characters or fewer"
 msgid "Keynote"
 msgstr "Keynote"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:186
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:190
 msgid "Kind of content"
 msgstr "Kind of content"
 
@@ -517,7 +517,7 @@ msgstr "My lanyard"
 msgid "Not found"
 msgstr "Not found"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:188
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:192
 msgid "Not specified"
 msgstr "Not specified"
 
@@ -580,7 +580,7 @@ msgstr "Part-time roles"
 msgid "Picked up {name}, at position {position} of {total}."
 msgstr "Picked up {name}, at position {position} of {total}."
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:154
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:158
 msgid "Platform"
 msgstr "Platform"
 
@@ -823,7 +823,7 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:167
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:171
 msgid "Title"
 msgstr "Title"
 
@@ -848,7 +848,7 @@ msgstr "Tutorial"
 msgid "Twitch"
 msgstr "Twitch"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:122
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:126
 msgid "Type of media"
 msgstr "Type of media"
 
@@ -860,7 +860,7 @@ msgstr "Unfollowed @{handle}"
 msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:196
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:200
 msgid "Update"
 msgstr "Update"
 
@@ -928,7 +928,7 @@ msgstr "We couldn't load your profile."
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
-#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:141
+#: src/features/lanyard/customise/MediaForm/MediaForm.tsx:145
 msgid "Web address"
 msgstr "Web address"
 
