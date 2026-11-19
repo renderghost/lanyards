@@ -50,10 +50,12 @@ export function QrSheet({
             returnFocus();
           }}
         >
-          <Dialog.Title className={styles.title}>{name}</Dialog.Title>
-          <Dialog.Description className={styles.description}>
-            {t`Scan to see my lanyard`}
-          </Dialog.Description>
+          <div className={styles.heading}>
+            <Dialog.Title className={styles.title}>{name}</Dialog.Title>
+            <Dialog.Description className={styles.description}>
+              {t`Scan to see my lanyard`}
+            </Dialog.Description>
+          </div>
           <QrCode value={url} className={styles.code} />
           <div className={styles.actions}>
             <Button

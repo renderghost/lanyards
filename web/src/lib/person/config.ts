@@ -1,6 +1,7 @@
 import { ACCENTS, type Accent, DEFAULT_ACCENT } from '@/design/accents';
 import { LANYARDS_NSID, type BlockType } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
+import { tooLong } from '@/lib/validation';
 
 /** `events` needs the calendar adapter (Slice 2), so it never renders yet. */
 export type RenderableBlockType = Exclude<BlockType, 'events'>;
@@ -28,6 +29,47 @@ export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
 
 export const DEFAULT_ITEM_LIMIT = 3;
 export const MAX_LINKS = 20;
+
+const CONFIG_FIELDS = ['accent', 'showJob', 'blocks', 'hidden'] as const;
+
+/**
+ * A three-way merge of the customiser's settings, for when another device
+ * saved since `base` was read: each field this side changed from `base`
+ * takes this side's value, and every other field keeps `theirs`.
+ */
+export function mergeConfig(
+  base: LanyardConfig,
+  ours: LanyardConfig,
+  theirs: LanyardConfig
+): LanyardConfig {
+  const merged = { ...theirs };
+  for (const field of CONFIG_FIELDS) {
+    if (JSON.stringify(ours[field]) !== JSON.stringify(base[field])) {
+      Object.assign(merged, { [field]: ours[field] });
+    }
+  }
+  return merged;
+}
+
+/** The lexicon's limits on hidden items: how many, and each key's bytes. */
+export const MAX_HIDDEN = 500;
+const MAX_HIDDEN_KEY_BYTES = 2048;
+
+export type HideProblem = 'tooMany' | 'tooLong';
+
+/**
+ * Why `key` can't join the hidden items, or null when it can. A record
+ * past the lexicon's limits would fail every later save.
+ */
+export function hideProblem(
+  config: Pick<LanyardConfig, 'hidden'>,
+  key: string
+): HideProblem | null {
+  if (config.hidden.includes(key)) return null;
+  if (tooLong(key, MAX_HIDDEN_KEY_BYTES)) return 'tooLong';
+  if (config.hidden.length >= MAX_HIDDEN) return 'tooMany';
+  return null;
+}
 
 export type BlockConfig = {
   type: RenderableBlockType;

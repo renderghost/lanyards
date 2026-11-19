@@ -3,6 +3,7 @@ import { useEffect, useId, useRef } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { itemTitle } from '@/features/lanyard/components/blocks/itemTitle';
+import { BLOCK_HEADINGS } from '@/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants';
 import type { HiddenItem } from '@/lib/person/blocks';
 import { cn } from '@/lib/utils';
 
@@ -47,10 +48,23 @@ export function HiddenItems({
     onFocused?.();
   }, [focusKey, items, onFocused]);
 
-  const titleOf = (entry: HiddenItem) =>
-    'item' in entry
-      ? itemTitle(entry.type, entry.item as never, i18n)
-      : t`An item that is no longer available`;
+  const titleOf = (entry: HiddenItem): string => {
+    if ('item' in entry) {
+      return itemTitle(entry.type, entry.item as never, i18n);
+    }
+    if (!entry.type) return t`An item that is no longer available`;
+    const block = i18n._(BLOCK_HEADINGS[entry.type]);
+    switch (entry.reason) {
+      case 'off':
+        return t`An item in ${block}, which is switched off`;
+      case 'failed':
+        return t`An item in ${block}, which didn't load`;
+      case 'loading':
+        return t`An item in ${block}, still loading`;
+      case 'gone':
+        return t`An item in ${block} that is no longer available`;
+    }
+  };
 
   return (
     <section

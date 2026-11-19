@@ -4,6 +4,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
+import { notify } from '@/components/Toaster/notify';
 import { PermissionNotice } from '@/features/auth/components/PermissionNotice/PermissionNotice';
 import { useSession } from '@/features/auth/session/useSession';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -11,6 +12,7 @@ import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
 import { profileId } from '@/lib/atproto/profileId';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { BLOCK_SOURCES } from '@/lib/person/blocks';
+import { hideProblem } from '@/lib/person/config';
 import { usePersonView } from '@/lib/person/usePersonView';
 import { cn } from '@/lib/utils';
 
@@ -116,7 +118,7 @@ function Customiser({
         canWrite(granted, collection, 'create') &&
         canWrite(granted, collection, 'delete')
     );
-  const { update } = lanyard;
+  const { update, config } = lanyard;
 
   const itemActions = useMemo<ItemActions | null>(
     () =>
@@ -126,18 +128,28 @@ function Customiser({
               <ItemMenu
                 title={title}
                 onHide={() => {
-                  update((config) =>
-                    config.hidden.includes(itemKey)
-                      ? config
-                      : { ...config, hidden: [...config.hidden, itemKey] }
+                  const problem = hideProblem(config, itemKey);
+                  if (problem) {
+                    notify.error(
+                      problem === 'tooMany'
+                        ? t`You can hide up to 500 items. Show some again first.`
+                        : t`This item can't be hidden.`
+                    );
+                    return false;
+                  }
+                  update((current) =>
+                    current.hidden.includes(itemKey)
+                      ? current
+                      : { ...current, hidden: [...current.hidden, itemKey] }
                   );
                   setJustHidden(itemKey);
+                  return true;
                 }}
               />
             ),
           }
         : null,
-    [viewAs, disabled, update]
+    [viewAs, disabled, update, config, t]
   );
 
   return (

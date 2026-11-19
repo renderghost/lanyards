@@ -13,11 +13,17 @@ import {
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { captureError, track } from '@/lib/analytics/analytics';
-import { putRecord, type WriteSession } from '@/lib/atproto/writes';
+import {
+  putRecord,
+  RecordChangedError,
+  type Reference,
+  type WriteSession,
+} from '@/lib/atproto/writes';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
 import {
   type LanyardConfig,
+  mergeConfig,
   resolveConfig,
   serialiseConfig,
 } from '@/lib/person/config';
@@ -28,6 +34,9 @@ import type { LanyardConfigRecord } from '@/lib/sources/lanyards/lanyards.types'
 
 /** Changes this close together are saved as one write (spec §7.4). */
 export const SAVE_DELAY_MS = 800;
+
+/** One failure toast, however many saves fail in a row. */
+const SAVE_FAILED_TOAST = 'lanyard-settings-save';
 
 type RecordValue = Record<string, unknown>;
 
@@ -106,6 +115,13 @@ export function useLanyardConfig(): UseLanyardConfig {
   const unsaved = useRef<RecordValue | null>(null);
   /** The record as the server last returned or confirmed it. */
   const server = useRef<LanyardConfigRecord | null | undefined>(undefined);
+  /**
+   * The stored version the unsaved changes were built on: its CID (null
+   * when there was no record) and value, for swapping and merging.
+   */
+  const base = useRef<{ cid: string | null; value: unknown } | undefined>(
+    undefined
+  );
   const mounted = useRef(true);
   // Read when a save runs or a change arrives, so both use the latest
   // session and load state. Kept current before any event can fire.
@@ -164,16 +180,75 @@ export function useLanyardConfig(): UseLanyardConfig {
       try {
         const current = latest.current.writer;
         if (!current) throw new Error('Not signed in');
-        const { $type: _type, ...fields } = changes;
-        const reference = await putRecord(
-          current,
-          LANYARDS_NSID.lanyard,
-          'self',
-          { ...fields, updatedAt: new Date().toISOString() }
-        );
-        server.current = { value: changes, cid: reference.cid, valid: true };
-        if (unsaved.current === changes) unsaved.current = null;
+        // Replaces only the stored version the record was built on.
+        const send = (
+          value: RecordValue,
+          swapRecord: string | null | undefined
+        ) => {
+          const { $type: _type, ...fields } = value;
+          return putRecord(
+            current,
+            LANYARDS_NSID.lanyard,
+            'self',
+            { ...fields, updatedAt: new Date().toISOString() },
+            swapRecord === undefined ? {} : { swapRecord }
+          );
+        };
+        let record = changes;
+        let reference: Reference;
+        try {
+          reference = await send(changes, base.current?.cid);
+        } catch (cause) {
+          if (!(cause instanceof RecordChangedError)) throw cause;
+          // Another device saved the settings since this change was built
+          // on them. Merge: the settings changed here win, the rest come
+          // from that version, as does everything else it holds (such as
+          // per-event overrides). Then save once more.
+          const fresh = await fetchLanyardConfig(current.did);
+          if (!fresh.ok) throw cause;
+          server.current = fresh.value;
+          if (fresh.value?.valid === false) {
+            // Saved elsewhere in a form Lanyards can't read: show that,
+            // with its Reset, rather than a Retry that can never succeed.
+            unsaved.current = null;
+            queryClient.setQueryData<LanyardConfigRecord | null>(
+              key,
+              fresh.value
+            );
+            setError(false);
+            notify.dismiss(SAVE_FAILED_TOAST);
+            return;
+          }
+          record = {
+            $type: LANYARDS_NSID.lanyard,
+            ...serialiseConfig(
+              mergeConfig(
+                resolveConfig(base.current?.value ?? null),
+                resolveConfig(changes),
+                resolveConfig(fresh.value?.value ?? null)
+              ),
+              fresh.value?.value ?? null,
+              new Date().toISOString()
+            ),
+          };
+          reference = await send(record, fresh.value?.cid ?? null);
+        }
+        server.current = { value: record, cid: reference.cid, valid: true };
+        if (unsaved.current === changes) {
+          unsaved.current = null;
+          // Show what's stored, with its CID, so a later visit builds on
+          // (and swaps against) this version.
+          queryClient.setQueryData<LanyardConfigRecord | null>(
+            key,
+            server.current
+          );
+        } else if (record === changes) {
+          // Later changes were built on what was just saved. (After a
+          // merge they weren't, so they keep the old base and merge too.)
+          base.current = { cid: reference.cid, value: record };
+        }
         setError(false);
+        notify.dismiss(SAVE_FAILED_TOAST);
         notify.success(t`Lanyard updated`);
         track('lanyard_updated');
       } catch (cause) {
@@ -184,16 +259,27 @@ export function useLanyardConfig(): UseLanyardConfig {
         }
         setError(true);
         notify.error(t`Failed to save. Please try again.`, {
+          id: SAVE_FAILED_TOAST,
           action: { label: t`Retry`, onClick: () => saveLater.current() },
         });
       } finally {
         setInFlight((count) => count - 1);
       }
     });
-  }, [t, restore]);
+  }, [t, restore, queryClient, key]);
 
   const schedule = useCallback(
     (value: RecordValue) => {
+      // A new run of changes builds on the stored version now shown.
+      if (!unsaved.current) {
+        base.current =
+          server.current === undefined
+            ? undefined
+            : {
+                cid: server.current?.cid || null,
+                value: server.current?.value ?? null,
+              };
+      }
       unsaved.current = value;
       show(value);
       setPending(true);

@@ -11,10 +11,12 @@ import {
   InvalidRecordError,
   MissingPermissionError,
   putRecord,
+  RecordChangedError,
   WRITABLE_COLLECTIONS,
 } from './writes';
 
 const NOW = '2026-11-10T09:00:00.000Z';
+const CID = `bafyrei${'a'.repeat(52)}`;
 const session = (scope?: string) =>
   signedInSession(BEA.did, scope).session as unknown as Parameters<
     typeof createRecord
@@ -98,6 +100,50 @@ describe('putRecord', () => {
         record: { $type: 'app.lanyards.actor.lanyard', createdAt: NOW },
       },
     ]);
+  });
+
+  it('replaces only the version it read, when given its CID', async () => {
+    const bodies = capture('putRecord');
+    await putRecord(
+      session(),
+      'app.lanyards.actor.lanyard',
+      'self',
+      { createdAt: NOW },
+      { swapRecord: CID }
+    );
+    expect(bodies[0]).toMatchObject({ rkey: 'self', swapRecord: CID });
+  });
+
+  it('creates only if no record exists, given a null swap', async () => {
+    const bodies = capture('putRecord');
+    await putRecord(
+      session(),
+      'app.lanyards.actor.lanyard',
+      'self',
+      { createdAt: NOW },
+      { swapRecord: null }
+    );
+    expect(bodies[0]).toMatchObject({ swapRecord: null });
+  });
+
+  it('says so when the record changed since it was read', async () => {
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.putRecord`, () =>
+        HttpResponse.json(
+          { error: 'InvalidSwap', message: 'Record was at a different CID' },
+          { status: 400 }
+        )
+      )
+    );
+    await expect(
+      putRecord(
+        session(),
+        'app.lanyards.actor.lanyard',
+        'self',
+        { createdAt: NOW },
+        { swapRecord: CID }
+      )
+    ).rejects.toBeInstanceOf(RecordChangedError);
   });
 });
 

@@ -12,7 +12,12 @@ import type {
   WebLink,
 } from './lanyards.types';
 
-const LIST_LIMIT = 20;
+/**
+ * The most kept records read per collection: all of anyone's in practice
+ * (listRecords pages through them 100 at a time), while a PDS that never
+ * stops paging can't keep the lanyard loading forever.
+ */
+const LIST_LIMIT = 500;
 
 type WebRecord = { url: string; title?: string };
 type MediaRecord = {
