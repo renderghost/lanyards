@@ -1,6 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
@@ -19,6 +19,30 @@ function Harness() {
     >
       <button type="button">Violet</button>
     </Sheet>
+  );
+}
+
+/** Opened from elsewhere on the page, as a toolbar button would. */
+function Untriggered({ handBack }: { handBack?: boolean }) {
+  const [open, setOpen] = useState(false);
+  const elsewhere = useRef<HTMLButtonElement>(null);
+  return (
+    <>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open style
+      </button>
+      <button type="button" ref={elsewhere}>
+        Elsewhere
+      </button>
+      <Sheet
+        open={open}
+        onOpenChange={setOpen}
+        title="Style"
+        returnFocus={handBack ? () => elsewhere.current?.focus() : undefined}
+      >
+        <button type="button">Violet</button>
+      </Sheet>
+    </>
   );
 }
 
@@ -51,6 +75,24 @@ describe('Sheet', () => {
     );
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
     expect(screen.getByRole('button', { name: 'Open style' })).toHaveFocus();
+  });
+
+  it('returns focus to what opened it when it has no trigger', async () => {
+    renderWithProviders(<Untriggered />);
+    await userEvent.click(screen.getByRole('button', { name: 'Open style' }));
+    await screen.findByRole('dialog', { name: 'Style' });
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Open style' })).toHaveFocus();
+  });
+
+  it('hands focus back through returnFocus when given one', async () => {
+    renderWithProviders(<Untriggered handBack />);
+    await userEvent.click(screen.getByRole('button', { name: 'Open style' }));
+    await screen.findByRole('dialog', { name: 'Style' });
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
+    expect(screen.getByRole('button', { name: 'Elsewhere' })).toHaveFocus();
   });
 
   it('has no axe violations', async () => {

@@ -8,4 +8,9 @@ export type SheetProps = {
   children: ReactNode;
   /** The button that opens the sheet; focus returns to it on close. */
   trigger?: ReactElement;
+  /**
+   * Without a trigger: puts focus back on what opened the sheet. If left
+   * out, focus returns to whatever had it when the sheet opened.
+   */
+  returnFocus?(): void;
 };

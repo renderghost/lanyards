@@ -18,9 +18,11 @@ export function Sheet({
   title,
   children,
   trigger,
+  returnFocus,
 }: SheetProps) {
   const { t } = useLingui();
   const contentRef = useRef<HTMLDivElement>(null);
+  const opener = useRef<HTMLElement | null>(null);
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
@@ -33,8 +35,21 @@ export function Sheet({
           // Focus the sheet itself, so its name is announced and the Close
           // button's tooltip doesn't open (or need a second Escape).
           onOpenAutoFocus={(event) => {
+            // Focus hasn't moved yet: this is what opened the sheet.
+            opener.current =
+              document.activeElement instanceof HTMLElement
+                ? document.activeElement
+                : null;
             event.preventDefault();
             contentRef.current?.focus();
+          }}
+          // Radix returns focus to a trigger; without one it would drop
+          // focus on the page.
+          onCloseAutoFocus={(event) => {
+            if (trigger) return;
+            event.preventDefault();
+            if (returnFocus) returnFocus();
+            else opener.current?.focus();
           }}
         >
           <div className={styles.header}>
