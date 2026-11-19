@@ -28,7 +28,6 @@ type ServeOptions = {
   sifa?: Record<string, unknown> | 'none';
   /** app.lanyards.actor.lanyard fields, or null for no record. */
   config?: Record<string, unknown> | null;
-  honorific?: 'Dr' | 'Prof' | null;
 };
 
 /** Answers every public read for ADA's lanyard. */
@@ -76,25 +75,7 @@ export function servePerson(options: ServeOptions = {}) {
         }
       : null
   );
-  mockGetRecord(
-    ADA.pds,
-    ADA.did,
-    'app.lanyards.actor.biography.honorific',
-    'self',
-    options.honorific === null
-      ? null
-      : {
-          uri: `at://${ADA.did}/app.lanyards.actor.biography.honorific/self`,
-          cid: CID,
-          value: {
-            $type: 'app.lanyards.actor.biography.honorific',
-            value: options.honorific ?? 'Dr',
-            createdAt: '2025-11-20T09:00:00.000Z',
-          },
-        }
-  );
   for (const collection of [
-    'app.lanyards.link.web',
     'app.lanyards.link.media.audio',
     'app.lanyards.link.media.video',
   ]) {

@@ -133,11 +133,14 @@ function mapView(did: Did, raw: Record<string, unknown>): SifaProfile | null {
     ...defined({
       handle: view.handle,
       displayName: view.displayName,
+      honorificPrefix: view.honorificPrefix,
+      honorificSuffix: view.honorificSuffix,
       avatar: view.avatar ? avatarThumbnail(view.avatar) : undefined,
       pronouns: view.pronouns,
       headline: view.headline,
       location: view.location,
     }),
+    showHonorifics: view.showHonorifics !== false,
     langs: view.langs ?? [],
     openTo: toOpenTo(view.openTo),
     positions: positions.map((item) =>

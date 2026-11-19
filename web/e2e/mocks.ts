@@ -111,17 +111,6 @@ export async function mockPerson(page: Page, options: PersonOptions = {}) {
         },
       });
     }
-    if (collection === 'app.lanyards.actor.biography.honorific') {
-      return json(route, {
-        uri: `at://${ADA.did}/${collection}/self`,
-        cid: CID,
-        value: {
-          $type: collection,
-          value: 'Dr',
-          createdAt: '2025-11-20T09:00:00.000Z',
-        },
-      });
-    }
     return json(route, { error: 'RecordNotFound' }, 400);
   });
   await page.route(
@@ -201,8 +190,21 @@ export async function signIn(
 }
 
 export type OwnerWrite = {
-  method: 'createRecord' | 'putRecord' | 'deleteRecord';
-  body: { collection: string; rkey?: string; record?: Record<string, unknown> };
+  method: 'createRecord' | 'putRecord' | 'deleteRecord' | 'applyWrites';
+  body: {
+    collection: string;
+    rkey?: string;
+    record?: Record<string, unknown>;
+    /** For applyWrites: what the write in the batch does. */
+    action?: 'create' | 'update' | 'delete';
+  };
+};
+
+type BatchWrite = {
+  $type: string;
+  collection: string;
+  rkey?: string;
+  value?: Record<string, unknown>;
 };
 
 /** Records the owner's writes from the customiser, in order. */
@@ -222,5 +224,24 @@ export async function mockOwnerWrites(page: Page): Promise<OwnerWrite[]> {
       }
     );
   }
+  // The customiser saves kept records in batches: one entry per write.
+  await page.route(
+    'https://pds.e2e.test/xrpc/com.atproto.repo.applyWrites',
+    (route) => {
+      const batch = route.request().postDataJSON() as { writes: BatchWrite[] };
+      for (const write of batch.writes) {
+        writes.push({
+          method: 'applyWrites',
+          body: {
+            collection: write.collection,
+            rkey: write.rkey,
+            record: write.value,
+            action: write.$type.split('#')[1] as 'create' | 'update' | 'delete',
+          },
+        });
+      }
+      return json(route, { results: [] });
+    }
+  );
   return writes;
 }

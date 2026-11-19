@@ -42,6 +42,49 @@ function captureSaves() {
   return saves;
 }
 
+type Write = {
+  $type: string;
+  collection: string;
+  rkey?: string;
+  value?: Record<string, unknown>;
+};
+
+/** Records every applyWrites batch the customiser sends. */
+function captureWrites() {
+  const batches: Write[][] = [];
+  server.use(
+    http.post(
+      `${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`,
+      async ({ request }) => {
+        const body = (await request.json()) as { writes: Write[] };
+        batches.push(body.writes);
+        return HttpResponse.json({ results: [] });
+      }
+    )
+  );
+  return batches;
+}
+
+/** The Links block on the lanyard. */
+const linksBlock = async () => {
+  const region = await preview();
+  return within(region).findByRole(
+    'listitem',
+    { name: 'Links' },
+    { timeout: 5000 }
+  );
+};
+
+/** Waits until a kept-record control can be used. */
+async function enabled(name: string) {
+  const button = await screen.findByRole('button', { name }, { timeout: 8000 });
+  await waitFor(() => expect(button).not.toHaveAttribute('aria-disabled'), {
+    timeout: 5000,
+  });
+  await waitFor(() => expect(button).toBeEnabled(), { timeout: 5000 });
+  return button;
+}
+
 const sifaDown = () =>
   server.use(
     http.get('https://sifa.id/xrpc/id.sifa.getProfileView', () =>
@@ -93,10 +136,11 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     sifaDown();
     renderRoute('/lanyard');
     const region = await preview();
+    // The title comes from Sifa: without it, the name stands alone.
     expect(
       await within(region).findByRole(
         'heading',
-        { level: 2, name: 'Dr Ada Example' },
+        { level: 2, name: 'Ada Example' },
         { timeout: 5000 }
       )
     ).toBeInTheDocument();
@@ -152,11 +196,8 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(
       within(await preview()).getByRole('list', { name: 'Blocks' })
     ).toBeInTheDocument();
-    // Until kept records are edited in place too (#118, PR 4).
-    const more = screen.getByRole('region', { name: 'More settings' });
-    expect(
-      within(more).getByRole('region', { name: 'Your links' })
-    ).toBeInTheDocument();
+    // Links, podcasts and the title are edited there too.
+    expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
   });
 
   it('View as public hides the sidebar and edit controls, and Edit brings them back', async () => {
@@ -172,7 +213,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       screen.getByRole('button', { name: 'View as public' })
     );
     expect(screen.queryByRole('complementary', { name: 'Style' })).toBeNull();
-    expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
+    expect(screen.queryByRole('switch', { name: 'Show Links' })).toBeNull();
     expect(
       screen.getByText('You’re seeing your lanyard as the public sees it.')
     ).toBeInTheDocument();
@@ -403,29 +444,159 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(saves).toEqual([]);
   });
 
-  it('edits the kept records: honorific, links, podcasts and videos', async () => {
+  it('links can only be hidden', async () => {
     servePerson();
     renderRoute('/lanyard');
-    const honorific = await screen.findByRole(
-      'group',
-      { name: 'Honorific' },
-      { timeout: 5000 }
-    );
-    await waitFor(
-      () =>
-        expect(
-          within(honorific).getByRole('radio', { name: 'Dr' })
-        ).toBeChecked(),
-      { timeout: 5000 }
-    );
+    const links = await linksBlock();
     expect(
-      screen.getByRole('region', { name: 'Your links' })
+      await within(links).findByRole(
+        'button',
+        { name: 'Hide GitHub' },
+        { timeout: 8000 }
+      )
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('region', { name: 'Your podcasts and videos' })
+      within(links).queryByRole('button', { name: 'Add a link' })
+    ).toBeNull();
+    expect(
+      within(links).queryByRole('button', { name: /^(Edit|Delete) / })
+    ).toBeNull();
+  });
+
+  it('has no Title control: the title comes from Sifa', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    await enabled('Hide GitHub');
+    expect(screen.queryByRole('combobox', { name: 'Title' })).toBeNull();
+  });
+
+  it('a session without the web-link or title scopes can still edit podcasts', async () => {
+    vi.mocked(useSession).mockReturnValue(
+      signedInSession(
+        ADA.did,
+        [
+          'atproto',
+          'repo:app.lanyards.actor.lanyard?action=create&action=update',
+          'repo:app.lanyards.link.media.audio?action=create&action=update&action=delete',
+          'repo:app.lanyards.link.media.video?action=create&action=update&action=delete',
+        ].join(' ')
+      )
+    );
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    renderRoute('/lanyard');
+    expect(await enabled('Add a podcast or video')).toBeEnabled();
+    expect(
+      screen.queryByRole('heading', { name: 'Lanyards needs your permission' })
+    ).toBeNull();
+  });
+
+  it('keeps the ORCID helper in Publications while editing', async () => {
+    servePerson({
+      config: {
+        blocks: [
+          { type: 'links', visible: true },
+          { type: 'media', visible: true },
+          { type: 'publications', visible: true, limit: 3 },
+        ],
+      },
+    });
+    renderRoute('/lanyard');
+    const region = await preview();
+    const publications = await within(region).findByRole(
+      'listitem',
+      { name: 'Publications' },
+      { timeout: 8000 }
+    );
+    expect(
+      await within(publications).findByRole(
+        'heading',
+        { level: 3, name: /ORCID iD/ },
+        { timeout: 5000 }
+      )
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add link' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Add media' })).toBeEnabled();
+  });
+
+  it('adds a podcast in a dialog; it’s saved only on Save', async () => {
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    const batches = captureWrites();
+    renderRoute('/lanyard');
+    await userEvent.click(await enabled('Add a podcast or video'));
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add a podcast or video',
+    });
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Web address' }),
+      'https://pod.example/new'
+    );
+    await userEvent.selectOptions(
+      within(dialog).getByRole('combobox', { name: 'Platform' }),
+      'spotify'
+    );
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Title' }),
+      'New episode'
+    );
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'Add media' })
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(
+      within(await preview()).getByText('New episode')
+    ).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(batches).toEqual([]);
+    await saveChanges();
+    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
+    expect(batches[0]).toEqual([
+      expect.objectContaining({
+        $type: 'com.atproto.repo.applyWrites#create',
+        collection: 'app.lanyards.link.media.audio',
+        value: expect.objectContaining({
+          url: 'https://pod.example/new',
+          platform: 'spotify',
+          title: 'New episode',
+        }),
+      }),
+    ]);
+  });
+
+  it('a new podcast hidden before Save stays hidden after it', async () => {
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    const batches = captureWrites();
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    await userEvent.click(await enabled('Add a podcast or video'));
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add a podcast or video',
+    });
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Web address' }),
+      'https://pod.example/secret'
+    );
+    await userEvent.selectOptions(
+      within(dialog).getByRole('combobox', { name: 'Platform' }),
+      'spotify'
+    );
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Title' }),
+      'Secret episode'
+    );
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'Add media' })
+    );
+    await userEvent.click(
+      within(await preview()).getByRole('button', {
+        name: 'Hide Secret episode',
+      })
+    );
+    await saveChanges();
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    const created = batches[0]?.[0];
+    const hidden = (saves[0]?.record as { hidden: string[] }).hidden;
+    // Hidden under the very key it was created at.
+    expect(hidden).toEqual([
+      `at://${ADA.did}/app.lanyards.link.media.audio/${created?.rkey}`,
+    ]);
   });
 
   it('explains a stored record it cannot read, and resets only when asked', async () => {

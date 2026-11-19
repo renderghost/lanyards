@@ -31,6 +31,8 @@ export function EditableBlock({
   onVisibleChange,
   onLimitChange,
   onRetry,
+  content,
+  footer,
 }: EditableBlockProps) {
   const { t, i18n } = useLingui();
   const {
@@ -84,13 +86,15 @@ export function EditableBlock({
             captureError(error, { source: `block:${block.type}` })
           }
         >
-          {block.status === 'empty' ? (
-            <p className={styles.empty}>{t`Nothing to show yet`}</p>
-          ) : (
-            <Items items={block.items.map(({ item }) => item) as never[]} />
-          )}
+          {content ??
+            (block.status === 'empty' ? (
+              <p className={styles.empty}>{t`Nothing to show yet`}</p>
+            ) : (
+              <Items items={block.items.map(({ item }) => item) as never[]} />
+            ))}
         </BlockSection>
       )}
+      {block.visible && footer}
     </li>
   );
 }

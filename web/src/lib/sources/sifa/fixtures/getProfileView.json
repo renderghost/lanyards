@@ -2,6 +2,7 @@
   "did": "did:plc:fixturealiceaaaaaaaaaaaa",
   "handle": "alice.test",
   "displayName": "Ada Example",
+  "honorificPrefix": "Dr",
   "givenName": "Ada",
   "familyName": "Example",
   "avatar": "https://cdn.bsky.app/img/avatar/plain/did:plc:fixturealiceaaaaaaaaaaaa/bafkreiadasifaavataraaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",

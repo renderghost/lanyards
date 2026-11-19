@@ -156,6 +156,31 @@
             "minimum": 0,
             "description": "End of typical working hours in UTC (0-23). May wrap around midnight (e.g., from 22 to 06 for someone in Asia working US hours)."
           },
+          "showHonorifics": {
+            "type": "boolean",
+            "description": "Whether the rendering app shows honorificPrefix and honorificSuffix next to the name on the profile. Default true when absent. When false, the name shows without them on the profile itself; the app may still use them elsewhere, for example in CV exports or structured data. A display choice only: the honorifics stay in this public record."
+          },
+          "honorificPrefix": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Title shown before the name, such as Dr., Prof. or Sir. Maps to Schema.org Person.honorificPrefix. Optional.",
+            "maxGraphemes": 64,
+            "x-skos:closeMatch": [
+              "foaf:title"
+            ],
+            "x-skos:exactMatch": [
+              "schema:honorificPrefix"
+            ]
+          },
+          "honorificSuffix": {
+            "type": "string",
+            "maxLength": 640,
+            "description": "Post-nominal letters shown after the name, such as PhD, OBE or FRSA. Maps to Schema.org Person.honorificSuffix. Optional.",
+            "maxGraphemes": 64,
+            "x-skos:exactMatch": [
+              "schema:honorificSuffix"
+            ]
+          },
           "availableFromUtc": {
             "type": "integer",
             "maximum": 23,

@@ -10,3 +10,5 @@ export const faded = '[&_img]:opacity-50 [&_img]:grayscale [&_svg]:opacity-50';
 
 export const tag =
   'shrink-0 self-center rounded-sm bg-accent-subtle px-1.5 text-xs font-medium leading-5 text-accent-text';
+
+export const controls = 'flex shrink-0 items-start';

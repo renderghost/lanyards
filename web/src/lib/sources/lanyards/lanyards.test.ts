@@ -5,6 +5,7 @@ import {
   mockGetRecord,
   mockListRecords,
 } from '@/test/handlers';
+import { server } from '@/test/msw';
 import { ADA } from '@/test/people';
 
 import records from './fixtures/records.json';
@@ -54,19 +55,21 @@ describe('fetchLanyardRecords', () => {
     serve();
   });
 
-  it('reads the config, honorific, web links and media', async () => {
+  it('reads only podcasts and videos', async () => {
+    const asked: string[] = [];
+    const listen = ({ request }: { request: Request }) => {
+      const url = new URL(request.url);
+      asked.push(url.searchParams.get('collection') ?? '');
+    };
+    server.events.on('request:start', listen);
     const result = await fetchLanyardRecords(ADA.did);
+    server.events.removeListener('request:start', listen);
+    // Web links and the honorific are no longer Lanyards' to show.
+    expect(asked).not.toContain('app.lanyards.link.web');
+    expect(asked).not.toContain(HONORIFIC);
     expect(result).toEqual({
       ok: true,
       value: {
-        honorific: 'Dr',
-        webLinks: [
-          {
-            key: `at://${ADA.did}/app.lanyards.link.web/3mwebone`,
-            url: 'https://ada.example/cv',
-            title: 'CV',
-          },
-        ],
         media: [
           {
             key: `at://${ADA.did}/app.lanyards.link.media.audio/3maudio`,
@@ -88,31 +91,6 @@ describe('fetchLanyardRecords', () => {
         ],
       },
     });
-  });
-
-  it('reads every web link, not just the first 20', async () => {
-    mockListRecords(
-      ADA.pds,
-      ADA.did,
-      'app.lanyards.link.web',
-      Array.from({ length: 150 }, (_, index) => ({
-        uri: `at://${ADA.did}/app.lanyards.link.web/3m${index}`,
-        cid: `bafyrei${'a'.repeat(52)}`,
-        value: {
-          $type: 'app.lanyards.link.web',
-          url: `https://ada.example/${index}`,
-          createdAt: '2026-01-01T00:00:00.000Z',
-        },
-      }))
-    );
-    const result = await fetchLanyardRecords(ADA.did);
-    expect(result.ok && result.value.webLinks).toHaveLength(150);
-  });
-
-  it('treats the honorific none as no honorific', async () => {
-    serve({ honorific: 'none' });
-    const result = await fetchLanyardRecords(ADA.did);
-    expect(result.ok && result.value.honorific).toBeUndefined();
   });
 
   it('reads the config on its own', async () => {

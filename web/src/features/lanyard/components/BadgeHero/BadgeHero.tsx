@@ -1,3 +1,4 @@
+import { heroName } from '@/lib/person/hero';
 import { cn } from '@/lib/utils';
 
 import * as styles from './BadgeHero.styles';
@@ -10,7 +11,7 @@ export function BadgeHero({
   className,
 }: BadgeHeroProps) {
   const Heading = headingLevel === 2 ? 'h2' : 'h1';
-  const name = [hero.honorific, hero.displayName].filter(Boolean).join(' ');
+  const name = heroName(hero);
   const job = hero.job
     ? [hero.job.title, hero.job.company].filter(Boolean).join(' · ')
     : undefined;

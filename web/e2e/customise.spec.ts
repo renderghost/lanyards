@@ -171,48 +171,46 @@ test.describe('lanyard customiser', () => {
     });
   });
 
-  test('sets the honorific', async ({ page }) => {
+  test('adds a podcast in the dialog and saves it', async ({ page }) => {
     await openCustomiser(page);
-    const honorific = page.getByRole('group', { name: 'Honorific' });
-    await expect(honorific.getByRole('radio', { name: 'Dr' })).toBeChecked();
-    await honorific.getByRole('radio', { name: 'Prof' }).check();
-    const save = page.getByRole('button', { name: 'Save honorific' });
-    await save.focus();
-    await page.keyboard.press('Enter');
-    await expect(page.getByText('Honorific updated')).toBeVisible();
-    await expect(save).toBeFocused();
-    const saved = writes.find(
-      (write) =>
-        write.body.collection === 'app.lanyards.actor.biography.honorific'
-    );
-    expect(saved?.method).toBe('putRecord');
-    expect(saved?.body).toMatchObject({
-      rkey: 'self',
-      record: { value: 'Prof', createdAt: '2025-11-20T09:00:00.000Z' },
-    });
-  });
-
-  test('checks a web link, then adds it once fixed', async ({ page }) => {
-    await openCustomiser(page);
-    const links = page.getByRole('region', { name: 'Your links' });
-    const address = links.getByRole('textbox', { name: 'Web address' });
-    await address.fill('ftp://x');
-    await links.getByRole('button', { name: 'Add link' }).click();
-    await expect(address).toHaveAttribute('aria-invalid', 'true');
-    await expect(address).toBeFocused();
+    await page
+      .getByRole('switch', { name: 'Show Podcasts and videos' })
+      .click();
+    const media = page.locator('[data-block="media"]');
+    const add = media.getByRole('button', { name: 'Add a podcast or video' });
+    await expect(add).toBeEnabled();
+    await add.click();
+    const dialog = page.getByRole('dialog', { name: 'Add a podcast or video' });
+    // The form starts with the kind of media.
+    await expect(dialog.getByRole('radio', { name: 'Audio' })).toBeFocused();
+    const address = dialog.getByRole('textbox', { name: 'Web address' });
+    await address.fill('https://pod.example/new');
+    await dialog
+      .getByRole('combobox', { name: 'Platform' })
+      .selectOption('spotify');
+    await dialog.getByRole('textbox', { name: 'Title' }).fill('New episode');
+    await dialog.getByRole('button', { name: 'Add media' }).click();
+    await expect(dialog).toBeHidden();
+    await expect(add).toBeFocused();
     await expect(
-      links.getByText('Enter a web address starting with https:// or http://')
+      media.getByRole('link', { name: 'New episode' })
     ).toBeVisible();
-
-    await address.fill('https://ada.example/talks');
-    await links.getByRole('textbox', { name: 'Title' }).fill('Talks');
-    await links.getByRole('button', { name: 'Add link' }).click();
-    await expect(page.getByText('Link added')).toBeVisible();
-    await expect(address).toHaveValue('');
-    expect(
-      writes.find((write) => write.body.collection === 'app.lanyards.link.web')
-        ?.body.record
-    ).toMatchObject({ url: 'https://ada.example/talks', title: 'Talks' });
+    expect(writes.filter((write) => write.method === 'applyWrites')).toEqual(
+      []
+    );
+    await saveChanges(page);
+    await expect(page.getByText('Lanyard updated')).toBeVisible();
+    const saved = writes.find(
+      (write) => write.body.collection === 'app.lanyards.link.media.audio'
+    );
+    expect(saved?.body).toMatchObject({
+      action: 'create',
+      record: {
+        url: 'https://pod.example/new',
+        platform: 'spotify',
+        title: 'New episode',
+      },
+    });
   });
 
   test('hides a record in place, then shows it again', async ({ page }) => {
@@ -298,9 +296,7 @@ test.describe('lanyard customiser', () => {
     await expect(
       page.getByText('You’re seeing your lanyard as the public sees it.')
     ).toBeVisible();
-    await expect(
-      page.getByRole('region', { name: 'More settings' })
-    ).toBeHidden();
+    await expect(page.getByRole('switch', { name: 'Show Links' })).toBeHidden();
     await expect(
       page.getByRole('button', { name: 'View as public' })
     ).toHaveAttribute('aria-pressed', 'true');
@@ -428,6 +424,30 @@ test.describe('lanyard customiser', () => {
       await expect(
         page.locator('[data-block="links"]').getByText('Hidden from visitors')
       ).toBeVisible();
+      const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+      expect(result.violations).toEqual([]);
+    });
+  }
+
+  for (const colorScheme of ['light', 'dark'] as const) {
+    test(`stays accessible with the podcast dialog open (${colorScheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await openCustomiser(page);
+      await page
+        .getByRole('switch', { name: 'Show Podcasts and videos' })
+        .click();
+      await page
+        .getByRole('button', { name: 'Add a podcast or video' })
+        .click();
+      const dialog = page.getByRole('dialog', {
+        name: 'Add a podcast or video',
+      });
+      await dialog.getByRole('button', { name: 'Add media' }).click();
+      await expect(
+        dialog.getByRole('textbox', { name: 'Web address' })
+      ).toHaveAttribute('aria-invalid', 'true');
       const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
       expect(result.violations).toEqual([]);
     });

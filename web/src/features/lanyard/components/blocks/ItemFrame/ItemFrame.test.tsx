@@ -59,4 +59,24 @@ describe('ItemFrame', () => {
     expect(item.closest('li')).not.toBeNull();
     expect(item.closest('[data-hidden="true"]')).not.toBeNull();
   });
+
+  it('adds its edit controls beside the toggle', () => {
+    renderWithProviders(
+      <ItemActionsContext
+        value={{
+          ...actions([]),
+          renderEdit: (_key, title) => (
+            <button type="button">{`Edit ${title}`}</button>
+          ),
+        }}
+      >
+        <ItemFrame itemKey="k1" title="Keynote">
+          <p>Keynote</p>
+        </ItemFrame>
+      </ItemActionsContext>
+    );
+    expect(
+      screen.getByRole('button', { name: 'Edit Keynote' })
+    ).toBeInTheDocument();
+  });
 });

@@ -1,3 +1,4 @@
+import type { MediaFields } from '../../hooks/useKeptRecordsDraft';
 import type { WebAddressError } from '@/lib/validation';
 
 export type MediaValues = {
@@ -16,6 +17,11 @@ export type MediaErrors = {
 };
 
 export type MediaFormProps = {
+  /** Gets a valid entry; the form itself writes nothing. */
+  onSubmit(fields: MediaFields): void;
+  /** Editing: the entry's current fields (the button then says Update). */
+  initial?: MediaFields;
+  onCancel?(): void;
   disabled?: boolean;
   className?: string;
 };

@@ -188,6 +188,17 @@ describe('useLanyardDraft', () => {
     expect(track).toHaveBeenCalledWith('lanyard_updated');
   });
 
+  it('saves quietly when asked, for a caller that announces it', async () => {
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'moss' })));
+    let outcome = false;
+    await act(async () => {
+      outcome = await result.current.save({ announce: false });
+    });
+    expect(outcome).toBe(true);
+    expect(notify.success).not.toHaveBeenCalled();
+  });
+
   it('Save with nothing changed writes nothing', async () => {
     const { result } = render();
     expect(await save(result)).toBe(true);

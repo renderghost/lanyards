@@ -74,6 +74,35 @@ describe('fetchSifaProfile from the Sifa view', () => {
     expect(talks.length).toBeGreaterThan(0);
   });
 
+  it('maps honorifics and their show switch', async () => {
+    serveView(() =>
+      HttpResponse.json({
+        ...view,
+        honorificPrefix: 'Prof.',
+        honorificSuffix: 'OBE',
+        showHonorifics: false,
+      })
+    );
+    const result = await fetchSifaProfile(ADA.did);
+    if (!result.ok || !result.value) throw new Error('no profile');
+    expect(result.value).toMatchObject({
+      honorificPrefix: 'Prof.',
+      honorificSuffix: 'OBE',
+      showHonorifics: false,
+    });
+  });
+
+  it('shows honorifics unless Sifa says not to', async () => {
+    const { honorificPrefix: _prefix, ...rest } = view as typeof view & {
+      honorificPrefix?: string;
+    };
+    serveView(() => HttpResponse.json(rest));
+    const result = await fetchSifaProfile(ADA.did);
+    if (!result.ok || !result.value) throw new Error('no profile');
+    expect(result.value.showHonorifics).toBe(true);
+    expect(result.value.honorificPrefix).toBeUndefined();
+  });
+
   it('merges delivered talks with standalone deliveries, newest first', async () => {
     const result = await fetchSifaProfile(ADA.did);
     expect(result.ok && result.value?.talks).toEqual([

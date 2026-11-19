@@ -6,6 +6,7 @@ import { ADA, BEA } from '@/test/people';
 import { signedInSession, VIEWER_PDS } from '@/test/person';
 
 import {
+  applyWrites,
   createRecord,
   deleteRecord,
   InvalidRecordError,
@@ -13,6 +14,8 @@ import {
   putRecord,
   RecordChangedError,
   WRITABLE_COLLECTIONS,
+  type WriteOp,
+  WriteFailedError,
 } from './writes';
 
 const NOW = '2026-11-10T09:00:00.000Z';
@@ -194,5 +197,145 @@ describe('writable collections', () => {
       )
     ).rejects.toBeInstanceOf(MissingPermissionError);
     expect(bodies).toEqual([]);
+  });
+});
+
+describe('applyWrites', () => {
+  const WEB = 'app.lanyards.link.web' as const;
+  const link = (url: string) => ({ url, title: 'Site', createdAt: NOW });
+
+  it('sends creates, updates and deletes in one batch', async () => {
+    const bodies = capture('applyWrites');
+    await applyWrites(session(), [
+      { type: 'create', collection: WEB, fields: link('https://ada.example/') },
+      {
+        type: 'update',
+        collection: WEB,
+        rkey: '3mold',
+        fields: link('https://ada.example/cv'),
+      },
+      { type: 'delete', collection: WEB, rkey: '3mgone' },
+    ]);
+    expect(bodies).toEqual([
+      {
+        repo: BEA.did,
+        writes: [
+          {
+            $type: 'com.atproto.repo.applyWrites#create',
+            collection: WEB,
+            rkey: expect.stringMatching(/^[a-z2-7]{13}$/),
+            value: { $type: WEB, ...link('https://ada.example/') },
+          },
+          {
+            $type: 'com.atproto.repo.applyWrites#update',
+            collection: WEB,
+            rkey: '3mold',
+            value: { $type: WEB, ...link('https://ada.example/cv') },
+          },
+          {
+            $type: 'com.atproto.repo.applyWrites#delete',
+            collection: WEB,
+            rkey: '3mgone',
+          },
+        ],
+      },
+    ]);
+  });
+
+  it('keeps a create’s own rkey when given one', async () => {
+    const bodies = capture('applyWrites');
+    await applyWrites(session(), [
+      {
+        type: 'create',
+        collection: 'app.lanyards.actor.biography.honorific',
+        rkey: 'self',
+        fields: { value: 'Dr', createdAt: NOW },
+      },
+    ]);
+    expect(bodies[0]).toMatchObject({ writes: [{ rkey: 'self' }] });
+  });
+
+  it('refuses the whole batch if one op lacks permission, sending nothing', async () => {
+    const bodies = capture('applyWrites');
+    await expect(
+      applyWrites(session('atproto'), [
+        { type: 'delete', collection: WEB, rkey: '3mgone' },
+      ])
+    ).rejects.toBeInstanceOf(MissingPermissionError);
+    expect(bodies).toEqual([]);
+  });
+
+  it('refuses the whole batch if one record breaks its lexicon, sending nothing', async () => {
+    const bodies = capture('applyWrites');
+    await expect(
+      applyWrites(session(), [
+        { type: 'delete', collection: WEB, rkey: '3mgone' },
+        { type: 'create', collection: WEB, fields: { title: 'No URL' } },
+      ])
+    ).rejects.toBeInstanceOf(InvalidRecordError);
+    expect(bodies).toEqual([]);
+  });
+
+  it('splits more than 10 ops into atomic chunks', async () => {
+    const bodies = capture('applyWrites');
+    const ops: WriteOp[] = Array.from({ length: 12 }, (_, index) => ({
+      type: 'delete',
+      collection: WEB,
+      rkey: `3mgone${index}`,
+    }));
+    await applyWrites(session(), ops);
+    expect(
+      bodies.map((body) => (body as { writes: unknown[] }).writes.length)
+    ).toEqual([10, 2]);
+  });
+
+  it('a failure part-way says how many writes landed', async () => {
+    let calls = 0;
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`, () => {
+        calls += 1;
+        return calls === 1
+          ? HttpResponse.json({ results: [] })
+          : HttpResponse.json(
+              { error: 'InternalServerError' },
+              { status: 500 }
+            );
+      })
+    );
+    const ops: WriteOp[] = Array.from({ length: 12 }, (_, index) => ({
+      type: 'delete',
+      collection: WEB,
+      rkey: `3mgone${index}`,
+    }));
+    const failure = await applyWrites(session(), ops).catch(
+      (error: unknown) => error
+    );
+    expect(failure).toBeInstanceOf(WriteFailedError);
+    expect((failure as WriteFailedError).applied).toBe(10);
+  });
+
+  it('nothing landed when the first chunk fails', async () => {
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`, () =>
+        HttpResponse.json({ error: 'InvalidRequest' }, { status: 400 })
+      )
+    );
+    const failure = await applyWrites(session(), [
+      { type: 'delete', collection: WEB, rkey: '3mgone' },
+    ]).catch((error: unknown) => error);
+    expect((failure as WriteFailedError).applied).toBe(0);
+  });
+
+  it('throws WriteFailedError when the PDS refuses', async () => {
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`, () =>
+        HttpResponse.json({ error: 'InvalidRequest' }, { status: 400 })
+      )
+    );
+    await expect(
+      applyWrites(session(), [
+        { type: 'delete', collection: WEB, rkey: '3mgone' },
+      ])
+    ).rejects.toBeInstanceOf(WriteFailedError);
   });
 });

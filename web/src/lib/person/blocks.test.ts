@@ -19,7 +19,7 @@ import {
   orphanedHiddenKeys,
 } from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
-import type { SourceSnapshot } from './personView.types';
+import type { LinkItem, SourceSnapshot } from './personView.types';
 
 // Counted, to keep hiddenItems' cost in step with the list's length.
 vi.mock('@/lib/normalise', async (importOriginal) => {
@@ -50,6 +50,7 @@ const bluesky: BlueskyProfile = {
 };
 
 const sifa: SifaProfile = {
+  showHonorifics: true,
   langs: ['en'],
   location: 'Edinburgh',
   openTo: ['mentoringOthers'],
@@ -111,21 +112,7 @@ const sifa: SifaProfile = {
   ],
 };
 
-const lanyards: LanyardRecords = {
-  webLinks: [
-    {
-      key: `at://${ADA.did}/app.lanyards.link.web/1`,
-      url: 'https://ada.example',
-      title: "Ada's site",
-    },
-    {
-      key: `at://${ADA.did}/app.lanyards.link.web/2`,
-      url: 'https://ada.example/cv',
-      title: 'CV',
-    },
-  ],
-  media: [],
-};
+const lanyards: LanyardRecords = { media: [] };
 
 const works: OrcidWork[] = [
   {
@@ -186,7 +173,7 @@ describe('composeBlocks: links', () => {
     expect(site).not.toHaveProperty('iconUrl');
   });
 
-  it('merges every source, de-duplicates by URL and prefers the owner’s titles', () => {
+  it('merges Bluesky and Sifa, de-duplicates by URL and prefers Bluesky’s titles', () => {
     const [links] = compose(showOnly(['links']));
     expect(links).toEqual({
       type: 'links',
@@ -196,7 +183,7 @@ describe('composeBlocks: links', () => {
         {
           key: 'https://ada.example/',
           url: 'https://ada.example/',
-          title: "Ada's site",
+          title: 'Website',
           platform: 'website',
           iconUrl: 'https://cdn.bsky.app/icon-site',
         },
@@ -206,12 +193,6 @@ describe('composeBlocks: links', () => {
           title: 'GitHub',
           platform: 'github',
           iconUrl: 'https://cdn.bsky.app/icon-github',
-        },
-        {
-          key: 'https://ada.example/cv',
-          url: 'https://ada.example/cv',
-          title: 'CV',
-          platform: 'website',
         },
         {
           key: 'https://orcid.org/0000-0002-1825-0097',
@@ -236,7 +217,7 @@ describe('composeBlocks: links', () => {
         links: [{ key: 'k', url: 'https://plain.example/page' }],
       }),
       sifa: ready(null),
-      lanyards: ready({ ...lanyards, webLinks: [] }),
+      lanyards: ready(lanyards),
     });
     expect(links?.status === 'ready' && links.items).toEqual([
       expect.objectContaining({ title: 'plain.example' }),
@@ -356,7 +337,7 @@ describe('composeBlocks: loading and failures', () => {
       'owner'
     );
     expect(links?.status === 'ready' && links.failedSources).toEqual(['sifa']);
-    expect(links?.status === 'ready' && links.items).toHaveLength(3);
+    expect(links?.status === 'ready' && links.items).toHaveLength(2);
   });
 });
 
@@ -365,7 +346,7 @@ describe('hiddenItems', () => {
     const config = showOnly(['talks'], {
       hidden: [
         sifaKey('presentationDelivery', 'd2'),
-        'https://ada.example/cv',
+        'https://github.com/ada-example',
         'at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/gone',
       ],
     });
@@ -378,9 +359,9 @@ describe('hiddenItems', () => {
         item: expect.objectContaining({ title: 'Talk two' }),
       },
       {
-        key: 'https://ada.example/cv',
+        key: 'https://github.com/ada-example',
         type: 'links',
-        item: expect.objectContaining({ title: 'CV' }),
+        item: expect.objectContaining({ title: 'GitHub' }),
       },
       {
         key: 'at://did:plc:fixturealiceaaaaaaaaaaaa/app.lanyards.link.web/gone',
@@ -465,12 +446,13 @@ describe('counts: feeds and Publications only (#118)', () => {
 
   it('shows every link, past the old cap of 20', () => {
     const many = Array.from({ length: 25 }, (_, index) => ({
-      key: `at://${ADA.did}/app.lanyards.link.web/${index}`,
+      key: `at://${ADA.did}/app.bsky.actor.link/${index}`,
       url: `https://ada.example/${index}`,
       title: `Link ${index}`,
     }));
     const [links] = compose(showOnly(['links']), {
-      lanyards: ready({ webLinks: many, media: [] }),
+      bluesky: ready({ ...bluesky, links: many }),
+      sifa: ready(null),
     });
     expect(links?.status === 'ready' && links.items).toHaveLength(25);
   });
@@ -517,7 +499,7 @@ describe('orphanedHiddenKeys', () => {
 
 describe('composeEditorBlocks', () => {
   it('keeps hidden blocks and flags hidden items in place', () => {
-    const hiddenLink = 'https://ada.example/cv';
+    const hiddenLink = 'https://github.com/ada-example';
     const config: LanyardConfig = {
       ...resolveConfig(null),
       blocks: [
@@ -539,7 +521,7 @@ describe('composeEditorBlocks', () => {
     });
     const flagged = links?.items.map(({ item, hidden }) => [item.key, hidden]);
     const all = compose(showOnly(['links'], { hidden: [] }))[0];
-    // Same items in the same order as with nothing hidden, the CV flagged.
+    // Same items in the same order as with nothing hidden, GitHub flagged.
     expect(flagged?.map(([key]) => key)).toEqual(
       all?.status === 'ready' && all.items.map((item) => item.key)
     );
@@ -620,5 +602,39 @@ describe('hiddenItems at scale', () => {
     expect(found).toHaveLength(200);
     // Was one call per hidden key per candidate: thousands.
     expect(vi.mocked(normaliseUrl).mock.calls.length).toBeLessThan(1000);
+  });
+});
+
+describe('links come only from Bluesky and Sifa', () => {
+  // Old app.lanyards.link.web records may still be in a repository.
+  const withOldLinks = ready({
+    webLinks: [
+      {
+        key: `at://${ADA.did}/app.lanyards.link.web/2`,
+        url: 'https://ada.example/cv',
+        title: 'CV',
+      },
+    ],
+    media: [],
+  } as never);
+
+  it('shows none of Lanyards’ own web links', () => {
+    const [links] = compose(showOnly(['links']), { lanyards: withOldLinks });
+    const items = (links?.status === 'ready' ? links.items : []) as LinkItem[];
+    expect(items.map((item) => item.url)).not.toContain(
+      'https://ada.example/cv'
+    );
+    expect(items.some((item) => 'ownKey' in item)).toBe(false);
+  });
+
+  it('a hidden key only an own link supplied becomes an orphan', () => {
+    const config = showOnly(['links'], { hidden: ['https://ada.example/cv'] });
+    expect(
+      orphanedHiddenKeys({
+        config,
+        sources: { ...allSources, lanyards: withOldLinks },
+        orcidVerified: false,
+      })
+    ).toEqual(['https://ada.example/cv']);
   });
 });

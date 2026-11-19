@@ -8,7 +8,7 @@ import { ADA } from '@/test/people';
 import { servePerson, signedInSession } from '@/test/person';
 import { renderInRouter } from '@/test/router';
 
-import { useLanyardDraft } from '../../hooks/useLanyardDraft';
+import { useCustomiserDraft } from '../../hooks/useCustomiserDraft';
 import { LanyardEditor } from './LanyardEditor';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
@@ -19,16 +19,18 @@ vi.mock('@/lib/analytics/analytics', () => ({
 
 /** The editor over the real draft, as the customiser wires it. */
 function Harness() {
-  const draft = useLanyardDraft();
+  const { settings, records } = useCustomiserDraft(ADA.did);
   return (
     <>
       <LanyardEditor
         did={ADA.did}
-        config={draft.config}
-        onChange={draft.update}
-        disabled={!draft.ready}
+        config={settings.config}
+        onChange={settings.update}
+        disabled={!settings.ready}
+        records={records}
+        recordsDisabled={!records.ready}
       />
-      <output data-testid="hidden">{draft.config.hidden.join(' ')}</output>
+      <output data-testid="hidden">{settings.config.hidden.join(' ')}</output>
     </>
   );
 }
@@ -158,6 +160,47 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
       )
     ).toBeInTheDocument();
     expect(screen.queryByText('Loading lanyard…')).toBeNull();
+  });
+
+  it('puts the ORCID helper in Publications', async () => {
+    servePerson({
+      config: {
+        blocks: [
+          { type: 'links', visible: true },
+          { type: 'media', visible: true },
+          { type: 'publications', visible: true, limit: 3 },
+        ],
+      },
+    });
+    await renderEditor();
+    expect(
+      await within(block('publications')).findByRole(
+        'heading',
+        { level: 3, name: /ORCID iD/ },
+        { timeout: 5000 }
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('adds podcasts and videos in their block; links can only be hidden', async () => {
+    servePerson({
+      config: {
+        blocks: [
+          { type: 'links', visible: true },
+          { type: 'media', visible: true },
+          { type: 'publications', visible: true, limit: 3 },
+        ],
+      },
+    });
+    await renderEditor();
+    expect(
+      within(block('links')).queryByRole('button', { name: 'Add a link' })
+    ).toBeNull();
+    expect(
+      within(block('media')).getByRole('button', {
+        name: 'Add a podcast or video',
+      })
+    ).toBeInTheDocument();
   });
 
   it('has no axe violations', async () => {

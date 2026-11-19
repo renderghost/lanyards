@@ -20,7 +20,7 @@ import * as styles from './OrcidHelper.styles';
 import type { OrcidHelperProps } from './OrcidHelper.types';
 
 /**
- * Helps the owner verify their ORCID iD two ways: Sifa links to ORCID, and
+ * In the owner's Publications block, helps them verify their ORCID iD two ways: Sifa links to ORCID, and
  * their ORCID record links back to their lanyard (spec §7.2), which earns
  * their publications the ORCID tick.
  */
@@ -53,9 +53,9 @@ export function OrcidHelper({
         aria-labelledby={headingId}
         className={cn(styles.section, className)}
       >
-        <h2 id={headingId} className={styles.heading}>
+        <h3 id={headingId} className={styles.heading}>
           {t`ORCID iD`}
-        </h2>
+        </h3>
         <p className={styles.text}>
           {t`Add your ORCID iD on Sifa to show verified publications.`}
         </p>
@@ -113,11 +113,11 @@ export function OrcidHelper({
       aria-labelledby={headingId}
       className={cn(styles.section, className)}
     >
-      <h2 id={headingId} className={styles.heading}>
+      <h3 id={headingId} className={styles.heading}>
         {pending || verified || unchecked
           ? t`ORCID iD`
           : t`Verify your ORCID iD`}
-      </h2>
+      </h3>
       {pending ? (
         <p className={styles.text}>{t`Checking your ORCID iD…`}</p>
       ) : verified ? (

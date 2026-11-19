@@ -1,28 +1,17 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { notify } from '@/components/Toaster/notify';
-import { useSession } from '@/features/auth/session/useSession';
-import { captureError, track } from '@/lib/analytics/analytics';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { expectNoAxeViolations } from '@/test/axe';
-import { ADA } from '@/test/people';
-import { captureWrites, signedInSession } from '@/test/person';
 import { renderWithClient } from '@/test/render';
 
 import audio from '../../../../../lexicons/lanyards/app/lanyards/link/media/audio.json';
 import video from '../../../../../lexicons/lanyards/app/lanyards/link/media/video.json';
 import { MediaForm } from './MediaForm';
 
-vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
-vi.mock('@/lib/analytics/analytics', () => ({
-  captureError: vi.fn(),
-  track: vi.fn(),
-}));
-vi.mock('@/components/Toaster/notify', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
+/** The form hands a valid entry over; it writes nothing itself. */
+const onSubmit = vi.fn();
 
 const values = (name: string) =>
   within(screen.getByRole('combobox', { name }))
@@ -31,12 +20,12 @@ const values = (name: string) =>
     .filter(Boolean);
 
 beforeEach(() => {
-  vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+  onSubmit.mockClear();
 });
 
 describe('MediaForm', () => {
   it('offers each kind’s platforms and content types from its lexicon', async () => {
-    renderWithClient(<MediaForm />);
+    renderWithClient(<MediaForm onSubmit={onSubmit} />);
     const kind = screen.getByRole('group', { name: 'Type of media' });
     expect(within(kind).getByRole('radio', { name: 'Audio' })).toBeChecked();
     expect(values('Platform')).toEqual(
@@ -55,15 +44,14 @@ describe('MediaForm', () => {
   });
 
   it('asks for a description in a text area', () => {
-    renderWithClient(<MediaForm />);
+    renderWithClient(<MediaForm onSubmit={onSubmit} />);
     expect(screen.getByRole('textbox', { name: 'Description' }).tagName).toBe(
       'TEXTAREA'
     );
   });
 
   it('shows each problem and moves to the first', async () => {
-    const writes = captureWrites();
-    renderWithClient(<MediaForm />);
+    renderWithClient(<MediaForm onSubmit={onSubmit} />);
     await userEvent.type(
       screen.getByRole('textbox', { name: 'Title' }),
       'x'.repeat(201)
@@ -78,31 +66,22 @@ describe('MediaForm', () => {
     expect(
       screen.getByRole('textbox', { name: 'Title' })
     ).toHaveAccessibleDescription('Keep the title to 200 characters or fewer');
-    expect(writes.created).toEqual([]);
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
   it.each([
-    [
-      'Audio',
-      'app.lanyards.link.media.audio',
-      'spotify',
-      'interview',
-      'Audio added',
-      'audio',
-    ],
+    ['Audio', 'app.lanyards.link.media.audio', 'spotify', 'interview', 'audio'],
     [
       'Video',
       'app.lanyards.link.media.video',
       'youtube',
       'conference-talk',
-      'Video added',
       'video',
     ],
   ] as const)(
-    'adds %s to its own collection',
-    async (label, collection, platform, type, toast, kind) => {
-      const writes = captureWrites();
-      renderWithClient(<MediaForm />);
+    'hands over %s for its own collection',
+    async (label, collection, platform, type, kind) => {
+      renderWithClient(<MediaForm onSubmit={onSubmit} />);
       await userEvent.click(screen.getByRole('radio', { name: label }));
       await userEvent.type(
         screen.getByRole('textbox', { name: 'Web address' }),
@@ -125,51 +104,77 @@ describe('MediaForm', () => {
         type
       );
       await userEvent.click(screen.getByRole('button', { name: 'Add media' }));
-      await waitFor(() => expect(writes.created).toHaveLength(1));
-      const write = writes.created[0] as {
-        collection: string;
-        record: Record<string, unknown>;
-      };
-      expect(write.collection).toBe(collection);
-      expect(write.record).toMatchObject({
+      const fields = {
         url: 'https://media.example/1',
         platform,
         title: 'Talking protocols',
         description: 'A conversation about open protocols.',
         type,
-      });
-      expect(validateRecord(collection, write.record).ok).toBe(true);
-      await waitFor(() => expect(notify.success).toHaveBeenCalledWith(toast));
-      expect(track).toHaveBeenCalledWith('kept_record_saved', { kind });
+      };
+      expect(onSubmit).toHaveBeenCalledWith({ kind, ...fields });
+      expect(
+        validateRecord(collection, {
+          $type: collection,
+          ...fields,
+          createdAt: '2026-11-19T12:00:00.000Z',
+        }).ok
+      ).toBe(true);
       expect(screen.getByRole('textbox', { name: 'Web address' })).toHaveValue(
         ''
       );
     }
   );
 
-  it('keeps the form and reports the failure when the server fails', async () => {
-    captureWrites({ fail: ['createRecord'] });
-    renderWithClient(<MediaForm />);
-    const address = screen.getByRole('textbox', { name: 'Web address' });
-    await userEvent.type(address, 'https://media.example/1');
-    await userEvent.selectOptions(
-      screen.getByRole('combobox', { name: 'Platform' }),
-      'spotify'
+  it('edits an entry in place, from its current values', async () => {
+    const onCancel = vi.fn();
+    renderWithClient(
+      <MediaForm
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        initial={{
+          kind: 'video',
+          url: 'https://media.example/2',
+          platform: 'youtube',
+          title: 'Keynote',
+        }}
+      />
     );
-    await userEvent.click(screen.getByRole('button', { name: 'Add media' }));
-    await waitFor(() =>
-      expect(notify.error).toHaveBeenCalledWith(
-        'Failed to save. Please try again.'
-      )
-    );
-    expect(address).toHaveValue('https://media.example/1');
-    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
-      source: 'media',
+    expect(screen.getByRole('radio', { name: 'Video' })).toBeChecked();
+    const title = screen.getByRole('textbox', { name: 'Title' });
+    expect(title).toHaveValue('Keynote');
+    await userEvent.clear(title);
+    await userEvent.type(title, 'Opening keynote');
+    await userEvent.click(screen.getByRole('button', { name: 'Update' }));
+    expect(onSubmit).toHaveBeenCalledWith({
+      kind: 'video',
+      url: 'https://media.example/2',
+      platform: 'youtube',
+      title: 'Opening keynote',
     });
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(onCancel).toHaveBeenCalled();
+  });
+
+  it('editing keeps the kind: audio and video are different records', () => {
+    renderWithClient(
+      <MediaForm
+        onSubmit={onSubmit}
+        initial={{
+          kind: 'video',
+          url: 'https://video.example/1',
+          platform: 'youtube',
+        }}
+      />
+    );
+    const kinds = within(screen.getByRole('group', { name: 'Type of media' }));
+    expect(kinds.getByRole('radio', { name: 'Video' })).toBeChecked();
+    expect(kinds.getByRole('radio', { name: 'Video' })).toBeDisabled();
+    expect(kinds.getByRole('radio', { name: 'Audio' })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Web address' })).toBeEnabled();
   });
 
   it('has no axe violations, including with errors', async () => {
-    const { container } = renderWithClient(<MediaForm />);
+    const { container } = renderWithClient(<MediaForm onSubmit={onSubmit} />);
     await expectNoAxeViolations(container);
     await userEvent.click(screen.getByRole('button', { name: 'Add media' }));
     await expectNoAxeViolations(container);

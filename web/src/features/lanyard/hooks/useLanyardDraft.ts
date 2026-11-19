@@ -57,8 +57,11 @@ export type UseLanyardDraft = {
    */
   changes: number;
   update(patch: (config: LanyardConfig) => LanyardConfig): void;
-  /** Writes the draft; resolves true once it is saved (or had nothing). */
-  save(): Promise<boolean>;
+  /**
+   * Writes the draft; resolves true once it is saved (or had nothing).
+   * `announce: false` leaves the success toast to the caller.
+   */
+  save(options?: { announce?: boolean }): Promise<boolean>;
   /** Drops the draft, back to the last save. */
   discard(): void;
   /** Replaces an unreadable record with the defaults, keeping createdAt. */
@@ -226,136 +229,139 @@ export function useLanyardDraft(): UseLanyardDraft {
   }, [queryClient, key, show, keepServer]);
 
   /** Writes the draft, after any save already under way. */
-  const save = useCallback((): Promise<boolean> => {
-    const changes = unsaved.current;
-    if (!changes) return Promise.resolve(true);
-    saving.current += 1;
-    setInFlight((count) => count + 1);
-    const run = queue.current.then(async (): Promise<boolean> => {
-      try {
-        const current = latest.current.writer;
-        if (!current) throw new Error('Not signed in');
-        // Replaces only the stored version the draft was built on.
-        const send = (
-          value: RecordValue,
-          swapRecord: string | null | undefined
-        ) => {
-          const { $type: _type, ...fields } = value;
-          return putRecord(
-            current,
-            LANYARDS_NSID.lanyard,
-            'self',
-            { ...fields, updatedAt: new Date().toISOString() },
-            swapRecord === undefined ? {} : { swapRecord }
-          );
-        };
-        let record = changes;
-        let reference: Reference;
+  const save = useCallback(
+    (options: { announce?: boolean } = {}): Promise<boolean> => {
+      const changes = unsaved.current;
+      if (!changes) return Promise.resolve(true);
+      saving.current += 1;
+      setInFlight((count) => count + 1);
+      const run = queue.current.then(async (): Promise<boolean> => {
         try {
-          reference = await send(changes, base.current?.cid);
-        } catch (cause) {
-          if (!(cause instanceof RecordChangedError)) throw cause;
-          // Another device saved the settings since this draft was built
-          // on them. Merge: the settings changed here win, the rest come
-          // from that version, as does everything else it holds (such as
-          // per-event overrides). Then save once more.
-          const fresh = await fetchLanyardConfig(current.did);
-          if (!fresh.ok) throw cause;
-          keepServer(fresh.value);
-          if (fresh.value?.valid === false) {
-            // Saved elsewhere in a form Lanyards can't read: show that,
-            // with its Reset, rather than a Retry that can never succeed.
-            keepUnsaved(null);
-            queryClient.setQueryData<LanyardConfigRecord | null>(
-              key,
-              fresh.value
+          const current = latest.current.writer;
+          if (!current) throw new Error('Not signed in');
+          // Replaces only the stored version the draft was built on.
+          const send = (
+            value: RecordValue,
+            swapRecord: string | null | undefined
+          ) => {
+            const { $type: _type, ...fields } = value;
+            return putRecord(
+              current,
+              LANYARDS_NSID.lanyard,
+              'self',
+              { ...fields, updatedAt: new Date().toISOString() },
+              swapRecord === undefined ? {} : { swapRecord }
             );
-            setError(false);
-            notify.dismiss(SAVE_FAILED_TOAST);
-            return false;
-          }
-          record = {
-            $type: LANYARDS_NSID.lanyard,
-            ...serialiseConfig(
-              mergeConfig(
-                resolveConfig(base.current?.value ?? null),
-                resolveConfig(changes),
-                resolveConfig(fresh.value?.value ?? null)
-              ),
-              fresh.value?.value ?? null,
-              new Date().toISOString()
-            ),
           };
-          reference = await send(record, fresh.value?.cid ?? null);
-        }
-        keepServer({ value: record, cid: reference.cid, valid: true });
-        if (unsaved.current === changes || unsaved.current === null) {
-          // Nothing changed meanwhile (or the draft was dropped): show
-          // what's stored, with its CID, so later changes build on (and
-          // swap against) this version.
-          keepUnsaved(null);
-          queryClient.setQueryData<LanyardConfigRecord | null>(
-            key,
-            server.current
-          );
-        } else {
-          if (record === changes) {
-            // Later changes were built on what was just saved. (After a
-            // merge they weren't, so they keep the old base and merge too.)
-            base.current = { cid: reference.cid, value: record };
+          let record = changes;
+          let reference: Reference;
+          try {
+            reference = await send(changes, base.current?.cid);
+          } catch (cause) {
+            if (!(cause instanceof RecordChangedError)) throw cause;
+            // Another device saved the settings since this draft was built
+            // on them. Merge: the settings changed here win, the rest come
+            // from that version, as does everything else it holds (such as
+            // per-event overrides). Then save once more.
+            const fresh = await fetchLanyardConfig(current.did);
+            if (!fresh.ok) throw cause;
+            keepServer(fresh.value);
+            if (fresh.value?.valid === false) {
+              // Saved elsewhere in a form Lanyards can't read: show that,
+              // with its Reset, rather than a Retry that can never succeed.
+              keepUnsaved(null);
+              queryClient.setQueryData<LanyardConfigRecord | null>(
+                key,
+                fresh.value
+              );
+              setError(false);
+              notify.dismiss(SAVE_FAILED_TOAST);
+              return false;
+            }
+            record = {
+              $type: LANYARDS_NSID.lanyard,
+              ...serialiseConfig(
+                mergeConfig(
+                  resolveConfig(base.current?.value ?? null),
+                  resolveConfig(changes),
+                  resolveConfig(fresh.value?.value ?? null)
+                ),
+                fresh.value?.value ?? null,
+                new Date().toISOString()
+              ),
+            };
+            reference = await send(record, fresh.value?.cid ?? null);
           }
-          // Changes made during the save that end where it did leave
-          // nothing to save; any others stay in the draft.
-          if (
-            countChanges(
-              resolveConfig(unsaved.current),
-              resolveConfig(record)
-            ) === 0
-          ) {
+          keepServer({ value: record, cid: reference.cid, valid: true });
+          if (unsaved.current === changes || unsaved.current === null) {
+            // Nothing changed meanwhile (or the draft was dropped): show
+            // what's stored, with its CID, so later changes build on (and
+            // swap against) this version.
             keepUnsaved(null);
             queryClient.setQueryData<LanyardConfigRecord | null>(
               key,
               server.current
             );
+          } else {
+            if (record === changes) {
+              // Later changes were built on what was just saved. (After a
+              // merge they weren't, so they keep the old base and merge too.)
+              base.current = { cid: reference.cid, value: record };
+            }
+            // Changes made during the save that end where it did leave
+            // nothing to save; any others stay in the draft.
+            if (
+              countChanges(
+                resolveConfig(unsaved.current),
+                resolveConfig(record)
+              ) === 0
+            ) {
+              keepUnsaved(null);
+              queryClient.setQueryData<LanyardConfigRecord | null>(
+                key,
+                server.current
+              );
+            }
           }
-        }
-        if (resetting.current === changes) resetting.current = null;
-        setError(false);
-        notify.dismiss(SAVE_FAILED_TOAST);
-        notify.success(t`Lanyard updated`);
-        track('lanyard_updated');
-        return true;
-      } catch (cause) {
-        captureError(cause, { source: 'lanyard-settings' });
-        if (!mounted.current) {
-          restore();
+          if (resetting.current === changes) resetting.current = null;
+          setError(false);
+          notify.dismiss(SAVE_FAILED_TOAST);
+          if (options.announce !== false) notify.success(t`Lanyard updated`);
+          track('lanyard_updated');
+          return true;
+        } catch (cause) {
+          captureError(cause, { source: 'lanyard-settings' });
+          if (!mounted.current) {
+            restore();
+            return false;
+          }
+          // A reset that failed puts the unreadable record (and its notice)
+          // back: nothing changed, and Retry tries the reset again.
+          const wasReset = resetting.current === changes;
+          if (wasReset) {
+            resetting.current = null;
+            if (unsaved.current === changes) restore();
+          }
+          setError(true);
+          notify.error(t`Failed to save. Please try again.`, {
+            id: SAVE_FAILED_TOAST,
+            action: {
+              label: t`Retry`,
+              onClick: () =>
+                wasReset ? resetLater.current() : saveLater.current(),
+            },
+          });
           return false;
+        } finally {
+          saving.current -= 1;
+          setInFlight((count) => count - 1);
         }
-        // A reset that failed puts the unreadable record (and its notice)
-        // back: nothing changed, and Retry tries the reset again.
-        const wasReset = resetting.current === changes;
-        if (wasReset) {
-          resetting.current = null;
-          if (unsaved.current === changes) restore();
-        }
-        setError(true);
-        notify.error(t`Failed to save. Please try again.`, {
-          id: SAVE_FAILED_TOAST,
-          action: {
-            label: t`Retry`,
-            onClick: () =>
-              wasReset ? resetLater.current() : saveLater.current(),
-          },
-        });
-        return false;
-      } finally {
-        saving.current -= 1;
-        setInFlight((count) => count - 1);
-      }
-    });
-    queue.current = run;
-    return run;
-  }, [t, restore, queryClient, key, keepServer, keepUnsaved]);
+      });
+      queue.current = run;
+      return run;
+    },
+    [t, restore, queryClient, key, keepServer, keepUnsaved]
+  );
 
   /** Makes `value` the draft, or drops the draft if it matches the save. */
   const keepDraft = useCallback(

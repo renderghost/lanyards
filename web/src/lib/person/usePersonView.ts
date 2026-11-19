@@ -173,7 +173,6 @@ export function usePersonView(
       ? composeHero({
           bluesky: profile.data,
           sifa: sifa.data,
-          lanyards: lanyards.data,
           config,
         })
       : undefined,

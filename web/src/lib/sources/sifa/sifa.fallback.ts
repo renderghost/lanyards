@@ -131,11 +131,14 @@ export async function fetchSifaRecords(
   return ok({
     ...defined({
       displayName: str(self.displayName),
+      honorificPrefix: str(self.honorificPrefix),
+      honorificSuffix: str(self.honorificSuffix),
       avatar: avatarUrl(did, self.avatar),
       pronouns: str(self.pronouns),
       headline: str(self.headline),
       location: formatAddress(location?.value.address),
     }),
+    showHonorifics: self.showHonorifics !== false,
     langs: strings(self.langs),
     openTo: toOpenTo(strings(self.openTo)),
     positions: items.position.map((item) =>

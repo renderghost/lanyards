@@ -10,7 +10,7 @@ const hero = {
   did: ADA.did,
   handle: 'alice.test',
   displayName: 'Ada Example',
-  honorific: 'Dr' as const,
+  honorificPrefix: 'Dr',
 };
 
 describe('BadgeHero', () => {
@@ -27,5 +27,23 @@ describe('BadgeHero', () => {
       screen.getByRole('heading', { level: 2, name: 'Dr Ada Example' })
     ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { level: 1 })).toBeNull();
+  });
+
+  it('shows the prefix before the name and the suffix after a comma', () => {
+    renderWithProviders(
+      <BadgeHero
+        hero={
+          {
+            ...hero,
+            honorificPrefix: 'Prof',
+            honorificSuffix: 'OBE',
+          } as never
+        }
+        headingLevel={2}
+      />
+    );
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Prof Ada Example, OBE' })
+    ).toBeInTheDocument();
   });
 });

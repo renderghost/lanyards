@@ -132,6 +132,11 @@ lanyard itself (which keeps its own branded look).
 
 ### Editing kept records in place
 
+> **Amended by `2026-11-19-lanyard-layout-design.md`:** links now come only
+> from Sifa and Bluesky (no Lanyards links to edit), the title comes from
+> Sifa (no Title control), and podcasts and videos are added and edited in
+> a dialog rather than an inline form.
+
 - **Links block:**
   - Lanyards' own web links can be edited (address, title) and deleted in
     place;

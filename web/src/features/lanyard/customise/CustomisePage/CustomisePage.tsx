@@ -10,40 +10,25 @@ import { useSession } from '@/features/auth/session/useSession';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
-import { profileId } from '@/lib/atproto/profileId';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
-import { usePersonView } from '@/lib/person/usePersonView';
 import { cn } from '@/lib/utils';
 
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
-import { useKeptRecords } from '../../hooks/useKeptRecords';
-import { useLanyardDraft } from '../../hooks/useLanyardDraft';
+import { KEPT_LISTS, useCustomiserDraft } from '../../hooks/useCustomiserDraft';
 import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
-import { HonorificForm } from '../HonorificForm/HonorificForm';
-import { MediaForm } from '../MediaForm/MediaForm';
-import { MediaList } from '../MediaList/MediaList';
-import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
 import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
-import { WebLinkForm } from '../WebLinkForm/WebLinkForm';
-import { WebLinkList } from '../WebLinkList/WebLinkList';
 import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
 import * as styles from './CustomisePage.styles';
 import type { CustomisePageProps } from './CustomisePage.types';
 
-/** Kept-record lists the owner adds to and deletes from. */
-const KEPT_LISTS = [
-  LANYARDS_NSID.webLink,
-  LANYARDS_NSID.audio,
-  LANYARDS_NSID.video,
-] as const;
-
 /**
- * `/lanyard`: the signed-in owner customises their lanyard beside a live
- * preview (spec §7.4). Changes show at once and are a draft until Save, in
+ * `/lanyard`: the signed-in owner customises their lanyard where it is
+ * (spec §7.4): its style in the sidebar, its blocks and records on the
+ * lanyard itself. Changes show at once and are one draft until Save, in
  * the route's own header (#118).
  */
 export function CustomisePage({ className }: CustomisePageProps) {
@@ -89,14 +74,8 @@ function Customiser({
 }) {
   const { t } = useLingui();
   const headingId = useId();
-  const linksId = useId();
-  const mediaId = useId();
-  const moreId = useId();
-  const linksHeading = useRef<HTMLHeadingElement>(null);
-  const mediaHeading = useRef<HTMLHeadingElement>(null);
-  const lanyard = useLanyardDraft();
-  const view = usePersonView(did, { mode: 'owner' });
-  const kept = useKeptRecords(did);
+  const draft = useCustomiserDraft(did);
+  const { settings, records } = draft;
   const [viewAs, setViewAs] = useState<ViewAs>('edit');
   /** On phones, the style sheet opened from the bottom toolbar. */
   const [styleOpen, setStyleOpen] = useState(false);
@@ -106,19 +85,18 @@ function Customiser({
   const canEdit =
     canWrite(granted, LANYARDS_NSID.lanyard, 'create') &&
     canWrite(granted, LANYARDS_NSID.lanyard, 'update');
-  const disabled = !canEdit || !lanyard.ready;
-  const canKeep =
-    canWrite(granted, LANYARDS_NSID.honorific, 'create') &&
-    canWrite(granted, LANYARDS_NSID.honorific, 'update') &&
-    KEPT_LISTS.every(
-      (collection) =>
-        canWrite(granted, collection, 'create') &&
-        canWrite(granted, collection, 'delete')
-    );
-  const { update } = lanyard;
+  const canKeep = KEPT_LISTS.every((collection) =>
+    (['create', 'update', 'delete'] as const).every((action) =>
+      canWrite(granted, collection, action)
+    )
+  );
+  const disabled = !canEdit || !settings.ready;
+  // A records save replaces the draft it sent, so edits wait for it.
+  const recordsDisabled = !canKeep || !records.ready || draft.saving;
+  const { update } = settings;
   const editing = viewAs === 'edit';
   useUnsavedChangesGuard(
-    lanyard.dirty,
+    draft.dirty,
     t`You have unsaved changes. Leave without saving?`
   );
 
@@ -130,11 +108,11 @@ function Customiser({
           <CustomiserActions
             viewAs={viewAs}
             onViewAsChange={setViewAs}
-            dirty={lanyard.dirty}
-            changes={lanyard.changes}
-            saving={lanyard.saving}
-            onSave={() => void lanyard.save()}
-            onReset={lanyard.discard}
+            dirty={draft.dirty}
+            changes={draft.changes}
+            saving={draft.saving}
+            onSave={() => void draft.save()}
+            onReset={draft.discard}
           />
         }
       />
@@ -142,7 +120,7 @@ function Customiser({
         <div className={cn(styles.workspace, className)}>
           {editing && (
             <StyleSidebar
-              config={lanyard.config}
+              config={settings.config}
               disabled={disabled}
               onChange={update}
             />
@@ -152,8 +130,10 @@ function Customiser({
               <h1 id={headingId} className={styles.heading}>
                 {t`Customise your lanyard`}
               </h1>
-              {!canEdit && <PermissionNotice returnTo={CUSTOMISE_PATH} />}
-              {lanyard.invalid && (
+              {(!canEdit || !canKeep || draft.permissionLost) && (
+                <PermissionNotice returnTo={CUSTOMISE_PATH} />
+              )}
+              {settings.invalid && (
                 <div role="status" className={styles.notice}>
                   <p className={styles.noticeHeading}>
                     {t`We couldn't read your lanyard settings`}
@@ -164,7 +144,7 @@ function Customiser({
                   <Button
                     variant="secondary"
                     disabled={!canEdit}
-                    onClick={lanyard.resetInvalid}
+                    onClick={settings.resetInvalid}
                   >
                     {t`Reset to defaults`}
                   </Button>
@@ -180,82 +160,31 @@ function Customiser({
               {editing ? (
                 <LanyardEditor
                   did={did}
-                  config={lanyard.config}
+                  config={settings.config}
                   onChange={update}
                   disabled={disabled}
+                  records={records}
+                  recordsDisabled={recordsDisabled}
                 />
               ) : (
                 <LanyardPage did={did} preview="visitor" />
               )}
             </section>
-            {editing && (
-              <section aria-labelledby={moreId} className={styles.more}>
-                <div className={styles.moreIntro}>
-                  <h2 id={moreId} className={styles.moreHeading}>
-                    {t`More settings`}
-                  </h2>
-                  <p className={styles.moreHint}>
-                    {t`Your links, podcasts, videos and honorific save as soon as you change them.`}
-                  </p>
-                </div>
-                <OrcidHelper
-                  did={did}
-                  profile={profileId(did, view.hero?.handle)}
-                  orcidId={view.orcidId}
-                />
-                <HonorificForm
-                  current={kept.data?.honorific ?? 'none'}
-                  disabled={!canKeep || kept.status !== 'success'}
-                />
-                <section aria-labelledby={linksId} className={styles.kept}>
-                  <h2
-                    ref={linksHeading}
-                    id={linksId}
-                    tabIndex={-1}
-                    className={styles.subheading}
-                  >
-                    {t`Your links`}
-                  </h2>
-                  <WebLinkList
-                    links={kept.data?.webLinks ?? []}
-                    disabled={!canKeep}
-                    onEmptied={() => linksHeading.current?.focus()}
-                  />
-                  <WebLinkForm disabled={!canKeep} />
-                </section>
-                <section aria-labelledby={mediaId} className={styles.kept}>
-                  <h2
-                    ref={mediaHeading}
-                    id={mediaId}
-                    tabIndex={-1}
-                    className={styles.subheading}
-                  >
-                    {t`Your podcasts and videos`}
-                  </h2>
-                  <MediaList
-                    items={kept.data?.media ?? []}
-                    disabled={!canKeep}
-                    onEmptied={() => mediaHeading.current?.focus()}
-                  />
-                  <MediaForm disabled={!canKeep} />
-                </section>
-              </section>
-            )}
           </div>
         </div>
         <CustomiserToolbar
           onOpenStyle={() => setStyleOpen(true)}
           styleButtonRef={styleButton}
-          onReset={lanyard.discard}
-          dirty={lanyard.dirty}
-          changes={lanyard.changes}
+          onReset={draft.discard}
+          dirty={draft.dirty}
+          changes={draft.changes}
         />
       </main>
       <StyleSheet
         open={styleOpen}
         onOpenChange={setStyleOpen}
         returnFocus={() => styleButton.current?.focus()}
-        config={lanyard.config}
+        config={settings.config}
         disabled={disabled}
         onChange={update}
       />

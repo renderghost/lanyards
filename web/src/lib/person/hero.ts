@@ -1,6 +1,5 @@
 import { cdnImage } from '@/lib/atproto/avatar';
 import type { BlueskyProfile } from '@/lib/sources/bluesky/bluesky.types';
-import type { LanyardRecords } from '@/lib/sources/lanyards/lanyards.types';
 import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 
 import type { LanyardConfig } from './config';
@@ -34,10 +33,10 @@ function bioHeadline(description?: string): string | undefined {
 export function composeHero(input: {
   bluesky: BlueskyProfile;
   sifa?: SifaProfile | null;
-  lanyards?: LanyardRecords;
   config: LanyardConfig;
 }): BadgeHero {
-  const { bluesky, sifa, lanyards, config } = input;
+  const { bluesky, sifa, config } = input;
+  const honorifics = sifa?.showHonorifics ? sifa : undefined;
   const job = config.showJob && sifa ? currentJob(sifa.positions) : undefined;
   const avatar = cdnImage(sifa?.avatar) ?? cdnImage(bluesky.avatar);
   const pronouns = sifa?.pronouns ?? bluesky.pronouns;
@@ -47,7 +46,12 @@ export function composeHero(input: {
     did: bluesky.did,
     handle: bluesky.handle,
     displayName: sifa?.displayName ?? bluesky.displayName ?? bluesky.handle,
-    ...(lanyards?.honorific ? { honorific: lanyards.honorific } : {}),
+    ...(honorifics?.honorificPrefix
+      ? { honorificPrefix: honorifics.honorificPrefix }
+      : {}),
+    ...(honorifics?.honorificSuffix
+      ? { honorificSuffix: honorifics.honorificSuffix }
+      : {}),
     ...(avatar ? { avatar } : {}),
     ...(pronouns ? { pronouns } : {}),
     ...(headline ? { headline } : {}),
@@ -60,4 +64,17 @@ export function composeHero(input: {
         }
       : {}),
   };
+}
+
+/**
+ * The badge's name with its honorifics, as Sifa holds them: the prefix
+ * before the name and the suffix after a comma ("Dr Ada Example, PhD").
+ */
+export function heroName(
+  hero: Pick<BadgeHero, 'displayName' | 'honorificPrefix' | 'honorificSuffix'>
+): string {
+  const name = [hero.honorificPrefix, hero.displayName]
+    .filter(Boolean)
+    .join(' ');
+  return hero.honorificSuffix ? `${name}, ${hero.honorificSuffix}` : name;
 }

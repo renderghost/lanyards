@@ -34,7 +34,7 @@ import { detectPlatform } from './platform';
 
 /** Which queries feed each block. */
 export const BLOCK_SOURCES: Record<RenderableBlockType, SourceKey[]> = {
-  links: ['bluesky', 'sifa', 'lanyards'],
+  links: ['bluesky', 'sifa'],
   talks: ['sifa'],
   openTo: ['sifa'],
   blogPosts: ['standardSite'],
@@ -89,11 +89,6 @@ function mergeLinks(values: Values): LinkItem[] {
       rank: 1,
       iconUrl: cdnImage(link.iconUrl),
     })),
-    ...(values.lanyards?.webLinks ?? []).map((link) => ({
-      url: link.url,
-      title: link.title,
-      rank: 0,
-    })),
     ...(values.sifa?.externalAccounts ?? []).map((account) => ({
       url: account.url,
       title: account.label,
@@ -104,7 +99,12 @@ function mergeLinks(values: Values): LinkItem[] {
 
   const merged = new Map<
     string,
-    { url: string; titles: Candidate[]; hint?: string; iconUrl?: string }
+    {
+      url: string;
+      titles: Candidate[];
+      hint?: string;
+      iconUrl?: string;
+    }
   >();
   for (const candidate of candidates) {
     const key = normaliseUrl(candidate.url);
