@@ -137,3 +137,60 @@ export async function deleteRecord(
   });
   if (!response.ok) throw new WriteFailedError(response.data.error);
 }
+
+/** At most this many writes go in one applyWrites call; each is atomic. */
+const BATCH_SIZE = 10;
+
+/** One change in a batch: create, update or delete a record. */
+export type WriteOp =
+  | {
+      type: 'create';
+      collection: WritableNsid;
+      /** A new TID when left out. */
+      rkey?: string;
+      fields: Record<string, unknown>;
+    }
+  | {
+      type: 'update';
+      collection: WritableNsid;
+      rkey: string;
+      fields: Record<string, unknown>;
+    }
+  | { type: 'delete'; collection: WritableNsid; rkey: string };
+
+const WRITE_TYPE = {
+  create: 'com.atproto.repo.applyWrites#create',
+  update: 'com.atproto.repo.applyWrites#update',
+  delete: 'com.atproto.repo.applyWrites#delete',
+} as const;
+
+/**
+ * Applies several writes to the signed-in person's repository. Every one
+ * is checked (permission and lexicon) before anything is sent; then they go
+ * in com.atproto.repo.applyWrites calls of at most 10, each all-or-nothing.
+ */
+export async function applyWrites(
+  session: WriteSession,
+  ops: WriteOp[]
+): Promise<void> {
+  const writes = ops.map((op) => {
+    allow(session, op.collection, op.type);
+    return op.type === 'delete'
+      ? { $type: WRITE_TYPE.delete, collection: op.collection, rkey: op.rkey }
+      : {
+          $type: WRITE_TYPE[op.type],
+          collection: op.collection,
+          rkey: op.rkey ?? tidNow(),
+          value: typed(op.collection, op.fields),
+        };
+  });
+  for (let start = 0; start < writes.length; start += BATCH_SIZE) {
+    const response = await session.rpc.post('com.atproto.repo.applyWrites', {
+      input: {
+        repo: session.did,
+        writes: writes.slice(start, start + BATCH_SIZE) as never,
+      },
+    });
+    if (!response.ok) throw new WriteFailedError(response.data.error);
+  }
+}
