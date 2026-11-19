@@ -70,6 +70,23 @@ describe('ToggleGroup', () => {
     expect(option('Edit')).toHaveAttribute('aria-pressed', 'true');
   });
 
+  it('can show a short label on small screens, keeping the full name', () => {
+    renderWithProviders(
+      <ToggleGroup
+        label="Preview mode"
+        value="edit"
+        onValueChange={vi.fn()}
+        options={[
+          { value: 'edit', label: 'Edit' },
+          { value: 'public', label: 'View as public', shortLabel: 'Public' },
+        ]}
+      />
+    );
+    const short = screen.getByRole('button', { name: 'View as public' });
+    expect(short).toHaveTextContent('Public');
+    expect(screen.getByText('Public')).toHaveClass('md:hidden');
+  });
+
   it('has a hit area at least 44px tall', () => {
     expect(hitHeight(styles.item)).toBeGreaterThanOrEqual(44);
   });

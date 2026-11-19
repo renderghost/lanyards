@@ -161,7 +161,7 @@ test.describe('lanyard customiser', () => {
     await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
     await expect(page.getByText('Unsaved changes')).toBeVisible();
     await saveChanges(page);
-    await expect(page.getByText('Saved', { exact: true })).toBeVisible();
+    await expect(page.getByText('All changes saved')).toBeVisible();
     const saves = lanyardSaves(writes);
     expect(saves).toHaveLength(1);
     expect(saves[0]?.accent).toBe('teal');

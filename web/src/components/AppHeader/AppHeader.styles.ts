@@ -2,12 +2,14 @@
 export const header =
   'flex items-center justify-between gap-4 border-b border-ui-border bg-ui-surface px-4 pb-1.5 pt-[max(0.375rem,env(safe-area-inset-top))]';
 
+export const start = 'flex min-w-0 items-center gap-3';
+
 export const homeLink = 'inline-flex min-h-11 min-w-11 items-center rounded-lg';
 
-export const accountLink =
-  'inline-flex size-11 items-center justify-center rounded-full';
+export const title =
+  'hidden truncate text-sm leading-5 text-ui-text-muted md:block';
 
-export const avatar = 'size-8 rounded-full bg-ui-surface-muted';
+export const actions = 'flex min-w-0 items-center gap-2';
 
 export const nav = 'flex items-center gap-1';
 

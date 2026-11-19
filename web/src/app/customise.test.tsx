@@ -113,6 +113,19 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(region).toContainElement(ground);
   });
 
+  it('shows only its own header, with the customiser’s actions', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    await preview();
+    const banners = screen.getAllByRole('banner');
+    expect(banners).toHaveLength(1);
+    expect(banners[0]).toHaveTextContent('Your lanyard');
+    expect(
+      within(banners[0] as HTMLElement).getByRole('button', { name: 'Save' })
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('main')).toHaveLength(1);
+  });
+
   it('gives the page one level-one heading, its purpose', async () => {
     servePerson();
     renderRoute('/lanyard');
@@ -135,7 +148,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await within(region).findAllByText("Couldn't load Sifa", undefined, {
       timeout: 8000,
     });
-    const toggle = screen.getByRole('button', { name: 'View as visitor' });
+    const toggle = screen.getByRole('button', { name: 'View as public' });
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await userEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
@@ -150,8 +163,8 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(teal);
     expect(document.documentElement.dataset.accent).toBe('teal');
-    const status = screen.getByText('Unsaved changes');
-    expect(status.closest('[aria-live="polite"]')).not.toBeNull();
+    const status = within(screen.getByRole('banner')).getByRole('status');
+    expect(status).toHaveTextContent('Unsaved changes');
     await new Promise((resolve) => setTimeout(resolve, 1000));
     expect(saves).toEqual([]);
     await saveChanges();
@@ -162,7 +175,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       rkey: 'self',
       record: { $type: 'app.lanyards.actor.lanyard', accent: 'teal' },
     });
-    expect(await screen.findByText('Saved')).toBeInTheDocument();
+    await waitFor(() => expect(status).toHaveTextContent('All changes saved'));
   });
 
   it('resets unsaved changes to the last save, writing nothing', async () => {
@@ -172,7 +185,9 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const teal = await accent('Teal');
     await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
     const save = screen.getByRole('button', { name: 'Save' });
-    const reset = screen.getByRole('button', { name: 'Reset' });
+    const reset = within(screen.getByRole('banner')).getByRole('button', {
+      name: 'Reset',
+    });
     expect(save).toHaveAttribute('aria-disabled', 'true');
     expect(reset).toHaveAttribute('aria-disabled', 'true');
     await userEvent.click(teal);
