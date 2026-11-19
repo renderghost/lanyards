@@ -11,7 +11,8 @@ msgstr ""
 msgid "(hidden)"
 msgstr "(hidden)"
 
-#: src/components/ExternalLink/ExternalLink.tsx:30
+#: src/components/ExternalLink/ExternalLink.tsx:28
+#: src/components/ExternalLink/ExternalLink.tsx:32
 msgid "(opens in a new tab)"
 msgstr "(opens in a new tab)"
 
@@ -386,6 +387,7 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:44
 #: src/features/lanyard/components/blocks/ItemFrame/ItemFrame.tsx:34
 msgid "Hidden"
 msgstr "Hidden"
@@ -599,6 +601,10 @@ msgstr "Podcast episode"
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:33
 msgid "Podcasts and videos"
 msgstr "Podcasts and videos"
+
+#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:31
+msgid "Post on Bluesky, {date}"
+msgstr "Post on Bluesky, {date}"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:21
 msgid "Presentation"
@@ -868,7 +874,7 @@ msgstr "Unsaved changes"
 msgid "Update"
 msgstr "Update"
 
-#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:45
+#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:41
 msgid "Verified on ORCID"
 msgstr "Verified on ORCID"
 
@@ -887,10 +893,6 @@ msgstr "Video"
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:37
 msgid "View as public"
 msgstr "View as public"
-
-#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:33
-msgid "View on Bluesky"
-msgstr "View on Bluesky"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:10
 msgid "Vimeo"
