@@ -171,41 +171,6 @@ test.describe('lanyard customiser', () => {
     });
   });
 
-  test('checks a web link, then adds it in place once fixed', async ({
-    page,
-  }) => {
-    await openCustomiser(page);
-    const links = page.locator('[data-block="links"]');
-    const add = links.getByRole('button', { name: 'Add a link' });
-    await expect(add).toBeEnabled();
-    await add.click();
-    const address = links.getByRole('textbox', { name: 'Web address' });
-    await expect(address).toBeFocused();
-    await address.fill('ftp://x');
-    await links.getByRole('button', { name: 'Add link' }).click();
-    await expect(address).toHaveAttribute('aria-invalid', 'true');
-    await expect(address).toBeFocused();
-    await expect(
-      links.getByText('Enter a web address starting with https:// or http://')
-    ).toBeVisible();
-
-    await address.fill('https://ada.example/talks');
-    await links.getByRole('textbox', { name: 'Title' }).fill('Talks');
-    await links.getByRole('button', { name: 'Add link' }).click();
-    await expect(links.getByRole('link', { name: /Talks/ })).toBeVisible();
-    await expect(add).toBeFocused();
-    expect(writes).toEqual([]);
-    await saveChanges(page);
-    await expect(page.getByText('Lanyard updated')).toBeVisible();
-    const saved = writes.find(
-      (write) => write.body.collection === 'app.lanyards.link.web'
-    );
-    expect(saved?.body).toMatchObject({
-      action: 'create',
-      record: { url: 'https://ada.example/talks', title: 'Talks' },
-    });
-  });
-
   test('hides a record in place, then shows it again', async ({ page }) => {
     await openCustomiser(page);
     const talks = page.locator('[data-block="talks"]');
@@ -289,8 +254,7 @@ test.describe('lanyard customiser', () => {
     await expect(
       page.getByText('You’re seeing your lanyard as the public sees it.')
     ).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Add a link' })).toBeHidden();
-    await expect(page.getByRole('combobox', { name: 'Title' })).toBeHidden();
+    await expect(page.getByRole('switch', { name: 'Show Links' })).toBeHidden();
     await expect(
       page.getByRole('button', { name: 'View as public' })
     ).toHaveAttribute('aria-pressed', 'true');
@@ -418,23 +382,6 @@ test.describe('lanyard customiser', () => {
       await expect(
         page.locator('[data-block="links"]').getByText('Hidden from visitors')
       ).toBeVisible();
-      const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-      expect(result.violations).toEqual([]);
-    });
-  }
-
-  for (const colorScheme of ['light', 'dark'] as const) {
-    test(`stays accessible while adding a link (${colorScheme})`, async ({
-      page,
-    }) => {
-      await page.emulateMedia({ colorScheme });
-      await openCustomiser(page);
-      const links = page.locator('[data-block="links"]');
-      await links.getByRole('button', { name: 'Add a link' }).click();
-      await links.getByRole('button', { name: 'Add link' }).click();
-      await expect(
-        links.getByRole('textbox', { name: 'Web address' })
-      ).toHaveAttribute('aria-invalid', 'true');
       const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
       expect(result.violations).toEqual([]);
     });

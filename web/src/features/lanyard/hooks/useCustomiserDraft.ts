@@ -17,11 +17,7 @@ import { useLanyardDraft, type UseLanyardDraft } from './useLanyardDraft';
 const SAVE_FAILED_TOAST = 'lanyard-settings-save';
 
 /** The kept-record lists the owner adds to, edits and deletes from. */
-export const KEPT_LISTS = [
-  LANYARDS_NSID.webLink,
-  LANYARDS_NSID.audio,
-  LANYARDS_NSID.video,
-] as const;
+export const KEPT_LISTS = [LANYARDS_NSID.audio, LANYARDS_NSID.video] as const;
 
 export type UseCustomiserDraft = {
   settings: UseLanyardDraft;
@@ -61,13 +57,11 @@ export function useCustomiserDraft(did: Did): UseCustomiserDraft {
         canWrite(granted, LANYARDS_NSID.lanyard, 'update'));
     const recordsAllowed =
       !records.dirty ||
-      (canWrite(granted, LANYARDS_NSID.honorific, 'create') &&
-        canWrite(granted, LANYARDS_NSID.honorific, 'update') &&
-        KEPT_LISTS.every((collection) =>
-          (['create', 'update', 'delete'] as const).every((action) =>
-            canWrite(granted, collection, action)
-          )
-        ));
+      KEPT_LISTS.every((collection) =>
+        (['create', 'update', 'delete'] as const).every((action) =>
+          canWrite(granted, collection, action)
+        )
+      );
     return settingsAllowed && recordsAllowed;
   }
 

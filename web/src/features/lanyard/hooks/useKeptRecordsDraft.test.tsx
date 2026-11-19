@@ -37,11 +37,8 @@ vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
 
 const NOW = '2026-11-19T12:00:00.000Z';
 const OLD = '2026-01-01T09:00:00.000Z';
-const WEB = `at://${ADA.did}/app.lanyards.link.web/3mweb1`;
 const AUDIO = `at://${ADA.did}/app.lanyards.link.media.audio/3maud1`;
 const STORED: LanyardRecords = {
-  honorific: 'Dr',
-  webLinks: [{ key: WEB, url: 'https://ada.example/', title: 'Site' }],
   media: [
     {
       key: AUDIO,
@@ -98,30 +95,43 @@ afterEach(() => {
 });
 
 describe('useKeptRecordsDraft', () => {
-  it('an added link shows at once with a draft key and isn’t written until save', () => {
+  const EPISODE = {
+    kind: 'audio' as const,
+    url: 'https://pod.example/2',
+    platform: 'spotify',
+  };
+
+  it('an added episode shows at once with a draft key and isn’t written until save', () => {
     const { result } = render();
-    act(() =>
-      result.current.addLink({ url: 'https://new.example/', title: 'New' })
-    );
-    expect(result.current.records.webLinks).toEqual([
-      STORED.webLinks[0],
-      { key: 'draft:1', url: 'https://new.example/', title: 'New' },
+    act(() => result.current.addMedia(EPISODE));
+    expect(result.current.records.media).toEqual([
+      STORED.media[0],
+      { key: 'draft:1', ...EPISODE },
     ]);
     // The lanyard (reading the same cache) shows it too.
     expect(
-      client.getQueryData<LanyardRecords>(key())?.webLinks.map((l) => l.key)
-    ).toEqual([WEB, 'draft:1']);
+      client.getQueryData<LanyardRecords>(key())?.media.map((m) => m.key)
+    ).toEqual([AUDIO, 'draft:1']);
     expect(result.current.dirty).toBe(true);
     expect(result.current.changes).toBe(1);
     expect(applyWrites).not.toHaveBeenCalled();
   });
 
-  it('editing a stored link keeps its createdAt', async () => {
+  it('holds only podcasts and videos', () => {
+    const { result } = render();
+    expect(Object.keys(result.current.records)).toEqual(['media']);
+    expect(result.current).not.toHaveProperty('addLink');
+    expect(result.current).not.toHaveProperty('setHonorific');
+  });
+
+  it('editing a stored episode keeps its createdAt', async () => {
     const { result } = render();
     act(() =>
-      result.current.updateLink(WEB, {
-        url: 'https://ada.example/cv',
-        title: 'CV',
+      result.current.updateMedia(AUDIO, {
+        kind: 'audio',
+        url: 'https://pod.example/1',
+        platform: 'spotify',
+        title: 'Episode 1',
       })
     );
     expect(await save(result)).toBe(true);
@@ -129,15 +139,46 @@ describe('useKeptRecordsDraft', () => {
       [
         {
           type: 'update',
-          collection: 'app.lanyards.link.web',
-          rkey: '3mweb1',
+          collection: 'app.lanyards.link.media.audio',
+          rkey: '3maud1',
           fields: {
-            url: 'https://ada.example/cv',
-            title: 'CV',
+            url: 'https://pod.example/1',
+            platform: 'spotify',
+            title: 'Episode 1',
             createdAt: OLD,
           },
         },
       ],
+    ]);
+  });
+
+  it('moving an episode to video deletes it there and creates it here', async () => {
+    const { result } = render();
+    act(() =>
+      result.current.updateMedia(AUDIO, {
+        kind: 'video',
+        url: 'https://pod.example/1',
+        platform: 'youtube',
+        title: 'Episode one',
+      })
+    );
+    await save(result);
+    expect(ops()[0]).toEqual([
+      {
+        type: 'delete',
+        collection: 'app.lanyards.link.media.audio',
+        rkey: '3maud1',
+      },
+      {
+        type: 'create',
+        collection: 'app.lanyards.link.media.video',
+        fields: {
+          url: 'https://pod.example/1',
+          platform: 'youtube',
+          title: 'Episode one',
+          createdAt: NOW,
+        },
+      },
     ]);
   });
 
@@ -146,10 +187,10 @@ describe('useKeptRecordsDraft', () => {
     vi.mocked(fetchLanyardRecords).mockReturnValue(new Promise(() => {}));
     const { result } = render();
     expect(result.current.ready).toBe(false);
-    act(() => result.current.addLink({ url: 'https://new.example/' }));
+    act(() => result.current.addMedia(EPISODE));
     // A draft built on nothing would delete every stored record on Save.
     expect(result.current.dirty).toBe(false);
-    expect(result.current.records.webLinks).toEqual([]);
+    expect(result.current.records.media).toEqual([]);
   });
 
   it('is ready once the stored records are read', () => {
@@ -157,62 +198,43 @@ describe('useKeptRecordsDraft', () => {
     expect(result.current.ready).toBe(true);
   });
 
-  it('a removed link disappears from the draft records', () => {
+  it('a removed episode disappears from the draft records', () => {
     const { result } = render();
-    act(() => result.current.removeLink(WEB));
-    expect(result.current.records.webLinks).toEqual([]);
+    act(() => result.current.removeMedia(AUDIO));
+    expect(result.current.records.media).toEqual([]);
     expect(result.current.changes).toBe(1);
   });
 
   it('save sends one batch and clears the draft', async () => {
     const { result } = render();
-    act(() => result.current.addLink({ url: 'https://new.example/' }));
+    act(() => result.current.addMedia(EPISODE));
     act(() => result.current.removeMedia(AUDIO));
-    act(() => result.current.setHonorific('Prof'));
-    expect(result.current.changes).toBe(3);
+    expect(result.current.changes).toBe(2);
     expect(await save(result)).toBe(true);
     expect(applyWrites).toHaveBeenCalledTimes(1);
     expect(ops()[0]).toEqual([
       {
         type: 'create',
-        collection: 'app.lanyards.link.web',
-        fields: { url: 'https://new.example/', createdAt: NOW },
+        collection: 'app.lanyards.link.media.audio',
+        fields: {
+          url: 'https://pod.example/2',
+          platform: 'spotify',
+          createdAt: NOW,
+        },
       },
       {
         type: 'delete',
         collection: 'app.lanyards.link.media.audio',
         rkey: '3maud1',
       },
-      {
-        type: 'update',
-        collection: 'app.lanyards.actor.biography.honorific',
-        rkey: 'self',
-        fields: { value: 'Prof', createdAt: OLD },
-      },
     ]);
     expect(result.current.dirty).toBe(false);
   });
 
-  it('creates the honorific when there is none', async () => {
-    vi.mocked(getRecord).mockResolvedValue({ ok: true, value: null } as never);
-    client.setQueryData(key(), { ...STORED, honorific: undefined });
-    const { result } = render();
-    act(() => result.current.setHonorific('Dr'));
-    await save(result);
-    expect(ops()[0]).toEqual([
-      {
-        type: 'create',
-        collection: 'app.lanyards.actor.biography.honorific',
-        rkey: 'self',
-        fields: { value: 'Dr', createdAt: NOW },
-      },
-    ]);
-  });
-
   it('records a save, by how many records it changed', async () => {
     const { result } = render();
-    act(() => result.current.addLink({ url: 'https://new.example/' }));
-    act(() => result.current.removeLink(WEB));
+    act(() => result.current.addMedia(EPISODE));
+    act(() => result.current.removeMedia(AUDIO));
     await save(result);
     expect(track).toHaveBeenCalledWith('kept_record_saved', { changes: 2 });
   });
@@ -220,18 +242,18 @@ describe('useKeptRecordsDraft', () => {
   it('a failed save keeps every change', async () => {
     vi.mocked(applyWrites).mockRejectedValue(new Error('PDS down'));
     const { result } = render();
-    act(() => result.current.addLink({ url: 'https://new.example/' }));
-    act(() => result.current.removeLink(WEB));
+    act(() => result.current.addMedia(EPISODE));
+    act(() => result.current.removeMedia(AUDIO));
     expect(await save(result)).toBe(false);
     expect(result.current.dirty).toBe(true);
-    expect(result.current.records.webLinks.map((link) => link.key)).toEqual([
+    expect(result.current.records.media.map((item) => item.key)).toEqual([
       'draft:1',
     ]);
   });
 
   it('discard returns to the stored records, for everyone', () => {
     const { result } = render();
-    act(() => result.current.addLink({ url: 'https://new.example/' }));
+    act(() => result.current.addMedia(EPISODE));
     act(() => result.current.discard());
     expect(result.current.records).toEqual(STORED);
     expect(client.getQueryData(key())).toEqual(STORED);

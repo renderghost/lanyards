@@ -115,8 +115,9 @@ test.describe('public lanyard, signed out', () => {
   }) => {
     await mockPerson(page, { sifaDown: true });
     await page.goto('/@alice.test');
+    // The title comes from Sifa: without it, the name stands alone.
     await expect(
-      page.getByRole('heading', { level: 1, name: 'Dr Ada Example' })
+      page.getByRole('heading', { level: 1, name: 'Ada Example' })
     ).toBeVisible();
     await expect(page.getByRole('region', { name: 'Links' })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Talks' })).toHaveCount(0);

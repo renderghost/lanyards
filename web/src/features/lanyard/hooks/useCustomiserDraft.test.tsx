@@ -52,7 +52,7 @@ const CONFIG = {
   accent: 'violet',
   createdAt: '2026-11-01T09:00:00.000Z',
 };
-const RECORDS: LanyardRecords = { webLinks: [], media: [] };
+const RECORDS: LanyardRecords = { media: [] };
 
 let client: QueryClient;
 
@@ -70,7 +70,13 @@ type Draft = ReturnType<typeof render>['result'];
 
 /** A link added and the accent changed: both halves dirty. */
 function editBoth(result: Draft) {
-  act(() => result.current.records.addLink({ url: 'https://new.example/' }));
+  act(() =>
+    result.current.records.addMedia({
+      kind: 'audio',
+      url: 'https://pod.example/2',
+      platform: 'spotify',
+    })
+  );
   act(() => result.current.settings.update((c) => ({ ...c, accent: 'teal' })));
 }
 

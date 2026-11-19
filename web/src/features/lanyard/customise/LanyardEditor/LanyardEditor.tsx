@@ -44,7 +44,6 @@ import type { BlockItems } from '@/lib/person/personView.types';
 import { usePersonView } from '@/lib/person/usePersonView';
 
 import { EditableBlock } from '../EditableBlock/EditableBlock';
-import { LinkEditor } from '../LinkEditor/LinkEditor';
 import { MediaEditor } from '../MediaEditor/MediaEditor';
 import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
 import { RecordToggle } from '../RecordToggle/RecordToggle';
@@ -59,7 +58,7 @@ const itemsOf = <T extends keyof BlockItems>(block: EditorBlock, _type: T) =>
 /**
  * The owner's lanyard, edited where it is (#118): every block with its bar
  * (drag, move, show/hide, count) and every record with its own show/hide.
- * Their own links, podcasts and videos are edited in their blocks. Hidden blocks and records stay in place. Every
+ * Their own podcasts and videos are edited in their block. Hidden blocks and records stay in place. Every
  * move is announced.
  */
 export function LanyardEditor({
@@ -217,16 +216,6 @@ export function LanyardEditor({
     block: EditorBlock
   ): { content?: ReactNode; footer?: ReactNode } => {
     switch (block.type) {
-      case 'links':
-        return {
-          content: (
-            <LinkEditor
-              items={itemsOf(block, 'links')}
-              records={records}
-              disabled={recordsDisabled}
-            />
-          ),
-        };
       case 'media':
         return {
           content: (

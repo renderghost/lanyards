@@ -85,14 +85,11 @@ function Customiser({
   const canEdit =
     canWrite(granted, LANYARDS_NSID.lanyard, 'create') &&
     canWrite(granted, LANYARDS_NSID.lanyard, 'update');
-  const canKeep =
-    canWrite(granted, LANYARDS_NSID.honorific, 'create') &&
-    canWrite(granted, LANYARDS_NSID.honorific, 'update') &&
-    KEPT_LISTS.every((collection) =>
-      (['create', 'update', 'delete'] as const).every((action) =>
-        canWrite(granted, collection, action)
-      )
-    );
+  const canKeep = KEPT_LISTS.every((collection) =>
+    (['create', 'update', 'delete'] as const).every((action) =>
+      canWrite(granted, collection, action)
+    )
+  );
   const disabled = !canEdit || !settings.ready;
   // A records save replaces the draft it sent, so edits wait for it.
   const recordsDisabled = !canKeep || !records.ready || draft.saving;

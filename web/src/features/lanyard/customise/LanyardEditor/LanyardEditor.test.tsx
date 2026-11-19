@@ -182,7 +182,7 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
   });
 
-  it('adds links and podcasts in their own blocks', async () => {
+  it('adds podcasts and videos in their block; links can only be hidden', async () => {
     servePerson({
       config: {
         blocks: [
@@ -194,8 +194,8 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
     });
     await renderEditor();
     expect(
-      within(block('links')).getByRole('button', { name: 'Add a link' })
-    ).toBeInTheDocument();
+      within(block('links')).queryByRole('button', { name: 'Add a link' })
+    ).toBeNull();
     expect(
       within(block('media')).getByRole('button', {
         name: 'Add a podcast or video',

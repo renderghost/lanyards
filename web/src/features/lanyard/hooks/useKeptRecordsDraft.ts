@@ -26,9 +26,7 @@ import type {
 
 import { rkeyOf, useKeptRecords } from './useKeptRecords';
 
-export type LinkFields = { url: string; title?: string };
 export type MediaFields = Omit<MediaLink, 'key'>;
-export type HonorificValue = 'Dr' | 'Prof' | 'none';
 
 export type UseKeptRecordsDraft = {
   /** The stored records with the draft's changes applied. */
@@ -38,13 +36,9 @@ export type UseKeptRecordsDraft = {
   dirty: boolean;
   /** How many records the draft creates, edits or deletes. */
   changes: number;
-  addLink(fields: LinkFields): void;
-  updateLink(key: string, fields: LinkFields): void;
-  removeLink(key: string): void;
   addMedia(fields: MediaFields): void;
   updateMedia(key: string, fields: MediaFields): void;
   removeMedia(key: string): void;
-  setHonorific(value: HonorificValue): void;
   /** Writes the changes in one batch; clears them on success. */
   save(): Promise<boolean>;
   discard(): void;
@@ -53,21 +47,22 @@ export type UseKeptRecordsDraft = {
 /** New records' keys until they are saved: `draft:1`, `draft:2`… */
 const DRAFT_PREFIX = 'draft:';
 
-const EMPTY: LanyardRecords = { webLinks: [], media: [] };
+const EMPTY: LanyardRecords = { media: [] };
 
 const MEDIA_COLLECTION = {
   audio: LANYARDS_NSID.audio,
   video: LANYARDS_NSID.video,
 } as const;
 
-/** A link record's fields, leaving out empty ones. */
-const linkFields = ({ url, title }: LinkFields) => ({
-  url,
-  ...(title ? { title } : {}),
-});
-
-/** A media record's fields (its kind is its collection). */
-const mediaFields = ({ kind: _kind, ...fields }: MediaFields) =>
+/**
+ * A media record's fields: its kind is its collection, and its key (the
+ * draft's handle on it) is never written.
+ */
+const mediaFields = ({
+  kind: _kind,
+  key: _key,
+  ...fields
+}: MediaFields & { key?: string }) =>
   Object.fromEntries(
     Object.entries(fields).filter(
       ([, value]) => value !== undefined && value !== ''
@@ -86,34 +81,11 @@ type Change =
       rkey: string;
       fields: Record<string, unknown>;
     }
-  | { op: 'delete'; collection: WritableNsid; rkey: string }
-  | { op: 'honorific'; value: HonorificValue };
+  | { op: 'delete'; collection: WritableNsid; rkey: string };
 
 /** What it takes to turn `stored` into `draft`. */
 function diff(stored: LanyardRecords, draft: LanyardRecords): Change[] {
   const changes: Change[] = [];
-  const web = LANYARDS_NSID.webLink;
-  const storedLinks = new Map(stored.webLinks.map((link) => [link.key, link]));
-  const keptLinks = new Set(draft.webLinks.map((link) => link.key));
-  for (const link of draft.webLinks) {
-    const before = storedLinks.get(link.key);
-    if (!before) {
-      changes.push({ op: 'create', collection: web, fields: linkFields(link) });
-    } else if (!same(linkFields(before), linkFields(link))) {
-      changes.push({
-        op: 'update',
-        collection: web,
-        rkey: rkeyOf(link.key),
-        fields: linkFields(link),
-      });
-    }
-  }
-  for (const link of stored.webLinks) {
-    if (!keptLinks.has(link.key)) {
-      changes.push({ op: 'delete', collection: web, rkey: rkeyOf(link.key) });
-    }
-  }
-
   const storedMedia = new Map(stored.media.map((item) => [item.key, item]));
   const keptMedia = new Set(draft.media.map((item) => item.key));
   for (const item of draft.media) {
@@ -148,16 +120,12 @@ function diff(stored: LanyardRecords, draft: LanyardRecords): Change[] {
     }
   }
 
-  const honorific = draft.honorific ?? 'none';
-  if (honorific !== (stored.honorific ?? 'none')) {
-    changes.push({ op: 'honorific', value: honorific });
-  }
   return changes;
 }
 
 /**
- * The owner's kept records (links, podcasts and videos, the honorific) as a
- * draft until Save (#118). Changes show at once: the lanyard reads the same
+ * The owner's kept records (podcasts and videos) as a draft until Save
+ * (#118). Changes show at once: the lanyard reads the same
  * query. Save writes them in one batch; leaving drops them for everyone.
  */
 export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
@@ -248,11 +216,7 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
         const read = await getRecord('lanyards', owner.did, collection, rkey);
         if (!read.ok) throw read.error;
         const value = read.value?.value as { createdAt?: unknown } | undefined;
-        return {
-          exists: Boolean(read.value),
-          createdAt:
-            typeof value?.createdAt === 'string' ? value.createdAt : now,
-        };
+        return typeof value?.createdAt === 'string' ? value.createdAt : now;
       };
       const ops = await Promise.all(
         changes.map(async (change): Promise<WriteOp> => {
@@ -270,22 +234,14 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
                 rkey: change.rkey,
               };
             case 'update': {
-              const kept = await createdAt(change.collection, change.rkey);
               return {
                 type: 'update',
                 collection: change.collection,
                 rkey: change.rkey,
-                fields: { ...change.fields, createdAt: kept.createdAt },
-              };
-            }
-            case 'honorific': {
-              const collection = LANYARDS_NSID.honorific;
-              const kept = await createdAt(collection, 'self');
-              return {
-                type: kept.exists ? 'update' : 'create',
-                collection,
-                rkey: 'self',
-                fields: { value: change.value, createdAt: kept.createdAt },
+                fields: {
+                  ...change.fields,
+                  createdAt: await createdAt(change.collection, change.rkey),
+                },
               };
             }
           }
@@ -323,26 +279,6 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
     ready: query.data !== undefined,
     dirty: changes > 0,
     changes,
-    addLink: (fields) =>
-      edit((current) => ({
-        ...current,
-        webLinks: [
-          ...current.webLinks,
-          { key: nextKey(), ...linkFields(fields) },
-        ],
-      })),
-    updateLink: (linkKey, fields) =>
-      edit((current) => ({
-        ...current,
-        webLinks: current.webLinks.map((link) =>
-          link.key === linkKey ? { key: linkKey, ...linkFields(fields) } : link
-        ),
-      })),
-    removeLink: (linkKey) =>
-      edit((current) => ({
-        ...current,
-        webLinks: current.webLinks.filter((link) => link.key !== linkKey),
-      })),
     addMedia: (fields) =>
       edit((current) => ({
         ...current,
@@ -360,11 +296,6 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
         ...current,
         media: current.media.filter((item) => item.key !== mediaKey),
       })),
-    setHonorific: (value) =>
-      edit((current) => {
-        const { honorific: _previous, ...rest } = current;
-        return value === 'none' ? rest : { ...rest, honorific: value };
-      }),
     save,
     discard: restore,
   };

@@ -9,7 +9,6 @@ import type {
   LanyardConfigRecord,
   LanyardRecords,
   MediaLink,
-  WebLink,
 } from './lanyards.types';
 
 /**
@@ -19,7 +18,6 @@ import type {
  */
 const LIST_LIMIT = 500;
 
-type WebRecord = { url: string; title?: string };
 type MediaRecord = {
   url: string;
   platform: string;
@@ -77,38 +75,16 @@ export async function fetchLanyardRecords(
 ): Promise<Result<LanyardRecords>> {
   const list = (collection: string) =>
     listRecords('lanyards', did, collection, { limit: LIST_LIMIT, signal });
-  const [honorific, web, audio, video] = await Promise.all([
-    getRecord('lanyards', did, LANYARDS_NSID.honorific, 'self', signal),
-    list(LANYARDS_NSID.webLink),
+  // Links come from Sifa and Bluesky, and the title from Sifa: old web-link
+  // and honorific records stay in the repository, unread.
+  const [audio, video] = await Promise.all([
     list(LANYARDS_NSID.audio),
     list(LANYARDS_NSID.video),
   ]);
-  if (!honorific.ok) return honorific;
-  if (!web.ok) return web;
   if (!audio.ok) return audio;
   if (!video.ok) return video;
 
-  const honorificCheck = honorific.value
-    ? validateRecord(LANYARDS_NSID.honorific, honorific.value.value)
-    : null;
-  const honorificValue =
-    honorificCheck?.ok &&
-    (honorificCheck.value as { value: string }).value !== 'none'
-      ? (honorificCheck.value as { value: 'Dr' | 'Prof' }).value
-      : undefined;
-
-  const webLinks: WebLink[] = validRecords<WebRecord>(
-    LANYARDS_NSID.webLink,
-    web.value
-  ).map(({ uri, value }) => ({
-    key: uri,
-    url: value.url,
-    ...(value.title ? { title: value.title } : {}),
-  }));
-
   return ok({
-    ...(honorificValue ? { honorific: honorificValue } : {}),
-    webLinks,
     media: [
       ...toMedia(
         'audio',

@@ -34,7 +34,7 @@ import { detectPlatform } from './platform';
 
 /** Which queries feed each block. */
 export const BLOCK_SOURCES: Record<RenderableBlockType, SourceKey[]> = {
-  links: ['bluesky', 'sifa', 'lanyards'],
+  links: ['bluesky', 'sifa'],
   talks: ['sifa'],
   openTo: ['sifa'],
   blogPosts: ['standardSite'],
@@ -81,8 +81,6 @@ function mergeLinks(values: Values): LinkItem[] {
     rank: number;
     hint?: string;
     iconUrl?: string;
-    /** The Lanyards web-link record it comes from. */
-    ownKey?: string;
   };
   const candidates: Candidate[] = [
     ...(values.bluesky?.links ?? []).map((link) => ({
@@ -90,12 +88,6 @@ function mergeLinks(values: Values): LinkItem[] {
       title: link.title,
       rank: 1,
       iconUrl: cdnImage(link.iconUrl),
-    })),
-    ...(values.lanyards?.webLinks ?? []).map((link) => ({
-      url: link.url,
-      title: link.title,
-      rank: 0,
-      ownKey: link.key,
     })),
     ...(values.sifa?.externalAccounts ?? []).map((account) => ({
       url: account.url,
@@ -112,7 +104,6 @@ function mergeLinks(values: Values): LinkItem[] {
       titles: Candidate[];
       hint?: string;
       iconUrl?: string;
-      ownKey?: string;
     }
   >();
   for (const candidate of candidates) {
@@ -122,7 +113,6 @@ function mergeLinks(values: Values): LinkItem[] {
     entry.titles.push(candidate);
     entry.hint ??= candidate.hint;
     entry.iconUrl ??= candidate.iconUrl;
-    entry.ownKey ??= candidate.ownKey;
     merged.set(key, entry);
   }
 
@@ -136,7 +126,6 @@ function mergeLinks(values: Values): LinkItem[] {
       title: titled?.title ?? hostOf(entry.url),
       platform: detectPlatform(entry.url, entry.hint),
       ...(entry.iconUrl ? { iconUrl: entry.iconUrl } : {}),
-      ...(entry.ownKey ? { ownKey: entry.ownKey } : {}),
     };
   });
 }

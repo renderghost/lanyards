@@ -9,7 +9,6 @@ import { expectNoAxeViolations } from '@/test/axe';
 import { server } from '@/test/msw';
 import { ADA } from '@/test/people';
 import {
-  KEPT_CREATED_AT,
   servePerson,
   signedInSession,
   signedOutSession,
@@ -42,35 +41,6 @@ function captureSaves() {
   );
   return saves;
 }
-
-type Write = {
-  $type: string;
-  collection: string;
-  rkey?: string;
-  value?: Record<string, unknown>;
-};
-
-/** Records every applyWrites batch the customiser sends. */
-function captureWrites() {
-  const batches: Write[][] = [];
-  server.use(
-    http.post(
-      `${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`,
-      async ({ request }) => {
-        const body = (await request.json()) as { writes: Write[] };
-        batches.push(body.writes);
-        return HttpResponse.json({ results: [] });
-      }
-    )
-  );
-  return batches;
-}
-
-const BLOG = {
-  rkey: '3mblog',
-  url: 'https://blog.ada.example/',
-  title: 'Blog',
-};
 
 /** The Links block on the lanyard. */
 const linksBlock = async () => {
@@ -220,8 +190,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       screen.getByRole('button', { name: 'View as public' })
     );
     expect(screen.queryByRole('complementary', { name: 'Style' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Add a link' })).toBeNull();
-    expect(screen.queryByRole('combobox', { name: 'Title' })).toBeNull();
+    expect(screen.queryByRole('switch', { name: 'Show Links' })).toBeNull();
     expect(
       screen.getByText('You’re seeing your lanyard as the public sees it.')
     ).toBeInTheDocument();
@@ -452,95 +421,49 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(saves).toEqual([]);
   });
 
-  it('adds a link in place; it’s saved only on Save', async () => {
-    const success = vi.spyOn(notify, 'success');
+  it('links can only be hidden', async () => {
     servePerson();
-    const batches = captureWrites();
     renderRoute('/lanyard');
-    await userEvent.click(await enabled('Add a link'));
-    await userEvent.type(
-      screen.getByRole('textbox', { name: 'Web address' }),
-      'https://new.ada.example/'
-    );
-    await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'New');
-    await userEvent.click(screen.getByRole('button', { name: 'Add link' }));
-    expect(within(await linksBlock()).getByText('New')).toBeInTheDocument();
-    expect(
-      within(screen.getByRole('banner')).getByRole('status')
-    ).toHaveTextContent('Unsaved changes');
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    expect(batches).toEqual([]);
-    await saveChanges();
-    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
-    expect(batches[0]).toEqual([
-      expect.objectContaining({
-        $type: 'com.atproto.repo.applyWrites#create',
-        collection: 'app.lanyards.link.web',
-        value: expect.objectContaining({
-          url: 'https://new.ada.example/',
-          title: 'New',
-        }),
-      }),
-    ]);
-    await waitFor(() =>
-      expect(success).toHaveBeenCalledWith('Lanyard updated')
-    );
-  });
-
-  it('edits an own link’s title, keeping when it was created', async () => {
-    servePerson({ webLinks: [BLOG] });
-    const batches = captureWrites();
-    renderRoute('/lanyard');
-    await userEvent.click(await enabled('Edit Blog'));
-    const title = screen.getByRole('textbox', { name: 'Title' });
-    await userEvent.clear(title);
-    await userEvent.type(title, 'Writing');
-    await userEvent.click(screen.getByRole('button', { name: 'Update link' }));
-    expect(within(await linksBlock()).getByText('Writing')).toBeInTheDocument();
-    await saveChanges();
-    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
-    expect(batches[0]).toEqual([
-      expect.objectContaining({
-        $type: 'com.atproto.repo.applyWrites#update',
-        collection: 'app.lanyards.link.web',
-        rkey: BLOG.rkey,
-        value: expect.objectContaining({
-          url: BLOG.url,
-          title: 'Writing',
-          createdAt: KEPT_CREATED_AT,
-        }),
-      }),
-    ]);
-  });
-
-  it('deletes an own link, and Reset brings it back', async () => {
-    servePerson({ webLinks: [BLOG] });
-    const batches = captureWrites();
-    renderRoute('/lanyard');
-    await userEvent.click(await enabled('Delete Blog'));
-    const links = await linksBlock();
-    expect(within(links).queryByText('Blog')).toBeNull();
-    await userEvent.click(
-      within(screen.getByRole('banner')).getByRole('button', { name: 'Reset' })
-    );
-    expect(within(links).getByText('Blog')).toBeInTheDocument();
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    expect(batches).toEqual([]);
-  });
-
-  it('Sifa and Bluesky links can only be hidden', async () => {
-    servePerson({ webLinks: [BLOG] });
-    renderRoute('/lanyard');
-    await enabled('Edit Blog');
     const links = await linksBlock();
     expect(
-      within(links).getByRole('button', { name: 'Hide GitHub' })
+      await within(links).findByRole(
+        'button',
+        { name: 'Hide GitHub' },
+        { timeout: 8000 }
+      )
     ).toBeInTheDocument();
     expect(
-      within(links).queryByRole('button', { name: 'Edit GitHub' })
+      within(links).queryByRole('button', { name: 'Add a link' })
     ).toBeNull();
     expect(
-      within(links).queryByRole('button', { name: 'Delete GitHub' })
+      within(links).queryByRole('button', { name: /^(Edit|Delete) / })
+    ).toBeNull();
+  });
+
+  it('has no Title control: the title comes from Sifa', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    await enabled('Hide GitHub');
+    expect(screen.queryByRole('combobox', { name: 'Title' })).toBeNull();
+  });
+
+  it('a session without the web-link or title scopes can still edit podcasts', async () => {
+    vi.mocked(useSession).mockReturnValue(
+      signedInSession(
+        ADA.did,
+        [
+          'atproto',
+          'repo:app.lanyards.actor.lanyard?action=create&action=update',
+          'repo:app.lanyards.link.media.audio?action=create&action=update&action=delete',
+          'repo:app.lanyards.link.media.video?action=create&action=update&action=delete',
+        ].join(' ')
+      )
+    );
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    renderRoute('/lanyard');
+    expect(await enabled('Add a podcast or video')).toBeEnabled();
+    expect(
+      screen.queryByRole('heading', { name: 'Lanyards needs your permission' })
     ).toBeNull();
   });
 

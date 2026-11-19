@@ -111,17 +111,6 @@ export async function mockPerson(page: Page, options: PersonOptions = {}) {
         },
       });
     }
-    if (collection === 'app.lanyards.actor.biography.honorific') {
-      return json(route, {
-        uri: `at://${ADA.did}/${collection}/self`,
-        cid: CID,
-        value: {
-          $type: collection,
-          value: 'Dr',
-          createdAt: '2025-11-20T09:00:00.000Z',
-        },
-      });
-    }
     return json(route, { error: 'RecordNotFound' }, 400);
   });
   await page.route(
