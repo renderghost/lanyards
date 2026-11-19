@@ -34,7 +34,9 @@ export type BadgeHero = {
   did: Did;
   handle: Handle;
   displayName: string;
-  honorific?: 'Dr' | 'Prof';
+  /** From Sifa, only when its owner shows honorifics. */
+  honorificPrefix?: string;
+  honorificSuffix?: string;
   avatar?: string;
   pronouns?: string;
   headline?: string;

@@ -50,6 +50,7 @@ const bluesky: BlueskyProfile = {
 };
 
 const sifa: SifaProfile = {
+  showHonorifics: true,
   langs: ['en'],
   location: 'Edinburgh',
   openTo: ['mentoringOthers'],

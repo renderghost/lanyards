@@ -44,7 +44,6 @@ import type { BlockItems } from '@/lib/person/personView.types';
 import { usePersonView } from '@/lib/person/usePersonView';
 
 import { EditableBlock } from '../EditableBlock/EditableBlock';
-import { HonorificControl } from '../HonorificControl/HonorificControl';
 import { LinkEditor } from '../LinkEditor/LinkEditor';
 import { MediaEditor } from '../MediaEditor/MediaEditor';
 import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
@@ -60,8 +59,7 @@ const itemsOf = <T extends keyof BlockItems>(block: EditorBlock, _type: T) =>
 /**
  * The owner's lanyard, edited where it is (#118): every block with its bar
  * (drag, move, show/hide, count) and every record with its own show/hide.
- * Their own links, podcasts and videos are edited in their blocks, and the
- * title under the badge. Hidden blocks and records stay in place. Every
+ * Their own links, podcasts and videos are edited in their blocks. Hidden blocks and records stay in place. Every
  * move is announced.
  */
 export function LanyardEditor({
@@ -254,11 +252,6 @@ export function LanyardEditor({
     <LanyardSurface variant="card">
       <div className={styles.page}>
         <BadgeHero hero={view.hero} headingLevel={2} />
-        <HonorificControl
-          value={records.records.honorific ?? 'none'}
-          onChange={records.setHonorific}
-          disabled={recordsDisabled}
-        />
         {view.configError && (
           <div role="status" className={styles.notice}>
             <p className={styles.noticeText}>

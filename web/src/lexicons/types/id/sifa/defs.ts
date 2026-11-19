@@ -160,6 +160,7 @@ const _fullTimeSchema = /*#__PURE__*/ v.literal("id.sifa.defs#fullTime");
 const _fullTimeRolesSchema = /*#__PURE__*/ v.literal("id.sifa.defs#fullTimeRoles");
 const _honorAwardSchema = /*#__PURE__*/ v.literal("id.sifa.defs#honorAward");
 const _honorChampionshipSchema = /*#__PURE__*/ v.literal("id.sifa.defs#honorChampionship");
+const _honorDecorationSchema = /*#__PURE__*/ v.literal("id.sifa.defs#honorDecoration");
 const _honorNominationSchema = /*#__PURE__*/ v.literal("id.sifa.defs#honorNomination");
 const _honorRecognitionSchema = /*#__PURE__*/ v.literal("id.sifa.defs#honorRecognition");
 const _honorRecordSchema = /*#__PURE__*/ v.literal("id.sifa.defs#honorRecord");
@@ -512,6 +513,7 @@ type fullTime$schematype = typeof _fullTimeSchema;
 type fullTimeRoles$schematype = typeof _fullTimeRolesSchema;
 type honorAward$schematype = typeof _honorAwardSchema;
 type honorChampionship$schematype = typeof _honorChampionshipSchema;
+type honorDecoration$schematype = typeof _honorDecorationSchema;
 type honorNomination$schematype = typeof _honorNominationSchema;
 type honorRecognition$schematype = typeof _honorRecognitionSchema;
 type honorRecord$schematype = typeof _honorRecordSchema;
@@ -841,6 +843,8 @@ export interface fullTimeRolesSchema extends fullTimeRoles$schematype {}
 export interface honorAwardSchema extends honorAward$schematype {}
 
 export interface honorChampionshipSchema extends honorChampionship$schematype {}
+
+export interface honorDecorationSchema extends honorDecoration$schematype {}
 
 export interface honorNominationSchema extends honorNomination$schematype {}
 
@@ -1202,6 +1206,7 @@ export const fullTimeSchema = _fullTimeSchema as fullTimeSchema;
 export const fullTimeRolesSchema = _fullTimeRolesSchema as fullTimeRolesSchema;
 export const honorAwardSchema = _honorAwardSchema as honorAwardSchema;
 export const honorChampionshipSchema = _honorChampionshipSchema as honorChampionshipSchema;
+export const honorDecorationSchema = _honorDecorationSchema as honorDecorationSchema;
 export const honorNominationSchema = _honorNominationSchema as honorNominationSchema;
 export const honorRecognitionSchema = _honorRecognitionSchema as honorRecognitionSchema;
 export const honorRecordSchema = _honorRecordSchema as honorRecordSchema;
@@ -1435,6 +1440,7 @@ export type FullTime = v.InferInput<typeof fullTimeSchema>;
 export type FullTimeRoles = v.InferInput<typeof fullTimeRolesSchema>;
 export type HonorAward = v.InferInput<typeof honorAwardSchema>;
 export type HonorChampionship = v.InferInput<typeof honorChampionshipSchema>;
+export type HonorDecoration = v.InferInput<typeof honorDecorationSchema>;
 export type HonorNomination = v.InferInput<typeof honorNominationSchema>;
 export type HonorRecognition = v.InferInput<typeof honorRecognitionSchema>;
 export type HonorRecord = v.InferInput<typeof honorRecordSchema>;

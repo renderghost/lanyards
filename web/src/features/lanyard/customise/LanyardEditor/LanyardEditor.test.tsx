@@ -162,18 +162,6 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
     expect(screen.queryByText('Loading lanyard…')).toBeNull();
   });
 
-  it('sets the title under the badge, showing it on the badge at once', async () => {
-    servePerson();
-    await renderEditor();
-    const title = screen.getByRole('combobox', { name: 'Title' });
-    await waitFor(() => expect(title).toBeEnabled());
-    expect(title).toHaveValue('Dr');
-    await userEvent.selectOptions(title, 'Prof');
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Prof Ada Example' })
-    ).toBeInTheDocument();
-  });
-
   it('puts the ORCID helper in Publications', async () => {
     servePerson({
       config: {

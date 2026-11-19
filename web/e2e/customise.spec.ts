@@ -171,32 +171,6 @@ test.describe('lanyard customiser', () => {
     });
   });
 
-  test('sets the title on the badge and saves it with the rest', async ({
-    page,
-  }) => {
-    await openCustomiser(page);
-    const title = page.getByRole('combobox', { name: 'Title' });
-    await expect(title).toBeEnabled();
-    await expect(title).toHaveValue('Dr');
-    await title.selectOption('Prof');
-    await expect(
-      page.getByRole('heading', { level: 2, name: 'Prof Ada Example' })
-    ).toBeVisible();
-    expect(writes).toEqual([]);
-    await saveChanges(page);
-    await expect(page.getByText('Lanyard updated')).toBeVisible();
-    const saved = writes.find(
-      (write) =>
-        write.body.collection === 'app.lanyards.actor.biography.honorific'
-    );
-    expect(saved?.method).toBe('applyWrites');
-    expect(saved?.body).toMatchObject({
-      action: 'update',
-      rkey: 'self',
-      record: { value: 'Prof', createdAt: '2025-11-20T09:00:00.000Z' },
-    });
-  });
-
   test('checks a web link, then adds it in place once fixed', async ({
     page,
   }) => {

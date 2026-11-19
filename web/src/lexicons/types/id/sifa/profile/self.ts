@@ -117,6 +117,30 @@ const _mainSchema = /*#__PURE__*/ v.record(
 				]
 			)),
 			/**
+			 * Title shown before the name, such as Dr., Prof. or Sir. Maps to Schema.org Person.honorificPrefix. Optional.
+			 * @maxLength 640
+			 * @maxGraphemes 64
+			 */
+			"honorificPrefix": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
+				/*#__PURE__*/ v.string(),
+				[
+					/*#__PURE__*/ v.stringLength(0, 640),
+					/*#__PURE__*/ v.stringGraphemes(0, 64)
+				]
+			)),
+			/**
+			 * Post-nominal letters shown after the name, such as PhD, OBE or FRSA. Maps to Schema.org Person.honorificSuffix. Optional.
+			 * @maxLength 640
+			 * @maxGraphemes 64
+			 */
+			"honorificSuffix": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
+				/*#__PURE__*/ v.string(),
+				[
+					/*#__PURE__*/ v.stringLength(0, 640),
+					/*#__PURE__*/ v.stringGraphemes(0, 64)
+				]
+			)),
+			/**
 			 * Professional industry/domain pairs. Each entry has a required industry and optional domain refinement. Replaces the former singular industry/domain fields.
 			 * @maxLength 10
 			 */
@@ -207,6 +231,10 @@ const _mainSchema = /*#__PURE__*/ v.record(
 			 * Whether the rendering app shows the user's activity in other ATproto apps (records the user creates in collections outside this namespace) on their profile and in activity feeds. Default true when absent. When false, the rendering app hides all of that activity, including activity from apps it starts to recognize in the future. Any per-app display choices the rendering app keeps stay as they are and apply again when this is true. Does not affect the public visibility of the underlying ATproto records, which remain readable by any client.
 			 */
 			"showActivity": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean()),
+			/**
+			 * Whether the rendering app shows honorificPrefix and honorificSuffix next to the name on the profile. Default true when absent. When false, the name shows without them on the profile itself; the app may still use them elsewhere, for example in CV exports or structured data. A display choice only: the honorifics stay in this public record.
+			 */
+			"showHonorifics": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean()),
 		}
 	)
 );

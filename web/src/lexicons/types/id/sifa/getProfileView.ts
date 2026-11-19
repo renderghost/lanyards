@@ -365,7 +365,7 @@ const _honorViewSchema = /*#__PURE__*/ v.object(
 		/**
 		 * What kind of honor this is. Absent means unspecified.
 		 */
-		"kind": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.string<"id.sifa.defs#honorAward" | "id.sifa.defs#honorChampionship" | "id.sifa.defs#honorNomination" | "id.sifa.defs#honorRecognition" | "id.sifa.defs#honorRecord" | (string & {})>()),
+		"kind": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.string<"id.sifa.defs#honorAward" | "id.sifa.defs#honorChampionship" | "id.sifa.defs#honorDecoration" | "id.sifa.defs#honorNomination" | "id.sifa.defs#honorRecognition" | "id.sifa.defs#honorRecord" | (string & {})>()),
 		/**
 		 * Public sources for the honor.
 		 */
@@ -990,6 +990,30 @@ const _profileViewSchema = /*#__PURE__*/ v.object(
 			]
 		)),
 		/**
+		 * Title shown before the name (such as Dr. or Prof.), when provided.
+		 * @maxLength 1280
+		 * @maxGraphemes 128
+		 */
+		"honorificPrefix": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
+			/*#__PURE__*/ v.string(),
+			[
+				/*#__PURE__*/ v.stringLength(0, 1280),
+				/*#__PURE__*/ v.stringGraphemes(0, 128)
+			]
+		)),
+		/**
+		 * Post-nominal letters shown after the name (such as PhD or OBE), when provided.
+		 * @maxLength 1280
+		 * @maxGraphemes 128
+		 */
+		"honorificSuffix": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
+			/*#__PURE__*/ v.string(),
+			[
+				/*#__PURE__*/ v.stringLength(0, 1280),
+				/*#__PURE__*/ v.stringGraphemes(0, 128)
+			]
+		)),
+		/**
 		 * Honors and awards.
 		 */
 		get "honors"() {
@@ -1119,6 +1143,10 @@ const _profileViewSchema = /*#__PURE__*/ v.object(
 		get "publications"() {
 			return /*#__PURE__*/ v.optional(/*#__PURE__*/ v.array(publicationViewSchema))
 		},
+		/**
+		 * Whether to show the honorifics next to the name on the profile. Absent means true.
+		 */
+		"showHonorifics": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean()),
 		/**
 		 * Skills, optionally linked to positions.
 		 */

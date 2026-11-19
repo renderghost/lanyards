@@ -820,6 +820,10 @@
       "type": "token",
       "description": "Logistics & Warehousing."
     },
+    "honorDecoration": {
+      "type": "token",
+      "description": "An order, decoration, or title of honour granted by a state, monarch, or similar body, such as a knighthood or an order of merit."
+    },
     "honorNomination": {
       "type": "token",
       "description": "A nomination or shortlisting for an award, without a win."

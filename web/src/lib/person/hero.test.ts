@@ -5,7 +5,7 @@ import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { ADA } from '@/test/people';
 
 import { resolveConfig } from './config';
-import { composeHero, currentJob } from './hero';
+import { composeHero, currentJob, heroName } from './hero';
 
 const bluesky: BlueskyProfile = {
   did: ADA.did,
@@ -19,6 +19,7 @@ const bluesky: BlueskyProfile = {
 };
 
 const emptySifa: SifaProfile = {
+  showHonorifics: true,
   langs: [],
   openTo: [],
   positions: [],
@@ -71,6 +72,7 @@ describe('composeHero', () => {
       bluesky,
       sifa: {
         ...emptySifa,
+        honorificPrefix: 'Dr',
         displayName: 'Ada Example',
         avatar: 'https://cdn.bsky.app/img/avatar_thumbnail/plain/sifa@jpeg',
         pronouns: 'she/her',
@@ -83,14 +85,13 @@ describe('composeHero', () => {
           }),
         ],
       },
-      lanyards: { honorific: 'Dr', webLinks: [], media: [] },
       config: resolveConfig(null),
     });
     expect(hero).toEqual({
       did: ADA.did,
       handle: 'alice.test',
       displayName: 'Ada Example',
-      honorific: 'Dr',
+      honorificPrefix: 'Dr',
       avatar: 'https://cdn.bsky.app/img/avatar_thumbnail/plain/sifa@jpeg',
       pronouns: 'she/her',
       headline: 'Research Engineer',
@@ -169,5 +170,53 @@ describe('composeHero', () => {
       config: resolveConfig(null),
     });
     expect(hero.displayName).toBe('<script>alert(1)</script>');
+  });
+});
+
+describe('the title from Sifa', () => {
+  const config = resolveConfig(null);
+
+  it('takes the title from Sifa, honouring its switch', () => {
+    const shown = composeHero({
+      bluesky,
+      sifa: { ...emptySifa, honorificPrefix: 'Dr', honorificSuffix: 'PhD' },
+      config,
+    });
+    expect(shown).toMatchObject({
+      honorificPrefix: 'Dr',
+      honorificSuffix: 'PhD',
+    });
+    const off = composeHero({
+      bluesky,
+      sifa: {
+        ...emptySifa,
+        honorificPrefix: 'Dr',
+        honorificSuffix: 'PhD',
+        showHonorifics: false,
+      },
+      config,
+    });
+    expect(off).not.toHaveProperty('honorificPrefix');
+    expect(off).not.toHaveProperty('honorificSuffix');
+    const noSifa = composeHero({ bluesky, sifa: null, config });
+    expect(noSifa).not.toHaveProperty('honorificPrefix');
+    expect(noSifa).not.toHaveProperty('honorificSuffix');
+  });
+
+  it('heroName puts the prefix before the name and the suffix after a comma', () => {
+    expect(
+      heroName({ displayName: 'Ada Example', honorificPrefix: 'Dr' })
+    ).toBe('Dr Ada Example');
+    expect(
+      heroName({ displayName: 'Ada Example', honorificSuffix: 'PhD' })
+    ).toBe('Ada Example, PhD');
+    expect(
+      heroName({
+        displayName: 'Ada Example',
+        honorificPrefix: 'Dr.',
+        honorificSuffix: 'PhD',
+      })
+    ).toBe('Dr. Ada Example, PhD');
+    expect(heroName({ displayName: 'Ada Example' })).toBe('Ada Example');
   });
 });

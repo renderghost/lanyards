@@ -64,6 +64,12 @@ export type SifaTalk = {
 export type SifaProfile = {
   handle?: string;
   displayName?: string;
+  /** Before the name, as typed in Sifa, e.g. "Dr" or "Prof.". */
+  honorificPrefix?: string;
+  /** After the name, e.g. "PhD" or "OBE". */
+  honorificSuffix?: string;
+  /** Whether the person shows their honorifics (Sifa's default: yes). */
+  showHonorifics: boolean;
   avatar?: string;
   pronouns?: string;
   headline?: string;

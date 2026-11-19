@@ -48,6 +48,7 @@
           "knownValues": [
             "id.sifa.defs#honorAward",
             "id.sifa.defs#honorChampionship",
+            "id.sifa.defs#honorDecoration",
             "id.sifa.defs#honorNomination",
             "id.sifa.defs#honorRecognition",
             "id.sifa.defs#honorRecord"
@@ -471,9 +472,25 @@
           "type": "string",
           "description": "Primary location region, state, or province."
         },
+        "showHonorifics": {
+          "type": "boolean",
+          "description": "Whether to show the honorifics next to the name on the profile. Absent means true."
+        },
         "blueskyVerified": {
           "type": "boolean",
           "description": "Whether the account holds a Bluesky verification."
+        },
+        "honorificPrefix": {
+          "type": "string",
+          "maxLength": 1280,
+          "description": "Title shown before the name (such as Dr. or Prof.), when provided.",
+          "maxGraphemes": 128
+        },
+        "honorificSuffix": {
+          "type": "string",
+          "maxLength": 1280,
+          "description": "Post-nominal letters shown after the name (such as PhD or OBE), when provided.",
+          "maxGraphemes": 128
         },
         "locationCountry": {
           "type": "string",

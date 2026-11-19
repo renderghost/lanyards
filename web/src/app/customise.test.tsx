@@ -143,10 +143,11 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     sifaDown();
     renderRoute('/lanyard');
     const region = await preview();
+    // The title comes from Sifa: without it, the name stands alone.
     expect(
       await within(region).findByRole(
         'heading',
-        { level: 2, name: 'Dr Ada Example' },
+        { level: 2, name: 'Ada Example' },
         { timeout: 5000 }
       )
     ).toBeInTheDocument();
@@ -541,39 +542,6 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(
       within(links).queryByRole('button', { name: 'Delete GitHub' })
     ).toBeNull();
-  });
-
-  it('sets the title on the badge, saving it with the rest', async () => {
-    servePerson();
-    const batches = captureWrites();
-    renderRoute('/lanyard');
-    const title = await screen.findByRole(
-      'combobox',
-      { name: 'Title' },
-      { timeout: 8000 }
-    );
-    await waitFor(() => expect(title).toBeEnabled(), { timeout: 5000 });
-    expect(title).toHaveValue('Dr');
-    await userEvent.selectOptions(title, 'Prof');
-    expect(
-      within(await preview()).getByRole('heading', {
-        level: 2,
-        name: 'Prof Ada Example',
-      })
-    ).toBeInTheDocument();
-    await saveChanges();
-    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
-    expect(batches[0]).toEqual([
-      expect.objectContaining({
-        $type: 'com.atproto.repo.applyWrites#update',
-        collection: 'app.lanyards.actor.biography.honorific',
-        rkey: 'self',
-        value: expect.objectContaining({
-          value: 'Prof',
-          createdAt: KEPT_CREATED_AT,
-        }),
-      }),
-    ]);
   });
 
   it('keeps the ORCID helper in Publications while editing', async () => {
