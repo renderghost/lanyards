@@ -1,46 +1,35 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { notify } from '@/components/Toaster/notify';
-import { useSession } from '@/features/auth/session/useSession';
-import { captureError, track } from '@/lib/analytics/analytics';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { expectNoAxeViolations } from '@/test/axe';
-import { ADA } from '@/test/people';
-import { captureWrites, signedInSession } from '@/test/person';
 import { renderWithClient } from '@/test/render';
 
 import { WebLinkForm } from './WebLinkForm';
 
-vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
-vi.mock('@/lib/analytics/analytics', () => ({
-  captureError: vi.fn(),
-  track: vi.fn(),
-}));
-vi.mock('@/components/Toaster/notify', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
+/** The form hands a valid link over; it writes nothing itself. */
+const onSubmit = vi.fn();
+
+beforeEach(() => {
+  onSubmit.mockClear();
+});
 
 const SCHEME = 'Enter a web address starting with https:// or http://';
 const address = () => screen.getByRole('textbox', { name: 'Web address' });
 const title = () => screen.getByRole('textbox', { name: 'Title' });
 const add = () => screen.getByRole('button', { name: 'Add link' });
 
-beforeEach(() => {
-  vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-});
-
 describe('WebLinkForm', () => {
   it('asks for a required web address and an optional title', () => {
-    renderWithClient(<WebLinkForm />);
+    renderWithClient(<WebLinkForm onSubmit={onSubmit} />);
     expect(address()).toHaveAttribute('type', 'url');
     expect(address()).toHaveAttribute('aria-required', 'true');
     expect(title()).not.toBeRequired();
   });
 
   it('checks the web address when you leave the field', async () => {
-    renderWithClient(<WebLinkForm />);
+    renderWithClient(<WebLinkForm onSubmit={onSubmit} />);
     await userEvent.type(address(), 'ftp://x');
     await userEvent.tab();
     expect(address()).toHaveAttribute('aria-invalid', 'true');
@@ -50,15 +39,14 @@ describe('WebLinkForm', () => {
   it('leaves checking to the submit when you leave the field for Add link', async () => {
     // Showing the error on that blur would move Add link before the click
     // lands, so the click (and the submit) would be lost.
-    renderWithClient(<WebLinkForm />);
+    renderWithClient(<WebLinkForm onSubmit={onSubmit} />);
     await userEvent.type(address(), 'ftp://x');
     fireEvent.blur(address(), { relatedTarget: add() });
     expect(address()).not.toHaveAttribute('aria-invalid');
   });
 
   it('keeps what you typed and moves to the first problem on submit', async () => {
-    const writes = captureWrites();
-    renderWithClient(<WebLinkForm />);
+    renderWithClient(<WebLinkForm onSubmit={onSubmit} />);
     await userEvent.type(address(), 'ftp://x');
     await userEvent.type(title(), 'x'.repeat(101));
     await userEvent.click(add());
@@ -67,58 +55,54 @@ describe('WebLinkForm', () => {
     expect(title()).toHaveAccessibleDescription(
       'Keep the title to 100 characters or fewer'
     );
-    expect(writes.created).toEqual([]);
+    expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('adds the link, clears the form and confirms', async () => {
-    const writes = captureWrites({ delayMs: 50 });
-    renderWithClient(<WebLinkForm />);
-    await userEvent.type(address(), 'https://ada.example/cv');
+  it('hands over a valid link and clears the form', async () => {
+    renderWithClient(<WebLinkForm onSubmit={onSubmit} />);
+    await userEvent.type(address(), ' https://ada.example/cv ');
     await userEvent.type(title(), 'CV');
     add().focus();
     await userEvent.keyboard('{Enter}');
-    expect(add()).toHaveAttribute('aria-disabled', 'true');
-    expect(add()).toHaveFocus();
-    await waitFor(() => expect(writes.created).toHaveLength(1));
-    const write = writes.created[0] as {
-      collection: string;
-      record: Record<string, unknown>;
-    };
-    expect(write.collection).toBe('app.lanyards.link.web');
-    expect(write.record).toMatchObject({
+    expect(onSubmit).toHaveBeenCalledWith({
       url: 'https://ada.example/cv',
       title: 'CV',
     });
-    expect(validateRecord('app.lanyards.link.web', write.record).ok).toBe(true);
-    await waitFor(() =>
-      expect(notify.success).toHaveBeenCalledWith('Link added')
-    );
+    expect(
+      validateRecord('app.lanyards.link.web', {
+        $type: 'app.lanyards.link.web',
+        url: 'https://ada.example/cv',
+        title: 'CV',
+        createdAt: '2026-11-19T12:00:00.000Z',
+      }).ok
+    ).toBe(true);
     expect(address()).toHaveValue('');
     expect(title()).toHaveValue('');
-    expect(track).toHaveBeenCalledWith('kept_record_saved', {
-      kind: 'webLink',
-    });
   });
 
-  it('keeps the form when the server fails', async () => {
-    captureWrites({ fail: ['createRecord'] });
-    renderWithClient(<WebLinkForm />);
-    await userEvent.type(address(), 'https://ada.example/cv');
-    await userEvent.click(add());
-    await waitFor(() =>
-      expect(notify.error).toHaveBeenCalledWith(
-        'Failed to save. Please try again.'
-      )
+  it('edits a link in place, from its current values', async () => {
+    const onCancel = vi.fn();
+    renderWithClient(
+      <WebLinkForm
+        onSubmit={onSubmit}
+        onCancel={onCancel}
+        initial={{ url: 'https://ada.example/', title: 'Site' }}
+      />
     );
-    expect(address()).toHaveValue('https://ada.example/cv');
-    expect(add()).toBeEnabled();
-    expect(captureError).toHaveBeenCalledWith(expect.any(Error), {
-      source: 'web-link',
+    expect(address()).toHaveValue('https://ada.example/');
+    await userEvent.clear(title());
+    await userEvent.type(title(), 'Personal site');
+    await userEvent.click(screen.getByRole('button', { name: 'Update link' }));
+    expect(onSubmit).toHaveBeenCalledWith({
+      url: 'https://ada.example/',
+      title: 'Personal site',
     });
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(onCancel).toHaveBeenCalled();
   });
 
   it('has no axe violations, including with errors', async () => {
-    const { container } = renderWithClient(<WebLinkForm />);
+    const { container } = renderWithClient(<WebLinkForm onSubmit={onSubmit} />);
     await expectNoAxeViolations(container);
     await userEvent.click(add());
     await expectNoAxeViolations(container);

@@ -9,6 +9,7 @@ import { expectNoAxeViolations } from '@/test/axe';
 import { server } from '@/test/msw';
 import { ADA } from '@/test/people';
 import {
+  KEPT_CREATED_AT,
   servePerson,
   signedInSession,
   signedOutSession,
@@ -40,6 +41,55 @@ function captureSaves() {
     )
   );
   return saves;
+}
+
+type Write = {
+  $type: string;
+  collection: string;
+  rkey?: string;
+  value?: Record<string, unknown>;
+};
+
+/** Records every applyWrites batch the customiser sends. */
+function captureWrites() {
+  const batches: Write[][] = [];
+  server.use(
+    http.post(
+      `${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`,
+      async ({ request }) => {
+        const body = (await request.json()) as { writes: Write[] };
+        batches.push(body.writes);
+        return HttpResponse.json({ results: [] });
+      }
+    )
+  );
+  return batches;
+}
+
+const BLOG = {
+  rkey: '3mblog',
+  url: 'https://blog.ada.example/',
+  title: 'Blog',
+};
+
+/** The Links block on the lanyard. */
+const linksBlock = async () => {
+  const region = await preview();
+  return within(region).findByRole(
+    'listitem',
+    { name: 'Links' },
+    { timeout: 5000 }
+  );
+};
+
+/** Waits until a kept-record control can be used. */
+async function enabled(name: string) {
+  const button = await screen.findByRole('button', { name }, { timeout: 8000 });
+  await waitFor(() => expect(button).not.toHaveAttribute('aria-disabled'), {
+    timeout: 5000,
+  });
+  await waitFor(() => expect(button).toBeEnabled(), { timeout: 5000 });
+  return button;
 }
 
 const sifaDown = () =>
@@ -152,11 +202,8 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(
       within(await preview()).getByRole('list', { name: 'Blocks' })
     ).toBeInTheDocument();
-    // Until kept records are edited in place too (#118, PR 4).
-    const more = screen.getByRole('region', { name: 'More settings' });
-    expect(
-      within(more).getByRole('region', { name: 'Your links' })
-    ).toBeInTheDocument();
+    // Links, podcasts and the title are edited there too.
+    expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
   });
 
   it('View as public hides the sidebar and edit controls, and Edit brings them back', async () => {
@@ -172,7 +219,8 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       screen.getByRole('button', { name: 'View as public' })
     );
     expect(screen.queryByRole('complementary', { name: 'Style' })).toBeNull();
-    expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Add a link' })).toBeNull();
+    expect(screen.queryByRole('combobox', { name: 'Title' })).toBeNull();
     expect(
       screen.getByText('You’re seeing your lanyard as the public sees it.')
     ).toBeInTheDocument();
@@ -403,29 +451,155 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(saves).toEqual([]);
   });
 
-  it('edits the kept records: honorific, links, podcasts and videos', async () => {
+  it('adds a link in place; it’s saved only on Save', async () => {
+    const success = vi.spyOn(notify, 'success');
     servePerson();
+    const batches = captureWrites();
     renderRoute('/lanyard');
-    const honorific = await screen.findByRole(
-      'group',
-      { name: 'Honorific' },
-      { timeout: 5000 }
+    await userEvent.click(await enabled('Add a link'));
+    await userEvent.type(
+      screen.getByRole('textbox', { name: 'Web address' }),
+      'https://new.ada.example/'
     );
-    await waitFor(
-      () =>
-        expect(
-          within(honorific).getByRole('radio', { name: 'Dr' })
-        ).toBeChecked(),
-      { timeout: 5000 }
-    );
+    await userEvent.type(screen.getByRole('textbox', { name: 'Title' }), 'New');
+    await userEvent.click(screen.getByRole('button', { name: 'Add link' }));
+    expect(within(await linksBlock()).getByText('New')).toBeInTheDocument();
     expect(
-      screen.getByRole('region', { name: 'Your links' })
+      within(screen.getByRole('banner')).getByRole('status')
+    ).toHaveTextContent('Unsaved changes');
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(batches).toEqual([]);
+    await saveChanges();
+    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
+    expect(batches[0]).toEqual([
+      expect.objectContaining({
+        $type: 'com.atproto.repo.applyWrites#create',
+        collection: 'app.lanyards.link.web',
+        value: expect.objectContaining({
+          url: 'https://new.ada.example/',
+          title: 'New',
+        }),
+      }),
+    ]);
+    await waitFor(() =>
+      expect(success).toHaveBeenCalledWith('Lanyard updated')
+    );
+  });
+
+  it('edits an own link’s title, keeping when it was created', async () => {
+    servePerson({ webLinks: [BLOG] });
+    const batches = captureWrites();
+    renderRoute('/lanyard');
+    await userEvent.click(await enabled('Edit Blog'));
+    const title = screen.getByRole('textbox', { name: 'Title' });
+    await userEvent.clear(title);
+    await userEvent.type(title, 'Writing');
+    await userEvent.click(screen.getByRole('button', { name: 'Update link' }));
+    expect(within(await linksBlock()).getByText('Writing')).toBeInTheDocument();
+    await saveChanges();
+    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
+    expect(batches[0]).toEqual([
+      expect.objectContaining({
+        $type: 'com.atproto.repo.applyWrites#update',
+        collection: 'app.lanyards.link.web',
+        rkey: BLOG.rkey,
+        value: expect.objectContaining({
+          url: BLOG.url,
+          title: 'Writing',
+          createdAt: KEPT_CREATED_AT,
+        }),
+      }),
+    ]);
+  });
+
+  it('deletes an own link, and Reset brings it back', async () => {
+    servePerson({ webLinks: [BLOG] });
+    const batches = captureWrites();
+    renderRoute('/lanyard');
+    await userEvent.click(await enabled('Delete Blog'));
+    const links = await linksBlock();
+    expect(within(links).queryByText('Blog')).toBeNull();
+    await userEvent.click(
+      within(screen.getByRole('banner')).getByRole('button', { name: 'Reset' })
+    );
+    expect(within(links).getByText('Blog')).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(batches).toEqual([]);
+  });
+
+  it('Sifa and Bluesky links can only be hidden', async () => {
+    servePerson({ webLinks: [BLOG] });
+    renderRoute('/lanyard');
+    await enabled('Edit Blog');
+    const links = await linksBlock();
+    expect(
+      within(links).getByRole('button', { name: 'Hide GitHub' })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('region', { name: 'Your podcasts and videos' })
+      within(links).queryByRole('button', { name: 'Edit GitHub' })
+    ).toBeNull();
+    expect(
+      within(links).queryByRole('button', { name: 'Delete GitHub' })
+    ).toBeNull();
+  });
+
+  it('sets the title on the badge, saving it with the rest', async () => {
+    servePerson();
+    const batches = captureWrites();
+    renderRoute('/lanyard');
+    const title = await screen.findByRole(
+      'combobox',
+      { name: 'Title' },
+      { timeout: 8000 }
+    );
+    await waitFor(() => expect(title).toBeEnabled(), { timeout: 5000 });
+    expect(title).toHaveValue('Dr');
+    await userEvent.selectOptions(title, 'Prof');
+    expect(
+      within(await preview()).getByRole('heading', {
+        level: 2,
+        name: 'Prof Ada Example',
+      })
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add link' })).toBeEnabled();
-    expect(screen.getByRole('button', { name: 'Add media' })).toBeEnabled();
+    await saveChanges();
+    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
+    expect(batches[0]).toEqual([
+      expect.objectContaining({
+        $type: 'com.atproto.repo.applyWrites#update',
+        collection: 'app.lanyards.actor.biography.honorific',
+        rkey: 'self',
+        value: expect.objectContaining({
+          value: 'Prof',
+          createdAt: KEPT_CREATED_AT,
+        }),
+      }),
+    ]);
+  });
+
+  it('keeps the ORCID helper in Publications while editing', async () => {
+    servePerson({
+      config: {
+        blocks: [
+          { type: 'links', visible: true },
+          { type: 'media', visible: true },
+          { type: 'publications', visible: true, limit: 3 },
+        ],
+      },
+    });
+    renderRoute('/lanyard');
+    const region = await preview();
+    const publications = await within(region).findByRole(
+      'listitem',
+      { name: 'Publications' },
+      { timeout: 8000 }
+    );
+    expect(
+      await within(publications).findByRole(
+        'heading',
+        { level: 3, name: /ORCID iD/ },
+        { timeout: 5000 }
+      )
+    ).toBeInTheDocument();
   });
 
   it('explains a stored record it cannot read, and resets only when asked', async () => {

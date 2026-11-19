@@ -3,13 +3,9 @@ import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { TextField } from '@/components/TextField/TextField';
-import { notify } from '@/components/Toaster/notify';
-import { captureError, track } from '@/lib/analytics/analytics';
 import { leavingForSubmit } from '@/lib/forms';
-import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
 
-import { useKeptRecordWriter } from '../../hooks/useKeptRecords';
 import { EMPTY_WEB_LINK } from './WebLinkForm.constants';
 import * as styles from './WebLinkForm.styles';
 import type {
@@ -19,13 +15,22 @@ import type {
 } from './WebLinkForm.types';
 import { validateWebLink } from './WebLinkForm.validation';
 
-/** Adds a kept web link (app.lanyards.link.web) to the lanyard. */
-export function WebLinkForm({ disabled = false, className }: WebLinkFormProps) {
+/**
+ * A web link for the lanyard: a new one, or `initial` to edit. A valid link
+ * goes to `onSubmit`; the form writes nothing itself.
+ */
+export function WebLinkForm({
+  onSubmit,
+  initial,
+  onCancel,
+  disabled = false,
+  className,
+}: WebLinkFormProps) {
   const { t } = useLingui();
-  const writer = useKeptRecordWriter();
-  const [values, setValues] = useState<WebLinkValues>(EMPTY_WEB_LINK);
+  const [values, setValues] = useState<WebLinkValues>(
+    initial ? { url: initial.url, title: initial.title ?? '' } : EMPTY_WEB_LINK
+  );
   const [errors, setErrors] = useState<WebLinkErrors>({});
-  const [submitting, setSubmitting] = useState(false);
   const urlRef = useRef<HTMLInputElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
 
@@ -48,30 +53,16 @@ export function WebLinkForm({ disabled = false, className }: WebLinkFormProps) {
       }));
     };
 
-  async function submit(event: FormEvent) {
+  function submit(event: FormEvent) {
     event.preventDefault();
     const found = validateWebLink(values);
     setErrors(found);
     if (found.url) return urlRef.current?.focus();
     if (found.title) return titleRef.current?.focus();
 
-    setSubmitting(true);
-    try {
-      const title = values.title.trim();
-      await writer.create(LANYARDS_NSID.webLink, {
-        url: values.url.trim(),
-        ...(title ? { title } : {}),
-        createdAt: new Date().toISOString(),
-      });
-      setValues(EMPTY_WEB_LINK);
-      notify.success(t`Link added`);
-      track('kept_record_saved', { kind: 'webLink' });
-    } catch (cause) {
-      captureError(cause, { source: 'web-link' });
-      notify.error(t`Failed to save. Please try again.`);
-    } finally {
-      setSubmitting(false);
-    }
+    const title = values.title.trim();
+    onSubmit({ url: values.url.trim(), ...(title ? { title } : {}) });
+    if (!initial) setValues(EMPTY_WEB_LINK);
   }
 
   return (
@@ -101,14 +92,14 @@ export function WebLinkForm({ disabled = false, className }: WebLinkFormProps) {
         disabled={disabled}
       />
       <div className={styles.actions}>
-        <Button
-          type="submit"
-          variant="secondary"
-          loading={submitting}
-          disabled={disabled}
-        >
-          {t`Add link`}
+        <Button type="submit" variant="secondary" disabled={disabled}>
+          {initial ? t`Update link` : t`Add link`}
         </Button>
+        {onCancel && (
+          <Button variant="ghost" onClick={onCancel}>
+            {t`Cancel`}
+          </Button>
+        )}
       </div>
     </form>
   );

@@ -11,4 +11,4 @@ export const kind =
 
 export const radio = 'size-5 accent-ui-primary';
 
-export const actions = 'flex';
+export const actions = 'flex flex-wrap gap-2';

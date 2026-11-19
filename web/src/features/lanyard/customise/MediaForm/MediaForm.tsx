@@ -5,16 +5,13 @@ import { Button } from '@/components/Button/Button';
 import { SelectField } from '@/components/SelectField/SelectField';
 import { TextAreaField } from '@/components/TextAreaField/TextAreaField';
 import { TextField } from '@/components/TextField/TextField';
-import { notify } from '@/components/Toaster/notify';
 import {
   PLATFORM_LABELS,
   TYPE_LABELS,
 } from '@/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants';
-import { captureError, track } from '@/lib/analytics/analytics';
 import { leavingForSubmit } from '@/lib/forms';
 import { cn } from '@/lib/utils';
 
-import { useKeptRecordWriter } from '../../hooks/useKeptRecords';
 import {
   EMPTY_MEDIA,
   MEDIA,
@@ -29,14 +26,31 @@ import type {
 } from './MediaForm.types';
 import { validateMedia } from './MediaForm.validation';
 
-/** Adds a kept podcast (audio) or video to the lanyard. */
-export function MediaForm({ disabled = false, className }: MediaFormProps) {
+/**
+ * A podcast (audio) or video for the lanyard: a new one, or `initial` to
+ * edit. A valid entry goes to `onSubmit`; the form writes nothing itself.
+ */
+export function MediaForm({
+  onSubmit,
+  initial,
+  onCancel,
+  disabled = false,
+  className,
+}: MediaFormProps) {
   const { t, i18n } = useLingui();
-  const writer = useKeptRecordWriter();
-  const [kind, setKind] = useState<MediaKind>('audio');
-  const [values, setValues] = useState<MediaValues>(EMPTY_MEDIA);
+  const [kind, setKind] = useState<MediaKind>(initial?.kind ?? 'audio');
+  const [values, setValues] = useState<MediaValues>(
+    initial
+      ? {
+          url: initial.url,
+          platform: initial.platform,
+          title: initial.title ?? '',
+          description: initial.description ?? '',
+          type: initial.type ?? '',
+        }
+      : EMPTY_MEDIA
+  );
   const [errors, setErrors] = useState<MediaErrors>({});
-  const [submitting, setSubmitting] = useState(false);
   const urlRef = useRef<HTMLInputElement>(null);
   const platformRef = useRef<HTMLSelectElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
@@ -80,7 +94,7 @@ export function MediaForm({ disabled = false, className }: MediaFormProps) {
     setErrors((current) => ({ ...current, platform: undefined }));
   }
 
-  async function submit(event: FormEvent) {
+  function submit(event: FormEvent) {
     event.preventDefault();
     const found = validateMedia(values);
     setErrors(found);
@@ -89,27 +103,17 @@ export function MediaForm({ disabled = false, className }: MediaFormProps) {
     if (found.title) return titleRef.current?.focus();
     if (found.description) return descriptionRef.current?.focus();
 
-    setSubmitting(true);
-    try {
-      const title = values.title.trim();
-      const description = values.description.trim();
-      await writer.create(MEDIA[kind].collection, {
-        url: values.url.trim(),
-        platform: values.platform,
-        ...(title ? { title } : {}),
-        ...(description ? { description } : {}),
-        ...(values.type ? { type: values.type } : {}),
-        createdAt: new Date().toISOString(),
-      });
-      setValues(EMPTY_MEDIA);
-      notify.success(kind === 'audio' ? t`Audio added` : t`Video added`);
-      track('kept_record_saved', { kind });
-    } catch (cause) {
-      captureError(cause, { source: 'media' });
-      notify.error(t`Failed to save. Please try again.`);
-    } finally {
-      setSubmitting(false);
-    }
+    const title = values.title.trim();
+    const description = values.description.trim();
+    onSubmit({
+      kind,
+      url: values.url.trim(),
+      platform: values.platform,
+      ...(title ? { title } : {}),
+      ...(description ? { description } : {}),
+      ...(values.type ? { type: values.type } : {}),
+    });
+    if (!initial) setValues(EMPTY_MEDIA);
   }
 
   return (
@@ -188,14 +192,14 @@ export function MediaForm({ disabled = false, className }: MediaFormProps) {
         disabled={disabled}
       />
       <div className={styles.actions}>
-        <Button
-          type="submit"
-          variant="secondary"
-          loading={submitting}
-          disabled={disabled}
-        >
-          {t`Add media`}
+        <Button type="submit" variant="secondary" disabled={disabled}>
+          {initial ? t`Update` : t`Add media`}
         </Button>
+        {onCancel && (
+          <Button variant="ghost" onClick={onCancel}>
+            {t`Cancel`}
+          </Button>
+        )}
       </div>
     </form>
   );

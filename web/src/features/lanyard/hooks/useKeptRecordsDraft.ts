@@ -10,7 +10,7 @@ import {
 } from 'react';
 
 import { useSession } from '@/features/auth/session/useSession';
-import { captureError } from '@/lib/analytics/analytics';
+import { captureError, track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
 import {
   applyWrites,
@@ -33,6 +33,8 @@ export type HonorificValue = 'Dr' | 'Prof' | 'none';
 export type UseKeptRecordsDraft = {
   /** The stored records with the draft's changes applied. */
   records: LanyardRecords;
+  /** The stored records have been read; until then edits are ignored. */
+  ready: boolean;
   dirty: boolean;
   /** How many records the draft creates, edits or deletes. */
   changes: number;
@@ -214,7 +216,9 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
 
   const edit = useCallback(
     (change: (records: LanyardRecords) => LanyardRecords) => {
-      const from = stored.current ?? EMPTY;
+      const from = stored.current;
+      // A draft built before the records are read would delete them all.
+      if (!from) return;
       const next = change(draftRef.current ?? from);
       if (diff(from, next).length === 0) {
         restore();
@@ -288,6 +292,7 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
         })
       );
       await applyWrites(owner, ops);
+      track('kept_record_saved', { changes: ops.length });
       // Saved: the draft goes, and its records stay on show until the
       // repository's version is read back.
       draftRef.current = null;
@@ -315,6 +320,7 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
 
   return {
     records,
+    ready: query.data !== undefined,
     dirty: changes > 0,
     changes,
     addLink: (fields) =>

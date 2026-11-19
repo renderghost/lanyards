@@ -29,7 +29,12 @@ type ServeOptions = {
   /** app.lanyards.actor.lanyard fields, or null for no record. */
   config?: Record<string, unknown> | null;
   honorific?: 'Dr' | 'Prof' | null;
+  /** The owner's own app.lanyards.link.web records. */
+  webLinks?: { rkey: string; url: string; title?: string }[];
 };
+
+/** When every kept record in the fixtures was created. */
+export const KEPT_CREATED_AT = '2025-11-20T09:00:00.000Z';
 
 /** Answers every public read for ADA's lanyard. */
 export function servePerson(options: ServeOptions = {}) {
@@ -89,12 +94,25 @@ export function servePerson(options: ServeOptions = {}) {
           value: {
             $type: 'app.lanyards.actor.biography.honorific',
             value: options.honorific ?? 'Dr',
-            createdAt: '2025-11-20T09:00:00.000Z',
+            createdAt: KEPT_CREATED_AT,
           },
         }
   );
+  const webLinks = (options.webLinks ?? []).map(({ rkey, ...fields }) => ({
+    uri: `at://${ADA.did}/app.lanyards.link.web/${rkey}`,
+    cid: CID,
+    value: {
+      $type: 'app.lanyards.link.web',
+      ...fields,
+      createdAt: KEPT_CREATED_AT,
+    },
+  }));
+  mockListRecords(ADA.pds, ADA.did, 'app.lanyards.link.web', webLinks);
+  for (const link of webLinks) {
+    const rkey = link.uri.split('/').pop() ?? '';
+    mockGetRecord(ADA.pds, ADA.did, 'app.lanyards.link.web', rkey, link);
+  }
   for (const collection of [
-    'app.lanyards.link.web',
     'app.lanyards.link.media.audio',
     'app.lanyards.link.media.video',
   ]) {

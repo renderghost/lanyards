@@ -17,7 +17,7 @@ import { useLanyardDraft, type UseLanyardDraft } from './useLanyardDraft';
 const SAVE_FAILED_TOAST = 'lanyard-settings-save';
 
 /** The kept-record lists the owner adds to, edits and deletes from. */
-const KEPT_LISTS = [
+export const KEPT_LISTS = [
   LANYARDS_NSID.webLink,
   LANYARDS_NSID.audio,
   LANYARDS_NSID.video,

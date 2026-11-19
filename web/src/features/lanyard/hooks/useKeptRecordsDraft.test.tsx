@@ -5,9 +5,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
+import { track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
 import { applyWrites } from '@/lib/atproto/writes';
 import { queryKeys } from '@/lib/query/keys';
+import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
 import type { LanyardRecords } from '@/lib/sources/lanyards/lanyards.types';
 import { ADA } from '@/test/people';
 import { signedInSession } from '@/test/person';
@@ -15,10 +17,19 @@ import { signedInSession } from '@/test/person';
 import { useKeptRecordsDraft } from './useKeptRecordsDraft';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
+vi.mock('@/lib/analytics/analytics', () => ({
+  captureError: vi.fn(),
+  track: vi.fn(),
+}));
 vi.mock('@/lib/atproto/pds', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/atproto/pds')>()),
   getRecord: vi.fn(),
 }));
+vi.mock('@/lib/sources/lanyards/lanyards', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@/lib/sources/lanyards/lanyards')>();
+  return { ...actual, fetchLanyardRecords: vi.fn(actual.fetchLanyardRecords) };
+});
 vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/atproto/writes')>()),
   applyWrites: vi.fn(),
@@ -130,6 +141,22 @@ describe('useKeptRecordsDraft', () => {
     ]);
   });
 
+  it('takes no edits until the stored records are read', () => {
+    client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    vi.mocked(fetchLanyardRecords).mockReturnValue(new Promise(() => {}));
+    const { result } = render();
+    expect(result.current.ready).toBe(false);
+    act(() => result.current.addLink({ url: 'https://new.example/' }));
+    // A draft built on nothing would delete every stored record on Save.
+    expect(result.current.dirty).toBe(false);
+    expect(result.current.records.webLinks).toEqual([]);
+  });
+
+  it('is ready once the stored records are read', () => {
+    const { result } = render();
+    expect(result.current.ready).toBe(true);
+  });
+
   it('a removed link disappears from the draft records', () => {
     const { result } = render();
     act(() => result.current.removeLink(WEB));
@@ -180,6 +207,14 @@ describe('useKeptRecordsDraft', () => {
         fields: { value: 'Dr', createdAt: NOW },
       },
     ]);
+  });
+
+  it('records a save, by how many records it changed', async () => {
+    const { result } = render();
+    act(() => result.current.addLink({ url: 'https://new.example/' }));
+    act(() => result.current.removeLink(WEB));
+    await save(result);
+    expect(track).toHaveBeenCalledWith('kept_record_saved', { changes: 2 });
   });
 
   it('a failed save keeps every change', async () => {

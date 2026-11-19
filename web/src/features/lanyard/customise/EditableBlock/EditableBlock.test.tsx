@@ -2,6 +2,7 @@ import { DndContext } from '@dnd-kit/core';
 import { SortableContext } from '@dnd-kit/sortable';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import type { EditorBlock } from '@/lib/person/blocks';
@@ -28,7 +29,11 @@ const LINKS: EditorBlock = {
   ],
 };
 
-function renderBlock(block: EditorBlock, onRetry = vi.fn()) {
+function renderBlock(
+  block: EditorBlock,
+  onRetry = vi.fn(),
+  slots: { content?: ReactNode; footer?: ReactNode } = {}
+) {
   return renderWithProviders(
     <DndContext>
       <SortableContext items={[block.type]}>
@@ -43,6 +48,7 @@ function renderBlock(block: EditorBlock, onRetry = vi.fn()) {
             onVisibleChange={vi.fn()}
             onLimitChange={vi.fn()}
             onRetry={onRetry}
+            {...slots}
           />
         </ul>
       </SortableContext>
@@ -81,6 +87,31 @@ describe('EditableBlock', () => {
     expect(screen.getByText("Couldn't load Sifa")).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
     expect(onRetry).toHaveBeenCalled();
+  });
+
+  it('its own content replaces the items, even when there are none yet', () => {
+    renderBlock({ ...LINKS, status: 'empty', items: [] }, vi.fn(), {
+      content: <button type="button">Add a link</button>,
+    });
+    expect(
+      screen.getByRole('button', { name: 'Add a link' })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Nothing to show yet')).toBeNull();
+  });
+
+  it('puts its footer after the items', () => {
+    renderBlock(LINKS, vi.fn(), { footer: <p>ORCID helper</p> });
+    expect(screen.getByText('Website')).toBeInTheDocument();
+    expect(screen.getByText('ORCID helper')).toBeInTheDocument();
+  });
+
+  it('a hidden block shows neither', () => {
+    renderBlock({ ...LINKS, visible: false }, vi.fn(), {
+      content: <p>Editor</p>,
+      footer: <p>ORCID helper</p>,
+    });
+    expect(screen.queryByText('Editor')).toBeNull();
+    expect(screen.queryByText('ORCID helper')).toBeNull();
   });
 
   it('has no axe violations', async () => {

@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
-import { useMemo, useRef, useState } from 'react';
+import { type ReactNode, useMemo, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { notify } from '@/components/Toaster/notify';
@@ -34,26 +34,43 @@ import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/L
 import { LanyardSurface } from '@/features/lanyard/components/LanyardSurface/LanyardSurface';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { profileId } from '@/lib/atproto/profileId';
-import { BLOCK_SOURCES, hiddenMatcher } from '@/lib/person/blocks';
+import {
+  BLOCK_SOURCES,
+  type EditorBlock,
+  hiddenMatcher,
+} from '@/lib/person/blocks';
 import { hideProblem, type RenderableBlockType } from '@/lib/person/config';
+import type { BlockItems } from '@/lib/person/personView.types';
 import { usePersonView } from '@/lib/person/usePersonView';
 
 import { EditableBlock } from '../EditableBlock/EditableBlock';
+import { HonorificControl } from '../HonorificControl/HonorificControl';
+import { LinkEditor } from '../LinkEditor/LinkEditor';
+import { MediaEditor } from '../MediaEditor/MediaEditor';
+import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
 import { RecordToggle } from '../RecordToggle/RecordToggle';
 import { MOUSE_DRAG, TOUCH_DRAG } from './LanyardEditor.constants';
 import * as styles from './LanyardEditor.styles';
 import type { LanyardEditorProps } from './LanyardEditor.types';
 
+/** A block's items, as the type its block shows. */
+const itemsOf = <T extends keyof BlockItems>(block: EditorBlock, _type: T) =>
+  block.items.map(({ item }) => item) as BlockItems[T][];
+
 /**
  * The owner's lanyard, edited where it is (#118): every block with its bar
  * (drag, move, show/hide, count) and every record with its own show/hide.
- * Hidden blocks and records stay in place. Every move is announced.
+ * Their own links, podcasts and videos are edited in their blocks, and the
+ * title under the badge. Hidden blocks and records stay in place. Every
+ * move is announced.
  */
 export function LanyardEditor({
   did,
   config,
   onChange,
   disabled,
+  records,
+  recordsDisabled,
 }: LanyardEditorProps) {
   const { t, i18n } = useLingui();
   const view = usePersonView(did, { mode: 'owner' });
@@ -197,10 +214,51 @@ export function LanyardEditor({
   const orphans = view.orphanedHidden;
   const count = orphans.length;
 
+  /** What a block shows in place of its items, and after them. */
+  const slotsOf = (
+    block: EditorBlock
+  ): { content?: ReactNode; footer?: ReactNode } => {
+    switch (block.type) {
+      case 'links':
+        return {
+          content: (
+            <LinkEditor
+              items={itemsOf(block, 'links')}
+              records={records}
+              disabled={recordsDisabled}
+            />
+          ),
+        };
+      case 'media':
+        return {
+          content: (
+            <MediaEditor
+              items={itemsOf(block, 'media')}
+              records={records}
+              disabled={recordsDisabled}
+            />
+          ),
+        };
+      case 'publications':
+        return {
+          footer: (
+            <OrcidHelper did={did} profile={profile} orcidId={view.orcidId} />
+          ),
+        };
+      default:
+        return {};
+    }
+  };
+
   return (
     <LanyardSurface variant="card">
       <div className={styles.page}>
         <BadgeHero hero={view.hero} headingLevel={2} />
+        <HonorificControl
+          value={records.records.honorific ?? 'none'}
+          onChange={records.setHonorific}
+          disabled={recordsDisabled}
+        />
         {view.configError && (
           <div role="status" className={styles.notice}>
             <p className={styles.noticeText}>
@@ -257,6 +315,7 @@ export function LanyardEditor({
                         BLOCK_SOURCES[block.type].map(view.retry)
                       )
                     }
+                    {...slotsOf(block)}
                   />
                 ))}
               </ul>

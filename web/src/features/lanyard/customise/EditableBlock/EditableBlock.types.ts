@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import type { EditorBlock } from '@/lib/person/blocks';
 
 export type EditableBlockProps = {
@@ -12,4 +14,11 @@ export type EditableBlockProps = {
   onLimitChange(limit: number): void;
   /** Fetches the block's sources again. */
   onRetry(): Promise<unknown> | void;
+  /**
+   * Replaces the block's items, e.g. with an editor that adds them, so it
+   * shows even before there are any.
+   */
+  content?: ReactNode;
+  /** Comes after the block while it is shown, e.g. the ORCID helper. */
+  footer?: ReactNode;
 };
