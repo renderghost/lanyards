@@ -144,6 +144,7 @@ msgstr "Choose a platform"
 msgid "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 msgstr "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 
+#: src/components/Sheet/Sheet.tsx:43
 #: src/features/qr/components/QrSheet/QrSheet.tsx:71
 msgid "Close"
 msgstr "Close"
@@ -198,7 +199,7 @@ msgstr "Couldn't load {failed}"
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:117
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:124
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
@@ -668,7 +669,7 @@ msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:122
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:119
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:126
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:183
 #: src/features/lanyard/hooks/useLanyardConfig.ts:263
 msgid "Retry"
@@ -734,13 +735,13 @@ msgstr "Sifa"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:87
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:92
 #: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:56
 msgid "Sign in"
 msgstr "Sign in"
 
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:55
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:82
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:87
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -825,11 +826,11 @@ msgstr "This is your lanyard"
 msgid "This item can't be hidden."
 msgstr "This item can't be hidden."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:94
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:100
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:84
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:89
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 

@@ -29,6 +29,7 @@
   --color-ui-on-primary: var(--ui-on-primary);
   --color-ui-primary-subtle: var(--ui-primary-subtle);
   --color-ui-warning: var(--ui-warning);
+  --color-ui-danger: var(--ui-danger);
   --font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'DM Serif Text', ui-serif, serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;

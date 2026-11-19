@@ -21,6 +21,27 @@ describe('Button', () => {
     );
   });
 
+  it('uses the product UI primary by default', () => {
+    renderWithProviders(<Button>Save</Button>);
+    expect(screen.getByRole('button', { name: 'Save' }).className).toContain(
+      'bg-ui-primary'
+    );
+  });
+
+  it('uses the lanyard accent with tone="accent"', () => {
+    renderWithProviders(<Button tone="accent">Follow</Button>);
+    const button = screen.getByRole('button', { name: 'Follow' });
+    expect(button.className).toContain('bg-accent');
+    expect(button.className).not.toContain('bg-ui-primary');
+  });
+
+  it('is 36px tall at the small size, with a 44px hit area', () => {
+    renderWithProviders(<Button size="sm">Reset</Button>);
+    const { className } = screen.getByRole('button', { name: 'Reset' });
+    expect(className).toContain('min-h-9');
+    expect(className).toContain('before:-inset-y-1');
+  });
+
   it('is unavailable and marked busy while loading, keeping focus', () => {
     const onClick = vi.fn();
     const { rerender } = renderWithProviders(

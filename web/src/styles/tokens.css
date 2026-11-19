@@ -56,6 +56,7 @@
   --ui-on-primary: oklch(1 0 0);
   --ui-primary-subtle: oklch(0.95 0.025 276);
   --ui-warning: oklch(0.6 0.15 55);
+  --ui-danger: oklch(0.53 0.2 27);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -82,5 +83,6 @@
     --ui-on-primary: oklch(0.17 0.004 265);
     --ui-primary-subtle: oklch(0.3 0.06 280);
     --ui-warning: oklch(0.78 0.15 70);
+    --ui-danger: oklch(0.74 0.16 22);
   }
 }

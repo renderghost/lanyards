@@ -44,6 +44,7 @@ describe('UI tokens', () => {
       '--ui-on-primary',
       '--ui-primary-subtle',
       '--ui-warning',
+      '--ui-danger',
     ]) {
       expect(vars[name], name).toBeTruthy();
     }
@@ -73,6 +74,18 @@ describe('UI tokens', () => {
       4.5
     );
   });
+
+  it.each(MODES)(
+    'the error red works as text and as a field ring (%s)',
+    (mode) => {
+      expect(ratio(mode, '--ui-danger', '--ui-surface')).toBeGreaterThanOrEqual(
+        4.5
+      );
+      expect(ratio(mode, '--ui-danger', '--ui-canvas')).toBeGreaterThanOrEqual(
+        4.5
+      );
+    }
+  );
 
   it.each(MODES)(
     'control boundaries and the unsaved dot are at least 3:1 (%s)',
