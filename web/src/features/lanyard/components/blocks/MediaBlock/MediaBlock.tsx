@@ -30,7 +30,11 @@ export function MediaBlock({ items, className }: MediaBlockProps) {
               itemKey={media.key}
               title={itemTitle('media', media, i18n)}
             >
-              <ExternalLink href={media.url} className={styles.title}>
+              <ExternalLink
+                tone="accent"
+                href={media.url}
+                className={styles.title}
+              >
                 {media.title ?? hostOf(media.url)}
               </ExternalLink>
               {meta.length > 0 && (

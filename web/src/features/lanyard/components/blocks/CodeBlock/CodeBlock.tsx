@@ -16,7 +16,11 @@ export function CodeBlock({ items, className }: CodeBlockProps) {
       {items.map((repo) => (
         <li key={repo.key} className={styles.item}>
           <ItemFrame itemKey={repo.key} title={itemTitle('code', repo, i18n)}>
-            <ExternalLink href={repo.url} className={styles.title}>
+            <ExternalLink
+              tone="accent"
+              href={repo.url}
+              className={styles.title}
+            >
               {repo.name}
             </ExternalLink>
             {repo.description && (

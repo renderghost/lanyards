@@ -44,7 +44,7 @@ export function LanyardNotFound({ handle, className }: LanyardNotFoundProps) {
           value={query}
           onChange={setQuery}
         />
-        <Button type="submit">{t`Show lanyard`}</Button>
+        <Button tone="accent" type="submit">{t`Show lanyard`}</Button>
       </form>
     </section>
   );

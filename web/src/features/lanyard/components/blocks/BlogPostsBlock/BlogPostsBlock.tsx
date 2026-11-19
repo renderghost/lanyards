@@ -20,7 +20,11 @@ export function BlogPostsBlock({ items, className }: BlogPostsBlockProps) {
             itemKey={post.key}
             title={itemTitle('blogPosts', post, i18n)}
           >
-            <ExternalLink href={post.url} className={styles.title}>
+            <ExternalLink
+              tone="accent"
+              href={post.url}
+              className={styles.title}
+            >
               {post.title}
             </ExternalLink>
             <p className={styles.meta}>

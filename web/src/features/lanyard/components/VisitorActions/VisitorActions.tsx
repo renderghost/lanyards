@@ -47,6 +47,7 @@ export function VisitorActions({
   return (
     <div className={cn(styles.actions, className)}>
       <ExternalLink
+        tone="accent"
         href={`https://bsky.app/profile/${profileId(did, handle)}`}
         className={styles.link}
       >
@@ -55,7 +56,12 @@ export function VisitorActions({
       <Link to="/" search={{ returnTo: path }} className={styles.link}>
         {t`Sign in`}
       </Link>
-      <Button size="lg" variant="secondary" onClick={createAccount}>
+      <Button
+        tone="accent"
+        size="lg"
+        variant="secondary"
+        onClick={createAccount}
+      >
         {t`Create account`}
       </Button>
     </div>

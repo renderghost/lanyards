@@ -19,6 +19,7 @@ import { LanyardBlocks } from '../LanyardBlocks/LanyardBlocks';
 import { LanyardNotice } from '../LanyardNotice/LanyardNotice';
 import { LanyardProblem } from '../LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '../LanyardSkeleton/LanyardSkeleton';
+import { LanyardSurface } from '../LanyardSurface/LanyardSurface';
 import { SharedContextStrip } from '../SharedContextStrip/SharedContextStrip';
 import { VisitorActions } from '../VisitorActions/VisitorActions';
 import { NO_UNAUTHENTICATED } from './LanyardPage.constants';
@@ -62,10 +63,13 @@ export function LanyardPage({
     if (hasHero && !preview) track('lanyard_viewed', { viewer });
   }, [did, viewer, hasHero, preview]);
 
-  // On its public page the lanyard keeps its own ground; in a preview the
-  // customiser frames it (#118).
-  const frame = (content: ReactNode) =>
-    preview ? content : <div className={styles.backdrop}>{content}</div>;
+  // The lanyard keeps its own ground: the whole page when public, a framed
+  // card in the customiser's preview (#118).
+  const frame = (content: ReactNode) => (
+    <LanyardSurface variant={preview ? 'card' : 'page'}>
+      {content}
+    </LanyardSurface>
+  );
 
   if (view.profile.status === 'error') {
     return frame(
@@ -122,7 +126,11 @@ export function LanyardPage({
           <p
             className={styles.text}
           >{t`Couldn't load your lanyard settings`}</p>
-          <Button variant="secondary" onClick={() => view.retry('lanyards')}>
+          <Button
+            tone="accent"
+            variant="secondary"
+            onClick={() => view.retry('lanyards')}
+          >
             {t`Retry`}
           </Button>
         </div>

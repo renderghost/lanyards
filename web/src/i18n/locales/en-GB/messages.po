@@ -7,7 +7,7 @@ msgstr ""
 "X-Generator: @lingui/cli\n"
 "Language: en-GB\n"
 
-#: src/components/ExternalLink/ExternalLink.tsx:25
+#: src/components/ExternalLink/ExternalLink.tsx:30
 msgid "(opens in a new tab)"
 msgstr "(opens in a new tab)"
 
@@ -178,7 +178,7 @@ msgstr "Contract roles"
 msgid "Copy link"
 msgstr "Copy link"
 
-#: src/features/lanyard/components/FollowButton/FollowButton.tsx:54
+#: src/features/lanyard/components/FollowButton/FollowButton.tsx:55
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
 
@@ -195,11 +195,11 @@ msgstr "Couldn't copy the link. Please try again."
 msgid "Couldn't load {failed}"
 msgstr "Couldn't load {failed}"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:114
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:115
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:124
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:128
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
@@ -219,7 +219,7 @@ msgstr "Couldn't restore it. Please try again."
 msgid "Couldn't restore the link. Please try again."
 msgstr "Couldn't restore the link. Please try again."
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:113
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:114
 msgid "Couldn't show this block"
 msgstr "Couldn't show this block"
 
@@ -236,7 +236,7 @@ msgstr "Couldn't start creating an account. Please try again."
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
 
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:59
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:65
 msgid "Create account"
 msgstr "Create account"
 
@@ -321,11 +321,11 @@ msgstr "Failed to save. Please try again."
 msgid "Failed to unfollow. Please try again."
 msgstr "Failed to unfollow. Please try again."
 
-#: src/features/lanyard/components/FollowButton/FollowButton.tsx:50
+#: src/features/lanyard/components/FollowButton/FollowButton.tsx:51
 msgid "Follow"
 msgstr "Follow"
 
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:53
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:54
 msgid "Follow on Bluesky"
 msgstr "Follow on Bluesky"
 
@@ -357,7 +357,7 @@ msgstr "Followed by {first}, {second} and {rest} you follow"
 msgid "Followed by {first}, who you follow"
 msgstr "Followed by {first}, who you follow"
 
-#: src/features/lanyard/components/FollowButton/FollowButton.tsx:50
+#: src/features/lanyard/components/FollowButton/FollowButton.tsx:51
 msgid "Following"
 msgstr "Following"
 
@@ -437,11 +437,11 @@ msgstr "Kind of content"
 msgid "Languages"
 msgstr "Languages"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:58
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:59
 msgid "Lanyard"
 msgstr "Lanyard"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:57
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:58
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:34
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
@@ -668,8 +668,8 @@ msgstr "Reordering cancelled. {name} stayed where it was."
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:122
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:126
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:124
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:134
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:183
 #: src/features/lanyard/hooks/useLanyardConfig.ts:263
 msgid "Retry"
@@ -735,13 +735,13 @@ msgstr "Sifa"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:92
-#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:56
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:96
+#: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:57
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:55
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:87
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:56
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:91
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -826,11 +826,11 @@ msgstr "This is your lanyard"
 msgid "This item can't be hidden."
 msgstr "This item can't be hidden."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:100
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:104
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:89
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:93
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 
@@ -881,7 +881,7 @@ msgstr "Undo"
 msgid "Unfollowed @{handle}"
 msgstr "Unfollowed @{handle}"
 
-#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:41
+#: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:45
 msgid "Verified on ORCID"
 msgstr "Verified on ORCID"
 
@@ -913,7 +913,7 @@ msgstr "Video restored"
 msgid "View as visitor"
 msgstr "View as visitor"
 
-#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:32
+#: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:33
 msgid "View on Bluesky"
 msgstr "View on Bluesky"
 

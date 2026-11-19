@@ -93,7 +93,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(document.title).toBe('Your lanyard · Lanyards');
   });
 
-  it('leaves the preview’s background to the customiser', async () => {
+  it('frames the lanyard on its own ground inside the preview', async () => {
     servePerson();
     renderRoute('/lanyard');
     const region = await preview();
@@ -102,8 +102,11 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       { level: 2, name: 'Dr Ada Example' },
       { timeout: 5000 }
     );
-    // The public page's own backdrop (#118) stays off in the preview.
-    expect(name.closest('.bg-background')).toBe(region);
+    // The lanyard brings its own ground; the customiser around it is neutral.
+    const ground = name.closest<HTMLElement>('.bg-background');
+    expect(ground).not.toBeNull();
+    expect(ground).not.toBe(region);
+    expect(region).toContainElement(ground);
   });
 
   it('gives the page one level-one heading, its purpose', async () => {
