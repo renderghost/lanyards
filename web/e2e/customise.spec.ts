@@ -359,22 +359,28 @@ test.describe('lanyard customiser', () => {
     expect(hidden).toEqual([]);
   });
 
-  test('names every block in full on its bar at 390 px', async ({ page }) => {
+  test('names every block in full in its header row at 390 px', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);
-    // A hidden counted block: the longest bar, with "Hidden from visitors".
+    // A hidden counted block: the longest row, with "Hidden from visitors".
     await page.getByRole('switch', { name: 'Show Publications' }).click();
     const clipped = await page.evaluate(() =>
       [...document.querySelectorAll<HTMLElement>('[data-block]')].flatMap(
         (block) => {
-          const bar = block.firstElementChild as HTMLElement;
-          const [label, controls] = [...bar.children].slice(1) as HTMLElement[];
-          const texts = [...(label?.querySelectorAll('span') ?? [])];
+          const header = block.querySelector<HTMLElement>(
+            '[data-block-header]'
+          );
+          const title = header?.querySelector('h2')?.parentElement;
+          const controls = header?.lastElementChild as HTMLElement | null;
+          if (!header || !title || !controls) return [block.dataset.block];
+          const texts = [...title.children] as HTMLElement[];
           const cut = texts.filter(
             (text) => text.scrollWidth > text.clientWidth + 1
           );
-          const a = label!.getBoundingClientRect();
-          const b = controls!.getBoundingClientRect();
+          const a = title.getBoundingClientRect();
+          const b = controls.getBoundingClientRect();
           const overlap =
             a.right > b.left + 1 &&
             a.bottom > b.top + 1 &&

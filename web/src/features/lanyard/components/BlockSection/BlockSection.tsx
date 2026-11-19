@@ -23,6 +23,10 @@ export function BlockSection({
   onRetry,
   onCrash,
   editLinks = [],
+  handle,
+  note,
+  controls,
+  collapsed = false,
   children,
   className,
 }: BlockSectionProps) {
@@ -57,18 +61,23 @@ export function BlockSection({
   return (
     <section
       aria-labelledby={headingId}
-      aria-busy={status === 'loading' || undefined}
-      className={cn(styles.section, className)}
+      aria-busy={(!collapsed && status === 'loading') || undefined}
+      data-collapsed={collapsed ? '' : undefined}
+      className={cn(styles.section, collapsed && styles.collapsed, className)}
     >
-      <div className={styles.header}>
-        <h2
-          ref={headingRef}
-          id={headingId}
-          tabIndex={-1}
-          className={styles.heading}
-        >
-          {heading}
-        </h2>
+      <div data-block-header="" className={styles.header}>
+        {handle}
+        <div className={styles.title}>
+          <h2
+            ref={headingRef}
+            id={headingId}
+            tabIndex={-1}
+            className={styles.heading}
+          >
+            {heading}
+          </h2>
+          {note && <p className={styles.note}>{note}</p>}
+        </div>
         {owner && editLinks.length > 0 && (
           <div className={styles.editLinks}>
             {editLinks.map((link) => (
@@ -83,14 +92,15 @@ export function BlockSection({
             ))}
           </div>
         )}
+        {controls}
       </div>
-      {status === 'loading' && (
+      {!collapsed && status === 'loading' && (
         <div className={styles.skeleton} aria-hidden="true">
           <span className={styles.skeletonLine} />
           <span className={styles.skeletonLine} />
         </div>
       )}
-      {status === 'ready' && (
+      {!collapsed && status === 'ready' && (
         <ErrorBoundary
           key={attempt}
           onError={(error) => {
@@ -107,7 +117,7 @@ export function BlockSection({
           {children}
         </ErrorBoundary>
       )}
-      {showProblem && (
+      {!collapsed && showProblem && (
         <div className={styles.problem}>
           <p className={styles.problemText}>
             {crashed

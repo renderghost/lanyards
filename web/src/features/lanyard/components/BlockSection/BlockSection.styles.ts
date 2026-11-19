@@ -1,7 +1,18 @@
-export const section = 'flex flex-col gap-3';
+// Every block is framed, so its bounds are clear (#122).
+export const section =
+  'flex flex-col gap-3 rounded-2xl border border-border p-4';
 
-export const header =
-  'flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1';
+// Hidden from visitors: only its header row, in a dashed frame.
+export const collapsed = 'border-dashed py-2';
+
+// One row: handle, name, Edit-on links, controls; it wraps on phones.
+export const header = 'flex flex-wrap items-center gap-x-3 gap-y-1';
+
+// At least 10rem, so on phones the controls wrap below the name rather
+// than squeezing it.
+export const title = 'flex min-w-0 flex-1 basis-40 flex-col';
+
+export const note = 'text-sm leading-5 text-muted-foreground';
 
 export const editLinks = 'flex flex-wrap gap-x-3 gap-y-1';
 

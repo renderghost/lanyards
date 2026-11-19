@@ -12,14 +12,16 @@ import { COUNTED_BLOCKS } from '@/lib/person/config';
 import { EDIT_LINKS } from '@/lib/person/editLinks';
 import { cn } from '@/lib/utils';
 
-import { BlockBar } from '../BlockBar/BlockBar';
+import { BlockControls } from '../BlockControls/BlockControls';
+import { BlockHandle } from '../BlockHandle/BlockHandle';
 import * as styles from './EditableBlock.styles';
 import type { EditableBlockProps } from './EditableBlock.types';
 
 /**
- * One block as the owner edits it on the lanyard: its bar, then (while
- * shown to visitors) the block with every item, hidden ones in place. A
- * hidden block collapses to its bar.
+ * One block as the owner edits it on the lanyard: framed, with its handle,
+ * name and controls in one header row, then (while shown to visitors)
+ * every item, hidden ones in place. A hidden block collapses to its header
+ * row (#122).
  */
 export function EditableBlock({
   block,
@@ -57,43 +59,51 @@ export function EditableBlock({
       aria-label={heading}
       className={cn(styles.block, isDragging && styles.dragging)}
     >
-      <BlockBar
-        type={block.type}
-        index={index}
-        total={total}
-        visible={block.visible}
-        limit={block.limit}
-        disabled={disabled}
-        onMove={onMove}
-        onVisibleChange={onVisibleChange}
-        onLimitChange={
-          COUNTED_BLOCKS.has(block.type) ? onLimitChange : undefined
+      <BlockSection
+        heading={heading}
+        status={block.status === 'empty' ? 'ready' : block.status}
+        failedSources={block.failedSources}
+        owner
+        editLinks={EDIT_LINKS[block.type](profile).map((link) => ({
+          label: i18n._(link.label),
+          url: link.url,
+        }))}
+        handle={
+          <BlockHandle
+            type={block.type}
+            disabled={disabled}
+            dragHandle={{ ref: setActivatorNodeRef, attributes, listeners }}
+          />
         }
-        dragHandle={{ ref: setActivatorNodeRef, attributes, listeners }}
-      />
-      {block.visible && (
-        <BlockSection
-          heading={heading}
-          status={block.status === 'empty' ? 'ready' : block.status}
-          failedSources={block.failedSources}
-          owner
-          editLinks={EDIT_LINKS[block.type](profile).map((link) => ({
-            label: i18n._(link.label),
-            url: link.url,
-          }))}
-          onRetry={onRetry}
-          onCrash={(error) =>
-            captureError(error, { source: `block:${block.type}` })
-          }
-        >
-          {content ??
-            (block.status === 'empty' ? (
-              <p className={styles.empty}>{t`Nothing to show yet`}</p>
-            ) : (
-              <Items items={block.items.map(({ item }) => item) as never[]} />
-            ))}
-        </BlockSection>
-      )}
+        note={block.visible ? undefined : t`Hidden from visitors`}
+        controls={
+          <BlockControls
+            type={block.type}
+            index={index}
+            total={total}
+            visible={block.visible}
+            limit={block.limit}
+            disabled={disabled}
+            onMove={onMove}
+            onVisibleChange={onVisibleChange}
+            onLimitChange={
+              COUNTED_BLOCKS.has(block.type) ? onLimitChange : undefined
+            }
+          />
+        }
+        collapsed={!block.visible}
+        onRetry={onRetry}
+        onCrash={(error) =>
+          captureError(error, { source: `block:${block.type}` })
+        }
+      >
+        {content ??
+          (block.status === 'empty' ? (
+            <p className={styles.empty}>{t`Nothing to show yet`}</p>
+          ) : (
+            <Items items={block.items.map(({ item }) => item) as never[]} />
+          ))}
+      </BlockSection>
       {block.visible && footer}
     </li>
   );
