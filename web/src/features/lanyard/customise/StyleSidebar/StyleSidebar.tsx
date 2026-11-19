@@ -11,10 +11,12 @@ export function StyleSidebar(props: StyleSidebarProps) {
   const headingId = useId();
   return (
     <aside aria-labelledby={headingId} className={styles.sidebar}>
-      <h2 id={headingId} className={styles.heading}>
-        {t`Style`}
-      </h2>
-      <StylePanel {...props} />
+      <div className={styles.pinned}>
+        <h2 id={headingId} className={styles.heading}>
+          {t`Style`}
+        </h2>
+        <StylePanel {...props} />
+      </div>
     </aside>
   );
 }

@@ -59,6 +59,17 @@ const preview = () =>
 
 const accent = (name: string) => screen.findByRole('radio', { name });
 
+/** Opens the style sidebar's Badge section; returns its job checkbox. */
+async function jobCheckbox() {
+  const sidebar = await screen.findByRole(
+    'complementary',
+    { name: 'Style' },
+    { timeout: 5000 }
+  );
+  await userEvent.click(within(sidebar).getByRole('button', { name: 'Badge' }));
+  return within(sidebar).getByRole('checkbox', { name: 'Show current job' });
+}
+
 /** Presses the customiser's Save. */
 const saveChanges = () =>
   userEvent.click(screen.getByRole('button', { name: 'Save' }));
@@ -124,6 +135,68 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       within(banners[0] as HTMLElement).getByRole('button', { name: 'Save' })
     ).toBeInTheDocument();
     expect(screen.getAllByRole('main')).toHaveLength(1);
+  });
+
+  it('lays the lanyard out beside a pinned style sidebar', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const sidebar = await screen.findByRole(
+      'complementary',
+      { name: 'Style' },
+      { timeout: 5000 }
+    );
+    expect(
+      within(sidebar).getByRole('button', { name: 'Accent colour' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(await preview()).toBeInTheDocument();
+    // Until blocks and records are edited in place (#118, PRs 3–4).
+    const more = screen.getByRole('region', { name: 'More settings' });
+    expect(
+      within(more).getByRole('region', { name: 'Blocks' })
+    ).toBeInTheDocument();
+  });
+
+  it('View as public hides the sidebar and edit controls, and Edit brings them back', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const region = await preview();
+    await within(region).findByRole(
+      'button',
+      { name: 'More options for Building on ATProto at Example Conf 2024' },
+      { timeout: 8000 }
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'View as public' })
+    );
+    expect(screen.queryByRole('complementary', { name: 'Style' })).toBeNull();
+    expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
+    expect(
+      screen.getByText('You’re seeing your lanyard as the public sees it.')
+    ).toBeInTheDocument();
+    expect(
+      within(await preview()).queryByRole('button', {
+        name: /^More options for/,
+      })
+    ).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(
+      screen.getByRole('complementary', { name: 'Style' })
+    ).toBeInTheDocument();
+  });
+
+  it('asks before leaving with unsaved changes', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    servePerson();
+    const { router } = renderRoute('/lanyard');
+    const teal = await accent('Teal');
+    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
+    await userEvent.click(teal);
+    await userEvent.click(screen.getByRole('link', { name: 'Lanyards' }));
+    expect(confirm).toHaveBeenCalledWith(
+      'You have unsaved changes. Leave without saving?'
+    );
+    expect(router.state.location.pathname).toBe('/lanyard');
+    confirm.mockRestore();
   });
 
   it('gives the page one level-one heading, its purpose', async () => {
@@ -205,9 +278,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     servePerson();
     const saves = captureSaves();
     renderRoute('/lanyard');
-    const job = await screen.findByRole('checkbox', {
-      name: 'Show current job on your badge',
-    });
+    const job = await jobCheckbox();
     await waitFor(() => expect(job).toBeEnabled(), { timeout: 5000 });
     expect(job).toBeChecked();
     await userEvent.click(job);
@@ -229,9 +300,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
     await preview();
     expect(await accent('Teal')).toBeDisabled();
-    expect(
-      screen.getByRole('checkbox', { name: 'Show current job on your badge' })
-    ).toBeDisabled();
+    expect(await jobCheckbox()).toBeDisabled();
   });
 
   it('never saves over settings it could not read', async () => {

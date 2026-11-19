@@ -243,6 +243,71 @@ test.describe('lanyard customiser', () => {
     expect(lanyardSaves(writes)[1]?.hidden).toEqual([]);
   });
 
+  test('switches to View as public and back', async ({ page }) => {
+    await openCustomiser(page);
+    const sidebar = page.getByRole('complementary', { name: 'Style' });
+    await expect(sidebar).toBeVisible();
+    await page.getByRole('button', { name: 'View as public' }).click();
+    await expect(sidebar).toBeHidden();
+    await expect(
+      page.getByText('You’re seeing your lanyard as the public sees it.')
+    ).toBeVisible();
+    await expect(
+      page.getByRole('region', { name: 'More settings' })
+    ).toBeHidden();
+    await expect(
+      page.getByRole('button', { name: 'View as public' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await expect(sidebar).toBeVisible();
+  });
+
+  test('asks before leaving unsaved changes: a link, Back and reload', async ({
+    page,
+  }) => {
+    await page.goto('/settings');
+    await page.getByRole('link', { name: 'My lanyard' }).click();
+    await expect(
+      page.getByRole('button', { name: 'Reorder Links' })
+    ).toBeEnabled();
+    await page.getByRole('radio', { name: 'Teal' }).click();
+
+    const dialogs: string[] = [];
+    page.on('dialog', (dialog) => {
+      dialogs.push(dialog.type());
+      void dialog.dismiss();
+    });
+    await page.getByRole('link', { name: 'Lanyards' }).click();
+    await page.goBack();
+    await expect.poll(() => dialogs).toEqual(['confirm', 'confirm']);
+    await expect(page).toHaveURL(/\/lanyard$/);
+    // Dismissing the prompt cancels the reload, so don't wait for a load.
+    await page.evaluate(() => window.location.reload());
+    await expect.poll(() => dialogs).toContain('beforeunload');
+    await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
+  });
+
+  test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    await expect(
+      page.getByRole('complementary', { name: 'Style' })
+    ).toBeHidden();
+    const toolbar = page.getByRole('toolbar', { name: 'Customiser' });
+    const style = toolbar.getByRole('button', { name: 'Style' });
+    await style.click();
+    const sheet = page.getByRole('dialog', { name: 'Style' });
+    await expect(sheet).toBeVisible();
+    await sheet.getByRole('radio', { name: 'Teal' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
+    await page.keyboard.press('Escape');
+    await expect(sheet).toBeHidden();
+    await expect(style).toBeFocused();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(390);
+  });
+
   for (const colorScheme of ['light', 'dark'] as const) {
     test(`has no accessibility violations (${colorScheme})`, async ({
       page,
