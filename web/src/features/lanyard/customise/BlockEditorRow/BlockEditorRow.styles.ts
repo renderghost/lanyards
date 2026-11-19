@@ -7,7 +7,7 @@ export const dragging = 'relative z-10 shadow-lg ring-2 ring-ui-primary';
 export const top = 'flex min-w-0 items-center gap-2';
 
 export const handle =
-  'inline-flex size-11 shrink-0 cursor-grab items-center justify-center rounded-md text-ui-text-muted hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60';
+  'inline-flex size-11 shrink-0 cursor-grab items-center justify-center rounded-lg text-ui-text-muted hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60';
 
 export const icon = 'size-5';
 
@@ -23,12 +23,12 @@ export const switchThumb =
 export const controls = 'flex flex-wrap items-center gap-2';
 
 export const move =
-  'inline-flex size-11 items-center justify-center rounded-md border border-ui-border bg-ui-surface text-ui-text hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
+  'inline-flex size-11 items-center justify-center rounded-lg border border-ui-border bg-ui-surface text-ui-text hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
 
 export const limit = 'flex items-center gap-2 text-sm leading-5 text-ui-text';
 
 export const select =
-  'min-h-11 rounded-md border border-ui-border-strong bg-ui-surface px-2 text-base leading-6 text-ui-text disabled:cursor-not-allowed disabled:opacity-60';
+  'min-h-11 rounded-lg border border-ui-border-strong bg-ui-surface px-2 text-base leading-6 text-ui-text disabled:cursor-not-allowed disabled:opacity-60';
 
 export const status = 'flex flex-wrap items-center gap-x-3 gap-y-1';
 

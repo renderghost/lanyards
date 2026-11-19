@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react';
-import { http, HttpResponse } from 'msw';
+import { delay, http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
@@ -111,6 +111,35 @@ describe('lanyard page states', () => {
       screen.getByRole('combobox', { name: 'Search for someone' })
     ).toBeInTheDocument();
     await expectNoAxeViolations(container);
+  });
+
+  it("keeps the lanyard's own ground while the handle resolves", async () => {
+    server.use(
+      http.get(
+        'https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile',
+        async () => {
+          await delay('infinite');
+          return HttpResponse.json({});
+        }
+      )
+    );
+    renderRoute('/@alice.test');
+    const loading = await screen.findByText('Loading lanyard…', undefined, {
+      timeout: 5000,
+    });
+    expect(loading.closest('.bg-background')).not.toBeNull();
+  });
+
+  it("keeps the lanyard's own ground and palette for an unknown handle", async () => {
+    servePerson();
+    renderRoute('/@nobody.test');
+    const heading = await screen.findByRole('heading', {
+      name: "We couldn't find @nobody.test",
+    });
+    expect(heading.closest('.bg-background')).not.toBeNull();
+    expect(
+      screen.getByRole('combobox', { name: 'Search for someone' })
+    ).toHaveClass('bg-surface');
   });
 
   it('says when an account is not available', async () => {

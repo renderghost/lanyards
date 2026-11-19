@@ -144,7 +144,7 @@ msgstr "Choose a platform"
 msgid "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 msgstr "Choose which blocks your lanyard shows, in what order, and how many items each shows."
 
-#: src/components/Sheet/Sheet.tsx:43
+#: src/components/Sheet/Sheet.tsx:58
 #: src/features/qr/components/QrSheet/QrSheet.tsx:71
 msgid "Close"
 msgstr "Close"
@@ -719,7 +719,7 @@ msgstr "Show again"
 msgid "Show current job on your badge"
 msgstr "Show current job on your badge"
 
-#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:47
+#: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:48
 msgid "Show lanyard"
 msgstr "Show lanyard"
 

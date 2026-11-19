@@ -3,7 +3,7 @@ export const field = 'flex flex-col gap-1.5';
 export const label = 'text-sm font-medium leading-5 text-ui-text';
 
 export const select =
-  'min-h-11 rounded-md border border-ui-border-strong bg-ui-surface px-3 text-base leading-6 text-ui-text disabled:opacity-60';
+  'min-h-11 rounded-lg border border-ui-border-strong bg-ui-surface px-3 text-base leading-6 text-ui-text disabled:opacity-60';
 
 export const selectInvalid = 'border-2 border-ui-danger';
 
