@@ -310,9 +310,8 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
   );
 
   const records = draft ?? query.data ?? EMPTY;
-  const changes = draft
-    ? diff(base ?? stored.current ?? EMPTY, draft).length
-    : 0;
+  // Every draft starts with setBase, so base is the stored records here.
+  const changes = draft ? diff(base ?? EMPTY, draft).length : 0;
 
   return {
     records,
