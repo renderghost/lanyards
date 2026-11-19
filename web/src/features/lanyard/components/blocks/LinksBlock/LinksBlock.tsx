@@ -1,24 +1,27 @@
 import { useLingui } from '@lingui/react/macro';
 
-import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { PlatformIcon } from '@/components/PlatformIcon/PlatformIcon';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
 import { itemTitle } from '../itemTitle';
+import { PillItem } from '../PillItem/PillItem';
 import * as styles from './LinksBlock.styles';
 import type { LinksBlockProps } from './LinksBlock.types';
 
-/** Important links with platform icons (spec §7.2). */
+/** Important links as pills, each with its icon (spec §7.2, #122). */
 export function LinksBlock({ items, className }: LinksBlockProps) {
   const { i18n } = useLingui();
   return (
-    <ul className={cn(styles.list, className)}>
+    <ul className={cn(styles.pills, className)}>
       {items.map((item) => (
-        <li key={item.key}>
-          <ItemFrame itemKey={item.key} title={itemTitle('links', item, i18n)}>
-            <ExternalLink tone="accent" href={item.url} className={styles.link}>
-              {item.iconUrl ? (
+        <li key={item.key} className={styles.item}>
+          <PillItem
+            itemKey={item.key}
+            title={itemTitle('links', item, i18n)}
+            label={item.title}
+            href={item.url}
+            icon={
+              item.iconUrl ? (
                 <img
                   src={item.iconUrl}
                   alt=""
@@ -28,10 +31,9 @@ export function LinksBlock({ items, className }: LinksBlockProps) {
                 />
               ) : (
                 <PlatformIcon platform={item.platform} />
-              )}
-              <span className={styles.title}>{item.title}</span>
-            </ExternalLink>
-          </ItemFrame>
+              )
+            }
+          />
         </li>
       ))}
     </ul>

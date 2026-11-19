@@ -191,3 +191,45 @@ test.describe('public lanyard, signed in', () => {
     expect(writes.created).toEqual([]);
   });
 });
+
+test.describe('pills at 320 px', () => {
+  test.use({ viewport: { width: 320, height: 640 } });
+
+  test('long pill labels truncate inside their pills', async ({ page }) => {
+    await mockPerson(page, {
+      config: {
+        blocks: [
+          { type: 'links', visible: true },
+          { type: 'skills', visible: true },
+        ],
+      },
+      sifa: {
+        externalAccounts: [
+          {
+            rkey: '3mlong',
+            url: 'https://long.example/',
+            platform: 'website',
+            label: 'A very long link title '.repeat(5).trim(),
+            primary: false,
+            verified: false,
+            verifiable: false,
+          },
+        ],
+        skills: [
+          {
+            rkey: '3mlongskill',
+            name: 'Supercalifragilisticexpialidocious'.repeat(3),
+            category: 'technical',
+            endorsed: false,
+            endorsementCount: 0,
+          },
+        ],
+      },
+    });
+    await page.goto('/@alice.test');
+    await expect(page.getByRole('region', { name: 'Skills' })).toBeVisible();
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(320);
+  });
+});

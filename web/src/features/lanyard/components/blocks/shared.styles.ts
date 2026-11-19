@@ -9,7 +9,5 @@ export const title =
 export const meta =
   'text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]';
 
-export const chips = 'flex flex-wrap gap-2';
-
-export const chip =
-  'max-w-full rounded-full border border-border px-3 py-1 text-sm leading-5 text-foreground [overflow-wrap:anywhere]';
+/** A wrapping row of pills (links, Open to, skills). */
+export const pills = 'flex flex-wrap gap-2';
