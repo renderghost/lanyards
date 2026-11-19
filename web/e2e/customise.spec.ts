@@ -287,6 +287,36 @@ test.describe('lanyard customiser', () => {
     await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
   });
 
+  test('never hides keyboard focus under the phone toolbar', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    const toolbar = page.getByRole('toolbar', { name: 'Customiser' });
+    const hidden: string[] = [];
+    for (let step = 0; step < 120; step += 1) {
+      await page.keyboard.press('Tab');
+      const covered = await page.evaluate(() => {
+        const focused = document.activeElement as HTMLElement | null;
+        const bar = document.querySelector('[role="toolbar"]');
+        if (!focused || !bar || bar.contains(focused)) return null;
+        // Tabbing past the last control returns to the page itself.
+        if (focused === document.body) return null;
+        if (focused.closest('header')) return null;
+        const { bottom } = focused.getBoundingClientRect();
+        const { top } = bar.getBoundingClientRect();
+        return bottom > top + 0.5
+          ? (focused.getAttribute('aria-label') ??
+              focused.textContent?.trim().slice(0, 40) ??
+              focused.tagName)
+          : null;
+      });
+      if (covered) hidden.push(covered);
+    }
+    await expect(toolbar).toBeVisible();
+    expect(hidden).toEqual([]);
+  });
+
   test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);

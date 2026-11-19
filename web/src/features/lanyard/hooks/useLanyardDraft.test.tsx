@@ -131,6 +131,29 @@ describe('useLanyardDraft', () => {
     expect(result.current.changes).toBe(2);
   });
 
+  it('counts each block and hidden item that changed', () => {
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, hidden: ['k1', 'k2'] })));
+    expect(result.current.changes).toBe(2);
+    act(() =>
+      result.current.update((c) => ({
+        ...c,
+        blocks: c.blocks.map((block, index) =>
+          index === 0 ? { ...block, visible: !block.visible } : block
+        ),
+      }))
+    );
+    expect(result.current.changes).toBe(3);
+    // Swapping the first two blocks moves both.
+    act(() =>
+      result.current.update((c) => ({
+        ...c,
+        blocks: [c.blocks[1]!, c.blocks[0]!, ...c.blocks.slice(2)],
+      }))
+    );
+    expect(result.current.changes).toBe(4);
+  });
+
   it('is clean again when a change is undone by hand', () => {
     const { result } = render();
     act(() => result.current.update((c) => ({ ...c, accent: 'rose' })));
@@ -170,6 +193,41 @@ describe('useLanyardDraft', () => {
     expect(await save(result)).toBe(true);
     expect(putRecord).not.toHaveBeenCalled();
     expect(notify.success).not.toHaveBeenCalled();
+  });
+
+  it('keeps a change made during a save that returns to the state before it', async () => {
+    let land: (value: { uri: string; cid: string }) => void = () => {};
+    vi.mocked(putRecord).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          land = resolve;
+        })
+    );
+    const { result } = render();
+    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    let pending: Promise<boolean> = Promise.resolve(false);
+    act(() => {
+      pending = result.current.save();
+    });
+    await advance(0);
+    // The owner changes their mind while the save is on its way.
+    act(() => result.current.update((c) => ({ ...c, accent: 'violet' })));
+    await act(async () => {
+      land({
+        uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
+        cid: OTHER,
+      });
+      await pending;
+    });
+    expect(result.current.saved.accent).toBe('teal');
+    expect(result.current.config.accent).toBe('violet');
+    expect(result.current.dirty).toBe(true);
+    expect(result.current.changes).toBe(1);
+    expect(await save(result)).toBe(true);
+    expect(saved()[1]?.fields).toMatchObject({ accent: 'violet' });
+    expect(vi.mocked(putRecord).mock.calls[1]?.[4]).toEqual({
+      swapRecord: OTHER,
+    });
   });
 
   it('save resolves false and keeps the draft when the write fails', async () => {
@@ -397,6 +455,27 @@ describe('useLanyardDraft', () => {
     expect(result.current.invalid).toBe(false);
     expect(result.current.ready).toBe(true);
     expect(result.current.dirty).toBe(false);
+  });
+
+  it('puts an unreadable record back, with Retry, when resetting it fails', async () => {
+    client.setQueryData(key(), {
+      value: { ...STORED, accent: 42 },
+      cid: CID,
+      valid: false,
+    });
+    vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
+    const { result } = render();
+    act(() => result.current.resetInvalid());
+    await advance(0);
+    expect(result.current.invalid).toBe(true);
+    expect(result.current.error).toBe(true);
+    expect(result.current.dirty).toBe(false);
+    const options = vi.mocked(notify.error).mock.calls[0]?.[1];
+    act(() => options?.action?.onClick());
+    await advance(0);
+    expect(putRecord).toHaveBeenCalledTimes(2);
+    expect(result.current.invalid).toBe(false);
+    expect(result.current.error).toBe(false);
   });
 
   it('keeps the draft when the settings are fetched again', async () => {

@@ -6,22 +6,30 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useSession } from '@/features/auth/session/useSession';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ALICE } from '@/test/fixtures';
-import { renderWithProviders } from '@/test/render';
+import { useProfile } from '@/lib/atproto/useProfile';
+import { renderInRouter } from '@/test/router';
 
 import { CustomiserToolbar } from './CustomiserToolbar';
 import type { CustomiserToolbarProps } from './CustomiserToolbar.types';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
+vi.mock('@/lib/atproto/useProfile', () => ({ useProfile: vi.fn() }));
 
-function renderToolbar(props: Partial<CustomiserToolbarProps> = {}) {
+async function renderToolbar(props: Partial<CustomiserToolbarProps> = {}) {
   const handlers = { onOpenStyle: vi.fn(), onReset: vi.fn() };
-  const view = renderWithProviders(
+  const view = renderInRouter(
     <CustomiserToolbar dirty={false} changes={0} {...handlers} {...props} />
   );
+  await screen.findByRole('toolbar', { name: 'Customiser' });
   return { ...handlers, ...view };
 }
 
 const toolbar = () => screen.getByRole('toolbar', { name: 'Customiser' });
+
+/** The toolbar's controls, in order: its buttons and the account link. */
+const controls = () => [
+  ...toolbar().querySelectorAll<HTMLElement>('button, a[href]'),
+];
 
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue({
@@ -30,6 +38,7 @@ beforeEach(() => {
     signOut: vi.fn(),
     refresh: vi.fn(),
   });
+  vi.mocked(useProfile).mockReturnValue({ data: ALICE } as never);
 });
 
 afterEach(() => {
@@ -37,26 +46,28 @@ afterEach(() => {
 });
 
 describe('CustomiserToolbar', () => {
-  it('is a toolbar named Customiser, with Style, Reset and Show QR', () => {
-    renderToolbar();
-    const bar = toolbar();
+  it('is a toolbar named Customiser, with Style, Reset, Show QR and the account', async () => {
+    await renderToolbar();
     expect(
-      within(bar)
-        .getAllByRole('button')
-        .map((button) => button.textContent)
-    ).toEqual(['Style', 'Reset', 'Show QR']);
+      controls().map(
+        (control) => control.getAttribute('aria-label') ?? control.textContent
+      )
+    ).toEqual(['Style', 'Reset', 'Show QR', 'Your account']);
+    expect(
+      within(toolbar()).getByRole('link', { name: 'Your account' })
+    ).toHaveAttribute('href', '/settings');
   });
 
-  it('hands over its Style button, for the sheet to return focus to', () => {
+  it('hands over its Style button, for the sheet to return focus to', async () => {
     const styleButtonRef = createRef<HTMLButtonElement>();
-    renderToolbar({ styleButtonRef });
+    await renderToolbar({ styleButtonRef });
     expect(styleButtonRef.current).toBe(
       within(toolbar()).getByRole('button', { name: 'Style' })
     );
   });
 
   it('opens the style sheet', async () => {
-    const { onOpenStyle } = renderToolbar();
+    const { onOpenStyle } = await renderToolbar();
     await userEvent.click(
       within(toolbar()).getByRole('button', { name: 'Style' })
     );
@@ -65,44 +76,44 @@ describe('CustomiserToolbar', () => {
 
   it('resets only when there are changes, asking first for several', async () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(true);
-    const { onReset, rerender } = renderToolbar();
+    const clean = await renderToolbar();
+    const unavailable = within(toolbar()).getByRole('button', {
+      name: 'Reset',
+    });
+    expect(unavailable).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(unavailable);
+    expect(clean.onReset).not.toHaveBeenCalled();
+    clean.unmount();
+
+    const { onReset } = await renderToolbar({ dirty: true, changes: 3 });
     const reset = within(toolbar()).getByRole('button', { name: 'Reset' });
-    expect(reset).toHaveAttribute('aria-disabled', 'true');
-    await userEvent.click(reset);
-    expect(onReset).not.toHaveBeenCalled();
-    rerender(
-      <CustomiserToolbar
-        dirty
-        changes={3}
-        onOpenStyle={vi.fn()}
-        onReset={onReset}
-      />
-    );
     await userEvent.click(reset);
     expect(confirm).toHaveBeenCalledWith('Discard your unsaved changes?');
     expect(onReset).toHaveBeenCalledOnce();
   });
 
-  it('moves between its buttons with the arrow keys', async () => {
-    renderToolbar();
-    const [style, reset, qr] = within(toolbar()).getAllByRole('button');
+  it('moves between its controls with the arrow keys', async () => {
+    await renderToolbar();
+    const [style, reset, qr, account] = controls();
     style?.focus();
     await userEvent.keyboard('{ArrowRight}');
     expect(reset).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
     expect(qr).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
+    expect(account).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
     expect(style).toHaveFocus();
     await userEvent.keyboard('{ArrowLeft}');
-    expect(qr).toHaveFocus();
+    expect(account).toHaveFocus();
     await userEvent.keyboard('{Home}');
     expect(style).toHaveFocus();
     await userEvent.keyboard('{End}');
-    expect(qr).toHaveFocus();
+    expect(account).toHaveFocus();
   });
 
   it('has no axe violations', async () => {
-    const { container } = renderToolbar({ dirty: true, changes: 1 });
+    const { container } = await renderToolbar({ dirty: true, changes: 1 });
     await expectNoAxeViolations(container);
   });
 });

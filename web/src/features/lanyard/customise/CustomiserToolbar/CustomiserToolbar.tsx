@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Palette } from 'lucide-react';
 import type { KeyboardEvent } from 'react';
 
+import { AccountLink } from '@/components/AccountLink/AccountLink';
 import { Button } from '@/components/Button/Button';
 import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
 
@@ -11,8 +12,9 @@ import * as styles from './CustomiserToolbar.styles';
 import type { CustomiserToolbarProps } from './CustomiserToolbar.types';
 
 /**
- * On phones, the customiser's bottom toolbar: Style (the sheet), Reset and
- * Show QR. The arrow keys, Home and End move between its buttons.
+ * On phones, the customiser's bottom toolbar: Style (the sheet), Reset,
+ * Show QR and the account link (Settings, signing out). The arrow keys,
+ * Home and End move between them.
  */
 export function CustomiserToolbar({
   onOpenStyle,
@@ -27,19 +29,21 @@ export function CustomiserToolbar({
   function move(event: KeyboardEvent<HTMLDivElement>) {
     const to = MOVES[event.key];
     if (!to) return;
-    const buttons = [
-      ...event.currentTarget.querySelectorAll<HTMLButtonElement>('button'),
+    const controls = [
+      ...event.currentTarget.querySelectorAll<HTMLElement>('button, a[href]'),
     ];
-    const index = buttons.indexOf(event.target as HTMLButtonElement);
+    const index = controls.indexOf(event.target as HTMLElement);
     if (index === -1) return;
     event.preventDefault();
-    buttons[to(index, buttons.length)]?.focus();
+    controls[to(index, controls.length)]?.focus();
   }
 
   return (
     <div
       role="toolbar"
       aria-label={t`Customiser`}
+      // Keeps focused controls scrolled clear of it (see index.css).
+      data-bottom-toolbar=""
       className={styles.toolbar}
       onKeyDown={move}
     >
@@ -67,6 +71,7 @@ export function CustomiserToolbar({
         {t`Reset`}
       </Button>
       <ShowQrButton />
+      <AccountLink />
     </div>
   );
 }

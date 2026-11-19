@@ -265,7 +265,7 @@ msgstr "Create an account"
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:42
+#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:44
 msgid "Customiser"
 msgstr "Customiser"
 
@@ -288,7 +288,7 @@ msgid "Details"
 msgstr "Details"
 
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:27
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:25
+#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:27
 msgid "Discard your unsaved changes?"
 msgstr "Discard your unsaved changes?"
 
@@ -343,7 +343,7 @@ msgstr "Failed to follow. Please try again."
 #: src/features/lanyard/customise/MediaList/MediaList.tsx:78
 #: src/features/lanyard/customise/WebLinkForm/WebLinkForm.tsx:71
 #: src/features/lanyard/customise/WebLinkList/WebLinkList.tsx:76
-#: src/features/lanyard/hooks/useLanyardDraft.ts:290
+#: src/features/lanyard/hooks/useLanyardDraft.ts:340
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
@@ -476,7 +476,7 @@ msgstr "Lanyard"
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
-#: src/features/lanyard/hooks/useLanyardDraft.ts:280
+#: src/features/lanyard/hooks/useLanyardDraft.ts:323
 msgid "Lanyard updated"
 msgstr "Lanyard updated"
 
@@ -707,7 +707,7 @@ msgid "Reordering cancelled. {name} stayed where it was."
 msgstr "Reordering cancelled. {name} stayed where it was."
 
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:65
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:67
+#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:71
 msgid "Reset"
 msgstr "Reset"
 
@@ -718,7 +718,7 @@ msgstr "Reset to defaults"
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:124
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:134
 #: src/features/lanyard/customise/BlockEditorRow/BlockEditorRow.tsx:183
-#: src/features/lanyard/hooks/useLanyardDraft.ts:292
+#: src/features/lanyard/hooks/useLanyardDraft.ts:343
 msgid "Retry"
 msgstr "Retry"
 
@@ -841,7 +841,7 @@ msgstr "Spotify"
 msgid "standard.site"
 msgstr "standard.site"
 
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:53
+#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:57
 #: src/features/lanyard/customise/StyleSheet/StyleSheet.tsx:21
 #: src/features/lanyard/customise/StyleSidebar/StyleSidebar.tsx:16
 msgid "Style"
