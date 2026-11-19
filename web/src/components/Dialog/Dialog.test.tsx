@@ -53,6 +53,18 @@ describe('Dialog', () => {
     );
   });
 
+  it('skips fields that can’t be used', async () => {
+    renderWithProviders(
+      <Dialog open onOpenChange={vi.fn()} title="Edit Episode one">
+        <input type="radio" aria-label="Audio" disabled />
+        <TextField label="Title" name="title" value="" onChange={vi.fn()} />
+      </Dialog>
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('textbox', { name: 'Title' })).toHaveFocus()
+    );
+  });
+
   it('Escape closes it and returnFocus runs', async () => {
     const onOpenChange = vi.fn();
     const returnFocus = vi.fn();

@@ -9,8 +9,9 @@ import { IconButton } from '../IconButton/IconButton';
 import * as styles from './Dialog.styles';
 import type { DialogProps } from './Dialog.types';
 
-/** The form fields a dialog opens on. */
-const FIELDS = 'input:not([type=hidden]), select, textarea';
+/** The form fields a dialog opens on: the first one that can be used. */
+const FIELDS =
+  'input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)';
 
 /**
  * A modal dialog for a short form: a visible title, a Close button, and

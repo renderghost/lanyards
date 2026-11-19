@@ -155,6 +155,24 @@ describe('MediaForm', () => {
     expect(onCancel).toHaveBeenCalled();
   });
 
+  it('editing keeps the kind: audio and video are different records', () => {
+    renderWithClient(
+      <MediaForm
+        onSubmit={onSubmit}
+        initial={{
+          kind: 'video',
+          url: 'https://video.example/1',
+          platform: 'youtube',
+        }}
+      />
+    );
+    const kinds = within(screen.getByRole('group', { name: 'Type of media' }));
+    expect(kinds.getByRole('radio', { name: 'Video' })).toBeChecked();
+    expect(kinds.getByRole('radio', { name: 'Video' })).toBeDisabled();
+    expect(kinds.getByRole('radio', { name: 'Audio' })).toBeDisabled();
+    expect(screen.getByRole('textbox', { name: 'Web address' })).toBeEnabled();
+  });
+
   it('has no axe violations, including with errors', async () => {
     const { container } = renderWithClient(<MediaForm onSubmit={onSubmit} />);
     await expectNoAxeViolations(container);

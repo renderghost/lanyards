@@ -118,7 +118,11 @@ export function MediaForm({
 
   return (
     <form noValidate onSubmit={submit} className={cn(styles.form, className)}>
-      <fieldset disabled={disabled} className={styles.fieldset}>
+      {/* Audio and video are different records: an entry keeps its kind. */}
+      <fieldset
+        disabled={disabled || Boolean(initial)}
+        className={styles.fieldset}
+      >
         <legend className={styles.legend}>{t`Type of media`}</legend>
         <div className={styles.kinds}>
           {MEDIA_KINDS.map((option) => (

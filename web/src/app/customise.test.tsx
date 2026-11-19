@@ -560,6 +560,45 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ]);
   });
 
+  it('a new podcast hidden before Save stays hidden after it', async () => {
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    const batches = captureWrites();
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    await userEvent.click(await enabled('Add a podcast or video'));
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add a podcast or video',
+    });
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Web address' }),
+      'https://pod.example/secret'
+    );
+    await userEvent.selectOptions(
+      within(dialog).getByRole('combobox', { name: 'Platform' }),
+      'spotify'
+    );
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Title' }),
+      'Secret episode'
+    );
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'Add media' })
+    );
+    await userEvent.click(
+      within(await preview()).getByRole('button', {
+        name: 'Hide Secret episode',
+      })
+    );
+    await saveChanges();
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    const created = batches[0]?.[0];
+    const hidden = (saves[0]?.record as { hidden: string[] }).hidden;
+    // Hidden under the very key it was created at.
+    expect(hidden).toEqual([
+      `at://${ADA.did}/app.lanyards.link.media.audio/${created?.rkey}`,
+    ]);
+  });
+
   it('explains a stored record it cannot read, and resets only when asked', async () => {
     servePerson({
       config: { blocks: [{ type: 'links', visible: true, limit: 0 }] },

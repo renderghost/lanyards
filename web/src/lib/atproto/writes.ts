@@ -38,6 +38,18 @@ export class InvalidRecordError extends Error {
 /** The PDS refused or failed the write. */
 export class WriteFailedError extends Error {
   override name = 'WriteFailedError';
+
+  /**
+   * @param applied How many of a batch's writes landed before it failed:
+   * those must not be sent again.
+   */
+  constructor(
+    message?: string,
+    readonly applied = 0,
+    options?: ErrorOptions
+  ) {
+    super(message, options);
+  }
 }
 
 /**
@@ -184,13 +196,20 @@ export async function applyWrites(
           value: typed(op.collection, op.fields),
         };
   });
+  // Each chunk lands whole or not at all; a failure says how many writes
+  // earlier chunks landed, so a retry sends only the rest.
   for (let start = 0; start < writes.length; start += BATCH_SIZE) {
-    const response = await session.rpc.post('com.atproto.repo.applyWrites', {
-      input: {
-        repo: session.did,
-        writes: writes.slice(start, start + BATCH_SIZE) as never,
-      },
-    });
-    if (!response.ok) throw new WriteFailedError(response.data.error);
+    let response;
+    try {
+      response = await session.rpc.post('com.atproto.repo.applyWrites', {
+        input: {
+          repo: session.did,
+          writes: writes.slice(start, start + BATCH_SIZE) as never,
+        },
+      });
+    } catch (cause) {
+      throw new WriteFailedError('Network error', start, { cause });
+    }
+    if (!response.ok) throw new WriteFailedError(response.data.error, start);
   }
 }

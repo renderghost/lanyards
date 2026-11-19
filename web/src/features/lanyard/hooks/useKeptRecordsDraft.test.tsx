@@ -7,9 +7,10 @@ import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
 import { track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
-import { applyWrites } from '@/lib/atproto/writes';
+import { applyWrites, WriteFailedError } from '@/lib/atproto/writes';
 import { queryKeys } from '@/lib/query/keys';
 import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
+import { ok } from '@/lib/sources/result';
 import type { LanyardRecords } from '@/lib/sources/lanyards/lanyards.types';
 import { ADA } from '@/test/people';
 import { signedInSession } from '@/test/person';
@@ -38,6 +39,8 @@ vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
 const NOW = '2026-11-19T12:00:00.000Z';
 const OLD = '2026-01-01T09:00:00.000Z';
 const AUDIO = `at://${ADA.did}/app.lanyards.link.media.audio/3maud1`;
+/** A record key made from the time: 13 base32-sortable characters. */
+const TID = /^[2-7a-z]{13}$/;
 const STORED: LanyardRecords = {
   media: [
     {
@@ -104,14 +107,15 @@ describe('useKeptRecordsDraft', () => {
   it('an added episode shows at once with a draft key and isn’t written until save', () => {
     const { result } = render();
     act(() => result.current.addMedia(EPISODE));
+    const added = result.current.records.media[1]!;
     expect(result.current.records.media).toEqual([
       STORED.media[0],
-      { key: 'draft:1', ...EPISODE },
+      { key: added.key, ...EPISODE },
     ]);
     // The lanyard (reading the same cache) shows it too.
     expect(
       client.getQueryData<LanyardRecords>(key())?.media.map((m) => m.key)
-    ).toEqual([AUDIO, 'draft:1']);
+    ).toEqual([AUDIO, added.key]);
     expect(result.current.dirty).toBe(true);
     expect(result.current.changes).toBe(1);
     expect(applyWrites).not.toHaveBeenCalled();
@@ -152,31 +156,157 @@ describe('useKeptRecordsDraft', () => {
     ]);
   });
 
-  it('moving an episode to video deletes it there and creates it here', async () => {
+  it('a new entry gets its real key at once, and is created at it', async () => {
+    const { result } = render();
+    act(() => result.current.addMedia(EPISODE));
+    const added = result.current.records.media[1]!;
+    expect(added.key).toMatch(
+      new RegExp(
+        `^at://${ADA.did}/app\\.lanyards\\.link\\.media\\.audio/[2-7a-z]{13}$`
+      )
+    );
+    await save(result);
+    expect(ops()[0]).toEqual([
+      expect.objectContaining({
+        type: 'create',
+        rkey: added.key.split('/').pop(),
+      }),
+    ]);
+  });
+
+  it('an edit right after Save builds on what was saved', async () => {
+    const { result } = render();
+    act(() => result.current.addMedia(EPISODE));
+    const added = result.current.records.media[1]!.key;
+    // The read-back after Save hasn't landed yet.
+    vi.mocked(fetchLanyardRecords).mockReturnValue(new Promise(() => {}));
+    expect(await save(result)).toBe(true);
+    act(() => result.current.removeMedia(AUDIO));
+    expect(result.current.records.media.map((item) => item.key)).toEqual([
+      added,
+    ]);
+    vi.mocked(applyWrites).mockClear();
+    expect(await save(result)).toBe(true);
+    expect(ops()).toEqual([
+      [
+        {
+          type: 'delete',
+          collection: 'app.lanyards.link.media.audio',
+          rkey: '3maud1',
+        },
+      ],
+    ]);
+  });
+
+  it('a record added elsewhere survives a refetch and Save', async () => {
+    const elsewhere = {
+      key: `at://${ADA.did}/app.lanyards.link.media.video/3mvid9`,
+      kind: 'video' as const,
+      url: 'https://video.example/9',
+      platform: 'youtube',
+    };
+    const { result } = render();
+    act(() => result.current.removeMedia(AUDIO));
+    vi.mocked(fetchLanyardRecords).mockResolvedValue(
+      ok({ media: [STORED.media[0]!, elsewhere] })
+    );
+    await act(() => client.refetchQueries({ queryKey: key() }));
+    expect(result.current.records.media).toEqual([elsewhere]);
+    expect(await save(result)).toBe(true);
+    expect(ops()).toEqual([
+      [
+        {
+          type: 'delete',
+          collection: 'app.lanyards.link.media.audio',
+          rkey: '3maud1',
+        },
+      ],
+    ]);
+  });
+
+  it('an edit to a record deleted elsewhere is dropped, not sent', async () => {
+    const { result } = render();
+    act(() =>
+      result.current.updateMedia(AUDIO, { ...STORED.media[0]!, title: 'New' })
+    );
+    vi.mocked(fetchLanyardRecords).mockResolvedValue(ok({ media: [] }));
+    await act(() => client.refetchQueries({ queryKey: key() }));
+    expect(result.current.dirty).toBe(false);
+    expect(await save(result)).toBe(true);
+    expect(applyWrites).not.toHaveBeenCalled();
+  });
+
+  it('a failure part-way keeps only what didn’t land; Retry sends the rest', async () => {
+    const { result } = render();
+    for (let index = 0; index < 11; index += 1) {
+      act(() =>
+        result.current.addMedia({
+          ...EPISODE,
+          url: `https://pod.example/${index}`,
+        })
+      );
+    }
+    vi.mocked(applyWrites).mockRejectedValueOnce(
+      new WriteFailedError('InternalServerError', 10)
+    );
+    expect(await save(result)).toBe(false);
+    expect(result.current.changes).toBe(1);
+    // Everything stays on show: ten saved, one still to save.
+    expect(result.current.records.media).toHaveLength(12);
+    vi.mocked(applyWrites).mockClear();
+    expect(await save(result)).toBe(true);
+    expect(ops()).toEqual([
+      [
+        expect.objectContaining({
+          type: 'create',
+          fields: expect.objectContaining({ url: 'https://pod.example/10' }),
+        }),
+      ],
+    ]);
+  });
+
+  it('editing keeps the fields Lanyards doesn’t edit', async () => {
+    vi.mocked(getRecord).mockResolvedValue({
+      ok: true,
+      value: {
+        cid: 'cid',
+        value: {
+          $type: 'app.lanyards.link.media.audio',
+          url: 'https://pod.example/1',
+          platform: 'spotify',
+          title: 'Episode one',
+          description: 'Old notes',
+          seriesName: 'The series',
+          duration: 1800,
+          publishedDate: '2025-06-01T09:00:00.000Z',
+          createdAt: OLD,
+        },
+      },
+    } as never);
     const { result } = render();
     act(() =>
       result.current.updateMedia(AUDIO, {
-        kind: 'video',
+        kind: 'audio',
         url: 'https://pod.example/1',
-        platform: 'youtube',
-        title: 'Episode one',
+        platform: 'spotify',
+        title: 'Episode 1',
       })
     );
     await save(result);
     expect(ops()[0]).toEqual([
       {
-        type: 'delete',
+        type: 'update',
         collection: 'app.lanyards.link.media.audio',
         rkey: '3maud1',
-      },
-      {
-        type: 'create',
-        collection: 'app.lanyards.link.media.video',
         fields: {
           url: 'https://pod.example/1',
-          platform: 'youtube',
-          title: 'Episode one',
-          createdAt: NOW,
+          platform: 'spotify',
+          title: 'Episode 1',
+          // The form cleared the description: it goes.
+          seriesName: 'The series',
+          duration: 1800,
+          publishedDate: '2025-06-01T09:00:00.000Z',
+          createdAt: OLD,
         },
       },
     ]);
@@ -214,18 +344,19 @@ describe('useKeptRecordsDraft', () => {
     expect(applyWrites).toHaveBeenCalledTimes(1);
     expect(ops()[0]).toEqual([
       {
+        type: 'delete',
+        collection: 'app.lanyards.link.media.audio',
+        rkey: '3maud1',
+      },
+      {
         type: 'create',
         collection: 'app.lanyards.link.media.audio',
+        rkey: expect.stringMatching(TID),
         fields: {
           url: 'https://pod.example/2',
           platform: 'spotify',
           createdAt: NOW,
         },
-      },
-      {
-        type: 'delete',
-        collection: 'app.lanyards.link.media.audio',
-        rkey: '3maud1',
       },
     ]);
     expect(result.current.dirty).toBe(false);
@@ -246,8 +377,8 @@ describe('useKeptRecordsDraft', () => {
     act(() => result.current.removeMedia(AUDIO));
     expect(await save(result)).toBe(false);
     expect(result.current.dirty).toBe(true);
-    expect(result.current.records.media.map((item) => item.key)).toEqual([
-      'draft:1',
+    expect(result.current.records.media.map((item) => item.kind)).toEqual([
+      'audio',
     ]);
   });
 
