@@ -59,6 +59,21 @@ const preview = () =>
 
 const accent = (name: string) => screen.findByRole('radio', { name });
 
+/** Opens the style sidebar's Badge section; returns its job checkbox. */
+async function jobCheckbox() {
+  const sidebar = await screen.findByRole(
+    'complementary',
+    { name: 'Style' },
+    { timeout: 5000 }
+  );
+  await userEvent.click(within(sidebar).getByRole('button', { name: 'Badge' }));
+  return within(sidebar).getByRole('checkbox', { name: 'Show current job' });
+}
+
+/** Presses the customiser's Save. */
+const saveChanges = () =>
+  userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
   document.documentElement.dataset.accent = 'violet';
@@ -109,6 +124,81 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(region).toContainElement(ground);
   });
 
+  it('shows only its own header, with the customiser’s actions', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    await preview();
+    const banners = screen.getAllByRole('banner');
+    expect(banners).toHaveLength(1);
+    expect(banners[0]).toHaveTextContent('Your lanyard');
+    expect(
+      within(banners[0] as HTMLElement).getByRole('button', { name: 'Save' })
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('main')).toHaveLength(1);
+  });
+
+  it('lays the lanyard out beside a pinned style sidebar', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const sidebar = await screen.findByRole(
+      'complementary',
+      { name: 'Style' },
+      { timeout: 5000 }
+    );
+    expect(
+      within(sidebar).getByRole('button', { name: 'Accent colour' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(await preview()).toBeInTheDocument();
+    // Until blocks and records are edited in place (#118, PRs 3–4).
+    const more = screen.getByRole('region', { name: 'More settings' });
+    expect(
+      within(more).getByRole('region', { name: 'Blocks' })
+    ).toBeInTheDocument();
+  });
+
+  it('View as public hides the sidebar and edit controls, and Edit brings them back', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const region = await preview();
+    await within(region).findByRole(
+      'button',
+      { name: 'More options for Building on ATProto at Example Conf 2024' },
+      { timeout: 8000 }
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'View as public' })
+    );
+    expect(screen.queryByRole('complementary', { name: 'Style' })).toBeNull();
+    expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
+    expect(
+      screen.getByText('You’re seeing your lanyard as the public sees it.')
+    ).toBeInTheDocument();
+    expect(
+      within(await preview()).queryByRole('button', {
+        name: /^More options for/,
+      })
+    ).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
+    expect(
+      screen.getByRole('complementary', { name: 'Style' })
+    ).toBeInTheDocument();
+  });
+
+  it('asks before leaving with unsaved changes', async () => {
+    const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
+    servePerson();
+    const { router } = renderRoute('/lanyard');
+    const teal = await accent('Teal');
+    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
+    await userEvent.click(teal);
+    await userEvent.click(screen.getByRole('link', { name: 'Lanyards' }));
+    expect(confirm).toHaveBeenCalledWith(
+      'You have unsaved changes. Leave without saving?'
+    );
+    expect(router.state.location.pathname).toBe('/lanyard');
+    confirm.mockRestore();
+  });
+
   it('gives the page one level-one heading, its purpose', async () => {
     servePerson();
     renderRoute('/lanyard');
@@ -131,7 +221,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await within(region).findAllByText("Couldn't load Sifa", undefined, {
       timeout: 8000,
     });
-    const toggle = screen.getByRole('button', { name: 'View as visitor' });
+    const toggle = screen.getByRole('button', { name: 'View as public' });
     expect(toggle).toHaveAttribute('aria-pressed', 'false');
     await userEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-pressed', 'true');
@@ -146,8 +236,11 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(teal);
     expect(document.documentElement.dataset.accent).toBe('teal');
-    const status = screen.getByText('Saving…');
-    expect(status.closest('[aria-live="polite"]')).not.toBeNull();
+    const status = within(screen.getByRole('banner')).getByRole('status');
+    expect(status).toHaveTextContent('Unsaved changes');
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(saves).toEqual([]);
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     expect(saves[0]).toMatchObject({
       repo: ADA.did,
@@ -155,19 +248,41 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       rkey: 'self',
       record: { $type: 'app.lanyards.actor.lanyard', accent: 'teal' },
     });
-    expect(await screen.findByText('Saved')).toBeInTheDocument();
+    await waitFor(() => expect(status).toHaveTextContent('All changes saved'));
+  });
+
+  it('resets unsaved changes to the last save, writing nothing', async () => {
+    servePerson();
+    const saves = captureSaves();
+    renderRoute('/lanyard');
+    const teal = await accent('Teal');
+    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
+    const save = screen.getByRole('button', { name: 'Save' });
+    const reset = within(screen.getByRole('banner')).getByRole('button', {
+      name: 'Reset',
+    });
+    expect(save).toHaveAttribute('aria-disabled', 'true');
+    expect(reset).toHaveAttribute('aria-disabled', 'true');
+    await userEvent.click(teal);
+    expect(save).not.toHaveAttribute('aria-disabled');
+    await userEvent.click(reset);
+    expect(document.documentElement.dataset.accent).toBe('violet');
+    expect(await accent('Violet')).toBeChecked();
+    expect(reset).toHaveFocus();
+    expect(reset).toHaveAttribute('aria-disabled', 'true');
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    expect(saves).toEqual([]);
   });
 
   it('saves the current-job switch', async () => {
     servePerson();
     const saves = captureSaves();
     renderRoute('/lanyard');
-    const job = await screen.findByRole('checkbox', {
-      name: 'Show current job on your badge',
-    });
+    const job = await jobCheckbox();
     await waitFor(() => expect(job).toBeEnabled(), { timeout: 5000 });
     expect(job).toBeChecked();
     await userEvent.click(job);
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     expect(saves[0]).toMatchObject({ record: { showJob: false } });
   });
@@ -185,9 +300,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
     await preview();
     expect(await accent('Teal')).toBeDisabled();
-    expect(
-      screen.getByRole('checkbox', { name: 'Show current job on your badge' })
-    ).toBeDisabled();
+    expect(await jobCheckbox()).toBeDisabled();
   });
 
   it('never saves over settings it could not read', async () => {
@@ -224,6 +337,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const down = within(links).getByRole('button', { name: 'Move Links down' });
     await waitFor(() => expect(down).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(down);
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     const record = saves[0]?.record as { blocks: { type: string }[] };
     expect(record.blocks.slice(0, 2).map((block) => block.type)).toEqual([
@@ -248,19 +362,21 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       await screen.findByRole('menuitem', { name: 'Hide this item' })
     );
     expect(within(region).queryByText(/Example Conf 2024/)).toBeNull();
-    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
-    expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
-
     const hidden = screen.getByRole('region', { name: 'Hidden items' });
     const showAgain = within(hidden).getByRole('button', {
       name: 'Show again',
       description: 'Building on ATProto at Example Conf 2024',
     });
     await waitFor(() => expect(showAgain).toHaveFocus());
+    await saveChanges();
+    await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
+    expect((saves[0]?.record as { hidden: string[] }).hidden).toHaveLength(1);
+
     await userEvent.click(showAgain);
     expect(
       await within(region).findByText(/Example Conf 2024/)
     ).toBeInTheDocument();
+    await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(2), { timeout: 3000 });
     expect((saves[1]?.record as { hidden: string[] }).hidden).toEqual([]);
   });

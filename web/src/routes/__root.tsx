@@ -1,8 +1,11 @@
+import '@/app/staticData';
+
 import {
   createRootRouteWithContext,
   notFound,
   Outlet,
   redirect,
+  useMatches,
 } from '@tanstack/react-router';
 
 import type { RouterContext } from '@/app/routerContext';
@@ -37,12 +40,24 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootLayout() {
   usePwaUpdatePrompt();
   useFocusOnNavigation();
+  // A route with its own header renders its <main> too, so its header is
+  // still the page's one banner landmark.
+  const ownHeader = useMatches({
+    select: (matches) =>
+      matches.some((match) => match.staticData.ownHeader === true),
+  });
   return (
     <div className="flex min-h-dvh flex-col">
-      <AppHeader />
-      <main className="flex flex-1 flex-col">
+      {ownHeader ? (
         <Outlet />
-      </main>
+      ) : (
+        <>
+          <AppHeader />
+          <main className="flex flex-1 flex-col">
+            <Outlet />
+          </main>
+        </>
+      )}
       <OfflineBanner />
     </div>
   );

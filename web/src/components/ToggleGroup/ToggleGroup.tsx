@@ -38,9 +38,17 @@ export function ToggleGroup<T extends string>({
           role={undefined}
           aria-checked={undefined}
           aria-pressed={option.value === value}
+          aria-label={option.shortLabel ? option.label : undefined}
           className={styles.item}
         >
-          {option.label}
+          {option.shortLabel ? (
+            <>
+              <span className={styles.short}>{option.shortLabel}</span>
+              <span className={styles.full}>{option.label}</span>
+            </>
+          ) : (
+            option.label
+          )}
         </Primitive.Item>
       ))}
     </Primitive.Root>

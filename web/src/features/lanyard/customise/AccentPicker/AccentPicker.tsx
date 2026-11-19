@@ -14,6 +14,7 @@ export function AccentPicker({
   value,
   onChange,
   disabled = false,
+  hideLabel = false,
   className,
 }: AccentPickerProps) {
   const { t, i18n } = useLingui();
@@ -21,7 +22,7 @@ export function AccentPicker({
 
   return (
     <div className={cn(styles.group, className)}>
-      <p id={labelId} className={styles.label}>
+      <p id={labelId} className={hideLabel ? styles.labelHidden : styles.label}>
         {t`Accent colour`}
       </p>
       <RadioGroup.Root

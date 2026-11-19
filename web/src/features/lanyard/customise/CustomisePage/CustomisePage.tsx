@@ -3,11 +3,13 @@ import { useLingui } from '@lingui/react/macro';
 import { useRouter } from '@tanstack/react-router';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
+import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { Button } from '@/components/Button/Button';
 import { notify } from '@/components/Toaster/notify';
 import { PermissionNotice } from '@/features/auth/components/PermissionNotice/PermissionNotice';
 import { useSession } from '@/features/auth/session/useSession';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
 import { profileId } from '@/lib/atproto/profileId';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
@@ -22,15 +24,19 @@ import {
 } from '../../components/blocks/itemActions';
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
 import { useKeptRecords } from '../../hooks/useKeptRecords';
-import { useLanyardConfig } from '../../hooks/useLanyardConfig';
-import { AccentPicker } from '../AccentPicker/AccentPicker';
+import { useLanyardDraft } from '../../hooks/useLanyardDraft';
 import { BlockEditor } from '../BlockEditor/BlockEditor';
+import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
+import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
+import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
 import { HiddenItems } from '../HiddenItems/HiddenItems';
 import { HonorificForm } from '../HonorificForm/HonorificForm';
 import { ItemMenu } from '../ItemMenu/ItemMenu';
 import { MediaForm } from '../MediaForm/MediaForm';
 import { MediaList } from '../MediaList/MediaList';
 import { OrcidHelper } from '../OrcidHelper/OrcidHelper';
+import { StyleSheet } from '../StyleSheet/StyleSheet';
+import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
 import { WebLinkForm } from '../WebLinkForm/WebLinkForm';
 import { WebLinkList } from '../WebLinkList/WebLinkList';
 import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
@@ -46,7 +52,8 @@ const KEPT_LISTS = [
 
 /**
  * `/lanyard`: the signed-in owner customises their lanyard beside a live
- * preview (spec §7.4). Changes show at once and save automatically.
+ * preview (spec §7.4). Changes show at once and are a draft until Save, in
+ * the route's own header (#118).
  */
 export function CustomisePage({ className }: CustomisePageProps) {
   const { t } = useLingui();
@@ -61,9 +68,14 @@ export function CustomisePage({ className }: CustomisePageProps) {
 
   if (session.status !== 'signedIn') {
     return (
-      <p role="status" className={styles.loading}>
-        {t`Loading…`}
-      </p>
+      <>
+        <AppHeader title={t`Your lanyard`} />
+        <main className={styles.main}>
+          <p role="status" className={styles.loading}>
+            {t`Loading…`}
+          </p>
+        </main>
+      </>
     );
   }
   return (
@@ -88,22 +100,18 @@ function Customiser({
   const headingId = useId();
   const linksId = useId();
   const mediaId = useId();
+  const moreId = useId();
   const linksHeading = useRef<HTMLHeadingElement>(null);
   const mediaHeading = useRef<HTMLHeadingElement>(null);
-  const lanyard = useLanyardConfig();
+  const lanyard = useLanyardDraft();
   const view = usePersonView(did, { mode: 'owner' });
   const kept = useKeptRecords(did);
-  const [viewAs, setViewAs] = useState<'owner' | 'visitor'>('owner');
+  const [viewAs, setViewAs] = useState<ViewAs>('edit');
+  /** On phones, the style sheet opened from the bottom toolbar. */
+  const [styleOpen, setStyleOpen] = useState(false);
+  const styleButton = useRef<HTMLButtonElement>(null);
   /** The item just hidden, whose Show again takes focus. */
   const [justHidden, setJustHidden] = useState<string | undefined>();
-
-  // "Saved" follows a save that finished without an error.
-  const [wasSaving, setWasSaving] = useState(lanyard.saving);
-  const [saved, setSaved] = useState(false);
-  if (lanyard.saving !== wasSaving) {
-    setWasSaving(lanyard.saving);
-    setSaved(!lanyard.saving && !lanyard.error);
-  }
 
   const granted = useMemo(() => parseGrantedScope(scope), [scope]);
   const canEdit =
@@ -119,10 +127,15 @@ function Customiser({
         canWrite(granted, collection, 'delete')
     );
   const { update, config } = lanyard;
+  const editing = viewAs === 'edit';
+  useUnsavedChangesGuard(
+    lanyard.dirty,
+    t`You have unsaved changes. Leave without saving?`
+  );
 
   const itemActions = useMemo<ItemActions | null>(
     () =>
-      viewAs === 'owner' && !disabled
+      editing && !disabled
         ? {
             renderMenu: (itemKey, title) => (
               <ItemMenu
@@ -149,134 +162,162 @@ function Customiser({
             ),
           }
         : null,
-    [viewAs, disabled, update, config, t]
+    [editing, disabled, update, config, t]
   );
 
   return (
-    <div className={cn(styles.page, className)}>
-      <section aria-labelledby={headingId} className={styles.controls}>
-        <h1 id={headingId} className={styles.heading}>
-          {t`Customise your lanyard`}
-        </h1>
-        {!canEdit && <PermissionNotice returnTo={CUSTOMISE_PATH} />}
-        {lanyard.invalid && (
-          <div role="status" className={styles.notice}>
-            <p className={styles.noticeHeading}>
-              {t`We couldn't read your lanyard settings`}
-            </p>
-            <p className={styles.noticeText}>
-              {t`They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults.`}
-            </p>
-            <Button
-              variant="secondary"
-              disabled={!canEdit}
-              onClick={lanyard.reset}
-            >
-              {t`Reset to defaults`}
-            </Button>
+    <>
+      <AppHeader
+        title={t`Your lanyard`}
+        actions={
+          <CustomiserActions
+            viewAs={viewAs}
+            onViewAsChange={setViewAs}
+            dirty={lanyard.dirty}
+            changes={lanyard.changes}
+            saving={lanyard.saving}
+            onSave={() => void lanyard.save()}
+            onReset={lanyard.discard}
+          />
+        }
+      />
+      <main className={styles.main}>
+        <div className={cn(styles.workspace, className)}>
+          {editing && (
+            <StyleSidebar
+              config={lanyard.config}
+              disabled={disabled}
+              onChange={update}
+            />
+          )}
+          <div className={styles.canvas}>
+            <div className={styles.intro}>
+              <h1 id={headingId} className={styles.heading}>
+                {t`Customise your lanyard`}
+              </h1>
+              {!canEdit && <PermissionNotice returnTo={CUSTOMISE_PATH} />}
+              {lanyard.invalid && (
+                <div role="status" className={styles.notice}>
+                  <p className={styles.noticeHeading}>
+                    {t`We couldn't read your lanyard settings`}
+                  </p>
+                  <p className={styles.noticeText}>
+                    {t`They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults.`}
+                  </p>
+                  <Button
+                    variant="secondary"
+                    disabled={!canEdit}
+                    onClick={lanyard.resetInvalid}
+                  >
+                    {t`Reset to defaults`}
+                  </Button>
+                </div>
+              )}
+              {!editing && (
+                <p className={styles.publicNote}>
+                  {t`You’re seeing your lanyard as the public sees it.`}
+                </p>
+              )}
+            </div>
+            <section aria-label={t`Preview`} className={styles.frame}>
+              <ItemActionsContext value={itemActions}>
+                <LanyardPage
+                  did={did}
+                  preview={editing ? 'owner' : 'visitor'}
+                />
+              </ItemActionsContext>
+            </section>
+            {editing && (
+              <section aria-labelledby={moreId} className={styles.more}>
+                <div className={styles.moreIntro}>
+                  <h2 id={moreId} className={styles.moreHeading}>
+                    {t`More settings`}
+                  </h2>
+                  <p className={styles.moreHint}>
+                    {t`Block settings save with Save. Your links, podcasts, videos and title save as soon as you change them.`}
+                  </p>
+                </div>
+                <BlockEditor
+                  config={lanyard.config}
+                  statuses={view.statuses}
+                  profile={profileId(did, view.hero?.handle)}
+                  disabled={disabled}
+                  onChange={update}
+                  onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
+                />
+                <HiddenItems
+                  items={view.hiddenItems}
+                  disabled={disabled}
+                  focusKey={justHidden}
+                  onFocused={() => setJustHidden(undefined)}
+                  onShow={(key) =>
+                    update((config) => ({
+                      ...config,
+                      hidden: config.hidden.filter((hidden) => hidden !== key),
+                    }))
+                  }
+                />
+                <OrcidHelper
+                  did={did}
+                  profile={profileId(did, view.hero?.handle)}
+                  orcidId={view.orcidId}
+                />
+                <HonorificForm
+                  current={kept.data?.honorific ?? 'none'}
+                  disabled={!canKeep || kept.status !== 'success'}
+                />
+                <section aria-labelledby={linksId} className={styles.kept}>
+                  <h2
+                    ref={linksHeading}
+                    id={linksId}
+                    tabIndex={-1}
+                    className={styles.subheading}
+                  >
+                    {t`Your links`}
+                  </h2>
+                  <WebLinkList
+                    links={kept.data?.webLinks ?? []}
+                    disabled={!canKeep}
+                    onEmptied={() => linksHeading.current?.focus()}
+                  />
+                  <WebLinkForm disabled={!canKeep} />
+                </section>
+                <section aria-labelledby={mediaId} className={styles.kept}>
+                  <h2
+                    ref={mediaHeading}
+                    id={mediaId}
+                    tabIndex={-1}
+                    className={styles.subheading}
+                  >
+                    {t`Your podcasts and videos`}
+                  </h2>
+                  <MediaList
+                    items={kept.data?.media ?? []}
+                    disabled={!canKeep}
+                    onEmptied={() => mediaHeading.current?.focus()}
+                  />
+                  <MediaForm disabled={!canKeep} />
+                </section>
+              </section>
+            )}
           </div>
-        )}
-        <p aria-live="polite" className={styles.status}>
-          {lanyard.saving ? t`Saving…` : saved ? t`Saved` : ''}
-        </p>
-        <AccentPicker
-          value={lanyard.config.accent}
-          onChange={(accent) => update((config) => ({ ...config, accent }))}
-          disabled={disabled}
-        />
-        <label className={styles.checkboxRow}>
-          <input
-            type="checkbox"
-            checked={lanyard.config.showJob}
-            onChange={(event) => {
-              const showJob = event.target.checked;
-              update((config) => ({ ...config, showJob }));
-            }}
-            disabled={disabled}
-            className={styles.checkbox}
-          />
-          <span>{t`Show current job on your badge`}</span>
-        </label>
-        <BlockEditor
-          config={lanyard.config}
-          statuses={view.statuses}
-          profile={profileId(did, view.hero?.handle)}
-          disabled={disabled}
-          onChange={update}
-          onRetry={(type) => BLOCK_SOURCES[type].forEach(view.retry)}
-        />
-        <HiddenItems
-          items={view.hiddenItems}
-          disabled={disabled}
-          focusKey={justHidden}
-          onFocused={() => setJustHidden(undefined)}
-          onShow={(key) =>
-            update((config) => ({
-              ...config,
-              hidden: config.hidden.filter((hidden) => hidden !== key),
-            }))
-          }
-        />
-        <OrcidHelper
-          did={did}
-          profile={profileId(did, view.hero?.handle)}
-          orcidId={view.orcidId}
-        />
-        <HonorificForm
-          current={kept.data?.honorific ?? 'none'}
-          disabled={!canKeep || kept.status !== 'success'}
-        />
-        <section aria-labelledby={linksId} className={styles.kept}>
-          <h2
-            ref={linksHeading}
-            id={linksId}
-            tabIndex={-1}
-            className={styles.subheading}
-          >
-            {t`Your links`}
-          </h2>
-          <WebLinkList
-            links={kept.data?.webLinks ?? []}
-            disabled={!canKeep}
-            onEmptied={() => linksHeading.current?.focus()}
-          />
-          <WebLinkForm disabled={!canKeep} />
-        </section>
-        <section aria-labelledby={mediaId} className={styles.kept}>
-          <h2
-            ref={mediaHeading}
-            id={mediaId}
-            tabIndex={-1}
-            className={styles.subheading}
-          >
-            {t`Your podcasts and videos`}
-          </h2>
-          <MediaList
-            items={kept.data?.media ?? []}
-            disabled={!canKeep}
-            onEmptied={() => mediaHeading.current?.focus()}
-          />
-          <MediaForm disabled={!canKeep} />
-        </section>
-      </section>
-      <section aria-label={t`Preview`} className={styles.preview}>
-        <div className={styles.previewBar}>
-          <Button
-            variant="secondary"
-            aria-pressed={viewAs === 'visitor'}
-            onClick={() =>
-              setViewAs((current) =>
-                current === 'owner' ? 'visitor' : 'owner'
-              )
-            }
-          >
-            {t`View as visitor`}
-          </Button>
         </div>
-        <ItemActionsContext value={itemActions}>
-          <LanyardPage did={did} preview={viewAs} />
-        </ItemActionsContext>
-      </section>
-    </div>
+        <CustomiserToolbar
+          onOpenStyle={() => setStyleOpen(true)}
+          styleButtonRef={styleButton}
+          onReset={lanyard.discard}
+          dirty={lanyard.dirty}
+          changes={lanyard.changes}
+        />
+      </main>
+      <StyleSheet
+        open={styleOpen}
+        onOpenChange={setStyleOpen}
+        returnFocus={() => styleButton.current?.focus()}
+        config={lanyard.config}
+        disabled={disabled}
+        onChange={update}
+      />
+    </>
   );
 }

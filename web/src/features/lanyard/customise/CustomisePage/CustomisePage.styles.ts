@@ -1,24 +1,34 @@
-export const page =
-  'grid w-full max-w-6xl self-center gap-8 px-4 py-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]';
+// The route draws its own header, so it draws its <main> too.
+export const main = 'flex flex-1 flex-col';
 
-export const controls = 'flex min-w-0 flex-col gap-6';
+// The style sidebar (from md up), then the canvas holding the lanyard.
+export const workspace = 'flex flex-1 items-stretch';
+
+export const canvas =
+  'flex min-w-0 flex-1 flex-col items-center gap-6 bg-ui-canvas px-4 py-6 md:px-8 md:py-8';
+
+export const intro = 'flex w-full max-w-[640px] flex-col gap-3';
 
 export const heading =
   'text-[22px] font-semibold leading-7 tracking-tight text-ui-text';
 
-export const status = 'min-h-6 text-sm leading-6 text-ui-text-muted';
+export const publicNote =
+  'rounded-lg border border-ui-border bg-ui-surface px-4 py-3 text-[13px] leading-[18px] text-ui-text-muted';
 
-export const checkboxRow =
-  'flex min-h-11 cursor-pointer items-center gap-3 text-[15px] leading-[22px] text-ui-text has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60';
+// The lanyard brings its own ground (LanyardSurface, as a card).
+export const frame = 'w-full max-w-[640px]';
 
-export const checkbox = 'size-5 shrink-0 accent-ui-primary';
+// Interim (#118, PRs 3–4): the editors not yet on the lanyard itself.
+export const more =
+  'flex w-full max-w-[640px] flex-col gap-6 rounded-xl border border-ui-border bg-ui-surface p-4 md:p-6';
+
+export const moreIntro = 'flex flex-col gap-1';
+
+export const moreHeading = 'text-[17px] font-semibold leading-6 text-ui-text';
+
+export const moreHint = 'text-[13px] leading-[18px] text-ui-text-muted';
 
 // A neutral canvas; the lanyard inside brings its own ground.
-export const preview =
-  'flex min-w-0 flex-col gap-4 rounded-xl border border-ui-border bg-ui-surface-muted p-4';
-
-export const previewBar = 'flex flex-wrap items-center justify-end gap-2';
-
 export const loading =
   'px-4 py-6 text-[15px] leading-[22px] text-ui-text-muted';
 

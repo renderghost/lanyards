@@ -48,4 +48,12 @@
   :focus-visible {
     @apply outline-focus-ring outline-2 outline-offset-2;
   }
+
+  /* A bottom toolbar (the customiser's, on phones) covers the foot of the
+     viewport: scroll focused controls clear of it (WCAG 2.4.11). */
+  @media (width < 48rem) {
+    html:has([data-bottom-toolbar]) {
+      scroll-padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
+    }
+  }
 }

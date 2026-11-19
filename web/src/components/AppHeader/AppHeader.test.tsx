@@ -54,6 +54,28 @@ describe('AppHeader', () => {
     expect(screen.getByRole('button', { name: 'Show QR' })).toBeInTheDocument();
   });
 
+  it('renders a title and actions when given, in place of its own links', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedIn',
+      session: { did: ALICE.did } as never,
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    vi.mocked(useProfile).mockReturnValue({ data: ALICE } as never);
+    renderInRouter(
+      <AppHeader
+        title="Your lanyard"
+        actions={<button type="button">Save</button>}
+      />
+    );
+    const header = await screen.findByRole('banner');
+    expect(header).toHaveTextContent('Your lanyard');
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'My lanyard' })
+    ).not.toBeInTheDocument();
+  });
+
   it('clears the top safe area in the installed app', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',
