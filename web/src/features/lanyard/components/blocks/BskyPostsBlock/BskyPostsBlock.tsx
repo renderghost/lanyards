@@ -28,6 +28,7 @@ export function BskyPostsBlock({ items, className }: BskyPostsBlockProps) {
                 <time dateTime={post.createdAt}>{date}</time>
                 {' · '}
                 <ExternalLink
+                  tone="accent"
                   href={post.url}
                 >{t`View on Bluesky`}</ExternalLink>
               </p>

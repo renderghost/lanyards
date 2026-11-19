@@ -3,6 +3,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { LanyardPage } from '@/features/lanyard/components/LanyardPage/LanyardPage';
 import { LanyardProblem } from '@/features/lanyard/components/LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/LanyardSkeleton';
+import { LanyardSurface } from '@/features/lanyard/components/LanyardSurface/LanyardSurface';
 import { useResolveHandle } from '@/features/lanyard/hooks/useResolveHandle';
 
 export const Route = createFileRoute('/@{$handle}')({
@@ -24,14 +25,18 @@ function HandleLanyard() {
   const { handle } = Route.useParams();
   const { state, retry } = useResolveHandle(handle);
 
-  if (state.status === 'error') {
-    return (
-      <LanyardProblem error={state.error} handle={handle} onRetry={retry} />
-    );
+  if (state.status === 'ready') {
+    return <LanyardPage did={state.value} handle={handle} />;
   }
-  return state.status === 'ready' ? (
-    <LanyardPage did={state.value} handle={handle} />
-  ) : (
-    <LanyardSkeleton />
+  // Until LanyardPage takes over, the lanyard's own ground stays put, so
+  // the page doesn't flash the app's neutral canvas (#118).
+  return (
+    <LanyardSurface variant="page">
+      {state.status === 'error' ? (
+        <LanyardProblem error={state.error} handle={handle} onRetry={retry} />
+      ) : (
+        <LanyardSkeleton />
+      )}
+    </LanyardSurface>
   );
 }

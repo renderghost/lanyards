@@ -19,7 +19,11 @@ export function CollectionsBlock({ items, className }: CollectionsBlockProps) {
             itemKey={collection.key}
             title={itemTitle('collections', collection, i18n)}
           >
-            <ExternalLink href={collection.url} className={styles.title}>
+            <ExternalLink
+              tone="accent"
+              href={collection.url}
+              className={styles.title}
+            >
               {collection.name}
             </ExternalLink>
             {collection.description && (
@@ -29,7 +33,9 @@ export function CollectionsBlock({ items, className }: CollectionsBlockProps) {
               <ul className={styles.links}>
                 {collection.links.map((link) => (
                   <li key={link.key} className={styles.link}>
-                    <ExternalLink href={link.url}>{link.title}</ExternalLink>
+                    <ExternalLink tone="accent" href={link.url}>
+                      {link.title}
+                    </ExternalLink>
                     {link.siteName && (
                       <span className={styles.meta}> · {link.siteName}</span>
                     )}

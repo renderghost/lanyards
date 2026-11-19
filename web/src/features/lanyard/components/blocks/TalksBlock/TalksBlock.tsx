@@ -28,7 +28,11 @@ export function TalksBlock({ items, className }: TalksBlockProps) {
               title={itemTitle('talks', talk, i18n)}
             >
               {talk.url ? (
-                <ExternalLink href={talk.url} className={styles.title}>
+                <ExternalLink
+                  tone="accent"
+                  href={talk.url}
+                  className={styles.title}
+                >
                   {talk.title}
                 </ExternalLink>
               ) : (

@@ -73,6 +73,7 @@ export function BlockSection({
           <div className={styles.editLinks}>
             {editLinks.map((link) => (
               <ExternalLink
+                tone="accent"
                 key={link.url}
                 href={link.url}
                 className={styles.edit}
@@ -115,6 +116,7 @@ export function BlockSection({
           </p>
           {onRetry && (
             <Button
+              tone="accent"
               variant="secondary"
               loading={retrying}
               onClick={() => (crashed ? void retryCrashed() : void onRetry())}

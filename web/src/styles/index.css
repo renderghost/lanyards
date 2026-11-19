@@ -18,6 +18,18 @@
   --color-on-accent: var(--on-accent);
   --color-accent-text: var(--accent-text);
   --color-accent-subtle: var(--accent-subtle);
+  --color-ui-canvas: var(--ui-canvas);
+  --color-ui-surface: var(--ui-surface);
+  --color-ui-surface-muted: var(--ui-surface-muted);
+  --color-ui-border: var(--ui-border);
+  --color-ui-border-strong: var(--ui-border-strong);
+  --color-ui-text: var(--ui-text);
+  --color-ui-text-muted: var(--ui-text-muted);
+  --color-ui-primary: var(--ui-primary);
+  --color-ui-on-primary: var(--ui-on-primary);
+  --color-ui-primary-subtle: var(--ui-primary-subtle);
+  --color-ui-warning: var(--ui-warning);
+  --color-ui-danger: var(--ui-danger);
   --font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'DM Serif Text', ui-serif, serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;
@@ -30,7 +42,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans leading-normal antialiased;
+    @apply bg-ui-canvas text-ui-text font-sans leading-normal antialiased;
   }
 
   :focus-visible {

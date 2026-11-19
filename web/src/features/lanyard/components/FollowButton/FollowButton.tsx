@@ -40,6 +40,7 @@ export function FollowButton({
   return (
     <div className={cn(styles.wrapper, className)}>
       <Button
+        tone="accent"
         size="lg"
         variant={following ? 'secondary' : 'primary'}
         onClick={press}

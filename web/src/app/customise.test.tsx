@@ -93,6 +93,22 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(document.title).toBe('Your lanyard · Lanyards');
   });
 
+  it('frames the lanyard on its own ground inside the preview', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    const region = await preview();
+    const name = await within(region).findByRole(
+      'heading',
+      { level: 2, name: 'Dr Ada Example' },
+      { timeout: 5000 }
+    );
+    // The lanyard brings its own ground; the customiser around it is neutral.
+    const ground = name.closest<HTMLElement>('.bg-background');
+    expect(ground).not.toBeNull();
+    expect(ground).not.toBe(region);
+    expect(region).toContainElement(ground);
+  });
+
   it('gives the page one level-one heading, its purpose', async () => {
     servePerson();
     renderRoute('/lanyard');

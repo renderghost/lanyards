@@ -17,7 +17,7 @@ export function LinksBlock({ items, className }: LinksBlockProps) {
       {items.map((item) => (
         <li key={item.key}>
           <ItemFrame itemKey={item.key} title={itemTitle('links', item, i18n)}>
-            <ExternalLink href={item.url} className={styles.link}>
+            <ExternalLink tone="accent" href={item.url} className={styles.link}>
               {item.iconUrl ? (
                 <img
                   src={item.iconUrl}

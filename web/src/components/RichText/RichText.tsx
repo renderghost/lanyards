@@ -24,7 +24,7 @@ export function RichText({ text, facets, className }: RichTextProps) {
           typeof feature.uri === 'string'
         ) {
           return (
-            <ExternalLink key={index} href={feature.uri}>
+            <ExternalLink tone="accent" key={index} href={feature.uri}>
               {segment.text}
             </ExternalLink>
           );

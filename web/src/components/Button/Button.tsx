@@ -1,10 +1,11 @@
 import { cn } from '@/lib/utils';
 
-import { base, sizes, spinner, variants } from './Button.styles';
+import { base, sizes, spinner, tones } from './Button.styles';
 import type { ButtonProps } from './Button.types';
 
 export function Button({
   variant = 'primary',
+  tone = 'ui',
   size = 'md',
   loading = false,
   disabled,
@@ -31,7 +32,7 @@ export function Button({
         }
         onClick?.(event);
       }}
-      className={cn(base, variants[variant], sizes[size], className)}
+      className={cn(base, tones[tone][variant], sizes[size], className)}
       {...rest}
     >
       {loading && <span className={spinner} aria-hidden="true" />}

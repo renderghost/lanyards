@@ -29,7 +29,11 @@ export function PublicationsBlock({
             >
               <div className={styles.heading}>
                 {href ? (
-                  <ExternalLink href={href} className={styles.title}>
+                  <ExternalLink
+                    tone="accent"
+                    href={href}
+                    className={styles.title}
+                  >
                     {publication.title}
                   </ExternalLink>
                 ) : (

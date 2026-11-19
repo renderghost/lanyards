@@ -132,6 +132,28 @@ describe('HandleCombobox', () => {
     );
   });
 
+  it('uses the product UI palette by default', () => {
+    renderWithProviders(<Harness />);
+    expect(screen.getByRole('combobox', { name: 'Your handle' })).toHaveClass(
+      'bg-ui-surface'
+    );
+  });
+
+  it('uses the lanyard palette with tone="accent"', () => {
+    renderWithProviders(
+      <HandleCombobox
+        id="search"
+        label="Search for someone"
+        value=""
+        onChange={vi.fn()}
+        tone="accent"
+      />
+    );
+    const input = screen.getByRole('combobox', { name: 'Search for someone' });
+    expect(input).toHaveClass('bg-surface');
+    expect(input).not.toHaveClass('bg-ui-surface');
+  });
+
   it('has no axe violations with suggestions open', async () => {
     server.use(
       http.get(TYPEAHEAD_URL, respondWith({ ali: { actors: [ALICE] } }))

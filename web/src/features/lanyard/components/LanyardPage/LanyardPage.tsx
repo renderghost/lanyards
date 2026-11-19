@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro';
 import { useLocation } from '@tanstack/react-router';
-import { useEffect } from 'react';
+import { type ReactNode, useEffect } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { DEFAULT_ACCENT } from '@/design/accents';
@@ -19,6 +19,7 @@ import { LanyardBlocks } from '../LanyardBlocks/LanyardBlocks';
 import { LanyardNotice } from '../LanyardNotice/LanyardNotice';
 import { LanyardProblem } from '../LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '../LanyardSkeleton/LanyardSkeleton';
+import { LanyardSurface } from '../LanyardSurface/LanyardSurface';
 import { SharedContextStrip } from '../SharedContextStrip/SharedContextStrip';
 import { VisitorActions } from '../VisitorActions/VisitorActions';
 import { NO_UNAUTHENTICATED } from './LanyardPage.constants';
@@ -62,8 +63,16 @@ export function LanyardPage({
     if (hasHero && !preview) track('lanyard_viewed', { viewer });
   }, [did, viewer, hasHero, preview]);
 
+  // The lanyard keeps its own ground: the whole page when public, a framed
+  // card in the customiser's preview (#118).
+  const frame = (content: ReactNode) => (
+    <LanyardSurface variant={preview ? 'card' : 'page'}>
+      {content}
+    </LanyardSurface>
+  );
+
   if (view.profile.status === 'error') {
-    return (
+    return frame(
       <LanyardProblem
         error={view.profile.error}
         handle={handle}
@@ -73,12 +82,12 @@ export function LanyardPage({
   }
 
   if (view.profile.status === 'loading' || !view.hero || shared.checkingBlock) {
-    return <LanyardSkeleton className={className} />;
+    return frame(<LanyardSkeleton className={className} />);
   }
 
   if (optedOut) {
     const returnTo = encodeURIComponent(location.pathname);
-    return (
+    return frame(
       <LanyardNotice heading={t`Sign in to see this lanyard`}>
         <p className={styles.text}>
           {t`This person has chosen to show their lanyard only to people who are signed in.`}
@@ -91,10 +100,12 @@ export function LanyardPage({
   }
 
   if (blocked) {
-    return <LanyardNotice heading={t`This lanyard isn't available to you.`} />;
+    return frame(
+      <LanyardNotice heading={t`This lanyard isn't available to you.`} />
+    );
   }
 
-  return (
+  return frame(
     <article className={cn(styles.page, className)}>
       <BadgeHero hero={view.hero} headingLevel={preview ? 2 : 1} />
       {!preview && (
@@ -115,7 +126,11 @@ export function LanyardPage({
           <p
             className={styles.text}
           >{t`Couldn't load your lanyard settings`}</p>
-          <Button variant="secondary" onClick={() => view.retry('lanyards')}>
+          <Button
+            tone="accent"
+            variant="secondary"
+            onClick={() => view.retry('lanyards')}
+          >
             {t`Retry`}
           </Button>
         </div>

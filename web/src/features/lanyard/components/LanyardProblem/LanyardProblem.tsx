@@ -49,7 +49,7 @@ export function LanyardProblem({
       <p className={styles.text}>
         {t`Bluesky isn't answering right now. Check your connection and try again.`}
       </p>
-      <Button onClick={onRetry}>{t`Try again`}</Button>
+      <Button tone="accent" onClick={onRetry}>{t`Try again`}</Button>
     </LanyardNotice>
   );
 }

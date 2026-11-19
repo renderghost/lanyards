@@ -20,7 +20,9 @@ export function HandleCombobox({
   required,
   disabled,
   inputRef,
+  tone = 'ui',
 }: HandleComboboxProps) {
+  const toned = styles.tones[tone];
   const [items, setItems] = useState<HandleSuggestion[]>([]);
 
   useEffect(() => {
@@ -72,7 +74,7 @@ export function HandleCombobox({
 
   return (
     <div className={styles.field}>
-      <label {...getLabelProps()} className={styles.label}>
+      <label {...getLabelProps()} className={toned.label}>
         {label}
       </label>
       <div className={styles.anchor}>
@@ -96,43 +98,43 @@ export function HandleCombobox({
           role="combobox"
           aria-controls={`${id}-suggestions`}
           aria-expanded={showMenu}
-          className={cn(styles.input, error && styles.inputInvalid)}
+          className={cn(toned.input, error && toned.inputInvalid)}
         />
-        <ul {...getMenuProps()} hidden={!showMenu} className={styles.menu}>
+        <ul {...getMenuProps()} hidden={!showMenu} className={toned.menu}>
           {showMenu &&
             items.map((item, index) => (
               <li
                 key={item.did}
                 {...getItemProps({ item, index })}
                 className={cn(
-                  styles.option,
-                  highlightedIndex === index && styles.optionActive
+                  toned.option,
+                  highlightedIndex === index && toned.optionActive
                 )}
               >
                 {item.avatar ? (
-                  <img src={item.avatar} alt="" className={styles.avatar} />
+                  <img src={item.avatar} alt="" className={toned.avatar} />
                 ) : (
-                  <span className={styles.avatar} aria-hidden="true" />
+                  <span className={toned.avatar} aria-hidden="true" />
                 )}
                 <span className={styles.names}>
                   {item.displayName && (
-                    <span className={styles.displayName}>
+                    <span className={toned.displayName}>
                       {item.displayName}
                     </span>
                   )}
-                  <span className={styles.handle}>@{item.handle}</span>
+                  <span className={toned.handle}>@{item.handle}</span>
                 </span>
               </li>
             ))}
         </ul>
       </div>
       {hint && (
-        <p id={hintId} className={styles.hint}>
+        <p id={hintId} className={toned.hint}>
           {hint}
         </p>
       )}
       {error && (
-        <p id={errorId} role="alert" className={styles.error}>
+        <p id={errorId} role="alert" className={toned.error}>
           {error}
         </p>
       )}
