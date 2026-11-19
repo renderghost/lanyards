@@ -31,7 +31,8 @@ msgstr "{title} at {eventName}"
 msgid "A new version of Lanyards is available"
 msgstr "A new version of Lanyards is available"
 
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.tsx:25
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.tsx:26
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:23
 msgid "Accent colour"
 msgstr "Accent colour"
 
@@ -99,6 +100,10 @@ msgstr "Audio deleted"
 msgid "Audio restored"
 msgstr "Audio restored"
 
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:37
+msgid "Badge"
+msgstr "Badge"
+
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:12
 msgid "Being mentored"
 msgstr "Being mentored"
@@ -106,6 +111,10 @@ msgstr "Being mentored"
 #: src/features/lanyard/customise/BlockEditor/BlockEditor.tsx:111
 msgid "Blocks"
 msgstr "Blocks"
+
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:57
+msgid "Blocks, links and items are edited on your lanyard."
+msgstr "Blocks, links and items are edited on your lanyard."
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:26
 msgid "Blog posts"
@@ -723,6 +732,10 @@ msgstr "Show {name}"
 msgid "Show again"
 msgstr "Show again"
 
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:50
+msgid "Show current job"
+msgstr "Show current job"
+
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:231
 msgid "Show current job on your badge"
 msgstr "Show current job on your badge"
@@ -801,6 +814,11 @@ msgstr "Spotify"
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:8
 msgid "standard.site"
 msgstr "standard.site"
+
+#: src/features/lanyard/customise/StyleSheet/StyleSheet.tsx:21
+#: src/features/lanyard/customise/StyleSidebar/StyleSidebar.tsx:15
+msgid "Style"
+msgstr "Style"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:24
 msgid "Talks"

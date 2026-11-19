@@ -47,6 +47,16 @@ describe('AccentPicker', () => {
     }
   });
 
+  it('can hide its heading visually, keeping the group’s name', () => {
+    renderWithProviders(
+      <AccentPicker value="violet" onChange={vi.fn()} hideLabel />
+    );
+    expect(
+      screen.getByRole('radiogroup', { name: 'Accent colour' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('Accent colour')).toHaveClass('sr-only');
+  });
+
   it('has no axe violations', async () => {
     const { container } = renderWithProviders(
       <AccentPicker value="moss" onChange={vi.fn()} />
