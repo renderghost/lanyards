@@ -258,7 +258,7 @@ test.describe('lanyard customiser', () => {
   test('changes a counted block’s count', async ({ page }) => {
     await openCustomiser(page);
     await page
-      .getByRole('combobox', { name: 'Items to show for Posts on Bluesky' })
+      .getByRole('combobox', { name: 'Items to show for Social posts' })
       .selectOption('5');
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);

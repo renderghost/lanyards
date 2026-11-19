@@ -108,7 +108,7 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
     await renderEditor();
     expect(
       within(block('bskyPosts')).getByRole('combobox', {
-        name: 'Items to show for Posts on Bluesky',
+        name: 'Items to show for Social posts',
       })
     ).toHaveValue('3');
     expect(within(block('talks')).queryByRole('combobox')).toBeNull();

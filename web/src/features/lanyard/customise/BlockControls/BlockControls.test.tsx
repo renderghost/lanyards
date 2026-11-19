@@ -61,7 +61,7 @@ describe('BlockControls', () => {
       limit: 3,
     });
     const count = screen.getByRole('combobox', {
-      name: 'Items to show for Blog posts',
+      name: 'Items to show for Articles',
     });
     await userEvent.selectOptions(count, '5');
     expect(onLimitChange).toHaveBeenCalledWith(5);
