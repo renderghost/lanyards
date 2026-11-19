@@ -182,7 +182,8 @@ It changes as follows.
 - **Sifa's honorifics:**
   - Re-vendor `id.sifa.profile.self` and `id.sifa.getProfileView` from
     `singi-labs/sifa-lexicons`. Their `profileView` now carries:
-    - `honorificPrefix` and `honorificSuffix` (strings, up to 64 graphemes);
+    - `honorificPrefix` and `honorificSuffix` (strings, up to 128 graphemes
+      in the view);
     - `showHonorifics` (absent means true).
   - The Sifa adapter maps the three, and `composeHero` puts them on the
     hero.
@@ -207,6 +208,8 @@ It changes as follows.
   - Submitting a valid form closes the dialog and puts the change in the
     draft, where it shows on the lanyard at once.
   - Cancel, Escape and the close button discard the form's input.
+  - A click outside the dialog doesn't close it, so typed input isn't lost
+    by accident.
   - **Focus:**
     - on open, the first field;
     - on close, back to the button that opened it: Add, or that card's
@@ -300,7 +303,7 @@ It changes as follows.
   | Block | Card shows | Opens |
   | --- | --- | --- |
   | Articles (was Blog posts) | Thumbnail on the left (cover image), title, publication · date | The article |
-  | Social posts (was Posts on Bluesky) | The post's text as plain text (facets not linked), date | The post on Bluesky |
+  | Social posts (was Posts on Bluesky) | The post's text as plain text (facets not linked), date | The post on Bluesky (the date is the card's link, named "Post on Bluesky, {date}") |
   | Talks | Title, event, date · role | The talk's page, when it has one; otherwise nothing |
   | Publications | Title, venue · year, the ORCID tick | The DOI or URL |
   | Education | Institution, qualification, years | Nothing |
@@ -355,6 +358,10 @@ Every place that names those blocks follows: bars, announcements, switches,
   not a visible "Hidden" tag, which would make pills uneven.
 - **Old `link.web` and honorific records** are left in people's
   repositories, unread.
+- **Hidden cards keep #118's visible "Hidden" tag;** only pills drop it.
+- **The app's own controls (`ui-*`) stay as they are on the lanyard's
+  ground.** They meet contrast there in light and dark: border-strong
+  3.2:1 and 4.2:1, muted text 6.9:1 and 8.3:1.
 
 ## Left to the builder
 
