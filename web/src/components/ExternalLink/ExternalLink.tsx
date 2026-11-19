@@ -14,6 +14,7 @@ export function ExternalLink({
   href,
   children,
   tone = 'ui',
+  label,
   className,
 }: ExternalLinkProps) {
   const { t } = useLingui();
@@ -24,6 +25,7 @@ export function ExternalLink({
       href={safe}
       target="_blank"
       rel="noopener noreferrer"
+      aria-label={label ? `${label} ${t`(opens in a new tab)`}` : undefined}
       className={cn(styles.tones[tone], className)}
     >
       {children}{' '}

@@ -7,7 +7,7 @@ import { renderInRouter } from '@/test/router';
 import { BskyPostsBlock } from './BskyPostsBlock';
 
 describe('BskyPostsBlock', () => {
-  it('shows the post text, its date and a link to Bluesky', async () => {
+  it('a card: plain text, and the date links to the post', async () => {
     const { container } = renderInRouter(
       <BskyPostsBlock
         items={[
@@ -26,8 +26,10 @@ describe('BskyPostsBlock', () => {
       'datetime',
       '2026-11-09T10:00:00.000Z'
     );
+    // The date is the card's one link, named for what it opens.
+    expect(screen.getAllByRole('link')).toHaveLength(1);
     expect(
-      screen.getByRole('link', { name: 'View on Bluesky (opens in a new tab)' })
+      screen.getByRole('link', { name: /^Post on Bluesky, 9 Nov 2026/ })
     ).toHaveAttribute('href', 'https://bsky.app/profile/x/post/1');
     await expectNoAxeViolations(container);
   });

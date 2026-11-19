@@ -1,38 +1,42 @@
 import { useLingui } from '@lingui/react/macro';
+import { FileText } from 'lucide-react';
 
-import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { formatPartialDate } from '@/lib/person/format';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { CardItem } from '../CardItem/CardItem';
+import { CardLink } from '../CardLink/CardLink';
 import { itemTitle } from '../itemTitle';
 import * as styles from './BlogPostsBlock.styles';
 import type { BlogPostsBlockProps } from './BlogPostsBlock.types';
 
-/** The latest standard.site posts. */
+/** The latest standard.site posts, as cards with their covers (#122). */
 export function BlogPostsBlock({ items, className }: BlogPostsBlockProps) {
   const { i18n } = useLingui();
   return (
     <ul className={cn(styles.list, className)}>
       {items.map((post) => (
-        <li key={post.key} className={styles.item}>
-          <ItemFrame
+        <li key={post.key}>
+          <CardItem
             itemKey={post.key}
             title={itemTitle('blogPosts', post, i18n)}
+            thumbnail={
+              post.thumbnail ? (
+                <img src={post.thumbnail} alt="" loading="lazy" />
+              ) : (
+                <FileText aria-hidden="true" />
+              )
+            }
           >
-            <ExternalLink
-              tone="accent"
-              href={post.url}
-              className={styles.title}
-            >
+            <CardLink href={post.url} className={styles.title}>
               {post.title}
-            </ExternalLink>
+            </CardLink>
             <p className={styles.meta}>
               {[post.publicationName, formatPartialDate(post.publishedAt)]
                 .filter(Boolean)
                 .join(' · ')}
             </p>
-          </ItemFrame>
+          </CardItem>
         </li>
       ))}
     </ul>
