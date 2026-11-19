@@ -1,13 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
-import type { BlueskyProfile } from '@/lib/sources/bluesky/bluesky.types';
+import type {
+  BlueskyProfile,
+  BskyPost,
+} from '@/lib/sources/bluesky/bluesky.types';
 import type { LanyardRecords } from '@/lib/sources/lanyards/lanyards.types';
 import type { OrcidWork } from '@/lib/sources/orcid/orcid.types';
 import { SourceError } from '@/lib/sources/result';
 import type { SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { ADA } from '@/test/people';
 
-import { blockStatuses, composeBlocks, hiddenItems } from './blocks';
+import {
+  blockStatuses,
+  composeBlocks,
+  composeEditorBlocks,
+  hiddenItems,
+  orphanedHiddenKeys,
+} from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
 import type { SourceSnapshot } from './personView.types';
 
@@ -472,5 +481,154 @@ describe('hiddenItems', () => {
       { key: talk, type: 'talks', reason: 'gone' },
       { key: 'mystery', reason: 'gone' },
     ]);
+  });
+});
+
+const posts: BskyPost[] = ['p1', 'p2', 'p3'].map((rkey, index) => ({
+  key: `at://${ADA.did}/app.bsky.feed.post/${rkey}`,
+  url: `https://bsky.app/profile/alice.test/post/${rkey}`,
+  text: `Post ${index + 1}`,
+  createdAt: `2026-11-0${index + 1}T09:00:00.000Z`,
+}));
+
+const titles = (items: { key: string }[] | false | undefined) =>
+  items ? items.map((item) => ('title' in item ? item.title : item.key)) : [];
+
+describe('counts: feeds and Publications only (#118)', () => {
+  it('shows every talk, whatever limit was stored', () => {
+    const [talks] = compose({
+      ...resolveConfig(null),
+      blocks: [{ type: 'talks', visible: true, limit: 1 }],
+    });
+    expect(talks?.status === 'ready' && talks.items).toHaveLength(4);
+  });
+
+  it('shows every link, past the old cap of 20', () => {
+    const many = Array.from({ length: 25 }, (_, index) => ({
+      key: `at://${ADA.did}/app.lanyards.link.web/${index}`,
+      url: `https://ada.example/${index}`,
+      title: `Link ${index}`,
+    }));
+    const [links] = compose(showOnly(['links']), {
+      lanyards: ready({ webLinks: many, media: [] }),
+    });
+    expect(links?.status === 'ready' && links.items).toHaveLength(25);
+  });
+
+  it('counted blocks still stop at their count', () => {
+    const [feed, publications] = compose(
+      {
+        ...resolveConfig(null),
+        blocks: [
+          { type: 'bskyPosts', visible: true, limit: 2 },
+          { type: 'publications', visible: true, limit: 1 },
+        ],
+      },
+      { ...allSources, blueskyPosts: ready(posts) }
+    );
+    expect(feed?.status === 'ready' && feed.items).toHaveLength(2);
+    expect(publications?.status === 'ready' && publications.items).toHaveLength(
+      1
+    );
+  });
+});
+
+describe('orphanedHiddenKeys', () => {
+  it('lists only hidden entries that are gone', () => {
+    const deleted = sifaKey('presentationDelivery', 'deleted');
+    const blog = `at://${ADA.did}/site.standard.document/3mblog`;
+    const code = `at://${ADA.did}/org.tangled.repo.manifest/self`;
+    const config = showOnly(['talks', 'blogPosts'], {
+      hidden: [deleted, blog, code, sifaKey('presentationDelivery', 'd1')],
+    });
+    const sources: SourceSnapshot = {
+      ...allSources,
+      standardSite: {
+        status: 'error',
+        error: new SourceError('standardSite', 'server'),
+      },
+    };
+    // The blog post's source failed and Code is switched off: not gone.
+    expect(
+      orphanedHiddenKeys({ config, sources, orcidVerified: false })
+    ).toEqual([deleted]);
+  });
+});
+
+describe('composeEditorBlocks', () => {
+  it('keeps hidden blocks and flags hidden items in place', () => {
+    const hiddenLink = 'https://ada.example/cv';
+    const config: LanyardConfig = {
+      ...resolveConfig(null),
+      blocks: [
+        { type: 'talks', visible: false },
+        { type: 'links', visible: true },
+      ],
+      hidden: [hiddenLink],
+    };
+    const [talks, links] = composeEditorBlocks({
+      config,
+      sources: allSources,
+      orcidVerified: false,
+    });
+    expect(talks).toMatchObject({ type: 'talks', visible: false });
+    expect(links).toMatchObject({
+      type: 'links',
+      visible: true,
+      status: 'ready',
+    });
+    const flagged = links?.items.map(({ item, hidden }) => [item.key, hidden]);
+    const all = compose(showOnly(['links'], { hidden: [] }))[0];
+    // Same items in the same order as with nothing hidden, the CV flagged.
+    expect(flagged?.map(([key]) => key)).toEqual(
+      all?.status === 'ready' && all.items.map((item) => item.key)
+    );
+    expect(flagged?.filter(([, hidden]) => hidden).map(([key]) => key)).toEqual(
+      [hiddenLink]
+    );
+  });
+
+  it('cuts counted blocks to their count among shown items, keeping hidden ones in place', () => {
+    const [feed] = composeEditorBlocks({
+      config: {
+        ...resolveConfig(null),
+        blocks: [{ type: 'bskyPosts', visible: true, limit: 1 }],
+        hidden: [posts[0]!.key],
+      },
+      sources: { ...allSources, blueskyPosts: ready(posts) },
+      orcidVerified: false,
+    });
+    expect(feed).toMatchObject({ limit: 1 });
+    expect(
+      feed?.items.map(({ item, hidden }) => [
+        'text' in item ? item.text : item.key,
+        hidden,
+      ])
+    ).toEqual([
+      ['Post 1', true],
+      ['Post 2', false],
+    ]);
+  });
+
+  it('says when a block is loading, empty or failed', () => {
+    const blocks = composeEditorBlocks({
+      config: showOnly(['talks', 'blogPosts', 'bskyPosts']),
+      sources: {
+        ...allSources,
+        standardSite: {
+          status: 'error',
+          error: new SourceError('standardSite', 'server'),
+        },
+        blueskyPosts: { status: 'loading' },
+      },
+      orcidVerified: false,
+    });
+    expect(blocks.map((block) => [block.type, block.status])).toEqual([
+      ['talks', 'ready'],
+      ['blogPosts', 'error'],
+      ['bskyPosts', 'loading'],
+    ]);
+    expect(blocks[1]?.failedSources).toEqual(['standardSite']);
+    expect(titles(blocks[0]?.items.map(({ item }) => item))).toHaveLength(4);
   });
 });

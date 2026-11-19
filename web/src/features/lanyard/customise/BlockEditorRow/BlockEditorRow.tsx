@@ -8,10 +8,10 @@ import { useEffect, useId, useRef } from 'react';
 import { Button } from '@/components/Button/Button';
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { SOURCE_LABELS } from '@/features/lanyard/components/BlockSection/BlockSection.constants';
-import { itemLimit } from '@/lib/person/config';
+import { COUNTED_BLOCKS, itemLimit } from '@/lib/person/config';
 import { cn } from '@/lib/utils';
 
-import { LIMIT_OPTIONS, SINGLE_ITEM_BLOCKS } from './BlockEditorRow.constants';
+import { LIMIT_OPTIONS } from './BlockEditorRow.constants';
 import * as styles from './BlockEditorRow.styles';
 import type { BlockEditorRowProps } from './BlockEditorRow.types';
 
@@ -134,7 +134,7 @@ export function BlockEditorRow({
         >
           <ArrowDown aria-hidden="true" className={styles.icon} />
         </button>
-        {!SINGLE_ITEM_BLOCKS.has(block.type) && (
+        {COUNTED_BLOCKS.has(block.type) && (
           <label className={styles.limit}>
             <span>{t`Items to show`}</span>
             <select

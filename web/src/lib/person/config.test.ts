@@ -4,6 +4,7 @@ import { validateRecord } from '@/lib/lexicons/validate';
 
 import {
   hideProblem,
+  COUNTED_BLOCKS,
   itemLimit,
   mergeConfig,
   resolveConfig,
@@ -84,13 +85,33 @@ describe('resolveConfig', () => {
 
 describe('itemLimit', () => {
   it.each([
-    [{ type: 'links' as const, visible: true }, 20],
-    [{ type: 'talks' as const, visible: true }, 3],
-    [{ type: 'talks' as const, visible: true, limit: 7 }, 7],
-    [{ type: 'links' as const, visible: true, limit: 25 }, 20],
-    [{ type: 'links' as const, visible: true, limit: 4 }, 4],
-  ])('gives %o a limit of %i', (block, expected) => {
+    [{ type: 'bskyPosts' as const, visible: true }, 3],
+    [{ type: 'blogPosts' as const, visible: true, limit: 7 }, 7],
+    [{ type: 'publications' as const, visible: true, limit: 1 }, 1],
+    [{ type: 'code' as const, visible: true }, 3],
+    [{ type: 'collections' as const, visible: true, limit: 5 }, 5],
+  ])('gives the counted block %o a limit of %i', (block, expected) => {
     expect(itemLimit(block)).toBe(expected);
+  });
+
+  it.each([
+    { type: 'links' as const, visible: true },
+    { type: 'links' as const, visible: true, limit: 4 },
+    { type: 'talks' as const, visible: true, limit: 1 },
+    { type: 'media' as const, visible: true, limit: 2 },
+    { type: 'skills' as const, visible: true },
+  ])('shows everything in the uncounted block %o', (block) => {
+    expect(itemLimit(block)).toBe(Infinity);
+  });
+
+  it('counts exactly the feeds and Publications', () => {
+    expect([...COUNTED_BLOCKS].sort()).toEqual([
+      'blogPosts',
+      'bskyPosts',
+      'code',
+      'collections',
+      'publications',
+    ]);
   });
 });
 

@@ -52,7 +52,7 @@ const order = () =>
     .map((item) => item.getAttribute('data-block'));
 
 describe('BlockEditor', () => {
-  it('gives every block a handle, moves, a switch and a limit', () => {
+  it('gives every block a handle, moves and a switch, and feeds a count', () => {
     renderWithProviders(<Harness />);
     expect(screen.getAllByRole('listitem')).toHaveLength(12);
     const links = row('Links');
@@ -68,16 +68,14 @@ describe('BlockEditor', () => {
     expect(
       within(links).getByRole('switch', { name: 'Show Links' })
     ).toBeChecked();
-    const limit = within(links).getByRole('combobox', {
-      name: 'Items to show for Links',
+    // Links, Talks and the other Sifa blocks show everything (#118).
+    expect(within(links).queryByRole('combobox')).toBeNull();
+    expect(within(row('Talks')).queryByRole('combobox')).toBeNull();
+    const count = within(row('Posts on Bluesky')).getByRole('combobox', {
+      name: 'Items to show for Posts on Bluesky',
     });
-    expect(within(limit).getAllByRole('option')).toHaveLength(20);
-    expect(limit).toHaveValue('20');
-    expect(
-      within(row('Talks')).getByRole('combobox', {
-        name: 'Items to show for Talks',
-      })
-    ).toHaveValue('3');
+    expect(within(count).getAllByRole('option')).toHaveLength(20);
+    expect(count).toHaveValue('3');
     expect(
       within(row('Details')).getByRole('button', { name: 'Move Details down' })
     ).toHaveAttribute('aria-disabled', 'true');
@@ -133,20 +131,20 @@ describe('BlockEditor', () => {
     ).toEqual({ type: 'talks', visible: false });
   });
 
-  it('saves a block’s item limit', async () => {
+  it('saves a feed’s count', async () => {
     const onSave = vi.fn();
     renderWithProviders(<Harness onSave={onSave} />);
     await userEvent.selectOptions(
-      within(row('Talks')).getByRole('combobox', {
-        name: 'Items to show for Talks',
+      within(row('Blog posts')).getByRole('combobox', {
+        name: 'Items to show for Blog posts',
       }),
       '5'
     );
     expect(
       onSave.mock.lastCall?.[0].blocks.find(
-        (b: { type: string }) => b.type === 'talks'
+        (b: { type: string }) => b.type === 'blogPosts'
       )
-    ).toEqual({ type: 'talks', visible: true, limit: 5 });
+    ).toMatchObject({ type: 'blogPosts', limit: 5 });
   });
 
   it('says when a block has nothing to show, and where to add it', () => {
@@ -187,7 +185,9 @@ describe('BlockEditor', () => {
       within(links).getByRole('switch', { name: 'Show Links' })
     ).toBeDisabled();
     expect(
-      within(links).getByRole('combobox', { name: 'Items to show for Links' })
+      within(row('Blog posts')).getByRole('combobox', {
+        name: 'Items to show for Blog posts',
+      })
     ).toBeDisabled();
   });
 

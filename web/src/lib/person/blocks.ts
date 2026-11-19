@@ -15,6 +15,7 @@ import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 import {
   type BlockConfig,
   DEFAULT_BLOCK_ORDER,
+  COUNTED_BLOCKS,
   itemLimit,
   type LanyardConfig,
   type RenderableBlockType,
@@ -332,7 +333,7 @@ export type BlockStatus =
   | { status: 'empty' }
   | { status: 'ready'; count: number; failedSources: SourceName[] };
 
-type ComposeInput = {
+export type ComposeInput = {
   config: LanyardConfig;
   sources: SourceSnapshot;
   orcidVerified: boolean;
@@ -456,5 +457,60 @@ export function hiddenItems(input: ComposeInput): HiddenItem[] {
             ? 'failed'
             : 'gone';
     return { key, type, reason };
+  });
+}
+
+/** Hidden entries that no longer exist where they were read: "Clear". */
+export function orphanedHiddenKeys(input: ComposeInput): string[] {
+  return hiddenItems(input).flatMap((entry) =>
+    'reason' in entry && entry.reason === 'gone' ? [entry.key] : []
+  );
+}
+
+/** A block as the owner edits it on the lanyard (#118). */
+export type EditorBlock = {
+  type: RenderableBlockType;
+  visible: boolean;
+  /** For counted blocks only. */
+  limit?: number;
+  status: BlockStatus['status'];
+  /** Every item it shows, with the hidden ones in their places. */
+  items: { item: BlockItem; hidden: boolean }[];
+  failedSources: SourceName[];
+};
+
+/**
+ * Every block in the owner's order, switched-off ones included, with each
+ * item it would show and the hidden ones flagged where they'd be. Counted
+ * blocks stop at their count of shown items.
+ */
+export function composeEditorBlocks(input: ComposeInput): EditorBlock[] {
+  const hidden = hiddenSet(input.config.hidden);
+  return input.config.blocks.map((block): EditorBlock => {
+    const limit = itemLimit(block);
+    const shape = {
+      type: block.type,
+      visible: block.visible,
+      ...(COUNTED_BLOCKS.has(block.type) ? { limit } : {}),
+    };
+    const gathered = gather(block.type, input.sources, input.orcidVerified);
+    if (gathered.loading) {
+      return { ...shape, status: 'loading', items: [], failedSources: [] };
+    }
+    const items: EditorBlock['items'] = [];
+    let shown = 0;
+    for (const item of gathered.items) {
+      if (shown >= limit) break;
+      const isItemHidden = isHidden(item.key, hidden);
+      items.push({ item: item as BlockItem, hidden: isItemHidden });
+      if (!isItemHidden) shown += 1;
+    }
+    const status: EditorBlock['status'] =
+      items.length > 0
+        ? 'ready'
+        : gathered.failed.length > 0
+          ? 'error'
+          : 'empty';
+    return { ...shape, status, items, failedSources: gathered.failed };
   });
 }
