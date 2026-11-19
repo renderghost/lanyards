@@ -6,10 +6,8 @@ export type ItemActions = {
   isHidden(itemKey: string): boolean;
   /** The item's show/hide control. */
   renderToggle(itemKey: string, title: string): ReactNode;
-  /** Edit and Delete, for records the owner keeps (links, podcasts). */
+  /** Edit and Delete, for records the owner keeps (podcasts and videos). */
   renderEdit?(itemKey: string, title: string): ReactNode;
-  /** The item's open form, shown in its place; null while it isn't open. */
-  renderEditor?(itemKey: string): ReactNode;
 };
 
 /**

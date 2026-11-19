@@ -79,22 +79,4 @@ describe('ItemFrame', () => {
       screen.getByRole('button', { name: 'Edit Keynote' })
     ).toBeInTheDocument();
   });
-
-  it('shows the editor in place of the item while it is edited', () => {
-    renderWithProviders(
-      <ItemActionsContext
-        value={{
-          ...actions([]),
-          renderEditor: (key) =>
-            key === 'k1' ? <form aria-label="Edit" /> : null,
-        }}
-      >
-        <ItemFrame itemKey="k1" title="Keynote">
-          <p>Keynote</p>
-        </ItemFrame>
-      </ItemActionsContext>
-    );
-    expect(screen.getByRole('form', { name: 'Edit' })).toBeInTheDocument();
-    expect(screen.queryByText('Keynote')).toBeNull();
-  });
 });

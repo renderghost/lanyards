@@ -3,11 +3,13 @@ import { Plus } from 'lucide-react';
 import { use } from 'react';
 
 import { Button } from '@/components/Button/Button';
-import { MediaBlock } from '@/features/lanyard/components/blocks/MediaBlock/MediaBlock';
+import { Dialog } from '@/components/Dialog/Dialog';
 import {
   type ItemActions,
   ItemActionsContext,
 } from '@/features/lanyard/components/blocks/itemActions';
+import { itemTitle } from '@/features/lanyard/components/blocks/itemTitle';
+import { MediaBlock } from '@/features/lanyard/components/blocks/MediaBlock/MediaBlock';
 import { hostOf } from '@/lib/normalise';
 import { cn } from '@/lib/utils';
 
@@ -29,9 +31,9 @@ const NO_ACTIONS: ItemActions = {
 };
 
 /**
- * The Media block as the owner edits it (#118): every podcast and video is
- * their own record, so each can be edited and deleted in place, and new
- * ones added below. Every change waits for Save.
+ * The Podcasts and videos block as the owner edits it (#118): each entry
+ * is their own record, edited or added in a dialog and deleted in place.
+ * Every change waits for Save.
  */
 export function MediaEditor({
   items,
@@ -39,11 +41,14 @@ export function MediaEditor({
   disabled,
   className,
 }: MediaEditorProps) {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const parent = use(ItemActionsContext) ?? NO_ACTIONS;
-  const { open, announcement, target, form, start, finish } =
+  const { open, announcement, target, start, close, moveFocus } =
     useInPlaceEditing();
-  const byKey = new Map(items.map((item) => [item.key, item]));
+  const editing =
+    open && open !== ADDING
+      ? items.find((item) => item.key === open)
+      : undefined;
   const nameOf = (fields: MediaFields) => fields.title || hostOf(fields.url);
 
   const actions: ItemActions = {
@@ -56,30 +61,14 @@ export function MediaEditor({
         onEdit={() => start(itemKey)}
         onDelete={() => {
           records.removeMedia(itemKey);
-          finish(ADD_BUTTON, t`${title} deleted`);
+          moveFocus(ADD_BUTTON, t`${title} deleted`);
         }}
       />
     ),
-    renderEditor: (itemKey) => {
-      const item = byKey.get(itemKey);
-      if (!item || open !== itemKey) return null;
-      const { key: _key, ...initial } = item;
-      return (
-        <div ref={form} className={styles.form}>
-          <MediaForm
-            initial={initial}
-            disabled={disabled}
-            onSubmit={(fields) => {
-              records.updateMedia(itemKey, fields);
-              const name = nameOf(fields);
-              finish(itemKey, t`${name} updated`);
-            }}
-            onCancel={() => finish(itemKey)}
-          />
-        </div>
-      );
-    },
   };
+
+  const editingTitle = editing ? itemTitle('media', editing, i18n) : '';
+  const { key: _key, ...initial } = editing ?? { key: '' };
 
   return (
     <div className={cn(styles.editor, className)}>
@@ -90,31 +79,40 @@ export function MediaEditor({
       ) : (
         <p className={styles.empty}>{t`Nothing to show yet`}</p>
       )}
-      {open === ADDING ? (
-        <div ref={form} className={styles.form}>
-          <MediaForm
-            disabled={disabled}
-            onSubmit={(fields) => {
-              records.addMedia(fields);
-              const name = nameOf(fields);
-              finish(ADD_BUTTON, t`${name} added`);
-            }}
-            onCancel={() => finish(ADD_BUTTON)}
-          />
-        </div>
-      ) : (
-        <Button
-          ref={target(ADD_BUTTON)}
-          variant="secondary"
-          size="sm"
+      <Button
+        ref={target(ADD_BUTTON)}
+        variant="secondary"
+        size="sm"
+        disabled={disabled}
+        onClick={() => start(ADDING)}
+        className={styles.add}
+      >
+        <Plus aria-hidden="true" />
+        {t`Add a podcast or video`}
+      </Button>
+      <Dialog
+        open={open === ADDING || editing !== undefined}
+        onOpenChange={(next) => {
+          if (!next) close();
+        }}
+        title={editing ? t`Edit ${editingTitle}` : t`Add a podcast or video`}
+      >
+        <MediaForm
+          initial={editing ? (initial as MediaFields) : undefined}
           disabled={disabled}
-          onClick={() => start(ADDING)}
-          className={styles.add}
-        >
-          <Plus aria-hidden="true" />
-          {t`Add a podcast or video`}
-        </Button>
-      )}
+          onSubmit={(fields) => {
+            const name = nameOf(fields);
+            if (editing) {
+              records.updateMedia(editing.key, fields);
+              close(t`${name} updated`);
+            } else {
+              records.addMedia(fields);
+              close(t`${name} added`);
+            }
+          }}
+          onCancel={() => close()}
+        />
+      </Dialog>
       <p role="status" className={styles.announcer}>
         {announcement}
       </p>

@@ -42,6 +42,29 @@ function captureSaves() {
   return saves;
 }
 
+type Write = {
+  $type: string;
+  collection: string;
+  rkey?: string;
+  value?: Record<string, unknown>;
+};
+
+/** Records every applyWrites batch the customiser sends. */
+function captureWrites() {
+  const batches: Write[][] = [];
+  server.use(
+    http.post(
+      `${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`,
+      async ({ request }) => {
+        const body = (await request.json()) as { writes: Write[] };
+        batches.push(body.writes);
+        return HttpResponse.json({ results: [] });
+      }
+    )
+  );
+  return batches;
+}
+
 /** The Links block on the lanyard. */
 const linksBlock = async () => {
   const region = await preview();
@@ -491,6 +514,50 @@ describe('/lanyard', { timeout: 20_000 }, () => {
         { timeout: 5000 }
       )
     ).toBeInTheDocument();
+  });
+
+  it('adds a podcast in a dialog; it’s saved only on Save', async () => {
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    const batches = captureWrites();
+    renderRoute('/lanyard');
+    await userEvent.click(await enabled('Add a podcast or video'));
+    const dialog = screen.getByRole('dialog', {
+      name: 'Add a podcast or video',
+    });
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Web address' }),
+      'https://pod.example/new'
+    );
+    await userEvent.selectOptions(
+      within(dialog).getByRole('combobox', { name: 'Platform' }),
+      'spotify'
+    );
+    await userEvent.type(
+      within(dialog).getByRole('textbox', { name: 'Title' }),
+      'New episode'
+    );
+    await userEvent.click(
+      within(dialog).getByRole('button', { name: 'Add media' })
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(
+      within(await preview()).getByText('New episode')
+    ).toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    expect(batches).toEqual([]);
+    await saveChanges();
+    await waitFor(() => expect(batches).toHaveLength(1), { timeout: 3000 });
+    expect(batches[0]).toEqual([
+      expect.objectContaining({
+        $type: 'com.atproto.repo.applyWrites#create',
+        collection: 'app.lanyards.link.media.audio',
+        value: expect.objectContaining({
+          url: 'https://pod.example/new',
+          platform: 'spotify',
+          title: 'New episode',
+        }),
+      }),
+    ]);
   });
 
   it('explains a stored record it cannot read, and resets only when asked', async () => {

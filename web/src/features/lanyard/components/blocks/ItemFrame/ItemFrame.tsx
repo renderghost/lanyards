@@ -11,8 +11,7 @@ import type { ItemFrameProps } from './ItemFrame.types';
  * Wraps one block item. On the public lanyard it adds nothing; in the
  * owner's editor it puts the item's show/hide control (and, for kept
  * records, Edit and Delete) beside it, and a hidden item stays in place,
- * faded and labelled "Hidden" (#118). An item being edited shows its form
- * in its place.
+ * faded and labelled "Hidden" (#118).
  */
 export function ItemFrame({
   itemKey,
@@ -23,8 +22,6 @@ export function ItemFrame({
   const { t } = useLingui();
   const actions = use(ItemActionsContext);
   if (!actions) return children;
-  const editor = actions.renderEditor?.(itemKey);
-  if (editor) return editor;
   const hidden = actions.isHidden(itemKey);
   return (
     <div

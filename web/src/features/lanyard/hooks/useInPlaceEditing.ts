@@ -4,13 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 export const ADDING = 'adding';
 /** The focus target for the Add button. */
 export const ADD_BUTTON = 'add';
-/** The focus target for whichever form is open. */
-const FORM = 'form';
 
 /**
- * One kept-record list edited in place (#118): at most one form open, a
- * record's or the new one's. Focus moves into the form when it opens, and
- * back to a control that stays when it closes; each change is announced.
+ * One kept-record list edited through a dialog (#118): at most one form
+ * open, a record's or the new one's. The dialog hands focus back to what
+ * opened it; after a delete, focus moves to a control that stays. Each
+ * change is announced.
  */
 export function useInPlaceEditing() {
   const [open, setOpen] = useState<string | null>(null);
@@ -23,11 +22,7 @@ export function useInPlaceEditing() {
     const key = pending.current;
     if (key === null) return;
     pending.current = null;
-    // A record whose Edit went away (merged with another link) hands focus
-    // to Add, which is always there.
-    const node = targets.current.get(key) ?? targets.current.get(ADD_BUTTON);
-    const field = node?.querySelector<HTMLElement>('input, select, textarea');
-    (field ?? node)?.focus();
+    (targets.current.get(key) ?? targets.current.get(ADD_BUTTON))?.focus();
   });
 
   return {
@@ -39,18 +34,16 @@ export function useInPlaceEditing() {
       if (node) targets.current.set(key, node);
       else targets.current.delete(key);
     },
-    /** A ref for the open form's wrapper. */
-    form: (node: HTMLElement | null) => {
-      if (node) targets.current.set(FORM, node);
-      else targets.current.delete(FORM);
-    },
     start(key: string) {
       setOpen(key);
-      pending.current = FORM;
     },
-    /** Closes the form; focus goes to `focusOn`, and `message` is said. */
-    finish(focusOn: string, message?: string) {
+    /** Closes the form, saying `message`; the dialog returns focus. */
+    close(message?: string) {
       setOpen(null);
+      if (message) setAnnouncement(message);
+    },
+    /** Moves focus to `focusOn` once rendered, saying `message`. */
+    moveFocus(focusOn: string, message?: string) {
       pending.current = focusOn;
       if (message) setAnnouncement(message);
     },

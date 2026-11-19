@@ -171,6 +171,48 @@ test.describe('lanyard customiser', () => {
     });
   });
 
+  test('adds a podcast in the dialog and saves it', async ({ page }) => {
+    await openCustomiser(page);
+    await page
+      .getByRole('switch', { name: 'Show Podcasts and videos' })
+      .click();
+    const media = page.locator('[data-block="media"]');
+    const add = media.getByRole('button', { name: 'Add a podcast or video' });
+    await expect(add).toBeEnabled();
+    await add.click();
+    const dialog = page.getByRole('dialog', { name: 'Add a podcast or video' });
+    // The form starts with the kind of media.
+    await expect(dialog.getByRole('radio', { name: 'Audio' })).toBeFocused();
+    const address = dialog.getByRole('textbox', { name: 'Web address' });
+    await address.fill('https://pod.example/new');
+    await dialog
+      .getByRole('combobox', { name: 'Platform' })
+      .selectOption('spotify');
+    await dialog.getByRole('textbox', { name: 'Title' }).fill('New episode');
+    await dialog.getByRole('button', { name: 'Add media' }).click();
+    await expect(dialog).toBeHidden();
+    await expect(add).toBeFocused();
+    await expect(
+      media.getByRole('link', { name: 'New episode' })
+    ).toBeVisible();
+    expect(writes.filter((write) => write.method === 'applyWrites')).toEqual(
+      []
+    );
+    await saveChanges(page);
+    await expect(page.getByText('Lanyard updated')).toBeVisible();
+    const saved = writes.find(
+      (write) => write.body.collection === 'app.lanyards.link.media.audio'
+    );
+    expect(saved?.body).toMatchObject({
+      action: 'create',
+      record: {
+        url: 'https://pod.example/new',
+        platform: 'spotify',
+        title: 'New episode',
+      },
+    });
+  });
+
   test('hides a record in place, then shows it again', async ({ page }) => {
     await openCustomiser(page);
     const talks = page.locator('[data-block="talks"]');
@@ -382,6 +424,30 @@ test.describe('lanyard customiser', () => {
       await expect(
         page.locator('[data-block="links"]').getByText('Hidden from visitors')
       ).toBeVisible();
+      const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+      expect(result.violations).toEqual([]);
+    });
+  }
+
+  for (const colorScheme of ['light', 'dark'] as const) {
+    test(`stays accessible with the podcast dialog open (${colorScheme})`, async ({
+      page,
+    }) => {
+      await page.emulateMedia({ colorScheme });
+      await openCustomiser(page);
+      await page
+        .getByRole('switch', { name: 'Show Podcasts and videos' })
+        .click();
+      await page
+        .getByRole('button', { name: 'Add a podcast or video' })
+        .click();
+      const dialog = page.getByRole('dialog', {
+        name: 'Add a podcast or video',
+      });
+      await dialog.getByRole('button', { name: 'Add media' }).click();
+      await expect(
+        dialog.getByRole('textbox', { name: 'Web address' })
+      ).toHaveAttribute('aria-invalid', 'true');
       const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
       expect(result.violations).toEqual([]);
     });
