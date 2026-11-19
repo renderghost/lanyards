@@ -60,6 +60,18 @@ describe('CardItem', () => {
     }
   });
 
+  it('editor: a hidden card tags itself under its text, and its controls can wrap below', () => {
+    renderWithProviders(
+      <ItemActionsContext value={actions(['k1'])}>{card}</ItemActionsContext>
+    );
+    const tag = screen.getByText('Hidden');
+    const content = screen.getByText('Ada’s notes · 4 Nov 2026').parentElement;
+    // In the text column, not beside it, so phones keep the text readable.
+    expect(content).toContainElement(tag);
+    expect(content).toHaveClass('basis-40');
+    expect(content?.closest('[data-card]')).toHaveClass('flex-wrap');
+  });
+
   it('editor: a hidden card stays in place, tagged Hidden', () => {
     renderWithProviders(
       <ItemActionsContext value={actions(['k1'])}>{card}</ItemActionsContext>

@@ -387,7 +387,7 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
-#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:44
+#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:43
 #: src/features/lanyard/components/blocks/ItemFrame/ItemFrame.tsx:34
 msgid "Hidden"
 msgstr "Hidden"

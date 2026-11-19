@@ -38,15 +38,15 @@ export function CardItem({
           {thumbnail}
         </div>
       )}
-      <div className={styles.content}>{children}</div>
+      <div data-card-content="" className={styles.content}>
+        {children}
+        {hidden && <span className={styles.tag}>{t`Hidden`}</span>}
+      </div>
       {actions && (
-        <>
-          {hidden && <span className={styles.tag}>{t`Hidden`}</span>}
-          <div className={styles.controls}>
-            {actions.renderToggle(itemKey, title)}
-            {actions.renderEdit?.(itemKey, title)}
-          </div>
-        </>
+        <div className={styles.controls}>
+          {actions.renderToggle(itemKey, title)}
+          {actions.renderEdit?.(itemKey, title)}
+        </div>
       )}
     </div>
   );
