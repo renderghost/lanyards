@@ -6,8 +6,19 @@ import { LOGO_DARK_SRC, LOGO_LIGHT_SRC, LOGO_SIZE_PX } from './Logo.constants';
 import * as styles from './Logo.styles';
 import type { LogoProps } from './Logo.types';
 
-export function Logo({ className }: LogoProps) {
+export function Logo({ fixed, className }: LogoProps) {
   const { t } = useLingui();
+  if (fixed) {
+    return (
+      <img
+        src={fixed === 'lime' ? LOGO_DARK_SRC : LOGO_LIGHT_SRC}
+        alt={t`Lanyards`}
+        width={LOGO_SIZE_PX}
+        height={LOGO_SIZE_PX}
+        className={cn(styles.image, className)}
+      />
+    );
+  }
   return (
     <picture>
       <source srcSet={LOGO_DARK_SRC} media="(prefers-color-scheme: dark)" />

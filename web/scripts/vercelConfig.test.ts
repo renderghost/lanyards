@@ -50,7 +50,8 @@ describe('vercel.json', () => {
     const all = config.headers.find((entry) => entry.source === '/(.*)');
     expect(all?.headers).toEqual(
       expect.arrayContaining([
-        { key: 'Content-Security-Policy', value: "frame-ancestors 'none'" },
+        // Only the app may frame itself: the homepage's sample (#145).
+        { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
         { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
         { key: 'X-Content-Type-Options', value: 'nosniff' },
       ])

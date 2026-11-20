@@ -92,14 +92,18 @@ const UI_COLOUR = new RegExp(`^${COLOUR}-(?:ui-|${throughVar('ui-[a-z-]+')})`);
 const RADIUS = /^rounded(?:-[trblse]{1,2})?(?:-([a-z0-9]+|\[[^\]]+\]))?$/;
 const ON_SCALE = new Set(['xs', 'sm', 'none', 'full']);
 
-/** Round things: avatars, dots, spinners and colour swatches. */
+/** Round things: avatars, dots, radios, spinners and colour swatches. */
 const isRound = ({ file, path = '' }: ClassString) =>
-  /(?:^|\.)(?:avatar|dot|spinner|swatch)$/.test(path) ||
+  /(?:^|\.)(?:avatar|dot|radio|spinner|swatch)$/.test(path) ||
   // The account link is a round focus target around its avatar.
   (file === 'src/components/AccountLink/AccountLink.styles.ts' &&
     path === 'link');
 
-/** The product UI: everything but the lanyard itself. */
+/**
+ * The product UI: everything but the lanyard itself. The homepage
+ * (src/features/home/) is neither: it's the brand's own page, in the
+ * lanyard's palette pinned to brand blue (#145).
+ */
 const CHROME = [
   'src/app/',
   'src/components/',

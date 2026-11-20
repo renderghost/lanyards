@@ -75,8 +75,10 @@ export async function initAnalytics(options: {
   key: string | undefined;
   host: string;
   doNotTrack: boolean;
+  /** Framed, as the homepage's sample lanyard is: not a visit (#145). */
+  framed?: boolean;
 }): Promise<boolean> {
-  if (!options.key || options.doNotTrack) return false;
+  if (!options.key || options.doNotTrack || options.framed) return false;
   loading = true;
   const { default: posthog } = await import('posthog-js');
   posthog.init(options.key, posthogOptions(options.host));
@@ -105,6 +107,11 @@ export function captureError(
   context: { source: string }
 ): void {
   send('app_error', { ...sanitiseError(error), source: context.source });
+}
+
+/** True when the app runs inside a frame, such as the homepage's sample. */
+export function isFramed(): boolean {
+  return window.self !== window.top;
 }
 
 /** True when the browser sends Do Not Track or Global Privacy Control. */

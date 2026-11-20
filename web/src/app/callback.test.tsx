@@ -89,7 +89,7 @@ describe('OAuth callback', () => {
     );
     const heading = await screen.findByRole('heading', {
       level: 1,
-      name: 'Your conference lanyard, from your AT Protocol account',
+      name: 'Welcome to Lanyards',
     });
     await waitFor(() => expect(heading).toHaveFocus());
   });

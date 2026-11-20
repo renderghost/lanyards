@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 
-import { expect, HEADING, test } from './fixtures';
+import { expect, HEADING, SAMPLE_PATH, test } from './fixtures';
 
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
@@ -36,4 +36,43 @@ test('fits a 320px-wide screen without sideways scrolling', async ({
     () => document.documentElement.scrollWidth
   );
   expect(scrollWidth).toBeLessThanOrEqual(320);
+});
+
+test.describe('the homepage (#145)', () => {
+  test('frames a sample lanyard on desktop, and links to it', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
+    const frame = page.getByTitle('Sample lanyard');
+    await expect(frame).toBeVisible();
+    await expect(frame).toHaveAttribute('src', SAMPLE_PATH);
+    await expect(
+      page.frameLocator('iframe[title="Sample lanyard"]').getByRole('heading')
+    ).toHaveText('Sample');
+    await expect(
+      page.getByRole('link', { name: /View sample profile/ })
+    ).toHaveAttribute('href', SAMPLE_PATH);
+  });
+
+  test('links to the sample, without the frame, on phones', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
+    await expect(page.getByTitle('Sample lanyard')).toBeHidden();
+    await expect(
+      page.getByRole('link', { name: /View sample profile/ })
+    ).toBeVisible();
+  });
+
+  test('takes “Create your lanyard” to the sign-in form', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Create your lanyard' }).click();
+    const handle = page.getByRole('combobox', { name: 'Your handle' });
+    await expect(handle).toBeFocused();
+    await expect(handle).toBeInViewport();
+  });
 });
