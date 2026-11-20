@@ -1,4 +1,5 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { isHandle } from '@atcute/lexicons/syntax';
+import { createFileRoute, notFound, redirect } from '@tanstack/react-router';
 
 import { LanyardPage } from '@/features/lanyard/components/LanyardPage/LanyardPage';
 import { LanyardProblem } from '@/features/lanyard/components/LanyardProblem/LanyardProblem';
@@ -7,16 +8,21 @@ import { LanyardSurface } from '@/features/lanyard/components/LanyardSurface/Lan
 import { useResolveHandle } from '@/features/lanyard/hooks/useResolveHandle';
 import { prefetchHandleLanyard } from '@/lib/person/personQueries';
 
-export const Route = createFileRoute('/@{$handle}')({
-  beforeLoad: ({ params }) => {
-    // A DID after @ belongs on the stable DID route.
-    if (params.handle.startsWith('did:')) {
-      throw redirect({ href: `/d/${params.handle}` });
+/**
+ * A public lanyard at `/<handle>` (#150), the old site's address. The
+ * beta's `/@<handle>` links come here; a DID goes to its stable route.
+ */
+export const Route = createFileRoute('/$handle')({
+  beforeLoad: ({ params, location }) => {
+    const bare = params.handle.replace(/^@/, '');
+    if (bare.startsWith('did:')) {
+      throw redirect({ href: `/d/${bare}${location.searchStr}` });
     }
     // Handles are case-insensitive; keep one canonical URL.
-    const lower = params.handle.toLowerCase();
-    if (lower !== params.handle) {
-      throw redirect({ to: '/@{$handle}', params: { handle: lower } });
+    const handle = bare.toLowerCase();
+    if (!isHandle(handle)) throw notFound();
+    if (handle !== params.handle) {
+      throw redirect({ href: `/${handle}${location.searchStr}` });
     }
   },
   // Starts the badge's reads while the page's code loads, so its short

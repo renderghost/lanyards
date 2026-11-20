@@ -1,7 +1,14 @@
 import type { Did } from '@atcute/lexicons';
 import { useLingui } from '@lingui/react/macro';
-import { useRouter } from '@tanstack/react-router';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useLocation, useRouter } from '@tanstack/react-router';
+import {
+  useEffect,
+  useEffectEvent,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { Button } from '@/components/Button/Button';
@@ -15,18 +22,14 @@ import { useProfile } from '@/lib/atproto/useProfile';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
 
-import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
 import { LanyardSurface } from '../../components/LanyardSurface/LanyardSurface';
 import { KEPT_LISTS, useCustomiserDraft } from '../../hooks/useCustomiserDraft';
 import { useMediaMove } from '../../hooks/useMediaMove';
 import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
-import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
-import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
 import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
 import { CustomiserSidebar } from '../CustomiserSidebar/CustomiserSidebar';
-import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
 import * as styles from './CustomisePage.styles';
 import type { CustomisePageProps } from './CustomisePage.types';
 
@@ -36,21 +39,30 @@ import type { CustomisePageProps } from './CustomisePage.types';
  * lanyard itself. Changes show at once and are one draft until Save, in
  * the route's own header (#118).
  */
-export function CustomisePage({ className }: CustomisePageProps) {
+export function CustomisePage({
+  pending = false,
+  className,
+}: CustomisePageProps) {
   const { t } = useLingui();
   const router = useRouter();
+  const path = useLocation({ select: (location) => location.pathname });
   const session = useSession();
   const signedOut = session.status === 'signedOut';
   useDocumentTitle(t`Your lanyard`);
 
+  // Signed out: sign in, then come back to this page. Once, from where
+  // they are: the page is still here while the sign-in page loads.
+  const signIn = useEffectEvent(() => {
+    router.history.replace(`/?returnTo=${encodeURIComponent(path)}`);
+  });
   useEffect(() => {
-    if (signedOut) router.history.replace(SIGN_IN_PATH);
-  }, [signedOut, router]);
+    if (signedOut) signIn();
+  }, [signedOut]);
 
-  if (session.status !== 'signedIn') {
+  if (pending || session.status !== 'signedIn') {
     return (
       <>
-        <AppHeader title={t`Your lanyard`} />
+        <AppHeader />
         <main className={styles.main}>
           <p role="status" className={styles.loading}>
             {t`Loading…`}
@@ -78,6 +90,7 @@ function Customiser({
   className?: string;
 }) {
   const { t } = useLingui();
+  const path = useLocation({ select: (location) => location.pathname });
   const headingId = useId();
   const draft = useCustomiserDraft(did);
   // For the monogram cover's preview.
@@ -86,7 +99,6 @@ function Customiser({
     profile.data?.displayName || profile.data?.handle || ''
   );
   const { settings, records } = draft;
-  const [viewAs, setViewAs] = useState<ViewAs>('edit');
   /** On phones, the style sheet opened from the bottom toolbar. */
   const [styleOpen, setStyleOpen] = useState(false);
   const styleButton = useRef<HTMLButtonElement>(null);
@@ -112,7 +124,6 @@ function Customiser({
   const recordsDisabled =
     !canKeep || !records.ready || draft.saving || move.moving;
   const { update } = settings;
-  const editing = viewAs === 'edit';
   useUnsavedChangesGuard(
     draft.dirty,
     t`You have unsaved changes. Leave without saving?`
@@ -121,31 +132,28 @@ function Customiser({
   return (
     <div className={styles.shell}>
       <AppHeader
-        title={t`Your lanyard`}
         actions={
           <CustomiserActions
-            viewAs={viewAs}
-            onViewAsChange={setViewAs}
             dirty={draft.dirty}
             changes={draft.changes}
             saving={draft.saving}
             onSave={() => void draft.save()}
             onReset={draft.discard}
+            onOpenStyle={() => setStyleOpen(true)}
+            styleButtonRef={styleButton}
           />
         }
       />
       <main className={styles.main}>
         <div className={cn(styles.workspace, className)}>
           <CustomiserSidebar>
-            {editing && (
-              <StyleSidebar
-                did={did}
-                initials={initials}
-                config={settings.config}
-                disabled={disabled}
-                onChange={update}
-              />
-            )}
+            <StyleSidebar
+              did={did}
+              initials={initials}
+              config={settings.config}
+              disabled={disabled}
+              onChange={update}
+            />
           </CustomiserSidebar>
           <LanyardSurface className={styles.canvas}>
             <div className={styles.intro}>
@@ -153,7 +161,7 @@ function Customiser({
                 {t`Customise your lanyard`}
               </h1>
               {(!canEdit || !canKeep || draft.permissionLost) && (
-                <PermissionNotice returnTo={CUSTOMISE_PATH} />
+                <PermissionNotice returnTo={path} />
               )}
               <p role="status" className={styles.moving}>
                 {move.moving ? t`Updating your podcasts and videos…` : ''}
@@ -175,35 +183,19 @@ function Customiser({
                   </Button>
                 </div>
               )}
-              {!editing && (
-                <p className={styles.publicNote}>
-                  {t`You’re seeing your lanyard as the public sees it.`}
-                </p>
-              )}
             </div>
             <section aria-label={t`Preview`} className={styles.frame}>
-              {editing ? (
-                <LanyardEditor
-                  did={did}
-                  config={settings.config}
-                  onChange={update}
-                  disabled={disabled}
-                  records={records}
-                  recordsDisabled={recordsDisabled}
-                />
-              ) : (
-                <LanyardPage did={did} preview="visitor" />
-              )}
+              <LanyardEditor
+                did={did}
+                config={settings.config}
+                onChange={update}
+                disabled={disabled}
+                records={records}
+                recordsDisabled={recordsDisabled}
+              />
             </section>
           </LanyardSurface>
         </div>
-        <CustomiserToolbar
-          onOpenStyle={() => setStyleOpen(true)}
-          styleButtonRef={styleButton}
-          onReset={draft.discard}
-          dirty={draft.dirty}
-          changes={draft.changes}
-        />
       </main>
       <StyleSheet
         open={styleOpen}

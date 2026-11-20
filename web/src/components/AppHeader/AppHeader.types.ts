@@ -1,9 +1,10 @@
 import type { ReactNode } from 'react';
 
 export type AppHeaderProps = {
-  /** Names the area the person is in, beside the logo (from `md` up). */
-  title?: string;
-  /** Replaces the header's own links, for a route with its own controls. */
+  /**
+   * A page's own controls, such as the customiser's Save and Reset: before
+   * Show QR and Account, and the only ones in the top bar on phones.
+   */
   actions?: ReactNode;
   /** Offer Sign in and Make your lanyard when signed out (#129). */
   signedOutActions?: boolean;

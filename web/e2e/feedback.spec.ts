@@ -132,7 +132,7 @@ test.describe('feedback (#134)', () => {
 
     // On phones, support is at the foot of the Style sheet.
     await page
-      .getByRole('toolbar', { name: 'Customiser' })
+      .getByRole('banner')
       .getByRole('button', { name: 'Style' })
       .click();
     const sheet = page.getByRole('dialog', { name: 'Style' });
@@ -162,7 +162,7 @@ test.describe('feedback (#134)', () => {
     await expect(form.getByRole('img', { name: 'Screenshot 1' })).toBeVisible();
     await form.getByLabel('Describe screenshot 1').fill('The QR sheet');
     await form.getByLabel('Include technical details').check();
-    await expect(form.locator('pre')).toContainText('Page: /lanyard');
+    await expect(form.locator('pre')).toContainText('Page: /alice.test/edit');
 
     // Nothing in the dialog spills sideways at 320 px.
     const overflow = await page.evaluate(
@@ -200,7 +200,7 @@ test.describe('feedback (#134)', () => {
     expect(post?.record.body).toContain(
       'On my phone the bottom of the code is hidden.'
     );
-    expect(post?.record.body).toContain('Page: /lanyard');
+    expect(post?.record.body).toContain('Page: /alice.test/edit');
   });
 
   test('captures the page without the dialog over it', async ({ page }) => {

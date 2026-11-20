@@ -25,9 +25,6 @@ export const heading =
 export const moving =
   'text-[15px] leading-[22px] text-ui-text-muted empty:sr-only';
 
-export const publicNote =
-  'rounded-sm border border-ui-border bg-ui-surface px-4 py-3 text-[13px] leading-[18px] text-ui-text-muted';
-
 export const frame = 'w-full max-w-[640px]';
 
 // While the session loads, before the lanyard's ground is drawn.

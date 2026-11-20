@@ -1,7 +1,10 @@
 // The brand's own page (#145), in the lanyard's palette pinned to brand
 // blue: the hanging badge edge to edge, then sections in billboard type,
 // then a billboard to close. Bold like the badge; quiet where it reads.
-export const page = 'flex flex-1 flex-col bg-background text-foreground';
+export const page =
+  'relative flex flex-1 flex-col bg-background text-foreground';
+
+export const main = 'flex flex-1 flex-col';
 
 export const body =
   'flex w-full flex-col items-center gap-20 px-4 pb-16 pt-14 md:gap-28 md:px-8 md:pt-20';

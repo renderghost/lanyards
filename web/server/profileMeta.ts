@@ -106,7 +106,7 @@ export async function fetchProfileMeta(
     title: `${person.displayName} (@${person.handle}) · Lanyards`,
     description:
       person.headline ?? `${person.displayName}'s conference lanyard`,
-    canonical: `${base}/@${person.handle}`,
+    canonical: `${base}/${person.handle}`,
     image: `${base}/og/p/${person.did}.png`,
     imageAlt: `${person.displayName}'s lanyard`,
     type: 'profile',

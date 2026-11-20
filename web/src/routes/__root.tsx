@@ -11,6 +11,7 @@ import {
 import type { RouterContext } from '@/app/routerContext';
 import { AppError } from '@/components/AppError/AppError';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
+import { MobileNav } from '@/components/MobileNav/MobileNav';
 import { NotFound } from '@/components/NotFound/NotFound';
 import { OfflineBanner } from '@/components/OfflineBanner/OfflineBanner';
 import { FeedbackProvider } from '@/features/feedback/components/FeedbackProvider/FeedbackProvider';
@@ -30,7 +31,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         // A malformed escape (a stray %) names nobody.
         throw notFound();
       }
-      throw redirect({ href: `/@${handle}${location.searchStr}` });
+      throw redirect({ href: `/${handle}${location.searchStr}` });
     }
   },
   component: RootLayout,
@@ -47,6 +48,10 @@ function RootLayout() {
     select: (matches) =>
       matches.some((match) => match.staticData.ownHeader === true),
   });
+  const fullScreen = useMatches({
+    select: (matches) =>
+      matches.some((match) => match.staticData.fullScreen === true),
+  });
   const signedOutActions = useMatches({
     select: (matches) =>
       matches.some((match) => match.staticData.signedOutActions === true),
@@ -55,7 +60,7 @@ function RootLayout() {
     // Feedback opens over any page that offers it (#134).
     <FeedbackProvider>
       <div className="flex min-h-dvh flex-col">
-        {ownHeader ? (
+        {ownHeader || fullScreen ? (
           <Outlet />
         ) : (
           <>
@@ -65,6 +70,8 @@ function RootLayout() {
             </main>
           </>
         )}
+        {/* On phones, signed in: the bottom bar (#150). */}
+        {!fullScreen && <MobileNav />}
         <OfflineBanner />
       </div>
     </FeedbackProvider>

@@ -28,7 +28,7 @@ const handler = (fetchImpl: typeof fetch = profileFetch) =>
 describe('meta handler', () => {
   it('serves the app with person-specific meta, cached for ten minutes', async () => {
     const response = await handler()(
-      new Request('https://next.lanyards.app/@alice.test?handle=alice.test')
+      new Request('https://next.lanyards.app/alice.test?handle=alice.test')
     );
     const html = await response.text();
     expect(response.status).toBe(200);
@@ -56,6 +56,16 @@ describe('meta handler', () => {
     );
   });
 
+  it('reads a bare handle from the path, the lanyard’s address (#150)', async () => {
+    const fetchImpl = vi.fn(profileFetch);
+    await handler(fetchImpl as unknown as typeof fetch)(
+      new Request('https://next.lanyards.app/alice.test')
+    );
+    expect(String(vi.mocked(fetchImpl).mock.calls[0]?.[0])).toContain(
+      'actor=alice.test'
+    );
+  });
+
   it('serves default meta, briefly cached, when the person is unknown', async () => {
     const missing = (async () =>
       Response.json(
@@ -63,7 +73,7 @@ describe('meta handler', () => {
         { status: 400 }
       )) as typeof fetch;
     const response = await handler(missing)(
-      new Request('https://next.lanyards.app/@nobody.test?handle=nobody.test')
+      new Request('https://next.lanyards.app/nobody.test?handle=nobody.test')
     );
     expect(response.status).toBe(200);
     expect(response.headers.get('cache-control')).toBe('public, s-maxage=60');

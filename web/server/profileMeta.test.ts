@@ -55,7 +55,7 @@ describe('fetchProfileMeta', () => {
     expect(meta).toEqual({
       title: 'Ada Example (@alice.test) · Lanyards',
       description: 'Research Engineer',
-      canonical: 'https://lanyards.app/@alice.test',
+      canonical: 'https://lanyards.app/alice.test',
       image: `https://lanyards.app/og/p/${DID}.png`,
       imageAlt: "Ada Example's lanyard",
       type: 'profile',
@@ -75,7 +75,7 @@ describe('fetchProfileMeta', () => {
 
   it('points the DID page at the handle URL', async () => {
     const meta = await fetchProfileMeta({ did: DID }, BASE, stubFetch({}));
-    expect(meta?.canonical).toBe('https://lanyards.app/@alice.test');
+    expect(meta?.canonical).toBe('https://lanyards.app/alice.test');
   });
 
   it('gives nothing away for someone who opted out of logged-out viewing', async () => {

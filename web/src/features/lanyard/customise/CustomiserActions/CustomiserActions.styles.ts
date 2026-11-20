@@ -6,7 +6,7 @@ export const status =
 
 export const dot = 'size-2 shrink-0 rounded-full bg-ui-warning';
 
-// On phones, Reset moves to the bottom toolbar.
-export const reset = 'hidden md:inline-flex';
+// Phones only: from md up, style is the pinned sidebar.
+export const style = 'md:hidden';
 
-export const account = 'hidden items-center gap-1 md:flex';
+export const icon = 'size-4 shrink-0';

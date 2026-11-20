@@ -124,8 +124,8 @@ describe('HeroActions when signed in', () => {
     const { container } = actions('/@alice.test', true);
     expect(
       await screen.findByRole('link', { name: 'Edit lanyard' })
-    ).toHaveAttribute('href', '/lanyard');
-    expect(screen.getByRole('button', { name: 'Show QR' })).toBeInTheDocument();
+    ).toHaveAttribute('href', '/alice.test/edit');
+    expect(screen.getByRole('link', { name: 'Show QR' })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Follow' })
     ).not.toBeInTheDocument();

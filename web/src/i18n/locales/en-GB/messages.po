@@ -79,6 +79,11 @@ msgstr "Academic researchers"
 msgid "Accent colour"
 msgstr "Accent colour"
 
+#: src/components/AccountLink/AccountLink.tsx:29
+#: src/components/MobileNav/MobileNav.tsx:84
+msgid "Account"
+msgstr "Account"
+
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:33
 msgid "Account unavailable"
 msgstr "Account unavailable"
@@ -112,7 +117,7 @@ msgstr "Add your ORCID iD on Sifa to show verified publications."
 msgid "Affiliations, qualifications, and skills presented with proper academic aesthetic."
 msgstr "Affiliations, qualifications, and skills presented with proper academic aesthetic."
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:49
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:39
 msgid "All changes saved"
 msgstr "All changes saved"
 
@@ -190,7 +195,7 @@ msgstr "Bluesky isn't answering right now. Check your connection and try again."
 msgid "Board positions"
 msgstr "Board positions"
 
-#: src/features/home/components/HomePage/HomePage.tsx:98
+#: src/features/home/components/HomePage/HomePage.tsx:105
 msgid "Built for researchers"
 msgstr "Built for researchers"
 
@@ -202,7 +207,7 @@ msgstr "Built on"
 msgid "Built on AT Protocol—transparent, inspectable, and aligned with academic values of openness and reusability."
 msgstr "Built on AT Protocol—transparent, inspectable, and aligned with academic values of openness and reusability."
 
-#: src/features/home/components/HomePage/HomePage.tsx:137
+#: src/features/home/components/HomePage/HomePage.tsx:144
 msgid "Built on the AT Protocol"
 msgstr "Built on the AT Protocol"
 
@@ -218,7 +223,7 @@ msgstr "Capture this screen"
 msgid "Career continuity"
 msgstr "Career continuity"
 
-#: src/features/home/components/HomePage/HomePage.tsx:66
+#: src/features/home/components/HomePage/HomePage.tsx:73
 msgid "Career progression demands comprehensive online presence, but maintaining it is administratively overwhelming."
 msgstr "Career progression demands comprehensive online presence, but maintaining it is administratively overwhelming."
 
@@ -297,7 +302,7 @@ msgstr "Connect ORCID, and your publications appear automatically."
 msgid "Constant maintenance"
 msgstr "Constant maintenance"
 
-#: src/features/home/components/HomePage/HomePage.tsx:158
+#: src/features/home/components/HomePage/HomePage.tsx:165
 msgid "Contact"
 msgstr "Contact"
 
@@ -348,10 +353,6 @@ msgstr "Couldn't load your lanyard settings"
 msgid "Couldn't open feedback. Please try again."
 msgstr "Couldn't open feedback. Please try again."
 
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:41
-msgid "Couldn't open your QR code. Please try again."
-msgstr "Couldn't open your QR code. Please try again."
-
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:76
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
@@ -364,7 +365,7 @@ msgstr "Couldn't send your feedback. Please try again."
 msgid "Couldn't show this block"
 msgstr "Couldn't show this block"
 
-#: src/components/AppHeader/AppHeader.tsx:40
+#: src/features/auth/useMakeLanyard.ts:16
 msgid "Couldn't start account creation. Please try again."
 msgstr "Couldn't start account creation. Please try again."
 
@@ -391,17 +392,18 @@ msgstr "Cover"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/home/components/HomePage/HomePage.tsx:122
+#: src/features/home/components/HomePage/HomePage.tsx:129
 msgid "Create your lanyard"
 msgstr "Create your lanyard"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:153
+#: src/components/AppHeader/AppHeader.tsx:75
+#: src/components/MobileNav/MobileNav.tsx:42
+msgid "Customise"
+msgstr "Customise"
+
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:161
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
-
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:44
-msgid "Customiser"
-msgstr "Customiser"
 
 #: src/features/home/components/HomePage/HomePage.constants.ts:103
 msgid "Decentralised, open, yours—no platform lock-in or data silos."
@@ -424,23 +426,18 @@ msgstr "Description"
 msgid "Details"
 msgstr "Details"
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:27
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:27
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:26
 msgid "Discard your unsaved changes?"
 msgstr "Discard your unsaved changes?"
 
 #: src/features/feedback/components/SupportLinks/SupportLinks.tsx:54
-#: src/features/home/components/HomePage/HomePage.tsx:144
+#: src/features/home/components/HomePage/HomePage.tsx:151
 msgid "Documentation"
 msgstr "Documentation"
 
 #: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:7
 msgid "Dots"
 msgstr "Dots"
-
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:36
-msgid "Edit"
-msgstr "Edit"
 
 #: src/features/lanyard/customise/MediaEditor/MediaEditor.tsx:99
 msgid "Edit {editingTitle}"
@@ -454,7 +451,7 @@ msgstr "Edit {title}"
 msgid "Edit in Bluesky"
 msgstr "Edit in Bluesky"
 
-#: src/features/lanyard/components/HeroActions/HeroActions.tsx:33
+#: src/features/lanyard/components/HeroActions/HeroActions.tsx:38
 msgid "Edit lanyard"
 msgstr "Edit lanyard"
 
@@ -511,8 +508,8 @@ msgstr "Follow"
 msgid "Follow @{BLUESKY_HANDLE} on Bluesky"
 msgstr "Follow @{BLUESKY_HANDLE} on Bluesky"
 
-#: src/features/home/components/HomePage/HomePage.tsx:129
-#: src/features/lanyard/components/HeroActions/HeroActions.tsx:55
+#: src/features/home/components/HomePage/HomePage.tsx:136
+#: src/features/lanyard/components/HeroActions/HeroActions.tsx:60
 msgid "Follow on Bluesky"
 msgstr "Follow on Bluesky"
 
@@ -560,11 +557,11 @@ msgstr "For example alice.bsky.social"
 msgid "Full-time roles"
 msgstr "Full-time roles"
 
-#: src/features/home/components/HomePage/HomePage.tsx:47
+#: src/features/home/components/HomePage/HomePage.tsx:53
 msgid "Get started"
 msgstr "Get started"
 
-#: src/features/home/components/HomePage/HomePage.tsx:151
+#: src/features/home/components/HomePage/HomePage.tsx:158
 msgid "GitHub"
 msgstr "GitHub"
 
@@ -622,7 +619,7 @@ msgstr "Interview"
 msgid "Items to show for {name}"
 msgstr "Items to show for {name}"
 
-#: src/features/home/components/HomePage/HomePage.tsx:118
+#: src/features/home/components/HomePage/HomePage.tsx:125
 msgid "Join researchers building their professional identity on open infrastructure."
 msgstr "Join researchers building their professional identity on open infrastructure."
 
@@ -686,11 +683,11 @@ msgstr "Lanyards needs your permission"
 msgid "Lanyards needs your permission to post feedback"
 msgstr "Lanyards needs your permission to post feedback"
 
-#: src/features/home/components/HomePage/HomePage.tsx:79
+#: src/features/home/components/HomePage/HomePage.tsx:86
 msgid "Lanyards pulls together your complete scholarly presence with zero maintenance overhead."
 msgstr "Lanyards pulls together your complete scholarly presence with zero maintenance overhead."
 
-#: src/features/home/components/HomePage/HomePage.tsx:56
+#: src/features/home/components/HomePage/HomePage.tsx:63
 msgid "Learn more"
 msgstr "Learn more"
 
@@ -726,7 +723,8 @@ msgstr "Loading your profile…"
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:45
 #: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:246
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:56
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:68
+#: src/features/qr/components/SharePage/SharePage.tsx:41
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -738,7 +736,8 @@ msgstr "Location"
 msgid "Location and languages"
 msgstr "Location and languages"
 
-#: src/components/AppHeader/AppHeader.tsx:72
+#: src/components/AppHeader/AppHeader.tsx:54
+#: src/features/home/components/HomeHeader/HomeHeader.tsx:54
 msgid "Make your lanyard"
 msgstr "Make your lanyard"
 
@@ -769,10 +768,6 @@ msgstr "Move {name} down"
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:70
 msgid "Move {name} up"
 msgstr "Move {name} up"
-
-#: src/components/AppHeader/AppHeader.tsx:49
-msgid "My lanyard"
-msgstr "My lanyard"
 
 #: src/features/home/components/HomePage/HomePage.constants.ts:114
 msgid "New connections see the full scope of your work immediately—from formal publications to informal contributions that drive real connections."
@@ -805,7 +800,7 @@ msgstr "Nothing to show yet"
 msgid "Now"
 msgstr "Now"
 
-#: src/features/home/components/HomePage/HomePage.tsx:78
+#: src/features/home/components/HomePage/HomePage.tsx:85
 msgid "One link, everything visible"
 msgstr "One link, everything visible"
 
@@ -900,7 +895,7 @@ msgstr "Podcasts and videos"
 msgid "Post on Bluesky, {date}"
 msgstr "Post on Bluesky, {date}"
 
-#: src/features/home/components/HomePage/HomePage.tsx:99
+#: src/features/home/components/HomePage/HomePage.tsx:106
 msgid "Powerful tools designed for academic needs, not corporate networking."
 msgstr "Powerful tools designed for academic needs, not corporate networking."
 
@@ -908,21 +903,13 @@ msgstr "Powerful tools designed for academic needs, not corporate networking."
 msgid "Preparing screenshot…"
 msgstr "Preparing screenshot…"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:184
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:187
 msgid "Preview"
 msgstr "Preview"
-
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:32
-msgid "Preview mode"
-msgstr "Preview mode"
 
 #: src/features/home/components/HomePage/HomePage.constants.ts:66
 msgid "Professional identity"
 msgstr "Professional identity"
-
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:37
-msgid "Public"
-msgstr "Public"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:30
 msgid "Publications"
@@ -940,7 +927,7 @@ msgstr "Put your work in the order you want, and hide what’s not relevant."
 msgid "QR code for {value}"
 msgstr "QR code for {value}"
 
-#: src/features/home/components/HomePage/HomePage.tsx:115
+#: src/features/home/components/HomePage/HomePage.tsx:122
 msgid "Ready to simplify your research presence?"
 msgstr "Ready to simplify your research presence?"
 
@@ -973,12 +960,11 @@ msgstr "Research outputs"
 msgid "Researcher profiles on the AT Protocol"
 msgstr "Researcher profiles on the AT Protocol"
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:65
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:71
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:64
 msgid "Reset"
 msgstr "Reset"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:174
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:182
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
@@ -999,7 +985,7 @@ msgstr "Roles"
 msgid "Sample lanyard"
 msgstr "Sample lanyard"
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:75
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:74
 msgid "Save"
 msgstr "Save"
 
@@ -1007,7 +993,7 @@ msgstr "Save"
 msgid "Save or reset your lanyard changes first: giving permission leaves this page."
 msgstr "Save or reset your lanyard changes first: giving permission leaves this page."
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:42
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:32
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -1072,7 +1058,8 @@ msgstr "Show lanyard"
 msgid "Show location"
 msgstr "Show location"
 
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:54
+#: src/components/MobileNav/MobileNav.tsx:71
+#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:26
 msgid "Show QR"
 msgstr "Show QR"
 
@@ -1084,17 +1071,17 @@ msgstr "Show what you’re open to"
 msgid "Sifa"
 msgstr "Sifa"
 
-#: src/components/AppHeader/AppHeader.tsx:64
-#: src/components/AppHeader/AppHeader.tsx:68
+#: src/components/AppHeader/AppHeader.tsx:47
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:22
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:26
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
+#: src/features/home/components/HomeHeader/HomeHeader.tsx:46
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:98
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/home/components/HomePage/HomePage.tsx:47
+#: src/features/home/components/HomePage/HomePage.tsx:52
 msgid "Sign in or sign up"
 msgstr "Sign in or sign up"
 
@@ -1180,7 +1167,7 @@ msgstr "Status"
 msgid "Stripes"
 msgstr "Stripes"
 
-#: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:57
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:50
 #: src/features/lanyard/customise/StyleSheet/StyleSheet.tsx:25
 #: src/features/lanyard/customise/StyleSidebar/StyleSidebar.tsx:15
 msgid "Style"
@@ -1206,15 +1193,15 @@ msgstr "Thank you"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/home/components/HomeBadge/HomeBadge.tsx:35
+#: src/features/home/components/HomeBadge/HomeBadge.tsx:41
 msgid "The curated link for academic researchers that collects your complete scholarly presence—publications, talks, affiliations, and social profiles."
 msgstr "The curated link for academic researchers that collects your complete scholarly presence—publications, talks, affiliations, and social profiles."
 
-#: src/features/home/components/HomePage/HomePage.tsx:64
+#: src/features/home/components/HomePage/HomePage.tsx:71
 msgid "The problem"
 msgstr "The problem"
 
-#: src/features/home/components/HomePage/HomePage.tsx:65
+#: src/features/home/components/HomePage/HomePage.tsx:72
 msgid "The visibility paradox"
 msgstr "The visibility paradox"
 
@@ -1222,7 +1209,7 @@ msgstr "The visibility paradox"
 msgid "There’s no single place that represents your complete, current scholarly identity when opportunities arise."
 msgstr "There’s no single place that represents your complete, current scholarly identity when opportunities arise."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:167
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:175
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -1288,7 +1275,7 @@ msgstr "Type of media"
 msgid "Unfollowed @{handle}"
 msgstr "Unfollowed @{handle}"
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:46
+#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:36
 msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
@@ -1308,7 +1295,7 @@ msgstr "Update"
 msgid "Update once, share everywhere. No more Sunday afternoons updating ten different websites or managing multiple link collections."
 msgstr "Update once, share everywhere. No more Sunday afternoons updating ten different websites or managing multiple link collections."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:159
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:167
 msgid "Updating your podcasts and videos…"
 msgstr "Updating your podcasts and videos…"
 
@@ -1332,9 +1319,12 @@ msgstr "Verify your ORCID iD"
 msgid "Video"
 msgstr "Video"
 
-#: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:37
-msgid "View as public"
-msgstr "View as public"
+#: src/components/AppHeader/AppHeader.tsx:85
+#: src/components/AppHeader/AppHeader.tsx:95
+#: src/components/MobileNav/MobileNav.tsx:52
+#: src/components/MobileNav/MobileNav.tsx:62
+msgid "View"
+msgstr "View"
 
 #: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:229
 msgid "View it on UserInput"
@@ -1376,7 +1366,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:164
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:172
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
@@ -1384,7 +1374,7 @@ msgstr "We couldn't read your lanyard settings"
 msgid "Web address"
 msgstr "Web address"
 
-#: src/features/home/components/HomeBadge/HomeBadge.tsx:32
+#: src/features/home/components/HomeBadge/HomeBadge.tsx:38
 msgid "Welcome to Lanyards"
 msgstr "Welcome to Lanyards"
 
@@ -1397,7 +1387,7 @@ msgstr "What happened, and what did you expect? Steps to repeat it help."
 msgid "What is this about?"
 msgstr "What is this about?"
 
-#: src/features/home/components/HomePage/HomePage.tsx:77
+#: src/features/home/components/HomePage/HomePage.tsx:84
 msgid "What you get"
 msgstr "What you get"
 
@@ -1405,7 +1395,7 @@ msgstr "What you get"
 msgid "What you share"
 msgstr "What you share"
 
-#: src/features/home/components/HomePage/HomePage.tsx:97
+#: src/features/home/components/HomePage/HomePage.tsx:104
 msgid "Why Lanyards"
 msgstr "Why Lanyards"
 
@@ -1421,7 +1411,7 @@ msgstr "You can hide up to 500 items. Show some again first."
 msgid "You follow each other"
 msgstr "You follow each other"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:118
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:129
 msgid "You have unsaved changes. Leave without saving?"
 msgstr "You have unsaved changes. Leave without saving?"
 
@@ -1433,15 +1423,12 @@ msgstr "You're offline. Connect to sign in."
 msgid "You're offline. Some things won't work until you reconnect."
 msgstr "You're offline. Some things won't work until you reconnect."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:180
-msgid "You’re seeing your lanyard as the public sees it."
-msgstr "You’re seeing your lanyard as the public sees it."
-
 #: src/features/auth/session/SessionProvider.tsx:36
 msgid "You've been signed out. Please sign in again."
 msgstr "You've been signed out. Please sign in again."
 
 #: src/components/AccountLink/AccountLink.tsx:21
+#: src/components/MobileNav/MobileNav.tsx:75
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:19
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:35
 msgid "Your account"
@@ -1467,14 +1454,13 @@ msgstr "Your feedback is posted from your own account to our board on UserInput.
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:44
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:124
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:51
 #: src/features/qr/components/QrSheet/QrSheet.tsx:41
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:47
+#: src/components/AppHeader/AppHeader.tsx:67
+#: src/components/MobileNav/MobileNav.tsx:30
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 

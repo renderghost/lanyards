@@ -12,9 +12,16 @@
       "includeFiles": "node_modules/{@resvg/resvg-wasm/index_bg.wasm,@fontsource/rethink-sans/files/rethink-sans-latin-{400,700}-normal.woff2}"
     }
   },
-  "rewrites": [
+  "redirects": [
     {
       "source": "/@:handle",
+      "destination": "/:handle",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/:handle([^/]+\\.[^/]+)",
       "destination": "/api/meta?handle=:handle"
     },
     {

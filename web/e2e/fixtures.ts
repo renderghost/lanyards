@@ -3,7 +3,7 @@ import { test as base, expect } from '@playwright/test';
 export const HEADING = 'Welcome to Lanyards';
 
 /** The homepage's live sample lanyard (#145), framed at `md` and up. */
-export const SAMPLE_PATH = '/@renderg.host';
+export const SAMPLE_PATH = '/renderg.host';
 
 const APP_ORIGIN = 'http://127.0.0.1:4173';
 

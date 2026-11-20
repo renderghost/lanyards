@@ -13,7 +13,7 @@ const badge = (page: import('@playwright/test').Page) =>
 test.describe('public lanyard, signed out', () => {
   test('shows the badge, links and Bluesky follow link', async ({ page }) => {
     await mockPerson(page);
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(badge(page)).toBeVisible();
     const links = page.getByRole('region', { name: 'Links' });
     await expect(
@@ -41,7 +41,7 @@ test.describe('public lanyard, signed out', () => {
           },
         });
         await page.emulateMedia({ colorScheme });
-        await page.goto('/@alice.test');
+        await page.goto('/alice.test');
         await expect(page.getByRole('region', { name: 'Talks' })).toBeVisible();
         await expect(
           page.getByRole('region', { name: 'Open to' })
@@ -57,7 +57,7 @@ test.describe('public lanyard, signed out', () => {
   }) => {
     await mockPerson(page);
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(badge(page)).toBeVisible();
     const width = await page.evaluate(
       () => document.documentElement.scrollWidth
@@ -83,7 +83,7 @@ test.describe('public lanyard, signed out', () => {
       },
     });
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(page.getByRole('region', { name: 'Skills' })).toBeVisible();
     await expect(page.getByText(unbroken)).toBeVisible();
     const width = await page.evaluate(
@@ -98,7 +98,7 @@ test.describe('public lanyard, signed out', () => {
     const longName = `Ada${'x'.repeat(57)}`;
     await mockPerson(page, { sifa: { displayName: longName } });
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(
       page.getByRole('heading', { level: 1, name: `Dr ${longName}` })
     ).toBeVisible();
@@ -122,7 +122,7 @@ test.describe('public lanyard, signed out', () => {
       }) => {
         await mockPerson(page, { config: { accent } });
         await page.emulateMedia({ colorScheme });
-        await page.goto('/@alice.test');
+        await page.goto('/alice.test');
         await expect(badge(page)).toBeVisible();
         await expect(page.locator('dl', { hasText: 'Now' })).toBeVisible();
         const result = await new AxeBuilder({ page })
@@ -138,7 +138,7 @@ test.describe('public lanyard, signed out', () => {
     page,
   }) => {
     await mockPerson(page);
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     const roles = page.getByRole('region', { name: 'Roles' });
     const rows = roles.getByRole('listitem');
     await expect(rows).toHaveCount(3);
@@ -168,7 +168,7 @@ test.describe('public lanyard, signed out', () => {
       },
     });
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     const roles = page.getByRole('region', { name: 'Roles' });
     const title = roles.getByText('Senior Research Software Engineer');
     await expect(title).toBeVisible();
@@ -186,7 +186,7 @@ test.describe('public lanyard, signed out', () => {
         hidden: [`at://${ADA.did}/id.sifa.profile.position/3mpos2`],
       },
     });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     const roles = page.getByRole('region', { name: 'Roles' });
     await expect(roles.getByRole('listitem')).toHaveCount(2);
     await expect(roles).not.toContainText('Visiting Fellow');
@@ -196,10 +196,19 @@ test.describe('public lanyard, signed out', () => {
     await expect(page.getByRole('link', { name: /more role/ })).toHaveCount(0);
   });
 
+  test('sends the beta’s /@handle links to /handle (#150)', async ({
+    page,
+  }) => {
+    await mockPerson(page);
+    await page.goto('/@alice.test');
+    await expect(page).toHaveURL('/alice.test');
+    await expect(badge(page)).toBeVisible();
+  });
+
   test('redirects an encoded @ to the canonical URL', async ({ page }) => {
     await mockPerson(page);
     await page.goto('/%40alice.test');
-    await expect(page).toHaveURL('/@alice.test');
+    await expect(page).toHaveURL('/alice.test');
     await expect(badge(page)).toBeVisible();
   });
 
@@ -209,7 +218,7 @@ test.describe('public lanyard, signed out', () => {
       'https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead**',
       (route) => route.fulfill({ json: { actors: [] } })
     );
-    await page.goto('/@nobody.test');
+    await page.goto('/nobody.test');
     await expect(
       page.getByRole('heading', { name: "We couldn't find @nobody.test" })
     ).toBeVisible();
@@ -220,7 +229,7 @@ test.describe('public lanyard, signed out', () => {
 
   test('respects an opt-out from logged-out viewing', async ({ page }) => {
     await mockPerson(page, { labels: ['!no-unauthenticated'] });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(
       page.getByText(
         'This person has chosen to show their lanyard only to people who are signed in.'
@@ -233,7 +242,7 @@ test.describe('public lanyard, signed out', () => {
     page,
   }) => {
     await mockPerson(page, { sifaDown: true });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     // The title comes from Sifa: without it, the name stands alone.
     await expect(
       page.getByRole('heading', { level: 1, name: 'Ada Example' })
@@ -286,7 +295,7 @@ test.describe('public lanyard, signed in', () => {
     });
     await signIn(page, { did: BEA.did, scope: GRANULAR });
     await page.setViewportSize({ width: 320, height: 640 });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(
       page.getByRole('list', { name: 'What you share' })
     ).toContainText(unbroken);
@@ -302,7 +311,7 @@ test.describe('public lanyard, signed in', () => {
     await mockPerson(page);
     const writes = await mockViewer(page);
     await signIn(page, { did: BEA.did, scope: 'atproto' });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await page.getByRole('button', { name: 'Follow' }).click();
     await expect(
       page.getByRole('heading', { name: 'Lanyards needs your permission' })
@@ -345,7 +354,7 @@ test.describe('pills at 320 px', () => {
         ],
       },
     });
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(page.getByRole('region', { name: 'Skills' })).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth)
@@ -358,7 +367,7 @@ test.describe('cards', () => {
     page,
   }) => {
     await mockPerson(page);
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     const talks = page.getByRole('region', { name: 'Talks' });
     await expect(talks).toBeVisible();
     // Every card holds at most one link.
@@ -388,7 +397,7 @@ test.describe('cards', () => {
     page,
   }) => {
     await mockPerson(page);
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     const talks = page.getByRole('region', { name: 'Talks' });
     const card = talks.locator('[data-card]:has(a)').first();
     await expect(card).toBeVisible();

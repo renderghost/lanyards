@@ -5,6 +5,7 @@ import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { useSession } from '@/features/auth/session/useSession';
 import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
 import { profileId } from '@/lib/atproto/profileId';
+import { ownPaths } from '@/lib/person/ownPaths';
 import { cn } from '@/lib/utils';
 
 import { FollowButton } from '../FollowButton/FollowButton';
@@ -29,7 +30,11 @@ export function HeroActions({
   if (mode === 'owner') {
     return (
       <div className={cn(styles.actions, className)}>
-        <Link to="/lanyard" className={styles.primary}>
+        <Link
+          to="/$handle/edit"
+          params={{ handle: ownPaths(did, handle).id }}
+          className={styles.primary}
+        >
           {t`Edit lanyard`}
         </Link>
         <ShowQrButton tone="badge" />

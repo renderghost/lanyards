@@ -10,9 +10,10 @@ export const hang = 'flex w-full max-w-[58rem] flex-col items-center';
 
 export const straps = 'h-28 w-[11.75rem] md:h-40 md:w-[16.75rem]';
 
-// Tilted on its clip from md up, after one swing as it arrives.
+// Tilted on its clip from md up, after one swing as it arrives. A mouse
+// sways it on the same clip (#151), with a transform added to the tilt.
 export const badge =
-  '@container flex w-full flex-col overflow-hidden rounded-sm bg-accent text-on-accent shadow-[0_2px_4px_rgb(6_1_30/0.2),0_12px_24px_rgb(6_1_30/0.2),0_32px_64px_rgb(6_1_30/0.3)] md:origin-top md:-rotate-[1.5deg] md:motion-safe:animate-swing';
+  '@container flex w-full origin-top flex-col overflow-hidden rounded-sm bg-accent text-on-accent shadow-[0_2px_4px_rgb(6_1_30/0.2),0_12px_24px_rgb(6_1_30/0.2),0_32px_64px_rgb(6_1_30/0.3)] md:-rotate-[1.5deg] md:motion-safe:animate-swing';
 
 export const cover = 'relative h-30 @min-[40rem]:h-52';
 

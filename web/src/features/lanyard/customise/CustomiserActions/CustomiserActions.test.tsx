@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
@@ -16,13 +17,12 @@ vi.mock('@/lib/atproto/useProfile', () => ({ useProfile: vi.fn() }));
 
 function renderActions(props: Partial<CustomiserActionsProps> = {}) {
   const handlers = {
-    onViewAsChange: vi.fn(),
     onSave: vi.fn(),
     onReset: vi.fn(),
+    onOpenStyle: vi.fn(),
   };
   const view = renderInRouter(
     <CustomiserActions
-      viewAs="edit"
       dirty={false}
       changes={0}
       saving={false}
@@ -50,15 +50,20 @@ afterEach(() => {
 });
 
 describe('CustomiserActions', () => {
-  it('toggles between editing and the public view', async () => {
-    const { onViewAsChange } = renderActions();
-    expect(
-      await screen.findByRole('group', { name: 'Preview mode' })
-    ).toBeInTheDocument();
-    expect(button('Edit')).toHaveAttribute('aria-pressed', 'true');
-    expect(button('View as public')).toHaveAttribute('aria-pressed', 'false');
-    await userEvent.click(button('View as public'));
-    expect(onViewAsChange).toHaveBeenCalledWith('public');
+  // View is its own page now, in the header (#150).
+  it('has no Edit / View as public toggle', async () => {
+    renderActions();
+    await screen.findByRole('button', { name: 'Save' });
+    expect(screen.queryByRole('group', { name: 'Preview mode' })).toBeNull();
+  });
+
+  it('opens the style sheet from Style, on phones (#150)', async () => {
+    const styleButtonRef = createRef<HTMLButtonElement>();
+    const { onOpenStyle } = renderActions({ styleButtonRef });
+    const style = await screen.findByRole('button', { name: 'Style' });
+    expect(styleButtonRef.current).toBe(style);
+    await userEvent.click(style);
+    expect(onOpenStyle).toHaveBeenCalledOnce();
   });
 
   it('says when everything is saved, with nothing to save or reset', async () => {
@@ -113,17 +118,17 @@ describe('CustomiserActions', () => {
     expect(onReset).toHaveBeenCalledOnce();
   });
 
-  it('keeps Show QR and the account link', async () => {
+  // The header adds Show QR and Account after these (#150).
+  it('leaves Show QR and Account to the header', async () => {
     renderActions();
-    expect(
-      await screen.findByRole('link', { name: 'Your account' })
-    ).toHaveAttribute('href', '/settings');
-    expect(button('Show QR')).toBeInTheDocument();
+    await screen.findByRole('button', { name: 'Save' });
+    expect(screen.queryByRole('link', { name: 'Show QR' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Your account' })).toBeNull();
   });
 
   it('has no axe violations', async () => {
     const { container } = renderActions({ dirty: true, changes: 1 });
-    await screen.findByRole('link', { name: 'Your account' });
+    await screen.findByRole('button', { name: 'Save' });
     await expectNoAxeViolations(container);
   });
 });

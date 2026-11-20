@@ -13,7 +13,7 @@ function readIndex(): Promise<string> {
   return index;
 }
 
-/** /@:handle and /d/:did, with person-specific link-preview meta. */
+/** /:handle and /d/:did, with person-specific link-preview meta. */
 export const GET = createMetaHandler({
   readIndex,
   baseUrl: process.env.PUBLIC_BASE_URL,

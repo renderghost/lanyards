@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -37,11 +37,21 @@ describe('AppHeader', () => {
       screen.queryByRole('link', { name: 'My lanyard' })
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Show QR' })
+      screen.queryByRole('link', { name: 'Show QR' })
     ).not.toBeInTheDocument();
   });
 
-  it('links to the account when signed in', async () => {
+  /** The banner's links and buttons, by name, in order. */
+  const controls = (banner: HTMLElement) =>
+    [...banner.querySelectorAll<HTMLElement>('a[href], button')].map(
+      (control) =>
+        control.getAttribute('aria-label') ??
+        // The logo link is named by the logo inside it.
+        control.querySelector('img')?.getAttribute('alt') ??
+        control.textContent
+    );
+
+  it('gives signed-in people Customise and View, then Show QR and Account (#150)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedIn',
       session: { did: ALICE.did } as never,
@@ -49,18 +59,36 @@ describe('AppHeader', () => {
       refresh: vi.fn(),
     });
     vi.mocked(useProfile).mockReturnValue({ data: ALICE } as never);
-    renderInRouter(<AppHeader />);
+    renderInRouter(<AppHeader />, `/${ALICE.handle}`);
+    const banner = await screen.findByRole('banner');
+    const nav = within(banner).getByRole('navigation', {
+      name: 'Your Lanyards',
+    });
     expect(
-      await screen.findByRole('link', { name: 'Your account' })
+      within(nav).getByRole('link', { name: 'Customise' })
+    ).toHaveAttribute('href', `/${ALICE.handle}/edit`);
+    const view = within(nav).getByRole('link', { name: 'View' });
+    expect(view).toHaveAttribute('href', `/${ALICE.handle}`);
+    expect(view).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(nav).getByRole('link', { name: 'Customise' })
+    ).not.toHaveAttribute('aria-current');
+    expect(
+      within(banner).getByRole('link', { name: 'Show QR' })
+    ).toHaveAttribute('href', `/${ALICE.handle}/share`);
+    expect(
+      within(banner).getByRole('link', { name: 'Your account' })
     ).toHaveAttribute('href', '/settings');
-    expect(screen.getByRole('link', { name: 'My lanyard' })).toHaveAttribute(
-      'href',
-      '/lanyard'
-    );
-    expect(screen.getByRole('button', { name: 'Show QR' })).toBeInTheDocument();
+    expect(controls(banner)).toEqual([
+      'Lanyards',
+      'Customise',
+      'View',
+      'Show QR',
+      'Your account',
+    ]);
   });
 
-  it('renders a title and actions when given, in place of its own links', async () => {
+  it('puts a page’s own actions before Show QR and Account (#150)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedIn',
       session: { did: ALICE.did } as never,
@@ -69,17 +97,25 @@ describe('AppHeader', () => {
     });
     vi.mocked(useProfile).mockReturnValue({ data: ALICE } as never);
     renderInRouter(
-      <AppHeader
-        title="Your lanyard"
-        actions={<button type="button">Save</button>}
-      />
+      <AppHeader actions={<button type="button">Save</button>} />,
+      `/${ALICE.handle}/edit`
     );
-    const header = await screen.findByRole('banner');
-    expect(header).toHaveTextContent('Your lanyard');
-    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    const banner = await screen.findByRole('banner');
+    expect(controls(banner)).toEqual([
+      'Lanyards',
+      'Customise',
+      'View',
+      'Save',
+      'Show QR',
+      'Your account',
+    ]);
     expect(
-      screen.queryByRole('link', { name: 'My lanyard' })
-    ).not.toBeInTheDocument();
+      within(banner).getByRole('link', { name: 'Customise' })
+    ).toHaveAttribute('aria-current', 'page');
+    // View is /<handle>, a prefix of /<handle>/edit: not current here.
+    expect(
+      within(banner).getByRole('link', { name: 'View' })
+    ).not.toHaveAttribute('aria-current');
   });
 
   it('clears the top safe area in the installed app', async () => {
@@ -129,28 +165,6 @@ describe('AppHeader', () => {
     );
     expect(startSignUp).toHaveBeenCalledWith('/@alice.test');
     await expectNoAxeViolations(container);
-  });
-
-  it('on the homepage, takes Sign in to the form on the page (#148)', async () => {
-    vi.mocked(useSession).mockReturnValue({
-      status: 'signedOut',
-      signOut: vi.fn(),
-      refresh: vi.fn(),
-    });
-    vi.mocked(useProfile).mockReturnValue({ data: undefined } as never);
-    const { router } = renderInRouter(
-      <>
-        <AppHeader signedOutActions />
-        <input id="sign-in-handle" aria-label="Your handle" />
-      </>,
-      '/'
-    );
-    const signIn = await screen.findByRole('link', { name: 'Sign in' });
-    // Without JavaScript, still a link to the form.
-    expect(signIn).toHaveAttribute('href', '/#sign-in-handle');
-    await userEvent.click(signIn);
-    expect(screen.getByRole('textbox', { name: 'Your handle' })).toHaveFocus();
-    expect(router.state.location.href).toBe('/');
   });
 
   it('offers neither elsewhere, nor to someone signed in', async () => {
