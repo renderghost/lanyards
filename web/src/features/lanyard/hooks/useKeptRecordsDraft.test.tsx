@@ -38,7 +38,8 @@ vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
 
 const NOW = '2026-11-19T12:00:00.000Z';
 const OLD = '2026-01-01T09:00:00.000Z';
-const AUDIO = `at://${ADA.did}/app.lanyards.link.media.audio/3maud1`;
+const AUDIO = `at://${ADA.did}/app.lanyards.media.item/3maud1`;
+const LEGACY = `at://${ADA.did}/app.lanyards.link.media.audio/3mleg1`;
 /** A record key made from the time: 13 base32-sortable characters. */
 const TID = /^[2-7a-z]{13}$/;
 const STORED: LanyardRecords = {
@@ -51,6 +52,15 @@ const STORED: LanyardRecords = {
       title: 'Episode one',
     },
   ],
+};
+/** A podcast still in the legacy collection (#132). */
+const LEGACY_ITEM = {
+  key: LEGACY,
+  kind: 'audio' as const,
+  url: 'https://pod.example/old',
+  platform: 'spotify',
+  title: 'Old episode',
+  legacy: true as const,
 };
 
 let client: QueryClient;
@@ -143,10 +153,11 @@ describe('useKeptRecordsDraft', () => {
       [
         {
           type: 'update',
-          collection: 'app.lanyards.link.media.audio',
+          collection: 'app.lanyards.media.item',
           rkey: '3maud1',
           fields: {
             url: 'https://pod.example/1',
+            kind: 'audio',
             platform: 'spotify',
             title: 'Episode 1',
             createdAt: OLD,
@@ -161,9 +172,7 @@ describe('useKeptRecordsDraft', () => {
     act(() => result.current.addMedia(EPISODE));
     const added = result.current.records.media[1]!;
     expect(added.key).toMatch(
-      new RegExp(
-        `^at://${ADA.did}/app\\.lanyards\\.link\\.media\\.audio/[2-7a-z]{13}$`
-      )
+      new RegExp(`^at://${ADA.did}/app\\.lanyards\\.media\\.item/[2-7a-z]{13}$`)
     );
     await save(result);
     expect(ops()[0]).toEqual([
@@ -191,7 +200,7 @@ describe('useKeptRecordsDraft', () => {
       [
         {
           type: 'delete',
-          collection: 'app.lanyards.link.media.audio',
+          collection: 'app.lanyards.media.item',
           rkey: '3maud1',
         },
       ],
@@ -200,7 +209,7 @@ describe('useKeptRecordsDraft', () => {
 
   it('a record added elsewhere survives a refetch and Save', async () => {
     const elsewhere = {
-      key: `at://${ADA.did}/app.lanyards.link.media.video/3mvid9`,
+      key: `at://${ADA.did}/app.lanyards.media.item/3mvid9`,
       kind: 'video' as const,
       url: 'https://video.example/9',
       platform: 'youtube',
@@ -217,7 +226,7 @@ describe('useKeptRecordsDraft', () => {
       [
         {
           type: 'delete',
-          collection: 'app.lanyards.link.media.audio',
+          collection: 'app.lanyards.media.item',
           rkey: '3maud1',
         },
       ],
@@ -271,14 +280,15 @@ describe('useKeptRecordsDraft', () => {
       value: {
         cid: 'cid',
         value: {
-          $type: 'app.lanyards.link.media.audio',
+          $type: 'app.lanyards.media.item',
           url: 'https://pod.example/1',
+          kind: 'audio',
           platform: 'spotify',
           title: 'Episode one',
           description: 'Old notes',
           seriesName: 'The series',
           duration: 1800,
-          publishedDate: '2025-06-01T09:00:00.000Z',
+          publishedAt: '2025-06-01T09:00:00.000Z',
           createdAt: OLD,
         },
       },
@@ -296,18 +306,105 @@ describe('useKeptRecordsDraft', () => {
     expect(ops()[0]).toEqual([
       {
         type: 'update',
-        collection: 'app.lanyards.link.media.audio',
+        collection: 'app.lanyards.media.item',
         rkey: '3maud1',
         fields: {
           url: 'https://pod.example/1',
+          kind: 'audio',
           platform: 'spotify',
           title: 'Episode 1',
           // The form cleared the description: it goes.
           seriesName: 'The series',
           duration: 1800,
+          publishedAt: '2025-06-01T09:00:00.000Z',
+          createdAt: OLD,
+        },
+      },
+    ]);
+  });
+
+  it('changing an item’s kind is one update, not a delete and add', async () => {
+    const { result } = render();
+    act(() =>
+      result.current.updateMedia(AUDIO, {
+        kind: 'video',
+        url: 'https://pod.example/1',
+        platform: 'youtube',
+        title: 'Episode one',
+      })
+    );
+    await save(result);
+    expect(ops()[0]).toEqual([
+      expect.objectContaining({
+        type: 'update',
+        collection: 'app.lanyards.media.item',
+        rkey: '3maud1',
+        fields: expect.objectContaining({ kind: 'video', platform: 'youtube' }),
+      }),
+    ]);
+  });
+
+  it('editing a legacy item moves it to a media item, keeping its fields', async () => {
+    client.setQueryData(key(), { media: [LEGACY_ITEM] });
+    vi.mocked(getRecord).mockResolvedValue({
+      ok: true,
+      value: {
+        cid: 'cid',
+        value: {
+          $type: 'app.lanyards.link.media.audio',
+          url: 'https://pod.example/old',
+          platform: 'spotify',
+          title: 'Old episode',
+          type: 'lecture',
+          seriesName: 'The series',
           publishedDate: '2025-06-01T09:00:00.000Z',
           createdAt: OLD,
         },
+      },
+    } as never);
+    const { result } = render();
+    act(() =>
+      result.current.updateMedia(LEGACY, {
+        kind: 'audio',
+        url: 'https://pod.example/old',
+        platform: 'spotify',
+        title: 'Renamed episode',
+      })
+    );
+    await save(result);
+    expect(ops()[0]).toEqual([
+      {
+        type: 'create',
+        collection: 'app.lanyards.media.item',
+        rkey: '3mleg1',
+        fields: {
+          url: 'https://pod.example/old',
+          kind: 'audio',
+          platform: 'spotify',
+          title: 'Renamed episode',
+          seriesName: 'The series',
+          publishedAt: '2025-06-01T09:00:00.000Z',
+          createdAt: OLD,
+        },
+      },
+      {
+        type: 'delete',
+        collection: 'app.lanyards.link.media.audio',
+        rkey: '3mleg1',
+      },
+    ]);
+  });
+
+  it('deleting a legacy item deletes it from its legacy collection', async () => {
+    client.setQueryData(key(), { media: [LEGACY_ITEM] });
+    const { result } = render();
+    act(() => result.current.removeMedia(LEGACY));
+    await save(result);
+    expect(ops()[0]).toEqual([
+      {
+        type: 'delete',
+        collection: 'app.lanyards.link.media.audio',
+        rkey: '3mleg1',
       },
     ]);
   });
@@ -345,15 +442,16 @@ describe('useKeptRecordsDraft', () => {
     expect(ops()[0]).toEqual([
       {
         type: 'delete',
-        collection: 'app.lanyards.link.media.audio',
+        collection: 'app.lanyards.media.item',
         rkey: '3maud1',
       },
       {
         type: 'create',
-        collection: 'app.lanyards.link.media.audio',
+        collection: 'app.lanyards.media.item',
         rkey: expect.stringMatching(TID),
         fields: {
           url: 'https://pod.example/2',
+          kind: 'audio',
           platform: 'spotify',
           createdAt: NOW,
         },

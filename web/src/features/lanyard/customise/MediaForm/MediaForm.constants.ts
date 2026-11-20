@@ -1,45 +1,16 @@
-import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
+import item from '../../../../../lexicons/lanyards/app/lanyards/media/item.json';
 
-import audio from '../../../../../lexicons/lanyards/app/lanyards/link/media/audio.json';
-import video from '../../../../../lexicons/lanyards/app/lanyards/link/media/video.json';
+export {
+  MEDIA_KINDS,
+  MEDIA_PLATFORMS,
+  MEDIA_TYPES,
+  type MediaKind,
+} from '@/lib/sources/lanyards/media';
 
-export type MediaKind = 'audio' | 'video';
-
-export const MEDIA_KINDS: MediaKind[] = ['audio', 'video'];
-
-const fields = { audio, video } as const;
-
-const LEGACY_COLLECTION = {
-  audio: LANYARDS_NSID.legacyAudio,
-  video: LANYARDS_NSID.legacyVideo,
-} as const;
-
-/** Each kind's collection and its lexicon's enums and limits, in order. */
-export const MEDIA = Object.fromEntries(
-  MEDIA_KINDS.map((kind) => {
-    const properties = fields[kind].defs.main.record.properties;
-    return [
-      kind,
-      {
-        collection: LEGACY_COLLECTION[kind],
-        platforms: properties.platform.enum as string[],
-        types: properties.type.enum as string[],
-      },
-    ];
-  })
-) as Record<
-  MediaKind,
-  {
-    collection: (typeof LEGACY_COLLECTION)[MediaKind];
-    platforms: string[];
-    types: string[];
-  }
->;
-
-/** Both kinds share these limits, in UTF-8 bytes. */
-export const TITLE_MAX = audio.defs.main.record.properties.title.maxLength;
+/** The lexicon's limits, in UTF-8 bytes. */
+export const TITLE_MAX = item.defs.main.record.properties.title.maxLength;
 export const DESCRIPTION_MAX =
-  audio.defs.main.record.properties.description.maxLength;
+  item.defs.main.record.properties.description.maxLength;
 
 export const EMPTY_MEDIA = {
   url: '',

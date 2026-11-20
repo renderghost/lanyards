@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { type FocusEvent, type FormEvent, useRef, useState } from 'react';
 
 import { Button } from '@/components/Button/Button';
+import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { SelectField } from '@/components/SelectField/SelectField';
 import { TextAreaField } from '@/components/TextAreaField/TextAreaField';
 import { TextField } from '@/components/TextField/TextField';
@@ -14,8 +15,9 @@ import { cn } from '@/lib/utils';
 
 import {
   EMPTY_MEDIA,
-  MEDIA,
   MEDIA_KINDS,
+  MEDIA_PLATFORMS,
+  MEDIA_TYPES,
   type MediaKind,
 } from './MediaForm.constants';
 import * as styles from './MediaForm.styles';
@@ -33,6 +35,7 @@ import { validateMedia } from './MediaForm.validation';
 export function MediaForm({
   onSubmit,
   initial,
+  talksUrl,
   onCancel,
   disabled = false,
   className,
@@ -43,7 +46,7 @@ export function MediaForm({
     initial
       ? {
           url: initial.url,
-          platform: initial.platform,
+          platform: initial.platform ?? '',
           title: initial.title ?? '',
           description: initial.description ?? '',
           type: initial.type ?? '',
@@ -71,7 +74,7 @@ export function MediaForm({
       tooLong: t`Keep the description to 1,000 characters or fewer`,
     },
   };
-  const options = (list: string[], labels: typeof PLATFORM_LABELS) =>
+  const options = (list: readonly string[], labels: typeof PLATFORM_LABELS) =>
     list.map((value) => ({
       value,
       label: labels[value] ? i18n._(labels[value]) : value,
@@ -118,11 +121,7 @@ export function MediaForm({
 
   return (
     <form noValidate onSubmit={submit} className={cn(styles.form, className)}>
-      {/* Audio and video are different records: an entry keeps its kind. */}
-      <fieldset
-        disabled={disabled || Boolean(initial)}
-        className={styles.fieldset}
-      >
+      <fieldset disabled={disabled} className={styles.fieldset}>
         <legend className={styles.legend}>{t`Type of media`}</legend>
         <div className={styles.kinds}>
           {MEDIA_KINDS.map((option) => (
@@ -139,6 +138,14 @@ export function MediaForm({
             </label>
           ))}
         </div>
+        {kind === 'video' && talksUrl && (
+          <p className={styles.hint}>
+            {t`Recording of a talk?`}{' '}
+            <ExternalLink href={talksUrl}>
+              {t`Add it to the talk on Sifa`}
+            </ExternalLink>
+          </p>
+        )}
       </fieldset>
       <TextField
         ref={urlRef}
@@ -159,7 +166,7 @@ export function MediaForm({
         name="platform"
         required
         placeholder={t`Choose a platform`}
-        options={options(MEDIA[kind].platforms, PLATFORM_LABELS)}
+        options={options(MEDIA_PLATFORMS[kind], PLATFORM_LABELS)}
         value={values.platform}
         onChange={change('platform')}
         onBlur={check('platform')}
@@ -190,7 +197,7 @@ export function MediaForm({
         label={t`Kind of content`}
         name="type"
         placeholder={t`Not specified`}
-        options={options(MEDIA[kind].types, TYPE_LABELS)}
+        options={options(MEDIA_TYPES[kind], TYPE_LABELS)}
         value={values.type}
         onChange={change('type')}
         disabled={disabled}

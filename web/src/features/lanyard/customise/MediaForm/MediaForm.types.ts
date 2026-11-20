@@ -21,6 +21,8 @@ export type MediaFormProps = {
   onSubmit(fields: MediaFields): void;
   /** Editing: the entry's current fields (the button then says Update). */
   initial?: MediaFields;
+  /** The owner's talks on Sifa, where recordings of talks belong (#132). */
+  talksUrl?: string;
   onCancel?(): void;
   disabled?: boolean;
   className?: string;

@@ -39,6 +39,7 @@ export function MediaEditor({
   items,
   records,
   disabled,
+  talksUrl,
   className,
 }: MediaEditorProps) {
   const { t, i18n } = useLingui();
@@ -98,6 +99,7 @@ export function MediaEditor({
         title={editing ? t`Edit ${editingTitle}` : t`Add a podcast or video`}
       >
         <MediaForm
+          talksUrl={talksUrl}
           initial={editing ? (initial as MediaFields) : undefined}
           disabled={disabled}
           onSubmit={(fields) => {

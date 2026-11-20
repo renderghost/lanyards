@@ -54,6 +54,7 @@ function serveLanyards(config: Record<string, unknown> | null) {
       : null
   );
   for (const collection of [
+    'app.lanyards.media.item',
     'app.lanyards.link.media.audio',
     'app.lanyards.link.media.video',
   ]) {

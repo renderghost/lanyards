@@ -33,6 +33,7 @@ import { LanyardProblem } from '@/features/lanyard/components/LanyardProblem/Lan
 import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/LanyardSkeleton';
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { profileId } from '@/lib/atproto/profileId';
+import { EDIT_LINKS } from '@/lib/person/editLinks';
 import {
   BLOCK_SOURCES,
   type EditorBlock,
@@ -216,6 +217,7 @@ export function LanyardEditor({
               items={itemsOf(block, 'media')}
               records={records}
               disabled={recordsDisabled}
+              talksUrl={EDIT_LINKS.talks(profile)[0]?.url}
             />
           ),
         };

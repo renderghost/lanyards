@@ -10,6 +10,7 @@ import type {
   LanyardRecords,
   MediaLink,
 } from './lanyards.types';
+import { isMediaKind, itemFromLegacy, type MediaKind } from './media';
 
 /**
  * The most kept records read per collection: all of anyone's in practice
@@ -18,29 +19,33 @@ import type {
  */
 const LIST_LIMIT = 500;
 
-type MediaRecord = {
+/** The fields of an app.lanyards.media.item that the lanyard shows. */
+type ItemRecord = {
   url: string;
-  platform: string;
+  kind: string;
+  platform?: string;
   title?: string;
   description?: string;
   type?: string;
-  publishedDate?: string;
+  publishedAt?: string;
 };
 
 function toMedia(
-  kind: MediaLink['kind'],
-  items: { uri: string; value: MediaRecord }[]
-): MediaLink[] {
-  return items.map(({ uri, value }) => ({
+  uri: string,
+  value: ItemRecord & { kind: MediaLink['kind'] },
+  legacy: boolean
+): MediaLink {
+  return {
     key: uri,
-    kind,
+    kind: value.kind,
     url: value.url,
-    platform: value.platform,
+    ...(value.platform ? { platform: value.platform } : {}),
     ...(value.title ? { title: value.title } : {}),
     ...(value.description ? { description: value.description } : {}),
     ...(value.type ? { type: value.type } : {}),
-    ...(value.publishedDate ? { publishedDate: value.publishedDate } : {}),
-  }));
+    ...(value.publishedAt ? { publishedAt: value.publishedAt } : {}),
+    ...(legacy ? { legacy: true as const } : {}),
+  };
 }
 
 /**
@@ -68,7 +73,10 @@ export async function fetchLanyardConfig(
   });
 }
 
-/** The person's kept Lanyards records: honorific, web links and media. */
+/**
+ * The person's kept Lanyards records: their podcasts and videos, from the
+ * one record type and, until each moves, the two legacy ones (#132).
+ */
 export async function fetchLanyardRecords(
   did: Did,
   signal?: AbortSignal
@@ -77,23 +85,38 @@ export async function fetchLanyardRecords(
     listRecords('lanyards', did, collection, { limit: LIST_LIMIT, signal });
   // Links come from Sifa and Bluesky, and the title from Sifa: old web-link
   // and honorific records stay in the repository, unread.
-  const [audio, video] = await Promise.all([
+  const [items, audio, video] = await Promise.all([
+    list(LANYARDS_NSID.mediaItem),
     list(LANYARDS_NSID.legacyAudio),
     list(LANYARDS_NSID.legacyVideo),
   ]);
+  if (!items.ok) return items;
   if (!audio.ok) return audio;
   if (!video.ok) return video;
 
+  const legacy = (kind: MediaKind, records: typeof audio.value) =>
+    validRecords<Record<string, unknown>>(
+      kind === 'audio' ? LANYARDS_NSID.legacyAudio : LANYARDS_NSID.legacyVideo,
+      records
+    ).map(({ uri, value }) =>
+      toMedia(
+        uri,
+        itemFromLegacy(kind, value) as ItemRecord & { kind: MediaKind },
+        true
+      )
+    );
+
   return ok({
     media: [
-      ...toMedia(
-        'audio',
-        validRecords<MediaRecord>(LANYARDS_NSID.legacyAudio, audio.value)
+      // An item of a kind this app doesn't know yet is left out.
+      ...validRecords<ItemRecord>(LANYARDS_NSID.mediaItem, items.value).flatMap(
+        ({ uri, value }) =>
+          isMediaKind(value.kind)
+            ? [toMedia(uri, { ...value, kind: value.kind }, false)]
+            : []
       ),
-      ...toMedia(
-        'video',
-        validRecords<MediaRecord>(LANYARDS_NSID.legacyVideo, video.value)
-      ),
+      ...legacy('audio', audio.value),
+      ...legacy('video', video.value),
     ],
   });
 }

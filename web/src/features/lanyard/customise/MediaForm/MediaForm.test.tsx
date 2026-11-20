@@ -6,9 +6,11 @@ import { validateRecord } from '@/lib/lexicons/validate';
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithClient } from '@/test/render';
 
-import audio from '../../../../../lexicons/lanyards/app/lanyards/link/media/audio.json';
-import video from '../../../../../lexicons/lanyards/app/lanyards/link/media/video.json';
+import { MEDIA_PLATFORMS, MEDIA_TYPES } from '@/lib/sources/lanyards/media';
+
 import { MediaForm } from './MediaForm';
+
+const SIFA_TALKS = 'https://sifa.id/p/ada.test/edit/presentations';
 
 /** The form hands a valid entry over; it writes nothing itself. */
 const onSubmit = vi.fn();
@@ -24,23 +26,29 @@ beforeEach(() => {
 });
 
 describe('MediaForm', () => {
-  it('offers each kind’s platforms and content types from its lexicon', async () => {
+  it('offers each kind’s platforms and content types', async () => {
     renderWithClient(<MediaForm onSubmit={onSubmit} />);
     const kind = screen.getByRole('group', { name: 'Type of media' });
     expect(within(kind).getByRole('radio', { name: 'Audio' })).toBeChecked();
-    expect(values('Platform')).toEqual(
-      audio.defs.main.record.properties.platform.enum
-    );
-    expect(values('Kind of content')).toEqual(
-      audio.defs.main.record.properties.type.enum
-    );
+    expect(values('Platform')).toEqual(MEDIA_PLATFORMS.audio);
+    expect(values('Kind of content')).toEqual(MEDIA_TYPES.audio);
     await userEvent.click(within(kind).getByRole('radio', { name: 'Video' }));
-    expect(values('Platform')).toEqual(
-      video.defs.main.record.properties.platform.enum
-    );
-    expect(values('Kind of content')).toEqual(
-      video.defs.main.record.properties.type.enum
-    );
+    expect(values('Platform')).toEqual(MEDIA_PLATFORMS.video);
+    expect(values('Kind of content')).toEqual(MEDIA_TYPES.video);
+    // Talk recordings belong on Sifa (#132).
+    expect(values('Kind of content')).not.toContain('conference-talk');
+  });
+
+  it('points recordings of talks to Sifa, for videos', async () => {
+    renderWithClient(<MediaForm onSubmit={onSubmit} talksUrl={SIFA_TALKS} />);
+    expect(
+      screen.queryByRole('link', { name: /Add it to the talk on Sifa/ })
+    ).toBeNull();
+    const kind = screen.getByRole('group', { name: 'Type of media' });
+    await userEvent.click(within(kind).getByRole('radio', { name: 'Video' }));
+    expect(
+      screen.getByRole('link', { name: /Add it to the talk on Sifa/ })
+    ).toHaveAttribute('href', SIFA_TALKS);
   });
 
   it('asks for a description in a text area', () => {
@@ -70,17 +78,11 @@ describe('MediaForm', () => {
   });
 
   it.each([
-    ['Audio', 'app.lanyards.link.media.audio', 'spotify', 'interview', 'audio'],
-    [
-      'Video',
-      'app.lanyards.link.media.video',
-      'youtube',
-      'conference-talk',
-      'video',
-    ],
+    ['Audio', 'spotify', 'interview', 'audio'],
+    ['Video', 'youtube', 'tutorial', 'video'],
   ] as const)(
-    'hands over %s for its own collection',
-    async (label, collection, platform, type, kind) => {
+    'hands over %s as a valid media item',
+    async (label, platform, type, kind) => {
       renderWithClient(<MediaForm onSubmit={onSubmit} />);
       await userEvent.click(screen.getByRole('radio', { name: label }));
       await userEvent.type(
@@ -113,8 +115,9 @@ describe('MediaForm', () => {
       };
       expect(onSubmit).toHaveBeenCalledWith({ kind, ...fields });
       expect(
-        validateRecord(collection, {
-          $type: collection,
+        validateRecord('app.lanyards.media.item', {
+          $type: 'app.lanyards.media.item',
+          kind,
           ...fields,
           createdAt: '2026-11-19T12:00:00.000Z',
         }).ok
@@ -155,22 +158,30 @@ describe('MediaForm', () => {
     expect(onCancel).toHaveBeenCalled();
   });
 
-  it('editing keeps the kind: audio and video are different records', () => {
+  it('editing can change the kind', async () => {
     renderWithClient(
       <MediaForm
         onSubmit={onSubmit}
         initial={{
-          kind: 'video',
-          url: 'https://video.example/1',
-          platform: 'youtube',
+          kind: 'audio',
+          url: 'https://pod.example/1',
+          platform: 'spotify',
         }}
       />
     );
     const kinds = within(screen.getByRole('group', { name: 'Type of media' }));
-    expect(kinds.getByRole('radio', { name: 'Video' })).toBeChecked();
-    expect(kinds.getByRole('radio', { name: 'Video' })).toBeDisabled();
-    expect(kinds.getByRole('radio', { name: 'Audio' })).toBeDisabled();
-    expect(screen.getByRole('textbox', { name: 'Web address' })).toBeEnabled();
+    expect(kinds.getByRole('radio', { name: 'Audio' })).toBeChecked();
+    await userEvent.click(kinds.getByRole('radio', { name: 'Video' }));
+    await userEvent.selectOptions(
+      screen.getByRole('combobox', { name: 'Platform' }),
+      'youtube'
+    );
+    await userEvent.click(screen.getByRole('button', { name: 'Update' }));
+    expect(onSubmit).toHaveBeenCalledWith({
+      kind: 'video',
+      url: 'https://pod.example/1',
+      platform: 'youtube',
+    });
   });
 
   it('has no axe violations, including with errors', async () => {

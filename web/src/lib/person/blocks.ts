@@ -377,6 +377,7 @@ const COLLECTION_BLOCKS: Record<string, RenderableBlockType> = {
   'org.tangled.repo.manifest': 'code',
   'org.tangled.repo.declaration': 'code',
   'network.cosmik.collection': 'collections',
+  'app.lanyards.media.item': 'media',
   'app.lanyards.link.media.audio': 'media',
   'app.lanyards.link.media.video': 'media',
 };

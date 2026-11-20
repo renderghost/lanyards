@@ -201,12 +201,13 @@ test.describe('lanyard customiser', () => {
     await saveChanges(page);
     await expect(page.getByText('Lanyard updated')).toBeVisible();
     const saved = writes.find(
-      (write) => write.body.collection === 'app.lanyards.link.media.audio'
+      (write) => write.body.collection === 'app.lanyards.media.item'
     );
     expect(saved?.body).toMatchObject({
       action: 'create',
       record: {
         url: 'https://pod.example/new',
+        kind: 'audio',
         platform: 'spotify',
         title: 'New episode',
       },
