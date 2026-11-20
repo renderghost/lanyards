@@ -23,8 +23,7 @@ const legacy = (path: string) =>
 const AUTHORED = [
   'authFull.json',
   'actor/lanyard.json',
-  'actor/biography/honorific.json',
-  'link/web.json',
+  'media/item.json',
   'link/media/audio.json',
   'link/media/video.json',
 ];
@@ -37,16 +36,10 @@ describe('authored lexicon documents', () => {
   });
 
   it.each([
-    ['actor/biography/honorific.json', 'actor/biography/honorific.json'],
-    ['link/web.json', 'link/web/web.json'],
     ['link/media/audio.json', 'link/media/audio.json'],
     ['link/media/video.json', 'link/media/video.json'],
   ])('kept lexicon %s is unchanged from the legacy app', (path, legacyPath) => {
     expect(ours(path)).toEqual(legacy(legacyPath));
-  });
-
-  it('keeps the web link NSID the legacy app writes', () => {
-    expect(ours('link/web.json').id).toBe('app.lanyards.link.web');
   });
 
   it('grants repo access to exactly the Lanyards collections', () => {
@@ -59,12 +52,26 @@ describe('authored lexicon documents', () => {
     );
   });
 
-  it('lists every block type the app knows', () => {
+  it('lists every block type the app knows, once, plus roles', () => {
     const doc = ours('actor/lanyard.json') as {
-      defs: { block: { properties: { type: { knownValues: string[] } } } };
+      defs: {
+        blockType: { knownValues: string[] };
+        block: { properties: { type: { ref: string } } };
+        eventOverride: {
+          properties: { emphasise: { items: { ref: string } } };
+        };
+      };
     };
-    expect(doc.defs.block.properties.type.knownValues).toEqual([
-      ...BLOCK_TYPES,
-    ]);
+    // Roles is in the lexicon from #132; the app learns it in #130.
+    expect(doc.defs.blockType.knownValues).toEqual([...BLOCK_TYPES, 'roles']);
+    expect(doc.defs.block.properties.type.ref).toBe('#blockType');
+    expect(doc.defs.eventOverride.properties.emphasise.items.ref).toBe(
+      '#blockType'
+    );
+  });
+
+  it('retires the lexicons that duplicate Sifa and Bluesky', () => {
+    expect(() => ours('actor/biography/honorific.json')).toThrow();
+    expect(() => ours('link/web.json')).toThrow();
   });
 });

@@ -14,6 +14,10 @@
             "type": "string",
             "maxLength": 32,
             "knownValues": [
+              "blue",
+              "mint",
+              "lime",
+              "pink",
               "violet",
               "indigo",
               "plum",
@@ -23,23 +27,33 @@
               "teal",
               "ocean"
             ],
-            "description": "Accent palette; violet when absent or unknown"
+            "description": "Accent palette; blue when absent or unknown. violet, indigo and ocean are legacy values read as blue; moss and teal as mint; rose, plum and ember as pink"
           },
           "showJob": {
             "type": "boolean",
             "default": true,
-            "description": "Show the current job line on the badge"
+            "description": "Legacy: show the current role on the badge. Read as badge.showRole when that is absent"
+          },
+          "badge": {
+            "type": "ref",
+            "ref": "#badgePrefs"
           },
           "blocks": {
             "type": "array",
             "maxLength": 20,
-            "items": { "type": "ref", "ref": "#block" },
+            "items": {
+              "type": "ref",
+              "ref": "#block"
+            },
             "description": "Blocks in display order"
           },
           "hidden": {
             "type": "array",
             "maxLength": 500,
-            "items": { "type": "string", "maxLength": 2048 },
+            "items": {
+              "type": "string",
+              "maxLength": 2048
+            },
             "description": "AT-URIs or URLs of individual items hidden from the lanyard"
           },
           "connect": {
@@ -49,7 +63,10 @@
           "events": {
             "type": "array",
             "maxLength": 200,
-            "items": { "type": "ref", "ref": "#eventOverride" },
+            "items": {
+              "type": "ref",
+              "ref": "#eventOverride"
+            },
             "description": "Per-event lanyard overrides, matched by event URI"
           },
           "createdAt": {
@@ -63,35 +80,79 @@
         }
       }
     },
+    "blockType": {
+      "type": "string",
+      "maxLength": 32,
+      "description": "A block a lanyard can show",
+      "knownValues": [
+        "links",
+        "talks",
+        "openTo",
+        "blogPosts",
+        "bskyPosts",
+        "publications",
+        "skills",
+        "education",
+        "code",
+        "collections",
+        "media",
+        "events",
+        "details",
+        "roles"
+      ]
+    },
+    "badgePrefs": {
+      "type": "object",
+      "description": "How the badge looks: its cover and which headline details it shows",
+      "properties": {
+        "cover": {
+          "type": "string",
+          "maxLength": 32,
+          "knownValues": [
+            "dots",
+            "stripes",
+            "pixels",
+            "orb",
+            "symbols",
+            "hazard",
+            "arrows",
+            "monogram"
+          ],
+          "description": "Cover pattern; derived from the DID when absent or unknown"
+        },
+        "showRole": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the current role on the badge"
+        },
+        "showLocation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the location on the badge"
+        },
+        "showOpenTo": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show what the owner is open to on the badge"
+        }
+      }
+    },
     "block": {
       "type": "object",
       "required": ["type", "visible"],
       "properties": {
         "type": {
-          "type": "string",
-          "maxLength": 32,
-          "knownValues": [
-            "links",
-            "talks",
-            "openTo",
-            "blogPosts",
-            "bskyPosts",
-            "publications",
-            "skills",
-            "education",
-            "code",
-            "collections",
-            "media",
-            "events",
-            "details"
-          ]
+          "type": "ref",
+          "ref": "#blockType"
         },
-        "visible": { "type": "boolean" },
+        "visible": {
+          "type": "boolean"
+        },
         "limit": {
           "type": "integer",
           "minimum": 1,
           "maximum": 20,
-          "description": "How many items to show; 3 by default, all links (up to 20) for the links block"
+          "description": "How many items to show, for blocks that keep a count; 3 by default"
         }
       }
     },
@@ -99,9 +160,18 @@
       "type": "object",
       "description": "What a Connect does; each defaults to true",
       "properties": {
-        "follow": { "type": "boolean", "default": true },
-        "vouch": { "type": "boolean", "default": true },
-        "metPack": { "type": "boolean", "default": true }
+        "follow": {
+          "type": "boolean",
+          "default": true
+        },
+        "vouch": {
+          "type": "boolean",
+          "default": true
+        },
+        "metPack": {
+          "type": "boolean",
+          "default": true
+        }
       }
     },
     "eventOverride": {
@@ -127,30 +197,18 @@
           "type": "array",
           "maxLength": 13,
           "items": {
-            "type": "string",
-            "maxLength": 32,
-            "knownValues": [
-              "links",
-              "talks",
-              "openTo",
-              "blogPosts",
-              "bskyPosts",
-              "publications",
-              "skills",
-              "education",
-              "code",
-              "collections",
-              "media",
-              "events",
-              "details"
-            ]
+            "type": "ref",
+            "ref": "#blockType"
           },
           "description": "Block types moved to the top for this event"
         },
         "metPacks": {
           "type": "array",
           "maxLength": 20,
-          "items": { "type": "string", "format": "at-uri" },
+          "items": {
+            "type": "string",
+            "format": "at-uri"
+          },
           "description": "Starter packs of people met at this event, in rollover order"
         }
       }

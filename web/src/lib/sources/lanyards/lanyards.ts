@@ -78,8 +78,8 @@ export async function fetchLanyardRecords(
   // Links come from Sifa and Bluesky, and the title from Sifa: old web-link
   // and honorific records stay in the repository, unread.
   const [audio, video] = await Promise.all([
-    list(LANYARDS_NSID.audio),
-    list(LANYARDS_NSID.video),
+    list(LANYARDS_NSID.legacyAudio),
+    list(LANYARDS_NSID.legacyVideo),
   ]);
   if (!audio.ok) return audio;
   if (!video.ok) return video;
@@ -88,11 +88,11 @@ export async function fetchLanyardRecords(
     media: [
       ...toMedia(
         'audio',
-        validRecords<MediaRecord>(LANYARDS_NSID.audio, audio.value)
+        validRecords<MediaRecord>(LANYARDS_NSID.legacyAudio, audio.value)
       ),
       ...toMedia(
         'video',
-        validRecords<MediaRecord>(LANYARDS_NSID.video, video.value)
+        validRecords<MediaRecord>(LANYARDS_NSID.legacyVideo, video.value)
       ),
     ],
   });

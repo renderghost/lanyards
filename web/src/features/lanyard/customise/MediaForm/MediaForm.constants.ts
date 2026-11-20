@@ -9,6 +9,11 @@ export const MEDIA_KINDS: MediaKind[] = ['audio', 'video'];
 
 const fields = { audio, video } as const;
 
+const LEGACY_COLLECTION = {
+  audio: LANYARDS_NSID.legacyAudio,
+  video: LANYARDS_NSID.legacyVideo,
+} as const;
+
 /** Each kind's collection and its lexicon's enums and limits, in order. */
 export const MEDIA = Object.fromEntries(
   MEDIA_KINDS.map((kind) => {
@@ -16,7 +21,7 @@ export const MEDIA = Object.fromEntries(
     return [
       kind,
       {
-        collection: LANYARDS_NSID[kind],
+        collection: LEGACY_COLLECTION[kind],
         platforms: properties.platform.enum as string[],
         types: properties.type.enum as string[],
       },
@@ -25,7 +30,7 @@ export const MEDIA = Object.fromEntries(
 ) as Record<
   MediaKind,
   {
-    collection: (typeof LANYARDS_NSID)[MediaKind];
+    collection: (typeof LEGACY_COLLECTION)[MediaKind];
     platforms: string[];
     types: string[];
   }

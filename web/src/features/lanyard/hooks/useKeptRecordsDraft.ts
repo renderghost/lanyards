@@ -62,8 +62,8 @@ type Pending = {
 const NONE: Pending = { added: [], updated: new Map(), removed: new Set() };
 
 const MEDIA_COLLECTION = {
-  audio: LANYARDS_NSID.audio,
-  video: LANYARDS_NSID.video,
+  audio: LANYARDS_NSID.legacyAudio,
+  video: LANYARDS_NSID.legacyVideo,
 } as const;
 
 /** The fields the media form holds; an edit replaces exactly these. */

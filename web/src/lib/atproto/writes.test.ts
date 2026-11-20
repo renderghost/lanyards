@@ -167,14 +167,13 @@ describe('deleteRecord', () => {
 });
 
 describe('writable collections', () => {
-  it('are the six Lanyards writes', () => {
+  it('are the five Lanyards writes', () => {
     expect([...WRITABLE_COLLECTIONS].sort()).toEqual([
       'app.bsky.graph.follow',
-      'app.lanyards.actor.biography.honorific',
       'app.lanyards.actor.lanyard',
       'app.lanyards.link.media.audio',
       'app.lanyards.link.media.video',
-      'app.lanyards.link.web',
+      'app.lanyards.media.item',
     ]);
   });
 
@@ -201,20 +200,29 @@ describe('writable collections', () => {
 });
 
 describe('applyWrites', () => {
-  const WEB = 'app.lanyards.link.web' as const;
-  const link = (url: string) => ({ url, title: 'Site', createdAt: NOW });
+  const MEDIA = 'app.lanyards.media.item' as const;
+  const item = (url: string) => ({
+    url,
+    kind: 'audio',
+    title: 'Episode',
+    createdAt: NOW,
+  });
 
   it('sends creates, updates and deletes in one batch', async () => {
     const bodies = capture('applyWrites');
     await applyWrites(session(), [
-      { type: 'create', collection: WEB, fields: link('https://ada.example/') },
+      {
+        type: 'create',
+        collection: MEDIA,
+        fields: item('https://ada.example/'),
+      },
       {
         type: 'update',
-        collection: WEB,
+        collection: MEDIA,
         rkey: '3mold',
-        fields: link('https://ada.example/cv'),
+        fields: item('https://ada.example/cv'),
       },
-      { type: 'delete', collection: WEB, rkey: '3mgone' },
+      { type: 'delete', collection: MEDIA, rkey: '3mgone' },
     ]);
     expect(bodies).toEqual([
       {
@@ -222,19 +230,19 @@ describe('applyWrites', () => {
         writes: [
           {
             $type: 'com.atproto.repo.applyWrites#create',
-            collection: WEB,
+            collection: MEDIA,
             rkey: expect.stringMatching(/^[a-z2-7]{13}$/),
-            value: { $type: WEB, ...link('https://ada.example/') },
+            value: { $type: MEDIA, ...item('https://ada.example/') },
           },
           {
             $type: 'com.atproto.repo.applyWrites#update',
-            collection: WEB,
+            collection: MEDIA,
             rkey: '3mold',
-            value: { $type: WEB, ...link('https://ada.example/cv') },
+            value: { $type: MEDIA, ...item('https://ada.example/cv') },
           },
           {
             $type: 'com.atproto.repo.applyWrites#delete',
-            collection: WEB,
+            collection: MEDIA,
             rkey: '3mgone',
           },
         ],
@@ -247,9 +255,9 @@ describe('applyWrites', () => {
     await applyWrites(session(), [
       {
         type: 'create',
-        collection: 'app.lanyards.actor.biography.honorific',
+        collection: 'app.lanyards.actor.lanyard',
         rkey: 'self',
-        fields: { value: 'Dr', createdAt: NOW },
+        fields: { createdAt: NOW },
       },
     ]);
     expect(bodies[0]).toMatchObject({ writes: [{ rkey: 'self' }] });
@@ -259,7 +267,7 @@ describe('applyWrites', () => {
     const bodies = capture('applyWrites');
     await expect(
       applyWrites(session('atproto'), [
-        { type: 'delete', collection: WEB, rkey: '3mgone' },
+        { type: 'delete', collection: MEDIA, rkey: '3mgone' },
       ])
     ).rejects.toBeInstanceOf(MissingPermissionError);
     expect(bodies).toEqual([]);
@@ -269,8 +277,8 @@ describe('applyWrites', () => {
     const bodies = capture('applyWrites');
     await expect(
       applyWrites(session(), [
-        { type: 'delete', collection: WEB, rkey: '3mgone' },
-        { type: 'create', collection: WEB, fields: { title: 'No URL' } },
+        { type: 'delete', collection: MEDIA, rkey: '3mgone' },
+        { type: 'create', collection: MEDIA, fields: { title: 'No URL' } },
       ])
     ).rejects.toBeInstanceOf(InvalidRecordError);
     expect(bodies).toEqual([]);
@@ -280,7 +288,7 @@ describe('applyWrites', () => {
     const bodies = capture('applyWrites');
     const ops: WriteOp[] = Array.from({ length: 12 }, (_, index) => ({
       type: 'delete',
-      collection: WEB,
+      collection: MEDIA,
       rkey: `3mgone${index}`,
     }));
     await applyWrites(session(), ops);
@@ -304,7 +312,7 @@ describe('applyWrites', () => {
     );
     const ops: WriteOp[] = Array.from({ length: 12 }, (_, index) => ({
       type: 'delete',
-      collection: WEB,
+      collection: MEDIA,
       rkey: `3mgone${index}`,
     }));
     const failure = await applyWrites(session(), ops).catch(
@@ -321,7 +329,7 @@ describe('applyWrites', () => {
       )
     );
     const failure = await applyWrites(session(), [
-      { type: 'delete', collection: WEB, rkey: '3mgone' },
+      { type: 'delete', collection: MEDIA, rkey: '3mgone' },
     ]).catch((error: unknown) => error);
     expect((failure as WriteFailedError).applied).toBe(0);
   });
@@ -334,7 +342,7 @@ describe('applyWrites', () => {
     );
     await expect(
       applyWrites(session(), [
-        { type: 'delete', collection: WEB, rkey: '3mgone' },
+        { type: 'delete', collection: MEDIA, rkey: '3mgone' },
       ])
     ).rejects.toBeInstanceOf(WriteFailedError);
   });

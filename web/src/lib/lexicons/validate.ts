@@ -2,11 +2,10 @@ import { AppBskyGraphFollow } from '@atcute/bluesky';
 import { safeParse } from '@atcute/lexicons/validations';
 
 import {
-  AppLanyardsActorBiographyHonorific,
   AppLanyardsActorLanyard,
   AppLanyardsLinkMediaAudio,
   AppLanyardsLinkMediaVideo,
-  AppLanyardsLinkWeb,
+  AppLanyardsMediaItem,
   IdSifaProfileEducation,
   IdSifaProfileExternalAccount,
   IdSifaProfileLocation,
@@ -31,9 +30,7 @@ import {
  */
 const RECORD_SCHEMAS = {
   'app.lanyards.actor.lanyard': AppLanyardsActorLanyard.mainSchema,
-  'app.lanyards.actor.biography.honorific':
-    AppLanyardsActorBiographyHonorific.mainSchema,
-  'app.lanyards.link.web': AppLanyardsLinkWeb.mainSchema,
+  'app.lanyards.media.item': AppLanyardsMediaItem.mainSchema,
   'app.lanyards.link.media.audio': AppLanyardsLinkMediaAudio.mainSchema,
   'app.lanyards.link.media.video': AppLanyardsLinkMediaVideo.mainSchema,
   'app.bsky.graph.follow': AppBskyGraphFollow.mainSchema,

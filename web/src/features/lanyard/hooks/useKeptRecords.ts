@@ -5,7 +5,7 @@ import { sourceQueryOptions } from '@/lib/person/sourceQuery';
 import { queryKeys } from '@/lib/query/keys';
 import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
 
-/** The owner's kept records (honorific, web links, media), as the lanyard reads them. */
+/** The owner's kept records (podcasts and videos), as the lanyard reads them. */
 export function useKeptRecords(did: Did) {
   return useQuery({
     queryKey: queryKeys.source('lanyards', did),

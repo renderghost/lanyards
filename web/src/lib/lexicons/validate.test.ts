@@ -64,28 +64,59 @@ describe('validateRecord', () => {
     expect(result.ok).toBe(false);
   });
 
-  it('rejects an honorific outside the closed enum', () => {
-    const result = validateRecord('app.lanyards.actor.biography.honorific', {
-      $type: 'app.lanyards.actor.biography.honorific',
-      value: 'Mx',
-      createdAt: NOW,
+  it('accepts the badge settings and the roles block', () => {
+    const result = validateRecord('app.lanyards.actor.lanyard', {
+      ...fullLanyard,
+      blocks: [{ type: 'roles', visible: true }],
+      badge: {
+        cover: 'orb',
+        showRole: false,
+        showLocation: true,
+        showOpenTo: false,
+      },
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects a badge setting of the wrong type', () => {
+    const result = validateRecord('app.lanyards.actor.lanyard', {
+      ...fullLanyard,
+      badge: { showRole: 'no' },
     });
     expect(result.ok).toBe(false);
   });
 
-  it('accepts a kept honorific', () => {
-    const result = validateRecord('app.lanyards.actor.biography.honorific', {
-      $type: 'app.lanyards.actor.biography.honorific',
-      value: 'Dr',
+  it('accepts a podcast or video as one media item', () => {
+    const result = validateRecord('app.lanyards.media.item', {
+      $type: 'app.lanyards.media.item',
+      url: 'https://example.com/episode-1',
+      kind: 'video',
+      platform: 'youtube',
+      type: 'interview',
+      title: 'An interview',
+      duration: 1800,
+      publishedAt: NOW,
       createdAt: NOW,
     });
     expect(result.ok).toBe(true);
   });
 
-  it('rejects a web link whose url is not a URI', () => {
-    const result = validateRecord('app.lanyards.link.web', {
-      $type: 'app.lanyards.link.web',
+  it('leaves the media kind and platform open', () => {
+    const result = validateRecord('app.lanyards.media.item', {
+      $type: 'app.lanyards.media.item',
+      url: 'https://example.com/hologram',
+      kind: 'hologram',
+      platform: 'newtube',
+      createdAt: NOW,
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('rejects a media item whose url is not a URI', () => {
+    const result = validateRecord('app.lanyards.media.item', {
+      $type: 'app.lanyards.media.item',
       url: 'not a url',
+      kind: 'audio',
       createdAt: NOW,
     });
     expect(result.ok).toBe(false);
