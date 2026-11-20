@@ -12,6 +12,7 @@ import {
 import { Button } from '@/components/Button/Button';
 import { captureError } from '@/lib/analytics/analytics';
 import { cn } from '@/lib/utils';
+import { fitBytes } from '@/lib/validation';
 
 import {
   canCaptureScreen,
@@ -30,6 +31,17 @@ const imagesIn = (data: DataTransfer | null): File[] =>
     .map((item) => item.getAsFile())
     .filter((file): file is File => file !== null);
 
+const TEXT_INPUTS = new Set(['text', 'search', 'url', 'email', 'tel']);
+
+/** Somewhere text is typed, which pasted text belongs in. */
+const takesText = (target: EventTarget | null): boolean =>
+  target instanceof HTMLTextAreaElement ||
+  (target instanceof HTMLInputElement && TEXT_INPUTS.has(target.type)) ||
+  (target instanceof HTMLElement && target.isContentEditable);
+
+const carriesFiles = (data: DataTransfer | null): boolean =>
+  [...(data?.types ?? [])].includes('Files');
+
 /**
  * Up to four screenshots for feedback (#134): chosen, pasted anywhere in
  * the form, dropped, or captured from the screen on desktop. Each is
@@ -47,11 +59,16 @@ export function ScreenshotPicker({
   const fileInput = useRef<HTMLInputElement>(null);
   const addButton = useRef<HTMLButtonElement>(null);
   const removeButtons = useRef(new Map<string, HTMLButtonElement>());
-  /** The screenshots as last rendered, for adds that finish later. */
+  /**
+   * The screenshots as last rendered or handed over, for adds that finish
+   * later: two that finish together each see the other.
+   */
   const latest = useRef(value);
   useLayoutEffect(() => {
     latest.current = value;
   }, [value]);
+  /** Screenshots still being prepared, whose places are kept. */
+  const pending = useRef(0);
   /** Where focus goes once a removal has rendered. */
   const focusAfterRemove = useRef<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -65,11 +82,12 @@ export function ScreenshotPicker({
     if (images.length < files.length) {
       setError(t`Choose PNG, JPEG, WebP or GIF images`);
     }
-    const room = MAX_SCREENSHOTS - latest.current.length;
+    const room = MAX_SCREENSHOTS - latest.current.length - pending.current;
     if (images.length > room) setError(t`Up to 4 screenshots`);
     const taken = images.slice(0, Math.max(0, room));
     if (taken.length === 0) return;
 
+    pending.current += taken.length;
     setPreparing(true);
     try {
       const prepared = await Promise.all(
@@ -83,18 +101,25 @@ export function ScreenshotPicker({
           } satisfies Screenshot;
         })
       );
-      onChange([...latest.current, ...prepared]);
+      const next = [...latest.current, ...prepared];
+      latest.current = next;
+      onChange(next);
     } catch (cause) {
       captureError(cause, { source: 'feedback-image' });
       setError(t`Couldn't use that image. Please try another.`);
     } finally {
-      setPreparing(false);
+      pending.current -= taken.length;
+      setPreparing(pending.current > 0);
     }
   }
 
-  // Pasting an image anywhere in the form attaches it; text pastes as text.
+  // Pasting an image anywhere in the form attaches it. Text pasted into a
+  // field stays text, even when the clipboard has a picture of it too, as
+  // Office apps put there.
   const onPaste = useEffectEvent((event: Event) => {
-    const files = imagesIn((event as ClipboardEvent).clipboardData);
+    const data = (event as ClipboardEvent).clipboardData;
+    if (takesText(event.target) && data?.getData('text/plain').trim()) return;
+    const files = imagesIn(data);
     if (files.length === 0) return;
     event.preventDefault();
     void add(files);
@@ -104,6 +129,25 @@ export function ScreenshotPicker({
     if (!scope) return;
     scope.addEventListener('paste', onPaste);
     return () => scope.removeEventListener('paste', onPaste);
+  }, []);
+
+  // Files dropped anywhere while the form is open are attached; left to
+  // the browser, they would open in place of the app, losing the draft.
+  const onDragOver = useEffectEvent((event: DragEvent) => {
+    if (carriesFiles(event.dataTransfer)) event.preventDefault();
+  });
+  const onDrop = useEffectEvent((event: DragEvent) => {
+    if (!carriesFiles(event.dataTransfer)) return;
+    event.preventDefault();
+    void add([...(event.dataTransfer?.files ?? [])]);
+  });
+  useEffect(() => {
+    document.addEventListener('dragover', onDragOver);
+    document.addEventListener('drop', onDrop);
+    return () => {
+      document.removeEventListener('dragover', onDragOver);
+      document.removeEventListener('drop', onDrop);
+    };
   }, []);
 
   useEffect(() => {
@@ -121,7 +165,9 @@ export function ScreenshotPicker({
     onChange(value.filter((_, at) => at !== index));
   }
 
-  function describe(index: number, alt: string) {
+  function describe(index: number, typed: string) {
+    // UserInput counts the description's UTF-8 bytes, not its characters.
+    const alt = fitBytes(typed, ALT_MAX_LENGTH);
     onChange(value.map((shot, at) => (at === index ? { ...shot, alt } : shot)));
   }
 
@@ -147,11 +193,6 @@ export function ScreenshotPicker({
       ref={root}
       className={cn(styles.fieldset, className)}
       aria-describedby={error ? `${hintId} ${errorId}` : hintId}
-      onDragOver={(event) => event.preventDefault()}
-      onDrop={(event) => {
-        event.preventDefault();
-        void add([...event.dataTransfer.files]);
-      }}
     >
       <legend className={styles.legend}>{t`Screenshots (optional)`}</legend>
       <p id={hintId} className={styles.hint}>

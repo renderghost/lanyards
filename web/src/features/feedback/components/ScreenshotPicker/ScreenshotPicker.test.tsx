@@ -1,4 +1,4 @@
-import { act, fireEvent, screen } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithProviders } from '@/test/render';
 
-import type { Screenshot } from '../../images';
+import { prepareImage, type Screenshot } from '../../images';
 import { ScreenshotPicker } from './ScreenshotPicker';
 
 // Re-encoding needs a real canvas: the e2e test covers it.
@@ -15,8 +15,19 @@ vi.mock('../../images', async (importOriginal) => ({
   prepareImage: vi.fn(async (file: Blob) => file),
 }));
 
+/** prepareImage, held until each call is let go, in any order. */
+function holdPreparing() {
+  const held: (() => void)[] = [];
+  vi.mocked(prepareImage).mockImplementation(
+    (file: Blob) =>
+      new Promise<Blob>((resolve) => held.push(() => resolve(file)))
+  );
+  return held;
+}
+
 let urls = 0;
 beforeEach(() => {
+  vi.mocked(prepareImage).mockImplementation(async (file: Blob) => file);
   urls = 0;
   URL.createObjectURL = vi.fn(() => `blob:preview-${(urls += 1)}`);
   URL.revokeObjectURL = vi.fn();
@@ -94,6 +105,10 @@ describe('ScreenshotPicker (#134)', () => {
         const event = new Event('paste', { bubbles: true, cancelable: true });
         Object.defineProperty(event, 'clipboardData', {
           value: {
+            types: items.map((item) =>
+              item.kind === 'file' ? 'Files' : item.type
+            ),
+            getData: () => '',
             items: items.map((item) => ({
               ...item,
               getAsFile: () => item.file ?? null,
@@ -127,5 +142,85 @@ describe('ScreenshotPicker (#134)', () => {
     expect(capture).toHaveBeenCalled();
     expect(await screen.findAllByRole('img')).toHaveLength(1);
     Reflect.deleteProperty(navigator, 'mediaDevices');
+  });
+
+  it('lets text paste as text into a field, even with an image alongside', async () => {
+    renderWithProviders(<Harness />);
+    const details = screen.getByRole('textbox', { name: 'Details' });
+    // Office apps put a picture of copied text on the clipboard too.
+    const event = new Event('paste', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'clipboardData', {
+      value: {
+        types: ['text/plain', 'Files'],
+        getData: (type: string) => (type === 'text/plain' ? 'Error 42' : ''),
+        items: [
+          { kind: 'string', type: 'text/plain', getAsFile: () => null },
+          {
+            kind: 'file',
+            type: 'image/png',
+            getAsFile: () => png('rendering.png'),
+          },
+        ],
+      },
+    });
+    act(() => {
+      details.dispatchEvent(event);
+    });
+    expect(event.defaultPrevented).toBe(false);
+    await act(async () => {});
+    expect(screen.queryAllByRole('img')).toHaveLength(0);
+  });
+
+  it('takes an image dropped anywhere, never opening it in the tab', async () => {
+    renderWithProviders(<Harness />);
+    const files = [png('dropped.png')];
+    const drag = (type: string) => {
+      const event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'dataTransfer', {
+        value: { types: ['Files'], files },
+      });
+      return event;
+    };
+    const over = drag('dragover');
+    const drop = drag('drop');
+    act(() => {
+      document.body.dispatchEvent(over);
+      document.body.dispatchEvent(drop);
+    });
+    expect(over.defaultPrevented).toBe(true);
+    expect(drop.defaultPrevented).toBe(true);
+    expect(await screen.findAllByRole('img')).toHaveLength(1);
+  });
+
+  it('never takes a fifth while others are still being prepared', async () => {
+    renderWithProviders(<Harness />);
+    await userEvent.upload(input(), [png('1.png'), png('2.png'), png('3.png')]);
+    expect(await screen.findAllByRole('img')).toHaveLength(3);
+    const held = holdPreparing();
+    fireEvent.change(input(), { target: { files: [png('4.png')] } });
+    fireEvent.change(input(), { target: { files: [png('5.png')] } });
+    expect(await screen.findByText('Up to 4 screenshots')).toBeInTheDocument();
+    await act(async () => held.forEach((release) => release()));
+    expect(screen.getAllByRole('img')).toHaveLength(4);
+  });
+
+  it('keeps both of two screenshots that finish together', async () => {
+    renderWithProviders(<Harness />);
+    const held = holdPreparing();
+    fireEvent.change(input(), { target: { files: [png('a.png')] } });
+    fireEvent.change(input(), { target: { files: [png('b.png')] } });
+    await waitFor(() => expect(held).toHaveLength(2));
+    await act(async () => held.forEach((release) => release()));
+    expect(screen.getAllByRole('img')).toHaveLength(2);
+  });
+
+  it('keeps a description within UserInput’s 2,000 bytes', async () => {
+    renderWithProviders(<Harness />);
+    await userEvent.upload(input(), [png('a.png')]);
+    const alt = await screen.findByRole('textbox', {
+      name: 'Describe screenshot 1',
+    });
+    fireEvent.change(alt, { target: { value: 'é'.repeat(1500) } });
+    expect(alt).toHaveValue('é'.repeat(1000));
   });
 });
