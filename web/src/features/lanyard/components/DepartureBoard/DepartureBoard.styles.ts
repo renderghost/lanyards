@@ -17,6 +17,6 @@ export const value =
   'flex flex-wrap items-baseline gap-x-3.5 gap-y-1 text-lg font-semibold leading-[1.625rem] text-on-badge-ink [overflow-wrap:anywhere]';
 
 export const more =
-  'inline-flex items-center gap-1 text-[0.9375rem] font-semibold leading-5 text-board-label underline underline-offset-[3px] hover:decoration-2';
+  'inline-flex items-center gap-1 text-[0.9375rem] font-semibold leading-5 text-board-label underline underline-offset-[3px] hover:decoration-2 focus-visible:outline-board-label';
 
 export const arrow = 'size-4 shrink-0';
