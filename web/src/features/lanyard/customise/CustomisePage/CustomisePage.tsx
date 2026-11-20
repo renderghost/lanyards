@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
 import { LanyardSurface } from '../../components/LanyardSurface/LanyardSurface';
 import { KEPT_LISTS, useCustomiserDraft } from '../../hooks/useCustomiserDraft';
+import { useMediaMove } from '../../hooks/useMediaMove';
 import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
@@ -92,6 +93,8 @@ function Customiser({
     )
   );
   const disabled = !canEdit || !settings.ready;
+  // Legacy podcasts and videos move to the one record type (#132).
+  useMediaMove(did, canEdit && canKeep && records.ready && settings.ready);
   // A records save replaces the draft it sent, so edits wait for it.
   const recordsDisabled = !canKeep || !records.ready || draft.saving;
   const { update } = settings;

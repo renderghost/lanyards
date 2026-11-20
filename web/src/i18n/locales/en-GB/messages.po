@@ -249,7 +249,7 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:132
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:135
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -482,7 +482,7 @@ msgstr "Loading your profile…"
 
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:52
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -602,7 +602,7 @@ msgstr "Podcasts and videos"
 msgid "Post on Bluesky, {date}"
 msgstr "Post on Bluesky, {date}"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:160
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:163
 msgid "Preview"
 msgstr "Preview"
 
@@ -644,7 +644,7 @@ msgstr "Reordering cancelled. {name} stayed where it was."
 msgid "Reset"
 msgstr "Reset"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:150
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:153
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
@@ -797,7 +797,7 @@ msgstr "Teal"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:143
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:146
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -926,7 +926,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:140
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:143
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
@@ -950,7 +950,7 @@ msgstr "You can hide up to 500 items. Show some again first."
 msgid "You follow each other"
 msgstr "You follow each other"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:101
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:104
 msgid "You have unsaved changes. Leave without saving?"
 msgstr "You have unsaved changes. Leave without saving?"
 
@@ -962,7 +962,7 @@ msgstr "You're offline. Connect to sign in."
 msgid "You're offline. Some things won't work until you reconnect."
 msgstr "You're offline. Some things won't work until you reconnect."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:156
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:159
 msgid "You’re seeing your lanyard as the public sees it."
 msgstr "You’re seeing your lanyard as the public sees it."
 
@@ -984,9 +984,9 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:40
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:49
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:107
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:41
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:50
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:110
 #: src/features/qr/components/QrSheet/QrSheet.tsx:28
 msgid "Your lanyard"
 msgstr "Your lanyard"
@@ -998,6 +998,10 @@ msgstr "Your Lanyards"
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:126
 msgid "Your ORCID iD is verified"
 msgstr "Your ORCID iD is verified"
+
+#: src/features/lanyard/hooks/useMediaMove.ts:194
+msgid "Your podcasts and videos were updated to the new format."
+msgstr "Your podcasts and videos were updated to the new format."
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:9
 msgid "YouTube"

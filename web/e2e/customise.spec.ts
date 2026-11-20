@@ -214,6 +214,61 @@ test.describe('lanyard customiser', () => {
     });
   });
 
+  test('moves a legacy podcast to the new record type when opened', async ({
+    page,
+  }) => {
+    const legacy = `at://${ADA.did}/app.lanyards.link.media.audio/3mlegacy`;
+    await mockPerson(page, {
+      config: { blocks: [{ type: 'media', visible: true }], hidden: [] },
+      legacyAudio: [
+        {
+          uri: legacy,
+          cid: `bafyrei${'b'.repeat(52)}`,
+          value: {
+            $type: 'app.lanyards.link.media.audio',
+            url: 'https://pod.example/legacy',
+            platform: 'spotify',
+            title: 'Legacy episode',
+            createdAt: '2025-01-01T09:00:00.000Z',
+          },
+        },
+      ],
+    });
+    await openCustomiser(page);
+    await expect(
+      page.getByText('Your podcasts and videos were updated to the new format.')
+    ).toBeVisible();
+    expect(writes).toEqual(
+      expect.arrayContaining([
+        {
+          method: 'applyWrites',
+          body: expect.objectContaining({
+            collection: 'app.lanyards.media.item',
+            action: 'create',
+            rkey: '3mlegacy',
+            record: expect.objectContaining({
+              kind: 'audio',
+              url: 'https://pod.example/legacy',
+            }),
+          }),
+        },
+        {
+          method: 'applyWrites',
+          body: expect.objectContaining({
+            collection: 'app.lanyards.link.media.audio',
+            action: 'delete',
+            rkey: '3mlegacy',
+          }),
+        },
+      ])
+    );
+    await expect(
+      page
+        .locator('[data-block="media"]')
+        .getByRole('link', { name: /Legacy episode/ })
+    ).toBeVisible();
+  });
+
   test('hides a record in place, then shows it again', async ({ page }) => {
     await openCustomiser(page);
     const talks = page.locator('[data-block="talks"]');
