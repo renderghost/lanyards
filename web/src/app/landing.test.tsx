@@ -32,8 +32,8 @@ describe('landing page', () => {
     });
     renderRoute('/');
     await screen.findByRole('button', { name: 'Sign in' });
-    expect(screen.queryByRole('contentinfo')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Send feedback' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Give feedback' })).toBeNull();
   });
 
   it('shows the sign-in form to signed-out visitors', async () => {
@@ -44,11 +44,22 @@ describe('landing page', () => {
     });
     renderRoute('/');
     expect(
-      await screen.findByRole('heading', {
-        name: 'Your conference lanyard, from your AT Protocol account',
-      })
+      await screen.findByRole('heading', { name: 'Welcome to Lanyards' })
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+    expect(document.title).toBe(
+      'Researcher profiles on the AT Protocol · Lanyards'
+    );
+  });
+
+  it('is titled for signing in when sent here to sign in (#145)', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    renderRoute('/?returnTo=%2Fsettings');
+    await screen.findByRole('heading', { name: 'Welcome to Lanyards' });
     expect(document.title).toBe('Sign in · Lanyards');
   });
 

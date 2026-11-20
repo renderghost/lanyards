@@ -19,6 +19,21 @@ describe('Logo', () => {
     expect(source).toHaveAttribute('media', '(prefers-color-scheme: dark)');
   });
 
+  it('can be one logo in both modes, for a fixed ground (#145)', () => {
+    const { container, unmount } = renderWithProviders(<Logo fixed="lime" />);
+    expect(container.querySelector('source')).toBeNull();
+    expect(screen.getByRole('img', { name: 'Lanyards' })).toHaveAttribute(
+      'src',
+      '/logo-dark.svg'
+    );
+    unmount();
+    renderWithProviders(<Logo fixed="blue" />);
+    expect(screen.getByRole('img', { name: 'Lanyards' })).toHaveAttribute(
+      'src',
+      '/logo-light.svg'
+    );
+  });
+
   it('has no axe violations', async () => {
     const { container } = renderWithProviders(<Logo />);
     await expectNoAxeViolations(container);

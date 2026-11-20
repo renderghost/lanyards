@@ -29,6 +29,24 @@ describe('initAnalytics', () => {
     expect(posthog.init).not.toHaveBeenCalled();
   });
 
+  it('stays off inside a frame, such as the homepage’s sample (#145)', async () => {
+    const { initAnalytics } = await load();
+    await expect(
+      initAnalytics({
+        key: 'phc_x',
+        host: HOST,
+        doNotTrack: false,
+        framed: true,
+      })
+    ).resolves.toBe(false);
+    expect(posthog.init).not.toHaveBeenCalled();
+  });
+
+  it('knows when the app is framed', async () => {
+    const { isFramed } = await load();
+    expect(isFramed()).toBe(false);
+  });
+
   it('starts PostHog cookieless, anonymous and without autocapture', async () => {
     const { initAnalytics } = await load();
     await expect(

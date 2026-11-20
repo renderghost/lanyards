@@ -10,6 +10,7 @@ import {
   browserDoNotTrack,
   DEFAULT_POSTHOG_HOST,
   initAnalytics,
+  isFramed,
   track,
 } from './lib/analytics/analytics';
 import { configureAuth } from './lib/atproto/session';
@@ -19,6 +20,7 @@ void initAnalytics({
   key: import.meta.env.VITE_POSTHOG_KEY,
   host: import.meta.env.VITE_POSTHOG_HOST ?? DEFAULT_POSTHOG_HOST,
   doNotTrack: browserDoNotTrack(),
+  framed: isFramed(),
 });
 track('app_opened');
 

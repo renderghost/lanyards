@@ -3,6 +3,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { useSession } from '@/features/auth/session/useSession';
+import { HomePage } from '@/features/home/components/HomePage/HomePage';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { safeReturnTo } from '@/lib/atproto/oauthConfig';
 
@@ -11,12 +12,19 @@ import { SIGNED_IN_HOME } from './LandingPage.constants';
 import * as styles from './LandingPage.styles';
 import type { LandingPageProps } from './LandingPage.types';
 
+/**
+ * `/`: the homepage for people who aren't signed in (#145), with the
+ * sign-in form; signed in, it sends people on to where they're going.
+ */
 export function LandingPage({ returnTo }: LandingPageProps) {
   const { t } = useLingui();
   const session = useSession();
   const router = useRouter();
-  useDocumentTitle(t`Sign in`);
   const safe = safeReturnTo(returnTo);
+  // Sent here to sign in, it says so; otherwise it's the homepage.
+  useDocumentTitle(
+    safe === '/' ? t`Researcher profiles on the AT Protocol` : t`Sign in`
+  );
   const destination = safe === '/' ? SIGNED_IN_HOME : safe;
 
   const signedIn = session.status === 'signedIn';
@@ -30,17 +38,16 @@ export function LandingPage({ returnTo }: LandingPageProps) {
   if (signedIn) return null;
 
   return (
-    <section className={styles.page} aria-labelledby="landing-heading">
-      <h1 id="landing-heading" className={styles.heading}>
-        {t`Your conference lanyard, from your AT Protocol account`}
-      </h1>
-      {session.status === 'loading' ? (
-        <p role="status" className={styles.loading}>
-          {t`Loading…`}
-        </p>
-      ) : (
-        <SignInForm returnTo={destination} />
-      )}
-    </section>
+    <HomePage
+      signIn={
+        session.status === 'loading' ? (
+          <p role="status" className={styles.loading}>
+            {t`Loading…`}
+          </p>
+        ) : (
+          <SignInForm returnTo={destination} />
+        )
+      }
+    />
   );
 }
