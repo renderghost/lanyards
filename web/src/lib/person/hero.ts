@@ -6,7 +6,7 @@ import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { openToKey } from './blocks';
 import type { LanyardConfig } from './config';
 import { truncateGraphemes } from './format';
-import type { BadgeHero, BadgeRole } from './personView.types';
+import type { BadgeHero, BadgeRole, BoardCell } from './personView.types';
 
 const HEADLINE_MAX_GRAPHEMES = 200;
 
@@ -91,6 +91,15 @@ export function composeHero(input: {
     ...(location ? { location } : {}),
     openTo,
   };
+}
+
+/** The board cells the owner's badge settings show (spec §7). */
+export function boardCells(config: LanyardConfig): BoardCell[] {
+  return [
+    ...(config.showRole ? (['now'] as const) : []),
+    ...(config.showLocation ? (['based'] as const) : []),
+    ...(config.showOpenTo ? (['openTo'] as const) : []),
+  ];
 }
 
 /**

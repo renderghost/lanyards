@@ -54,16 +54,36 @@ describe('DepartureBoard', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('keeps its place while Sifa hasn’t answered, then shows or goes', () => {
+  // Final review I3: on a phone each cell is a row of its own, so the
+  // place kept is one cell per cell the owner shows, as the board lays out.
+  it('keeps a place for each cell the owner shows while Sifa hasn’t answered', () => {
     const { container, rerender } = renderWithProviders(
-      <DepartureBoard openTo={[]} pending />
+      <DepartureBoard
+        role={{ title: 'Research Engineer', others: 0 }}
+        location="Berlin"
+        openTo={['mentoringOthers']}
+      />
+    );
+    const real = [...container.querySelectorAll('dl > div')].map(
+      (cell) => cell.className
+    );
+    rerender(
+      <DepartureBoard openTo={[]} pending={['now', 'based', 'openTo']} />
     );
     const reserved = container.querySelector('[data-board-pending]');
     expect(reserved).toHaveAttribute('aria-hidden', 'true');
-    rerender(<DepartureBoard openTo={['mentoringOthers']} pending />);
-    expect(container.querySelector('dl')).not.toBeNull();
+    expect([...reserved!.children].map((cell) => cell.className)).toEqual(real);
+    rerender(<DepartureBoard openTo={[]} pending={['based']} />);
+    expect(
+      container.querySelector('[data-board-pending]')!.children
+    ).toHaveLength(1);
+    rerender(
+      <DepartureBoard openTo={['mentoringOthers']} pending={['openTo']} />
+    );
     expect(container.querySelector('[data-board-pending]')).toBeNull();
-    rerender(<DepartureBoard openTo={[]} />);
+    expect(container.querySelector('dl')).not.toBeNull();
+    // With every cell turned off, nothing is reserved at all.
+    rerender(<DepartureBoard openTo={[]} pending={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
 });

@@ -34,6 +34,7 @@ import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/L
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { profileId } from '@/lib/atproto/profileId';
 import { EDIT_LINKS } from '@/lib/person/editLinks';
+import { boardCells } from '@/lib/person/hero';
 import {
   BLOCK_SOURCES,
   type EditorBlock,
@@ -238,7 +239,7 @@ export function LanyardEditor({
       <BadgeHero
         hero={view.hero}
         headingLevel={2}
-        boardPending={view.sifaPending}
+        boardPending={view.sifaPending ? boardCells(view.config) : undefined}
       />
       {view.configError && (
         <div role="status" className={styles.notice}>

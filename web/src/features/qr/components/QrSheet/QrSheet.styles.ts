@@ -76,8 +76,11 @@ export const site =
 export const actions =
   'flex w-full max-w-[22rem] gap-3 max-[22.5rem]:max-w-none max-[22.5rem]:px-4 landscape:col-start-2 landscape:row-start-4 landscape:flex-col landscape:px-0';
 
-// White and ink, the same on every accent; the ring white on the ground.
-const action = 'flex-1 focus-visible:outline-white';
+// White and ink, the same on every accent. The ring is white on the blue
+// or ink ground; sideways the ground is the accent, so it takes the accent
+// field's own ring (ink on mint, lime and pink; white on blue).
+const action =
+  'flex-1 focus-visible:outline-white landscape:focus-visible:outline-(--focus-ring-on-accent)';
 
 export const copy = `${action} bg-white text-badge-ink hover:bg-white/90`;
 

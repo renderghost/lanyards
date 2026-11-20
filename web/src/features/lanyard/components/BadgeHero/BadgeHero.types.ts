@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { BadgeHero } from '@/lib/person/personView.types';
+import type { BadgeHero, BoardCell } from '@/lib/person/personView.types';
 
 export type BadgeHeroProps = {
   hero: BadgeHero;
@@ -10,7 +10,7 @@ export type BadgeHeroProps = {
   actions?: ReactNode;
   /** The Roles block, when it is shown: the board links to it. */
   rolesHref?: string;
-  /** Sifa hasn't answered yet: the board keeps its place. */
-  boardPending?: boolean;
+  /** Sifa hasn't answered yet: the board cells whose places it keeps. */
+  boardPending?: readonly BoardCell[];
   className?: string;
 };

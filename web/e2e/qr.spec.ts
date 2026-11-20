@@ -116,6 +116,50 @@ test.describe('QR sheet', () => {
     }
   });
 
+  // Final review I2: sideways, the sheet's ground is the accent itself.
+  test('shows its focus ring sideways on every accent (#129)', async ({
+    page,
+  }) => {
+    await mockPerson(page, { config: { accent: 'lime' } });
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto('/lanyard');
+    await page.getByRole('button', { name: 'Show QR' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
+    await expect(sheet).toHaveAttribute('data-accent', 'lime');
+    for (const name of ['Copy link', 'Close']) {
+      const button = sheet.getByRole('button', { name });
+      // Focus from the keyboard, so the ring shows.
+      await button.focus();
+      await page.keyboard.press('Shift+Tab');
+      await page.keyboard.press('Tab');
+      await expect(button).toBeFocused();
+      // The ring fades in (transition-colors): read it once settled.
+      const ratio = () =>
+        button.evaluate((element) => {
+          const rgb = (value: string) =>
+            (value.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+          const luminance = ([r, g, b]: number[]) =>
+            [r!, g!, b!]
+              .map((channel) => channel / 255)
+              .map((c) =>
+                c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+              )
+              .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
+          const ring = luminance(rgb(getComputedStyle(element).outlineColor));
+          const ground = luminance(
+            rgb(
+              getComputedStyle(element.closest('[role=dialog]')!)
+                .backgroundColor
+            )
+          );
+          return (
+            (Math.max(ring, ground) + 0.05) / (Math.min(ring, ground) + 0.05)
+          );
+        });
+      await expect.poll(ratio).toBeGreaterThanOrEqual(3);
+    }
+  });
+
   test('fits a nearly square landscape window without spilling', async ({
     page,
   }) => {

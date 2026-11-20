@@ -52,6 +52,9 @@ export type BadgeHero = {
   openTo: OpenToValue[];
 };
 
+/** The departure board's cells (spec §7). */
+export type BoardCell = 'now' | 'based' | 'openTo';
+
 /** The main current role, and how many other current roles there are. */
 export type BadgeRole = { title: string; company?: string; others: number };
 
