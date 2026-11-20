@@ -1,11 +1,14 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { useSession } from '@/features/auth/session/useSession';
 import { expectNoAxeViolations } from '@/test/axe';
-import { renderWithProviders } from '@/test/render';
+import { renderInRouter } from '@/test/router';
 
 import { HomePage } from './HomePage';
+
+vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 
 const WIKI = 'https://github.com/renderghost/lanyards/wiki/';
 
@@ -17,20 +20,32 @@ const signIn = (
   </label>
 );
 
-const home = () => renderWithProviders(<HomePage signIn={signIn} />);
+/** The homepage, once its router has loaded. */
+async function home() {
+  const view = renderInRouter(<HomePage signIn={signIn} />, '/');
+  await screen.findByRole('heading', { level: 1 });
+  return view;
+}
+
+beforeEach(() => {
+  vi.mocked(useSession).mockReturnValue({
+    status: 'signedOut',
+    signOut: vi.fn(),
+    refresh: vi.fn(),
+  });
+});
 
 describe('HomePage (#145)', () => {
   it('welcomes visitors, with sign-in where Get started was', async () => {
-    const { container } = home();
+    const { container } = await home();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome to Lanyards' })
     ).toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
     // On the lime badge, the blue logo in light and dark alike.
-    expect(screen.getByRole('img', { name: 'Lanyards' })).toHaveAttribute(
-      'src',
-      '/logo-light.svg'
-    );
+    expect(
+      within(screen.getByRole('main')).getByRole('img', { name: 'Lanyards' })
+    ).toHaveAttribute('src', '/logo-light.svg');
     expect(
       screen.getByText(/collects your complete scholarly presence/)
     ).toBeInTheDocument();
@@ -44,8 +59,27 @@ describe('HomePage (#145)', () => {
     await expectNoAxeViolations(container);
   });
 
-  it('keeps the old homepage’s sections, in order', () => {
-    home();
+  it('puts its own header on the blue, over the hanging badge (#151)', async () => {
+    const { container } = await home();
+    const banners = screen.getAllByRole('banner');
+    expect(banners).toHaveLength(1);
+    const banner = banners[0] as HTMLElement;
+    // The header comes first, outside main, so it's the page's banner.
+    expect(screen.getByRole('main')).not.toContainElement(banner);
+    expect(
+      banner.compareDocumentPosition(screen.getByRole('main')) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+    expect(
+      within(banner).getByRole('link', { name: 'Sign in' })
+    ).toBeInTheDocument();
+    // On the page's brand blue, laid over the badge's ground.
+    expect(banner.closest('[data-accent="blue"]')).toBe(container.firstChild);
+    expect(banner.className).toContain('absolute');
+  });
+
+  it('keeps the old homepage’s sections, in order', async () => {
+    await home();
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     ).toEqual([
@@ -82,8 +116,8 @@ describe('HomePage (#145)', () => {
     ]);
   });
 
-  it('says only what the new app does', () => {
-    home();
+  it('says only what the new app does', async () => {
+    await home();
     expect(
       screen.getByText(
         'Connect ORCID, and your publications appear automatically.'
@@ -100,8 +134,8 @@ describe('HomePage (#145)', () => {
     expect(screen.getByText(/Decentralised, open, yours/)).toBeInTheDocument();
   });
 
-  it('shows a sample lanyard, live in a phone frame, and links to it', () => {
-    home();
+  it('shows a sample lanyard, live in a phone frame, and links to it', async () => {
+    await home();
     const frame = screen.getByTitle('Sample lanyard');
     expect(frame.tagName).toBe('IFRAME');
     expect(frame).toHaveAttribute('src', '/renderg.host');
@@ -112,7 +146,7 @@ describe('HomePage (#145)', () => {
   });
 
   it('takes “Create your lanyard” to the sign-in form', async () => {
-    home();
+    await home();
     await userEvent.click(
       screen.getByRole('button', { name: 'Create your lanyard' })
     );
@@ -122,8 +156,8 @@ describe('HomePage (#145)', () => {
     ).toHaveAttribute('href', 'https://bsky.app/profile/lanyards.app');
   });
 
-  it('ends with the old footer’s links', () => {
-    home();
+  it('ends with the old footer’s links', async () => {
+    await home();
     const footer = screen
       .getByText('Built on the AT Protocol')
       .closest('footer') as HTMLElement;
