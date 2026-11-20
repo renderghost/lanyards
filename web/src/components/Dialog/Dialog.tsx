@@ -25,6 +25,7 @@ export function Dialog({
   title,
   children,
   returnFocus,
+  concealed = false,
   className,
 }: DialogProps) {
   const { t } = useLingui();
@@ -33,10 +34,16 @@ export function Dialog({
   return (
     <Primitive.Root open={open} onOpenChange={onOpenChange}>
       <Primitive.Portal>
-        <Primitive.Overlay className={styles.overlay} />
+        <Primitive.Overlay
+          className={cn(styles.overlay, concealed && styles.concealed)}
+        />
         <Primitive.Content
           ref={contentRef}
-          className={cn(styles.content, className)}
+          className={cn(
+            styles.content,
+            concealed && styles.concealed,
+            className
+          )}
           aria-describedby={undefined}
           onOpenAutoFocus={(event) => {
             // Focus hasn't moved yet: this is what opened the dialog.

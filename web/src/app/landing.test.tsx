@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -24,6 +24,19 @@ beforeEach(() => {
 const LAZY_ROUTE_TIMEOUT = 5000;
 
 describe('landing page', () => {
+  it('has a footer to send feedback (#134)', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    renderRoute('/');
+    const footer = await screen.findByRole('contentinfo');
+    expect(
+      within(footer).getByRole('button', { name: 'Send feedback' })
+    ).toBeInTheDocument();
+  });
+
   it('shows the sign-in form to signed-out visitors', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',

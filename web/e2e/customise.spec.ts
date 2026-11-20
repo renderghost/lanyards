@@ -447,9 +447,10 @@ test.describe('lanyard customiser', () => {
         // Tabbing past the last control returns to the page itself.
         if (focused === document.body) return null;
         if (focused.closest('header')) return null;
-        const { bottom } = focused.getBoundingClientRect();
-        const { top } = bar.getBoundingClientRect();
-        return bottom > top + 0.5
+        // Under the bar, not merely after it: the site footer follows it.
+        const control = focused.getBoundingClientRect();
+        const { top, bottom } = bar.getBoundingClientRect();
+        return control.bottom > top + 0.5 && control.top < bottom - 0.5
           ? (focused.getAttribute('aria-label') ??
               focused.textContent?.trim().slice(0, 40) ??
               focused.tagName)

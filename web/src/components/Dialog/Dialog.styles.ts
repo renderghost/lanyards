@@ -10,3 +10,5 @@ export const header =
 export const title = 'text-[17px] font-semibold leading-6 text-ui-text';
 
 export const body = 'min-h-0 overflow-y-auto p-4';
+
+export const concealed = 'invisible';

@@ -205,7 +205,7 @@ msgstr "Choose what this is about"
 msgid "Clear"
 msgstr "Clear"
 
-#: src/components/Dialog/Dialog.tsx:63
+#: src/components/Dialog/Dialog.tsx:70
 #: src/components/Sheet/Sheet.tsx:58
 #: src/features/qr/components/QrSheet/QrSheet.tsx:123
 msgid "Close"
@@ -270,6 +270,10 @@ msgstr "Couldn't load {sources}"
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
+#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:44
+msgid "Couldn't open feedback. Please try again."
+msgstr "Couldn't open feedback. Please try again."
+
 #: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:41
 msgid "Couldn't open your QR code. Please try again."
 msgstr "Couldn't open your QR code. Please try again."
@@ -296,6 +300,7 @@ msgstr "Couldn't start creating an account. Please try again."
 
 #: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:40
 #: src/features/auth/components/SignInForm/SignInForm.tsx:69
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:60
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
 
@@ -403,6 +408,10 @@ msgstr "Failed to save. Please try again."
 msgid "Failed to unfollow. Please try again."
 msgstr "Failed to unfollow. Please try again."
 
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:149
+msgid "Feedback isn’t open yet."
+msgstr "Feedback isn’t open yet."
+
 #: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:97
 msgid "Feedback sent"
 msgstr "Feedback sent"
@@ -464,6 +473,7 @@ msgid "Give it a title"
 msgstr "Give it a title"
 
 #: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:61
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:97
 msgid "Give permission"
 msgstr "Give permission"
 
@@ -555,6 +565,10 @@ msgstr "Lanyards"
 msgid "Lanyards needs your permission"
 msgstr "Lanyards needs your permission"
 
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:90
+msgid "Lanyards needs your permission to post feedback"
+msgstr "Lanyards needs your permission to post feedback"
+
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:9
 msgid "Lime"
 msgstr "Lime"
@@ -582,6 +596,7 @@ msgstr "Loading your profile…"
 
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:134
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:55
 msgid "Loading…"
 msgstr "Loading…"
@@ -679,6 +694,10 @@ msgstr "ORCID iD"
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:21
 msgid "Other"
 msgstr "Other"
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:78
+msgid "Other ways to reach us"
+msgstr "Other ways to reach us"
 
 #: src/components/NotFound/NotFound.tsx:12
 msgid "Page not found"
@@ -822,9 +841,15 @@ msgstr "See our feedback board"
 msgid "Semble"
 msgstr "Semble"
 
+#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:76
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:181
 #: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:209
 msgid "Send feedback"
 msgstr "Send feedback"
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:125
+msgid "Send more"
+msgstr "Send more"
 
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:50
 msgid "Show"
@@ -887,6 +912,10 @@ msgstr "Sign-in was cancelled."
 #: src/features/feedback/components/ContactLinks/ContactLinks.tsx:23
 msgid "Signal username copied"
 msgstr "Signal username copied"
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:141
+msgid "Signed in, you can send us feedback, with screenshots, right from Lanyards. Or reach us here:"
+msgstr "Signed in, you can send us feedback, with screenshots, right from Lanyards. Or reach us here:"
 
 #: src/features/auth/session/SessionProvider.tsx:80
 msgid "Signed out"
@@ -954,6 +983,10 @@ msgstr "Talks"
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:10
 msgid "Tangled"
 msgstr "Tangled"
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:109
+msgid "Thank you"
+msgstr "Thank you"
 
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:11
 msgid "That doesn't look like a handle — for example alice.bsky.social"
@@ -1065,6 +1098,10 @@ msgstr "Video"
 msgid "View as public"
 msgstr "View as public"
 
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:117
+msgid "View it on UserInput"
+msgstr "View it on UserInput"
+
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:10
 msgid "Vimeo"
 msgstr "Vimeo"
@@ -1163,6 +1200,14 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 #: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:205
 msgid "Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal."
 msgstr "Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal."
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:112
+msgid "Your feedback is on our board, where you can follow what happens to it."
+msgstr "Your feedback is on our board, where you can follow what happens to it."
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:93
+msgid "Your feedback is posted from your own account to our board on UserInput. To do that, Lanyards needs permission to post there and upload your screenshots."
+msgstr "Your feedback is posted from your own account to our board on UserInput. To do that, Lanyards needs permission to post there and upload your screenshots."
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:88
 msgid "Your handle"
