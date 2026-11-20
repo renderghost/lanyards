@@ -12,6 +12,10 @@ export const intro = 'flex w-full max-w-[640px] flex-col gap-3';
 export const heading =
   'text-[22px] font-semibold leading-7 tracking-tight text-ui-text';
 
+/** Empty but present, so the status is announced when it appears. */
+export const moving =
+  'text-[15px] leading-[22px] text-ui-text-muted empty:sr-only';
+
 export const publicNote =
   'rounded-lg border border-ui-border bg-ui-surface px-4 py-3 text-[13px] leading-[18px] text-ui-text-muted';
 

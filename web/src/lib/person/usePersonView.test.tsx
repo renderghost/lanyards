@@ -53,15 +53,8 @@ function serveLanyards(config: Record<string, unknown> | null) {
         }
       : null
   );
-  mockGetRecord(
-    ADA.pds,
-    ADA.did,
-    'app.lanyards.actor.biography.honorific',
-    'self',
-    null
-  );
   for (const collection of [
-    'app.lanyards.link.web',
+    'app.lanyards.media.item',
     'app.lanyards.link.media.audio',
     'app.lanyards.link.media.video',
   ]) {

@@ -2,11 +2,39 @@ import type {} from '@atcute/lexicons';
 import * as v from '@atcute/lexicons/validations';
 import type {} from '@atcute/lexicons/ambient';
 
+const _badgePrefsSchema = /*#__PURE__*/ v.object(
+	{
+		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("app.lanyards.actor.lanyard#badgePrefs")),
+		/**
+		 * Cover pattern; derived from the DID when absent or unknown
+		 * @maxLength 32
+		 */
+		"cover": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
+			/*#__PURE__*/ v.string<"arrows" | "dots" | "hazard" | "monogram" | "orb" | "pixels" | "stripes" | "symbols" | (string & {})>(),
+			[/*#__PURE__*/ v.stringLength(0, 32)]
+		)),
+		/**
+		 * Show the location on the badge
+		 * @default true
+		 */
+		"showLocation": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean(), true),
+		/**
+		 * Show what the owner is open to on the badge
+		 * @default true
+		 */
+		"showOpenTo": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean(), true),
+		/**
+		 * Show the current role on the badge
+		 * @default true
+		 */
+		"showRole": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean(), true),
+	}
+);
 const _blockSchema = /*#__PURE__*/ v.object(
 	{
 		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("app.lanyards.actor.lanyard#block")),
 		/**
-		 * How many items to show; 3 by default, all links (up to 20) for the links block
+		 * How many items to show, for blocks that keep a count; 3 by default
 		 * @minimum 1
 		 * @maximum 20
 		 */
@@ -14,15 +42,15 @@ const _blockSchema = /*#__PURE__*/ v.object(
 			/*#__PURE__*/ v.integer(),
 			[/*#__PURE__*/ v.integerRange(1, 20)]
 		)),
-		/**
-		 * @maxLength 32
-		 */
-		"type": /*#__PURE__*/ v.constrain(
-			/*#__PURE__*/ v.string<"blogPosts" | "bskyPosts" | "code" | "collections" | "details" | "education" | "events" | "links" | "media" | "openTo" | "publications" | "skills" | "talks" | (string & {})>(),
-			[/*#__PURE__*/ v.stringLength(0, 32)]
-		),
+		get "type"() {
+			return blockTypeSchema
+		},
 		"visible": /*#__PURE__*/ v.boolean(),
 	}
+);
+const _blockTypeSchema = /*#__PURE__*/ v.constrain(
+	/*#__PURE__*/ v.string<"blogPosts" | "bskyPosts" | "code" | "collections" | "details" | "education" | "events" | "links" | "media" | "openTo" | "publications" | "roles" | "skills" | "talks" | (string & {})>(),
+	[/*#__PURE__*/ v.stringLength(0, 32)]
 );
 const _connectPrefsSchema = /*#__PURE__*/ v.object(
 	{
@@ -46,15 +74,14 @@ const _eventOverrideSchema = /*#__PURE__*/ v.object(
 		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("app.lanyards.actor.lanyard#eventOverride")),
 		/**
 		 * Block types moved to the top for this event
-		 * @maxLength 13
+		 * @maxLength 20
 		 */
-		"emphasise": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
-			/*#__PURE__*/ v.array(/*#__PURE__*/ v.constrain(
-				/*#__PURE__*/ v.string<"blogPosts" | "bskyPosts" | "code" | "collections" | "details" | "education" | "events" | "links" | "media" | "openTo" | "publications" | "skills" | "talks" | (string & {})>(),
-				[/*#__PURE__*/ v.stringLength(0, 32)]
-			)),
-			[/*#__PURE__*/ v.arrayLength(0, 13)]
-		)),
+		get "emphasise"() {
+			return /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
+				/*#__PURE__*/ v.array(blockTypeSchema),
+				[/*#__PURE__*/ v.arrayLength(0, 20)]
+			))
+		},
 		/**
 		 * The community.lexicon.calendar.event this override applies to
 		 */
@@ -97,13 +124,16 @@ const _mainSchema = /*#__PURE__*/ v.record(
 		{
 			"$type": /*#__PURE__*/ v.literal("app.lanyards.actor.lanyard"),
 			/**
-			 * Accent palette; violet when absent or unknown
+			 * Accent palette; blue when absent or unknown. violet, indigo and ocean are legacy values read as blue; moss and teal as mint; rose, plum and ember as pink
 			 * @maxLength 32
 			 */
 			"accent": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
-				/*#__PURE__*/ v.string<"ember" | "indigo" | "moss" | "ocean" | "plum" | "rose" | "teal" | "violet" | (string & {})>(),
+				/*#__PURE__*/ v.string<"blue" | "ember" | "indigo" | "lime" | "mint" | "moss" | "ocean" | "pink" | "plum" | "rose" | "teal" | "violet" | (string & {})>(),
 				[/*#__PURE__*/ v.stringLength(0, 32)]
 			)),
+			get "badge"() {
+				return /*#__PURE__*/ v.optional(badgePrefsSchema)
+			},
 			/**
 			 * Blocks in display order
 			 * @maxLength 20
@@ -140,7 +170,7 @@ const _mainSchema = /*#__PURE__*/ v.record(
 				[/*#__PURE__*/ v.arrayLength(0, 500)]
 			)),
 			/**
-			 * Show the current job line on the badge
+			 * Legacy: show the current role on the badge. Read as badge.showRole when that is absent
 			 * @default true
 			 */
 			"showJob": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.boolean(), true),
@@ -148,24 +178,35 @@ const _mainSchema = /*#__PURE__*/ v.record(
 		}
 	)
 );
+type badgePrefs$schematype = typeof _badgePrefsSchema;
 type block$schematype = typeof _blockSchema;
+type blockType$schematype = typeof _blockTypeSchema;
 type connectPrefs$schematype = typeof _connectPrefsSchema;
 type eventOverride$schematype = typeof _eventOverrideSchema;
 type main$schematype = typeof _mainSchema;
 
+export interface badgePrefsSchema extends badgePrefs$schematype {}
+
 export interface blockSchema extends block$schematype {}
+
+export interface blockTypeSchema extends blockType$schematype {}
 
 export interface connectPrefsSchema extends connectPrefs$schematype {}
 
 export interface eventOverrideSchema extends eventOverride$schematype {}
 
 export interface mainSchema extends main$schematype {}
+export const badgePrefsSchema = _badgePrefsSchema as badgePrefsSchema;
 export const blockSchema = _blockSchema as blockSchema;
+export const blockTypeSchema = _blockTypeSchema as blockTypeSchema;
 export const connectPrefsSchema = _connectPrefsSchema as connectPrefsSchema;
 export const eventOverrideSchema = _eventOverrideSchema as eventOverrideSchema;
 export const mainSchema = _mainSchema as mainSchema;
 
+export interface BadgePrefs extends v.InferInput<typeof badgePrefsSchema> {}
+
 export interface Block extends v.InferInput<typeof blockSchema> {}
+export type BlockType = v.InferInput<typeof blockTypeSchema>;
 
 export interface ConnectPrefs extends v.InferInput<typeof connectPrefsSchema> {}
 

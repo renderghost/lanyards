@@ -5,6 +5,7 @@ import type {
   BskyPost,
 } from '@/lib/sources/bluesky/bluesky.types';
 import type { LanyardRecords } from '@/lib/sources/lanyards/lanyards.types';
+import { movedKeyOf } from '@/lib/sources/lanyards/media';
 import type { OrcidWork } from '@/lib/sources/orcid/orcid.types';
 import type { SourceName } from '@/lib/sources/result';
 import type { SembleCollection } from '@/lib/sources/semble/semble.types';
@@ -261,13 +262,15 @@ function gather(
 }
 
 /** Hidden keys, with each URL also in its normalised form. */
-function hiddenSet(hidden: readonly string[]): Set<string> {
-  return new Set(
-    hidden.flatMap((value) => {
-      const url = normaliseUrl(value);
-      return url ? [value, url] : [value];
-    })
+/** Every form a hidden key matches: itself, its URL, and where it moved. */
+function hiddenForms(value: string): string[] {
+  return [value, normaliseUrl(value), movedKeyOf(value)].filter(
+    (form): form is string => form !== null
   );
+}
+
+function hiddenSet(hidden: readonly string[]): Set<string> {
+  return new Set(hidden.flatMap(hiddenForms));
 }
 
 /** Whether a key is among `hidden`, a link by any form of its URL. */
@@ -377,6 +380,7 @@ const COLLECTION_BLOCKS: Record<string, RenderableBlockType> = {
   'org.tangled.repo.manifest': 'code',
   'org.tangled.repo.declaration': 'code',
   'network.cosmik.collection': 'collections',
+  'app.lanyards.media.item': 'media',
   'app.lanyards.link.media.audio': 'media',
   'app.lanyards.link.media.video': 'media',
 };
@@ -421,8 +425,8 @@ export function hiddenItems(input: ComposeInput): HiddenItem[] {
     }
   }
   return input.config.hidden.map((key): HiddenItem => {
-    const match = [key, normaliseUrl(key)]
-      .flatMap((form) => (form === null ? [] : [index.get(form)]))
+    const match = hiddenForms(key)
+      .map((form) => index.get(form))
       .filter((entry) => entry !== undefined)
       .sort((a, b) => a.order - b.order)[0];
     if (match) return { key, type: match.type, item: match.item };

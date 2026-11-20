@@ -497,6 +497,31 @@ describe('orphanedHiddenKeys', () => {
   });
 });
 
+describe('a hidden legacy podcast that has moved (#132)', () => {
+  const moved = {
+    key: `at://${ADA.did}/app.lanyards.media.item/3mpod`,
+    kind: 'audio' as const,
+    url: 'https://pod.example/1',
+  };
+  const config = showOnly(['media'], {
+    hidden: [`at://${ADA.did}/app.lanyards.link.media.audio/3mpod`],
+  });
+  const sources: SourceSnapshot = {
+    ...allSources,
+    lanyards: ready({ media: [moved] }),
+  };
+
+  it('stays hidden under its old key', () => {
+    expect(compose(config, sources)).toEqual([]);
+  });
+
+  it('isn’t offered to Clear as gone', () => {
+    expect(
+      orphanedHiddenKeys({ config, sources, orcidVerified: false })
+    ).toEqual([]);
+  });
+});
+
 describe('composeEditorBlocks', () => {
   it('keeps hidden blocks and flags hidden items in place', () => {
     const hiddenLink = 'https://github.com/ada-example';

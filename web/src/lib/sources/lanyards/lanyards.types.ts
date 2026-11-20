@@ -1,13 +1,18 @@
 export type MediaLink = {
-  /** AT-URI of the app.lanyards.link.media.audio/.video record. */
+  /**
+   * AT-URI of the app.lanyards.media.item record, or of a legacy
+   * app.lanyards.link.media.audio/.video record until it moves (#132).
+   */
   key: string;
   kind: 'audio' | 'video';
   url: string;
-  platform: string;
+  platform?: string;
   title?: string;
   description?: string;
   type?: string;
-  publishedDate?: string;
+  publishedAt?: string;
+  /** Read from a legacy collection: moved on the owner's next visit. */
+  legacy?: true;
 };
 
 /**

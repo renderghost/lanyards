@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
 import { LanyardSurface } from '../../components/LanyardSurface/LanyardSurface';
 import { KEPT_LISTS, useCustomiserDraft } from '../../hooks/useCustomiserDraft';
+import { useMediaMove } from '../../hooks/useMediaMove';
 import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
@@ -91,9 +92,17 @@ function Customiser({
       canWrite(granted, collection, action)
     )
   );
-  const disabled = !canEdit || !settings.ready;
+  // Legacy podcasts and videos move to the one record type first (#132):
+  // editing waits, so no edit builds on a record that is moving.
+  const move = useMediaMove(did, {
+    enabled: canEdit && canKeep && records.ready && settings.ready,
+    records: records.records,
+    hidden: settings.config.hidden,
+  });
+  const disabled = !canEdit || !settings.ready || move.moving;
   // A records save replaces the draft it sent, so edits wait for it.
-  const recordsDisabled = !canKeep || !records.ready || draft.saving;
+  const recordsDisabled =
+    !canKeep || !records.ready || draft.saving || move.moving;
   const { update } = settings;
   const editing = viewAs === 'edit';
   useUnsavedChangesGuard(
@@ -134,6 +143,9 @@ function Customiser({
               {(!canEdit || !canKeep || draft.permissionLost) && (
                 <PermissionNotice returnTo={CUSTOMISE_PATH} />
               )}
+              <p role="status" className={styles.moving}>
+                {move.moving ? t`Updating your podcasts and videos…` : ''}
+              </p>
               {settings.invalid && (
                 <div role="status" className={styles.notice}>
                   <p className={styles.noticeHeading}>

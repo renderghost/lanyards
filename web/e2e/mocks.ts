@@ -35,6 +35,8 @@ type PersonOptions = {
   config?: Record<string, unknown>;
   /** Make the Sifa view and its PDS fallback fail. */
   sifaDown?: boolean;
+  /** Records in the legacy app.lanyards.link.media.audio collection. */
+  legacyAudio?: { uri: string; cid: string; value: Record<string, unknown> }[];
 };
 
 /** Answers every public read for ADA's lanyard. */
@@ -120,6 +122,9 @@ export async function mockPerson(page: Page, options: PersonOptions = {}) {
         new URL(route.request().url()).searchParams.get('collection') ?? '';
       if (options.sifaDown && collection.startsWith('id.sifa')) {
         return json(route, {}, 500);
+      }
+      if (collection === 'app.lanyards.link.media.audio') {
+        return json(route, { records: options.legacyAudio ?? [] });
       }
       return json(route, { records: [] });
     }

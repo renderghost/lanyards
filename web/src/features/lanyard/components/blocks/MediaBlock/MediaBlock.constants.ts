@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 
-/** Labels for the kept media lexicons' platform and type enums. */
+/** Labels for app.lanyards.media.item's platforms and kinds of content. */
 export const PLATFORM_LABELS: Record<string, ReturnType<typeof msg>> = {
   spotify: msg`Spotify`,
   'apple-podcasts': msg`Apple Podcasts`,
@@ -16,10 +16,7 @@ export const PLATFORM_LABELS: Record<string, ReturnType<typeof msg>> = {
 export const TYPE_LABELS: Record<string, ReturnType<typeof msg>> = {
   'podcast-episode': msg`Podcast episode`,
   interview: msg`Interview`,
-  lecture: msg`Lecture`,
   'panel-discussion': msg`Panel discussion`,
-  presentation: msg`Presentation`,
   tutorial: msg`Tutorial`,
-  'conference-talk': msg`Conference talk`,
   other: msg`Other`,
 };

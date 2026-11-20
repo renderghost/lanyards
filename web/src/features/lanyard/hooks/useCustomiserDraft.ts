@@ -5,6 +5,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
+import { ScopeRefusedError } from '@/lib/atproto/writes';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 
 import {
@@ -17,7 +18,12 @@ import { useLanyardDraft, type UseLanyardDraft } from './useLanyardDraft';
 const SAVE_FAILED_TOAST = 'lanyard-settings-save';
 
 /** The kept-record lists the owner adds to, edits and deletes from. */
-export const KEPT_LISTS = [LANYARDS_NSID.audio, LANYARDS_NSID.video] as const;
+/** The media collections the owner must be able to write (#132). */
+export const KEPT_LISTS = [
+  LANYARDS_NSID.mediaItem,
+  LANYARDS_NSID.legacyAudio,
+  LANYARDS_NSID.legacyVideo,
+] as const;
 
 export type UseCustomiserDraft = {
   settings: UseLanyardDraft;
@@ -74,7 +80,17 @@ export function useCustomiserDraft(did: Did): UseCustomiserDraft {
     setPermissionLost(false);
     if (records.dirty) {
       setSavingRecords(true);
-      const saved = await records.save();
+      let saved: boolean;
+      try {
+        saved = await records.save();
+      } catch (cause) {
+        setSavingRecords(false);
+        if (cause instanceof ScopeRefusedError) {
+          setPermissionLost(true);
+          return;
+        }
+        throw cause;
+      }
       setSavingRecords(false);
       if (!saved) {
         notify.error(t`Failed to save. Please try again.`, {

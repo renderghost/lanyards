@@ -7,10 +7,14 @@ const WEB_LINK = 'app.lanyards.link.web';
 const FOLLOW = 'app.bsky.graph.follow';
 const LANYARDS_COLLECTIONS = [
   'app.lanyards.actor.lanyard',
-  'app.lanyards.actor.biography.honorific',
-  'app.lanyards.link.web',
+  'app.lanyards.media.item',
   'app.lanyards.link.media.audio',
   'app.lanyards.link.media.video',
+];
+/** Retired: Sifa and Bluesky hold these now (#132). */
+const RETIRED = [
+  'app.lanyards.actor.biography.honorific',
+  'app.lanyards.link.web',
 ];
 const ACTIONS = ['create', 'update', 'delete'] as const;
 
@@ -49,6 +53,13 @@ describe('canWrite', () => {
       expect(writes(granted, collection)).toEqual(ACTIONS);
     }
     expect(writes(granted, FOLLOW)).toEqual([]);
+  });
+
+  it('no longer covers the retired honorific and web link collections', () => {
+    const granted = 'atproto include:app.lanyards.authFull';
+    for (const collection of RETIRED) {
+      expect(writes(granted, collection)).toEqual([]);
+    }
   });
 
   it('allows nothing under the identity-only atproto scope', () => {

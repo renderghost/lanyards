@@ -1,0 +1,93 @@
+{
+  "lexicon": 1,
+  "id": "app.lanyards.media.item",
+  "defs": {
+    "main": {
+      "type": "record",
+      "description": "A podcast, interview or video the owner appears in. Recordings of talks belong on Sifa talks (id.sifa.profile.presentation).",
+      "key": "tid",
+      "record": {
+        "type": "object",
+        "required": ["url", "kind", "createdAt"],
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Where to listen or watch"
+          },
+          "kind": {
+            "type": "string",
+            "maxLength": 32,
+            "knownValues": ["audio", "video"],
+            "description": "Audio or video"
+          },
+          "platform": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "spotify",
+              "apple-podcasts",
+              "soundcloud",
+              "anchor",
+              "youtube",
+              "vimeo",
+              "twitch",
+              "tiktok",
+              "other"
+            ],
+            "description": "Where it is hosted"
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 64,
+            "knownValues": [
+              "podcast-episode",
+              "interview",
+              "panel-discussion",
+              "tutorial",
+              "other"
+            ],
+            "description": "What kind of appearance it is"
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "Episode or video title"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "seriesName": {
+            "type": "string",
+            "maxLength": 200,
+            "description": "The podcast or series it belongs to"
+          },
+          "duration": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Length in seconds"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "datetime",
+            "description": "When it was published"
+          },
+          "related": {
+            "type": "string",
+            "format": "at-uri",
+            "description": "A related Sifa presentation or publication"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      }
+    }
+  }
+}

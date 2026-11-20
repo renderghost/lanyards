@@ -76,6 +76,7 @@ export function servePerson(options: ServeOptions = {}) {
       : null
   );
   for (const collection of [
+    'app.lanyards.media.item',
     'app.lanyards.link.media.audio',
     'app.lanyards.link.media.video',
   ]) {

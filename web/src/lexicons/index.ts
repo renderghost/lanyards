@@ -1,8 +1,7 @@
-export * as AppLanyardsActorBiographyHonorific from "./types/app/lanyards/actor/biography/honorific.js";
 export * as AppLanyardsActorLanyard from "./types/app/lanyards/actor/lanyard.js";
 export * as AppLanyardsLinkMediaAudio from "./types/app/lanyards/link/media/audio.js";
 export * as AppLanyardsLinkMediaVideo from "./types/app/lanyards/link/media/video.js";
-export * as AppLanyardsLinkWeb from "./types/app/lanyards/link/web.js";
+export * as AppLanyardsMediaItem from "./types/app/lanyards/media/item.js";
 export * as CommunityLexiconLocationAddress from "./types/community/lexicon/location/address.js";
 export * as IdSifaDefs from "./types/id/sifa/defs.js";
 export * as IdSifaGetProfileView from "./types/id/sifa/getProfileView.js";

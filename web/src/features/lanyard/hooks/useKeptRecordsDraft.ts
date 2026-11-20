@@ -14,7 +14,8 @@ import { useSession } from '@/features/auth/session/useSession';
 import { captureError, track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
 import {
-  applyWrites,
+  applyWriteGroups,
+  ScopeRefusedError,
   WriteFailedError,
   type WriteOp,
 } from '@/lib/atproto/writes';
@@ -24,10 +25,15 @@ import type {
   LanyardRecords,
   MediaLink,
 } from '@/lib/sources/lanyards/lanyards.types';
+import {
+  collectionOf,
+  itemFromLegacy,
+  legacyKindOf,
+} from '@/lib/sources/lanyards/media';
 
 import { rkeyOf, useKeptRecords } from './useKeptRecords';
 
-export type MediaFields = Omit<MediaLink, 'key'>;
+export type MediaFields = Omit<MediaLink, 'key' | 'legacy'>;
 
 export type UseKeptRecordsDraft = {
   /** The stored records with the draft's changes applied. */
@@ -40,7 +46,10 @@ export type UseKeptRecordsDraft = {
   addMedia(fields: MediaFields): void;
   updateMedia(key: string, fields: MediaFields): void;
   removeMedia(key: string): void;
-  /** Writes the changes; whatever lands leaves the draft. */
+  /**
+   * Writes the changes; whatever lands leaves the draft. Rejects with
+   * ScopeRefusedError when the PDS refuses the session's scope.
+   */
   save(): Promise<boolean>;
   discard(): void;
 };
@@ -61,23 +70,18 @@ type Pending = {
 
 const NONE: Pending = { added: [], updated: new Map(), removed: new Set() };
 
-const MEDIA_COLLECTION = {
-  audio: LANYARDS_NSID.audio,
-  video: LANYARDS_NSID.video,
-} as const;
-
 /** The fields the media form holds; an edit replaces exactly these. */
-const FORM_FIELDS = ['url', 'platform', 'title', 'description', 'type'];
+const FORM_FIELDS = ['url', 'kind', 'platform', 'title', 'description', 'type'];
 
 /**
- * A media record's fields: its kind is its collection, and its key is
- * where it's stored; neither is written into the record.
+ * A media record's fields: its key is where it's stored, and `legacy`
+ * where it was read from; neither is written into the record.
  */
 const mediaFields = ({
-  kind: _kind,
   key: _key,
+  legacy: _legacy,
   ...fields
-}: MediaFields & { key?: string }) =>
+}: MediaFields & { key?: string; legacy?: true }) =>
   Object.fromEntries(
     Object.entries(fields).filter(
       ([, value]) => value !== undefined && value !== ''
@@ -137,8 +141,20 @@ function without(pending: Pending, settled: Pending): Pending {
   };
 }
 
-/** One write, and the change it settles once it has landed. */
-type Write = { op: WriteOp; settles: Pending };
+/**
+ * The writes one change needs (moving a legacy record takes two), and the
+ * change it settles once they have all landed.
+ */
+type Write = { ops: WriteOp[]; settles: Pending };
+
+/** The changes whose writes all landed, when the first `applied` did. */
+function landedWrites(writes: Write[], applied: number): Write[] {
+  let sent = 0;
+  return writes.filter((write) => {
+    sent += write.ops.length;
+    return sent <= applied;
+  });
+}
 
 /**
  * The owner's kept records (podcasts and videos) as a draft until Save
@@ -239,24 +255,28 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
       show(without(pendingRef.current, settled));
     };
     let writes: Write[] = [];
+    /** Where a moved legacy record goes: its own rkey, unless taken. */
+    const itemRkey = (rkey: string) =>
+      byKey.has(`at://${owner.did}/${LANYARDS_NSID.mediaItem}/${rkey}`)
+        ? tidNow()
+        : rkey;
     try {
       writes = await Promise.all([
-        ...[...current.removed].map(async (removedKey): Promise<Write> => {
-          const item = byKey.get(removedKey)!;
-          return {
-            op: {
+        ...[...current.removed].map(async (removedKey): Promise<Write> => ({
+          ops: [
+            {
               type: 'delete',
-              collection: MEDIA_COLLECTION[item.kind],
+              collection: collectionOf(removedKey),
               rkey: rkeyOf(removedKey),
             },
-            settles: { ...NONE, removed: new Set([removedKey]) },
-          };
-        }),
+          ],
+          settles: { ...NONE, removed: new Set([removedKey]) },
+        })),
         ...[...current.updated].map(
           async ([updatedKey, fields]): Promise<Write> => {
-            const item = byKey.get(updatedKey)!;
-            const collection = MEDIA_COLLECTION[item.kind];
+            const collection = collectionOf(updatedKey);
             const rkey = rkeyOf(updatedKey);
+            const legacyKind = legacyKindOf(updatedKey);
             // Keep what the form doesn't hold: the record's own extra
             // fields and when it was created.
             const read = await getRecord(
@@ -266,40 +286,58 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
               rkey
             );
             if (!read.ok) throw read.error;
+            const value = (read.value?.value ?? {}) as Record<string, unknown>;
             const {
               $type: _type,
               createdAt,
               ...kept
-            } = (read.value?.value ?? {}) as Record<string, unknown>;
+            } = legacyKind ? itemFromLegacy(legacyKind, value) : value;
             for (const field of FORM_FIELDS) delete kept[field];
-            return {
-              op: {
-                type: 'update',
-                collection,
-                rkey,
-                fields: {
-                  ...mediaFields(fields),
-                  ...kept,
-                  createdAt: typeof createdAt === 'string' ? createdAt : now,
-                },
-              },
-              settles: { ...NONE, updated: new Map([[updatedKey, fields]]) },
+            const record = {
+              ...mediaFields(fields),
+              ...kept,
+              createdAt: typeof createdAt === 'string' ? createdAt : now,
             };
+            const settles = {
+              ...NONE,
+              updated: new Map([[updatedKey, fields]]),
+            };
+            // A legacy record moves to app.lanyards.media.item (#132).
+            return legacyKind
+              ? {
+                  ops: [
+                    {
+                      type: 'create',
+                      collection: LANYARDS_NSID.mediaItem,
+                      rkey: itemRkey(rkey),
+                      fields: record,
+                    },
+                    { type: 'delete', collection, rkey },
+                  ],
+                  settles,
+                }
+              : {
+                  ops: [{ type: 'update', collection, rkey, fields: record }],
+                  settles,
+                };
           }
         ),
         ...current.added.map(async (item): Promise<Write> => ({
-          op: {
-            type: 'create',
-            collection: MEDIA_COLLECTION[item.kind],
-            rkey: rkeyOf(item.key),
-            fields: { ...mediaFields(item), createdAt: now },
-          },
+          ops: [
+            {
+              type: 'create',
+              collection: LANYARDS_NSID.mediaItem,
+              rkey: rkeyOf(item.key),
+              fields: { ...mediaFields(item), createdAt: now },
+            },
+          ],
           settles: { ...NONE, added: [item] },
         })),
       ]);
-      await applyWrites(
+      // A move's create and delete never travel apart (#132).
+      await applyWriteGroups(
         owner,
-        writes.map((write) => write.op)
+        writes.map((write) => write.ops)
       );
       landed(writes);
       track('kept_record_saved', { changes: writes.length });
@@ -310,9 +348,11 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
       // Whatever landed before a failure leaves the draft, so a retry
       // never sends it again.
       if (cause instanceof WriteFailedError && cause.applied > 0) {
-        landed(writes.slice(0, cause.applied));
+        landed(landedWrites(writes, cause.applied));
       }
       captureError(cause, { source: 'kept-records' });
+      // The owner signs in again; the draft keeps what didn't land.
+      if (cause instanceof ScopeRefusedError) throw cause;
       return false;
     }
   }, [queryClient, key, settle, show]);
@@ -353,7 +393,7 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
           ...current.added,
           {
             ...fields,
-            key: `at://${did}/${MEDIA_COLLECTION[fields.kind]}/${tidNow()}`,
+            key: `at://${did}/${LANYARDS_NSID.mediaItem}/${tidNow()}`,
           },
         ],
       })),

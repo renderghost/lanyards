@@ -12,3 +12,5 @@ export const kind =
 export const radio = 'size-5 accent-ui-primary';
 
 export const actions = 'flex flex-wrap gap-2';
+
+export const hint = 'text-sm leading-5 text-ui-text-muted';
