@@ -1,7 +1,8 @@
 # Billboard badge and brand design language
 
 - **Status:** design, for the owner's approval
-- **Issues:** epic #127 (a sub-issue of #94), delivered as three PRs:
+- **Issues:** epic #127 (a sub-issue of #94), with follow-up #131 for
+  the link-preview badge. #127 is delivered as three PRs:
   - #128: the design language;
   - #129: the badge (cover patterns, the hero and the Show QR badge);
   - #130: Roles.
@@ -75,14 +76,17 @@ new Roles block.
 - Printing physical badges, and per-event badges.
 - New data sources. Everything comes from Bluesky, Sifa and the lanyard
   record we already read.
+- **The link-preview image as a billboard badge,** with the owner's
+  accent and cover. It needs new server-side reads, so it's follow-up
+  issue #131. This epic only restyles it (§8a).
 
 ## 4. Anti-goals
 
 These would make the work a failure even if it ships:
 
 - **A QR code that scans worse.** It stays ink on white, with its quiet
-  zone, never tinted and never smaller than today on a phone held
-  upright.
+  zone, never tinted, and at least 240 px wide on a phone held upright
+  (§8).
 - **Any text or control below WCAG 2.2 AA,** in light or dark, on any
   accent. That includes the badge's accent field and the cover.
 - **An existing lanyard changing family:** a pink lanyard turning
@@ -358,6 +362,26 @@ All three join the lexicon, the draft and the merge.
   narrower (up to 760 px), both centred.
 - **The skeleton** mirrors the hero's shape: cover, field and strip.
 
+**Loading.** Today the hero renders as soon as Bluesky answers, and Sifa
+and the lanyard record fill in later. With the badge, that would flash
+the default accent and cover, and make the board and the name jump.
+- **The wait:**
+  - After Bluesky answers, the hero waits for the lanyard record and
+    Sifa to settle (answered or failed), for at most **800 ms**.
+  - Meanwhile the skeleton shows, already in the hero's shape.
+- **After the cap:**
+  - The hero renders with fallbacks: Bluesky's name, avatar and bio
+    headline, the default accent and the derived cover.
+  - Late data then swaps in place. The board's height is reserved while
+    Sifa is pending, so only a Sifa answer with no board cells collapses
+    it.
+- **Supersedes:** this amends the 2026-11-10 spec's §12.3 ("a slow or
+  failed source never blocks the hero"). A slow source can delay the
+  hero by up to 800 ms, never longer. A failed source never blocks it.
+- **Performance:** the perf e2e budgets hold (LCP under 2.5 s, CLS
+  under 0.1).
+- **Blocks:** they keep loading independently, as today.
+
 ## 8. The Show QR badge (PR 2, #129)
 
 As on the Show QR board. The full-screen dialog stays: Radix Dialog,
@@ -371,11 +395,24 @@ wake lock, Copy link, Close, and focus returning to the opener.
   - the name in billboard type, 46 px, stepping down for long names;
   - the main role, when shown;
   - pronouns and handle;
-  - the QR code on white, at least 240 px wherever the screen allows it,
-    as today: ink on white, with its quiet zone;
+  - the QR code on white, ink on white with its quiet zone:
+    - at least 240 px wide, or the card's full inner width on screens
+      too narrow for that;
+    - on screens up to 360 px wide, the card runs edge to edge so the
+      code keeps its size;
   - "Scan to see my lanyard";
   - an ink strip with Based and `lanyards.app`.
 - **Actions** below the card: **Copy link** (white) and **Close** (ink).
+- **Short screens, upright:**
+  - The whole code is visible when the sheet opens, without scrolling.
+  - When the card doesn't fit, these give way, in this order:
+    1. the straps;
+    2. the cover, shrinking to 56 px, then going;
+    3. the pronouns and handle line;
+    4. the ink strip.
+  - The name, the code and the two actions never go.
+  - On the 320×640 e2e viewport the code is at least 240 px, fully on
+    screen.
 - **Landscape:** the QR code as large as the screen allows, with the
   card's details beside it. No straps.
 - **Data:**
@@ -387,6 +424,19 @@ wake lock, Copy link, Close, and focus returning to the opener.
 - **Accent:** the badge is scoped to the owner's accent with
   `data-accent` on the sheet. It never touches `:root`, because the
   owner may open it while viewing someone else's lanyard.
+
+## 8a. The link-preview image (PR 2, #129)
+
+This is the image that `server/badgeImage.ts` draws behind `api/og` for
+every shared lanyard link. PR 2 restyles it, keeping today's layout and
+data:
+- **Font:** Rethink Sans in place of DM Sans.
+- **Colours:** the brand palette (ink 06011E, brand blue, the grays) in
+  place of the old ink (1F1638).
+- **Corners:** the same 1–3 px rule as everywhere else.
+
+It still doesn't read the owner's accent or cover. Making it the full
+billboard badge is #131 (§3).
 
 ## 9. Roles (PR 3, #130)
 
@@ -444,6 +494,8 @@ they cost requests and can't recolour.
   standard.site and offprint.app, soft modern shadows, and corners of
   1–3 px.
 - The mockups as approved ("Let's go").
+- **The link-preview image:** restyle it now (§8a), and turn it into the
+  billboard badge in #131.
 
 ## 12. My calls (correctable)
 
@@ -465,6 +517,13 @@ they cost requests and can't recolour.
     lanyard";
   - signed-out Sign in and Create account move to the header.
 - **The Show QR badge** looks the same in light and dark.
+- **The hero waits** up to 800 ms for Sifa and the lanyard record, so
+  the badge doesn't flash the wrong accent or jump (§7, Loading).
+- **The QR code floor** is 240 px, not "today's size":
+  - Today's code is the screen width minus the gutters (288 px on a
+    320 px phone), and the card frame can't keep that on narrow phones.
+  - The approved mockup showed 192 px.
+  - On short screens, the decoration gives way before the code (§8).
 - **The primary button** is ink, not violet.
 
 ## 13. Left to the builder
@@ -491,8 +550,9 @@ they cost requests and can't recolour.
    - Unit tests: contrast and the mapping.
    - e2e: axe in light and dark, on two accents.
 2. **PR 2 (#129):** the cover patterns and the cover setting (lexicon),
-   the hero, the badge settings, the header actions for signed-out
-   visitors, and the Show QR badge.
+   the hero (with its loading rule), the badge settings, the header
+   actions for signed-out visitors, the Show QR badge, and the
+   link-preview restyle.
    - Unit tests: the board cells, hidden roles and cover derivation.
    - e2e: the hero for the owner, a visitor and a signed-out visitor;
      choosing a cover and saving it; Show QR showing the badge and a
