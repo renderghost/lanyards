@@ -243,4 +243,27 @@ test.describe('feedback (#134)', () => {
       )
     ).toBe('hidden');
   });
+
+  test('draws its choices in the app’s colours in dark mode', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await customiser(page, FEEDBACK);
+    await openFeedback(page);
+    const radio = dialog(page).getByRole('radio', { name: 'bug' });
+    const tick = dialog(page).getByRole('checkbox', {
+      name: 'Include technical details',
+    });
+    await expect(radio).toBeVisible();
+    // The dialog's surface (#0e0a26), not the browser's grey control.
+    const ground = (locator: typeof radio) =>
+      locator.evaluate((element) => getComputedStyle(element).backgroundColor);
+    expect(await ground(radio)).toBe('rgb(14, 10, 38)');
+    expect(await ground(tick)).toBe('rgb(14, 10, 38)');
+    await radio.check();
+    await tick.check();
+    await expect(radio).toBeChecked();
+    // Checked, the primary colour: light on the dark ground.
+    expect(await ground(tick)).toBe('rgb(246, 245, 255)');
+  });
 });
