@@ -13,3 +13,10 @@ export const USERINPUT_ORIGIN = 'https://userinput.app';
 
 /** Boards read to find our newest valid one. */
 export const BOARDS_READ = 10;
+
+/** Our user documentation, in the GitHub wiki. */
+export const DOCS_URL = 'https://github.com/renderghost/lanyards/wiki/';
+
+/** Our Signal group, for beta testers to talk with us and each other. */
+export const SIGNAL_GROUP_URL =
+  'https://signal.group/#CjQKII7UrdZwfftsYT2F7w0zKkFaudDblsBRc2eLpgpP3m-CEhAhjk2AnC2hvLLOFYBrcBe-';

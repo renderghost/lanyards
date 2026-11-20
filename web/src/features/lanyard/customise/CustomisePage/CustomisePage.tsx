@@ -23,8 +23,11 @@ import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
 import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
+import { SupportSheet } from '@/features/feedback/components/SupportSheet/SupportSheet';
+
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
+import { CustomiserSidebar } from '../CustomiserSidebar/CustomiserSidebar';
 import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
 import * as styles from './CustomisePage.styles';
 import type { CustomisePageProps } from './CustomisePage.types';
@@ -89,6 +92,9 @@ function Customiser({
   /** On phones, the style sheet opened from the bottom toolbar. */
   const [styleOpen, setStyleOpen] = useState(false);
   const styleButton = useRef<HTMLButtonElement>(null);
+  /** On phones, "Beta support" opened from the bottom toolbar (#134). */
+  const [supportOpen, setSupportOpen] = useState(false);
+  const supportButton = useRef<HTMLButtonElement>(null);
 
   const granted = useMemo(() => parseGrantedScope(scope), [scope]);
   const canEdit =
@@ -118,7 +124,7 @@ function Customiser({
   );
 
   return (
-    <>
+    <div className={styles.shell}>
       <AppHeader
         title={t`Your lanyard`}
         actions={
@@ -135,15 +141,17 @@ function Customiser({
       />
       <main className={styles.main}>
         <div className={cn(styles.workspace, className)}>
-          {editing && (
-            <StyleSidebar
-              did={did}
-              initials={initials}
-              config={settings.config}
-              disabled={disabled}
-              onChange={update}
-            />
-          )}
+          <CustomiserSidebar>
+            {editing && (
+              <StyleSidebar
+                did={did}
+                initials={initials}
+                config={settings.config}
+                disabled={disabled}
+                onChange={update}
+              />
+            )}
+          </CustomiserSidebar>
           <LanyardSurface className={styles.canvas}>
             <div className={styles.intro}>
               <h1 id={headingId} className={styles.heading}>
@@ -198,10 +206,17 @@ function Customiser({
           onOpenStyle={() => setStyleOpen(true)}
           styleButtonRef={styleButton}
           onReset={draft.discard}
+          onOpenSupport={() => setSupportOpen(true)}
+          supportButtonRef={supportButton}
           dirty={draft.dirty}
           changes={draft.changes}
         />
       </main>
+      <SupportSheet
+        open={supportOpen}
+        onOpenChange={setSupportOpen}
+        returnFocus={() => supportButton.current?.focus()}
+      />
       <StyleSheet
         open={styleOpen}
         onOpenChange={setStyleOpen}
@@ -212,6 +227,6 @@ function Customiser({
         disabled={disabled}
         onChange={update}
       />
-    </>
+    </div>
   );
 }

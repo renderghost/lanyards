@@ -195,17 +195,42 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(screen.getAllByRole('main')).toHaveLength(1);
   });
 
-  it('has the site footer, to send feedback (#134)', async () => {
+  it('keeps support at the foot of the sidebar, even viewed as public (#134)', async () => {
     servePerson();
     renderRoute('/lanyard');
     await preview();
-    const footers = screen.getAllByRole('contentinfo');
-    expect(footers).toHaveLength(1);
+    expect(screen.queryByRole('contentinfo')).toBeNull();
+    const support = screen.getByRole('region', { name: 'Beta support' });
     expect(
-      within(footers[0] as HTMLElement).getByRole('button', {
-        name: 'Send feedback',
-      })
+      within(support).getByRole('button', { name: 'Send feedback' })
     ).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole('button', { name: 'View as public' })
+    );
+    expect(
+      screen.getByRole('region', { name: 'Beta support' })
+    ).toBeInTheDocument();
+  });
+
+  it('offers support from the phone toolbar, in a sheet (#134)', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    await preview();
+    const toolbar = screen.getByRole('toolbar', { name: 'Customiser' });
+    await userEvent.click(
+      within(toolbar).getByRole('button', { name: 'Support' })
+    );
+    const sheet = await screen.findByRole('dialog', { name: 'Beta support' });
+    expect(
+      within(sheet).getByRole('link', { name: /Signal group/ })
+    ).toBeInTheDocument();
+    await userEvent.click(
+      within(sheet).getByRole('button', { name: 'Send feedback' })
+    );
+    expect(
+      await screen.findByRole('dialog', { name: 'Send feedback' })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: 'Beta support' })).toBeNull();
   });
 
   it('lays the lanyard out beside a pinned style sidebar', async () => {

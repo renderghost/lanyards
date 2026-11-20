@@ -16,7 +16,11 @@ vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 vi.mock('@/lib/atproto/useProfile', () => ({ useProfile: vi.fn() }));
 
 async function renderToolbar(props: Partial<CustomiserToolbarProps> = {}) {
-  const handlers = { onOpenStyle: vi.fn(), onReset: vi.fn() };
+  const handlers = {
+    onOpenStyle: vi.fn(),
+    onReset: vi.fn(),
+    onOpenSupport: vi.fn(),
+  };
   const view = renderInRouter(
     <CustomiserToolbar dirty={false} changes={0} {...handlers} {...props} />
   );
@@ -46,13 +50,13 @@ afterEach(() => {
 });
 
 describe('CustomiserToolbar', () => {
-  it('is a toolbar named Customiser, with Style, Reset, Show QR and the account', async () => {
+  it('is a toolbar named Customiser, with Style, Reset, Support, Show QR and the account', async () => {
     await renderToolbar();
     expect(
       controls().map(
         (control) => control.getAttribute('aria-label') ?? control.textContent
       )
-    ).toEqual(['Style', 'Reset', 'Show QR', 'Your account']);
+    ).toEqual(['Style', 'Reset', 'Support', 'Show QR', 'Your account']);
     expect(
       within(toolbar()).getByRole('link', { name: 'Your account' })
     ).toHaveAttribute('href', '/settings');
@@ -64,6 +68,15 @@ describe('CustomiserToolbar', () => {
     expect(styleButtonRef.current).toBe(
       within(toolbar()).getByRole('button', { name: 'Style' })
     );
+  });
+
+  it('opens support, handing over its button to return focus to (#134)', async () => {
+    const supportButtonRef = createRef<HTMLButtonElement>();
+    const { onOpenSupport } = await renderToolbar({ supportButtonRef });
+    const support = within(toolbar()).getByRole('button', { name: 'Support' });
+    expect(supportButtonRef.current).toBe(support);
+    await userEvent.click(support);
+    expect(onOpenSupport).toHaveBeenCalledOnce();
   });
 
   it('opens the style sheet', async () => {
@@ -94,10 +107,12 @@ describe('CustomiserToolbar', () => {
 
   it('moves between its controls with the arrow keys', async () => {
     await renderToolbar();
-    const [style, reset, qr, account] = controls();
+    const [style, reset, support, qr, account] = controls();
     style?.focus();
     await userEvent.keyboard('{ArrowRight}');
     expect(reset).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(support).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
     expect(qr).toHaveFocus();
     await userEvent.keyboard('{ArrowRight}');
