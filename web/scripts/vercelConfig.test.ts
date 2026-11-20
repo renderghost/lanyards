@@ -15,7 +15,12 @@ import { afterEach, describe, expect, it } from 'vitest';
 type Config = {
   ignoreCommand: string;
   functions?: Record<string, { includeFiles?: string }>;
-  redirects?: { source: string; destination: string; permanent: boolean }[];
+  redirects?: {
+    source: string;
+    destination: string;
+    permanent: boolean;
+    has?: { type: string; key?: string; value?: string }[];
+  }[];
   rewrites: { source: string; destination: string }[];
   headers: { source: string; headers: { key: string; value: string }[] }[];
 };
@@ -25,9 +30,20 @@ const config = JSON.parse(
 ) as Config;
 
 describe('vercel.json', () => {
-  // The beta's /@handle links, link previews included (#150).
-  it('sends /@handle on to /handle for good', () => {
+  // The beta's /@handle links, link previews included (#150). The beta
+  // subdomain's pages move to lanyards.app (#154); only page visits, so
+  // an installed copy's service worker can still fetch its update there.
+  it('sends next.lanyards.app pages to lanyards.app, and /@handle to /handle', () => {
     expect(config.redirects).toEqual([
+      {
+        source: '/:path*',
+        has: [
+          { type: 'host', value: 'next.lanyards.app' },
+          { type: 'header', key: 'sec-fetch-dest', value: 'document' },
+        ],
+        destination: 'https://lanyards.app/:path*',
+        permanent: true,
+      },
       { source: '/@:handle', destination: '/:handle', permanent: true },
     ]);
   });
