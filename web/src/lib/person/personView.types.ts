@@ -23,7 +23,9 @@ import type { LanyardConfig, RenderableBlockType } from './config';
 import type { Platform } from './platform';
 
 /** Every query a lanyard can make: one per source, plus two extra reads. */
-export type SourceKey = SourceName | 'blueskyPosts' | 'orcidWorks';
+export type SourceKey =
+  // UserInput is our feedback board's source, not a lanyard's (#134).
+  Exclude<SourceName, 'userinput'> | 'blueskyPosts' | 'orcidWorks';
 
 export type SourceState<T> =
   | { status: 'loading' }

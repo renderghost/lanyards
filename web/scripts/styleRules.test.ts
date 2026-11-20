@@ -105,6 +105,7 @@ const CHROME = [
   'src/components/',
   'src/features/account/',
   'src/features/auth/',
+  'src/features/feedback/',
   'src/features/lanyard/customise/',
   'src/features/qr/',
   'src/routes/',

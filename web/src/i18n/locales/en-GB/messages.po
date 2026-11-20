@@ -216,6 +216,10 @@ msgstr "Contract roles"
 msgid "Copy link"
 msgstr "Copy link"
 
+#: src/features/feedback/components/ContactLinks/ContactLinks.tsx:58
+msgid "Copy Signal username"
+msgstr "Copy Signal username"
+
 #: src/features/lanyard/components/FollowButton/FollowButton.tsx:56
 msgid "Couldn't check whether you already follow them"
 msgstr "Couldn't check whether you already follow them"
@@ -223,6 +227,10 @@ msgstr "Couldn't check whether you already follow them"
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:131
 msgid "Couldn't check your ORCID iD right now."
 msgstr "Couldn't check your ORCID iD right now."
+
+#: src/features/feedback/components/ContactLinks/ContactLinks.tsx:26
+msgid "Couldn't copy it. Please try again."
+msgstr "Couldn't copy it. Please try again."
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:94
 #: src/features/qr/components/QrSheet/QrSheet.tsx:51
@@ -361,6 +369,10 @@ msgstr "Failed to unfollow. Please try again."
 #: src/features/lanyard/components/FollowButton/FollowButton.tsx:52
 msgid "Follow"
 msgstr "Follow"
+
+#: src/features/feedback/components/ContactLinks/ContactLinks.tsx:44
+msgid "Follow @{BLUESKY_HANDLE} on Bluesky"
+msgstr "Follow @{BLUESKY_HANDLE} on Bluesky"
 
 #: src/features/lanyard/components/HeroActions/HeroActions.tsx:55
 msgid "Follow on Bluesky"
@@ -532,6 +544,10 @@ msgstr "Make your lanyard"
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:11
 msgid "Mentoring others"
 msgstr "Mentoring others"
+
+#: src/features/feedback/components/ContactLinks/ContactLinks.tsx:49
+msgid "Message us privately on Signal:"
+msgstr "Message us privately on Signal:"
 
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:8
 msgid "Mint"
@@ -725,6 +741,10 @@ msgstr "Scan to see my lanyard"
 msgid "Search for someone"
 msgstr "Search for someone"
 
+#: src/features/feedback/components/ContactLinks/ContactLinks.tsx:35
+msgid "See our feedback board"
+msgstr "See our feedback board"
+
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:11
 msgid "Semble"
 msgstr "Semble"
@@ -786,6 +806,10 @@ msgstr "Sign out"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.constants.ts:7
 msgid "Sign-in was cancelled."
 msgstr "Sign-in was cancelled."
+
+#: src/features/feedback/components/ContactLinks/ContactLinks.tsx:23
+msgid "Signal username copied"
+msgstr "Signal username copied"
 
 #: src/features/auth/session/SessionProvider.tsx:80
 msgid "Signed out"
@@ -930,6 +954,10 @@ msgstr "Update"
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:156
 msgid "Updating your podcasts and videos…"
 msgstr "Updating your podcasts and videos…"
+
+#: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:13
+msgid "UserInput"
+msgstr "UserInput"
 
 #: src/features/lanyard/components/blocks/PublicationsBlock/PublicationsBlock.tsx:41
 msgid "Verified on ORCID"
