@@ -126,3 +126,18 @@ describe('UI tokens draw on the brand neutrals', () => {
     expect(value(mode, name)).toBe(expected);
   });
 });
+
+describe('links and selection in the app (#128)', () => {
+  it.each(MODES)('are the brand blue, at least 4.5:1 (%s)', (mode) => {
+    expect(ui(mode)['--ui-link']?.trim().toLowerCase()).toBe(
+      mode === 'light' ? '#4020df' : '#b3a6ff'
+    );
+    for (const ground of [
+      '--ui-surface',
+      '--ui-canvas',
+      '--ui-surface-muted',
+    ]) {
+      expect(ratio(mode, '--ui-link', ground)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
