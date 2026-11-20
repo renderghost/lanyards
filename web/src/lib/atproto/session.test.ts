@@ -18,7 +18,12 @@ import {
 
 import { track } from '@/lib/analytics/analytics';
 
-import { DID_STORAGE_KEY, FALLBACK_SCOPE, GRANULAR_SCOPE } from './oauthConfig';
+import {
+  DID_STORAGE_KEY,
+  FALLBACK_SCOPE,
+  FEEDBACK_SCOPE,
+  GRANULAR_SCOPE,
+} from './oauthConfig';
 import {
   completeSignIn,
   isUnknownAccountError,
@@ -89,6 +94,20 @@ describe('startSignIn', () => {
     });
     expect(assign).toHaveBeenCalledWith(url);
     expect(track).toHaveBeenCalledWith('sign_in_started');
+  });
+
+  it('asks for extra scopes on request, on top of the usual ones (#134)', async () => {
+    vi.mocked(createAuthorizationUrl).mockResolvedValue(
+      new URL('https://bsky.social/oauth/authorize?x=2')
+    );
+    await startSignIn('alice.bsky.social', '/feedback', {
+      extraScope: FEEDBACK_SCOPE,
+    });
+    expect(createAuthorizationUrl).toHaveBeenCalledWith({
+      target: { type: 'account', identifier: 'alice.bsky.social' },
+      scope: `${GRANULAR_SCOPE} ${FEEDBACK_SCOPE}`,
+      state: { returnTo: '/feedback' },
+    });
   });
 
   it('falls back to transition:generic when the server rejects the scopes', async () => {

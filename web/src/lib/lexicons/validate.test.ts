@@ -136,6 +136,57 @@ describe('validateRecord', () => {
     expect(result.ok).toBe(false);
   });
 
+  // Feedback to our UserInput board (#134).
+  const discussion = {
+    $type: 'app.userinput.discussion',
+    space: {
+      uri: 'at://did:plc:ua3d6biqepazbq6mw4ysotfo/app.userinput.space/3mboard',
+      cid: `bafyrei${'c'.repeat(52)}`,
+    },
+    title: 'The badge overlaps on my phone',
+    body: 'Steps to reproduce…',
+    tags: ['bug'],
+    createdAt: NOW,
+  };
+  const screenshot = {
+    alt: 'The badge on a 320 px phone',
+    image: {
+      $type: 'blob',
+      ref: { $link: `bafkrei${'d'.repeat(52)}` },
+      mimeType: 'image/webp',
+      size: 48_000,
+    },
+  };
+
+  it('accepts a UserInput discussion with a screenshot', () => {
+    expect(
+      validateRecord('app.userinput.discussion', {
+        ...discussion,
+        images: [screenshot],
+      }).ok
+    ).toBe(true);
+  });
+
+  it('rejects a UserInput discussion with five screenshots', () => {
+    expect(
+      validateRecord('app.userinput.discussion', {
+        ...discussion,
+        images: Array.from({ length: 5 }, () => screenshot),
+      }).ok
+    ).toBe(false);
+  });
+
+  it('reads a UserInput board with its tags', () => {
+    expect(
+      validateRecord('app.userinput.space', {
+        $type: 'app.userinput.space',
+        name: 'Lanyards feedback',
+        tags: [{ value: 'bug', label: 'Bug' }],
+        createdAt: NOW,
+      }).ok
+    ).toBe(true);
+  });
+
   it('tolerates null optional fields in third-party records', () => {
     const result = validateRecord('id.sifa.profile.position', {
       $type: 'id.sifa.profile.position',

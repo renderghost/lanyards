@@ -1,0 +1,73 @@
+{
+  "id": "app.userinput.space",
+  "defs": {
+    "tag": {
+      "type": "object",
+      "required": [
+        "label",
+        "value"
+      ],
+      "properties": {
+        "label": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Human-readable display label."
+        },
+        "value": {
+          "type": "string",
+          "maxLength": 64,
+          "description": "Stable machine value stored on discussions."
+        }
+      }
+    },
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "name"
+        ],
+        "properties": {
+          "icon": {
+            "type": "blob",
+            "accept": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ],
+            "maxSize": 1000000,
+            "description": "Optional space icon/logo."
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "maxGraphemes": 100
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "ref": "#tag",
+              "type": "ref"
+            },
+            "maxLength": 24,
+            "description": "The set of categories feedback in this space may be filed under."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "maxGraphemes": 1500
+          }
+        }
+      },
+      "description": "A feedback space created by an organization. Lives in the owner's repo; the owner DID is the repo it is stored in."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}

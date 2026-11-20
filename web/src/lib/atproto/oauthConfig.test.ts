@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   buildOAuthEnv,
   CLIENT_SCOPE,
+  FEEDBACK_SCOPE,
   FALLBACK_SCOPE,
   GRANULAR_SCOPE,
   resolveBaseUrl,
@@ -117,7 +118,15 @@ describe('OAuth scopes', () => {
   });
 
   it('declares both the granular and the fallback scopes for the client', () => {
-    expect(CLIENT_SCOPE).toBe(`${GRANULAR_SCOPE} transition:generic`);
+    expect(CLIENT_SCOPE).toBe(
+      `${GRANULAR_SCOPE} ${FEEDBACK_SCOPE} transition:generic`
+    );
+    // Declared, but asked for only from the feedback page (#134).
+    expect(FEEDBACK_SCOPE).toBe(
+      'repo:app.userinput.discussion?action=create blob:image/*'
+    );
+    expect(GRANULAR_SCOPE).not.toContain('app.userinput');
+    expect(GRANULAR_SCOPE).not.toContain('blob:');
   });
 
   it('puts the client scope byte for byte into the loopback client_id', () => {

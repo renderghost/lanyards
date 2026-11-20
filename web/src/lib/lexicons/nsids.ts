@@ -39,3 +39,9 @@ export const BLOCK_TYPES = [
 ] as const;
 
 export type BlockType = (typeof BLOCK_TYPES)[number];
+
+/** UserInput's records, for feedback to our board there (#134). */
+export const USERINPUT_NSID = {
+  discussion: 'app.userinput.discussion',
+  space: 'app.userinput.space',
+} as const;

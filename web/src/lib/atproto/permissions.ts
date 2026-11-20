@@ -1,4 +1,8 @@
-import { AUTH_FULL_COLLECTIONS, LANYARDS_NSID } from '@/lib/lexicons/nsids';
+import {
+  AUTH_FULL_COLLECTIONS,
+  LANYARDS_NSID,
+  USERINPUT_NSID,
+} from '@/lib/lexicons/nsids';
 
 export type RepoAction = 'create' | 'update' | 'delete';
 
@@ -12,6 +16,8 @@ export type GrantedPermissions = {
   repo: Map<string, Set<RepoAction>>;
   /** Method NSIDs (or '*') callable through the service proxy. */
   rpc: Set<string>;
+  /** MIME patterns the session may upload: exact, `type/` + `*`, or any. */
+  blob: string[];
 };
 
 const isAction = (value: string): value is RepoAction =>
@@ -49,6 +55,7 @@ export function parseGrantedScope(scope: string): GrantedPermissions {
     generic: false,
     repo: new Map(),
     rpc: new Set(),
+    blob: [],
   };
 
   for (const raw of scope.split(' ')) {
@@ -68,6 +75,10 @@ export function parseGrantedScope(scope: string): GrantedPermissions {
       if (!params.getAll('aud').length) continue;
       const methods = positional ? [positional] : params.getAll('lxm');
       for (const method of methods) granted.rpc.add(method);
+    } else if (resource === 'blob') {
+      granted.blob.push(
+        ...(positional ? [positional] : params.getAll('accept'))
+      );
     } else if (resource === 'include') {
       // Only our own permission set is expanded; others grant nothing here.
       const nsid = positional ?? params.get('nsid');
@@ -94,4 +105,25 @@ export function canWrite(
 export function canCall(granted: GrantedPermissions, lxm: string): boolean {
   if (granted.generic && !lxm.startsWith('chat.bsky.')) return true;
   return granted.rpc.has(lxm) || granted.rpc.has('*');
+}
+
+/** Whether the session may upload a blob of type `mime`. */
+export function canUploadBlob(
+  granted: GrantedPermissions,
+  mime: string
+): boolean {
+  if (granted.generic) return true;
+  const [type] = mime.split('/');
+  return granted.blob.some(
+    (pattern) =>
+      pattern === '*/*' || pattern === mime || pattern === `${type}/*`
+  );
+}
+
+/** Whether the session may post feedback with screenshots (#134). */
+export function canSendFeedback(granted: GrantedPermissions): boolean {
+  return (
+    canWrite(granted, USERINPUT_NSID.discussion, 'create') &&
+    canUploadBlob(granted, 'image/webp')
+  );
 }

@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { canCall, canWrite, parseGrantedScope } from './permissions';
+import { FEEDBACK_SCOPE, GRANULAR_SCOPE } from './oauthConfig';
+import {
+  canCall,
+  canSendFeedback,
+  canUploadBlob,
+  canWrite,
+  parseGrantedScope,
+} from './permissions';
 
 const LANYARD = 'app.lanyards.actor.lanyard';
 const WEB_LINK = 'app.lanyards.link.web';
@@ -103,5 +110,40 @@ describe('parseGrantedScope', () => {
     const granted = parseGrantedScope('repo: rpc?aud=x repo?action=create ::');
     expect(writes('repo: rpc?aud=x repo?action=create ::', FOLLOW)).toEqual([]);
     expect(canCall(granted, 'app.bsky.graph.getRelationships')).toBe(false);
+  });
+});
+
+// Feedback to our UserInput board (#134) uploads screenshots as blobs.
+describe('canUploadBlob', () => {
+  const uploads = (scope: string, mime: string) =>
+    canUploadBlob(parseGrantedScope(scope), mime);
+
+  it('reads blob permissions by MIME pattern', () => {
+    expect(uploads('atproto blob:image/*', 'image/webp')).toBe(true);
+    expect(uploads('atproto blob:image/*', 'video/mp4')).toBe(false);
+    expect(uploads('atproto blob:*/*', 'video/mp4')).toBe(true);
+    expect(
+      uploads('atproto blob?accept=image/png&accept=image/webp', 'image/webp')
+    ).toBe(true);
+    expect(
+      uploads('atproto blob?accept=image/png&accept=image/webp', 'image/jpeg')
+    ).toBe(false);
+  });
+
+  it('allows any upload under transition:generic, none without a grant', () => {
+    expect(uploads('atproto transition:generic', 'image/png')).toBe(true);
+    expect(uploads(GRANULAR_SCOPE, 'image/png')).toBe(false);
+  });
+});
+
+describe('canSendFeedback', () => {
+  it('needs both the discussion and the image permissions', () => {
+    const send = (scope: string) => canSendFeedback(parseGrantedScope(scope));
+    expect(send(`${GRANULAR_SCOPE} ${FEEDBACK_SCOPE}`)).toBe(true);
+    expect(send(GRANULAR_SCOPE)).toBe(false);
+    expect(send('atproto repo:app.userinput.discussion?action=create')).toBe(
+      false
+    );
+    expect(send('atproto transition:generic')).toBe(true);
   });
 });

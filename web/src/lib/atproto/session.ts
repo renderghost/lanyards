@@ -167,14 +167,16 @@ function needsFallback(identifier: string): boolean {
 
 async function authorizationUrl(
   options: AuthorizationOptions,
-  identifier?: string
+  identifier?: string,
+  extraScope?: string
 ): Promise<URL> {
+  const scope = extraScope ? `${GRANULAR_SCOPE} ${extraScope}` : GRANULAR_SCOPE;
   if (identifier && needsFallback(identifier)) {
     track('oauth_scope_fallback');
     return createAuthorizationUrl({ ...options, scope: FALLBACK_SCOPE });
   }
   try {
-    return await createAuthorizationUrl({ ...options, scope: GRANULAR_SCOPE });
+    return await createAuthorizationUrl({ ...options, scope });
   } catch (error) {
     if (!(error instanceof OAuthResponseError)) throw error;
     if (error.error !== 'invalid_scope') throw error;
@@ -183,9 +185,15 @@ async function authorizationUrl(
   }
 }
 
+/**
+ * Signs in to `identifier`. `extraScope` asks for more than the usual
+ * scopes, for a feature that needs them (feedback, #134); a server that
+ * rejects granular scopes gets transition:generic, which covers it.
+ */
 export async function startSignIn(
   identifier: string,
-  returnTo: string
+  returnTo: string,
+  options: { extraScope?: string } = {}
 ): Promise<void> {
   const state: SignInState = { returnTo: safeReturnTo(returnTo) };
   rememberReturnTo(state.returnTo);
@@ -194,7 +202,8 @@ export async function startSignIn(
       target: { type: 'account', identifier: identifier as ActorIdentifier },
       state,
     },
-    identifier
+    identifier,
+    options.extraScope
   );
   track('sign_in_started');
   await redirect(url);

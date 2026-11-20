@@ -3,19 +3,25 @@ import type { Client } from '@atcute/client';
 import type { Did } from '@atcute/lexicons';
 import { now as tidNow } from '@atcute/tid';
 
-import { AUTH_FULL_COLLECTIONS } from '@/lib/lexicons/nsids';
+import { AUTH_FULL_COLLECTIONS, USERINPUT_NSID } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
 
-import { canWrite, parseGrantedScope, type RepoAction } from './permissions';
+import {
+  canUploadBlob,
+  canWrite,
+  parseGrantedScope,
+  type RepoAction,
+} from './permissions';
 
 /**
- * The only collections Lanyards writes: its own records and Bluesky
- * follows. A broad (transition:generic) session could write anything, so
+ * The only collections Lanyards writes: its own records, Bluesky follows
+ * and feedback to our UserInput board (#134). A broad (transition:generic) session could write anything, so
  * this is checked at run time as well as by the types.
  */
 export const WRITABLE_COLLECTIONS = [
   ...AUTH_FULL_COLLECTIONS,
   'app.bsky.graph.follow',
+  USERINPUT_NSID.discussion,
 ] as const;
 
 export type WritableNsid = (typeof WRITABLE_COLLECTIONS)[number];
@@ -262,4 +268,34 @@ export async function applyWriteGroups(
     }
     applied += writes.length;
   }
+}
+
+/** A blob as a record refers to it. */
+export type BlobRef = {
+  $type: 'blob';
+  ref: { $link: string };
+  mimeType: string;
+  size: number;
+};
+
+/**
+ * Uploads `blob` to the signed-in person's repository, for a record to
+ * refer to: a screenshot on their feedback (#134).
+ */
+export async function uploadBlob(
+  session: WriteSession,
+  blob: Blob
+): Promise<BlobRef> {
+  if (!canUploadBlob(parseGrantedScope(session.scope), blob.type)) {
+    throw new MissingPermissionError(`No permission to upload ${blob.type}`);
+  }
+  const response = await session.rpc.post('com.atproto.repo.uploadBlob', {
+    input: blob,
+    headers: { 'content-type': blob.type },
+  });
+  if (!response.ok) {
+    refused(response.status, response.data.error);
+    throw new WriteFailedError(response.data.error);
+  }
+  return response.data.blob as unknown as BlobRef;
 }
