@@ -54,13 +54,9 @@ export function RolesBlock({ items, className }: RolesBlockProps) {
                   {role.company && (
                     <p className={styles.company}>{role.company}</p>
                   )}
+                  {when && <p className={styles.dates}>{when}</p>}
                 </div>
-                <div className={styles.aside}>
-                  {!role.endedAt && (
-                    <span className={styles.now}>{t`Now`}</span>
-                  )}
-                  {when && <span className={styles.dates}>{when}</span>}
-                </div>
+                {!role.endedAt && <span className={styles.now}>{t`Now`}</span>}
               </div>
             </ItemFrame>
           </li>

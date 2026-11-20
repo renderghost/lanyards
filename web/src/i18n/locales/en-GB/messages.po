@@ -571,7 +571,7 @@ msgstr "Not verified yet. ORCID can take a few minutes to update."
 msgid "Nothing to show yet"
 msgstr "Nothing to show yet"
 
-#: src/features/lanyard/components/blocks/RolesBlock/RolesBlock.tsx:60
+#: src/features/lanyard/components/blocks/RolesBlock/RolesBlock.tsx:59
 #: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:67
 msgid "Now"
 msgstr "Now"

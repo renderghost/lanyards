@@ -151,6 +151,33 @@ test.describe('public lanyard, signed out', () => {
     await expect(roles.getByRole('heading', { name: 'Roles' })).toBeFocused();
   });
 
+  // Final review I1: a long role, with full dates, on a 320 px phone.
+  test('keeps a long role readable at 320 px (#130)', async ({ page }) => {
+    await mockPerson(page, {
+      sifa: {
+        positions: [
+          {
+            rkey: '3mlong',
+            title: 'Senior Research Software Engineer',
+            company: 'The University of Somewhere Rather Far Away',
+            startedAt: '2019-03-07',
+            endedAt: '2023-11-12',
+            primary: false,
+          },
+        ],
+      },
+    });
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/@alice.test');
+    const roles = page.getByRole('region', { name: 'Roles' });
+    const title = roles.getByText('Senior Research Software Engineer');
+    await expect(title).toBeVisible();
+    expect((await title.boundingBox())!.width).toBeGreaterThanOrEqual(150);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(320);
+  });
+
   test('a hidden role leaves the block and the badge’s count (#130)', async ({
     page,
   }) => {

@@ -144,6 +144,11 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
       ...(block.limit ? { limit: block.limit } : {}),
     });
   }
+  const showRole = stored.badge?.showRole ?? stored.showJob ?? true;
+  // An owner who hid their role from the badge doesn't find every role
+  // listed by a Roles block they never turned on (#130).
+  const visibleByDefault = (type: RenderableBlockType) =>
+    type === 'roles' ? showRole : DEFAULT_VISIBLE.has(type);
   DEFAULT_BLOCK_ORDER.forEach((type, index) => {
     if (seen.has(type)) return;
     const before = DEFAULT_BLOCK_ORDER.slice(0, index).findLast((earlier) =>
@@ -152,7 +157,7 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
     const at = before
       ? blocks.findIndex((block) => block.type === before) + 1
       : 0;
-    blocks.splice(at, 0, { type, visible: DEFAULT_VISIBLE.has(type) });
+    blocks.splice(at, 0, { type, visible: visibleByDefault(type) });
     seen.add(type);
   });
 
@@ -160,7 +165,7 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
     // A legacy accent reads as the nearest of the four (#128).
     accent: resolveAccent(stored.accent),
     cover: isCover(stored.badge?.cover) ? stored.badge.cover : null,
-    showRole: stored.badge?.showRole ?? stored.showJob ?? true,
+    showRole,
     showLocation: stored.badge?.showLocation ?? true,
     showOpenTo: stored.badge?.showOpenTo ?? true,
     blocks,

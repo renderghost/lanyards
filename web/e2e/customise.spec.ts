@@ -87,6 +87,22 @@ test.describe('lanyard customiser', () => {
     );
   });
 
+  // Final review I1: a hidden role in the editor, on a phone.
+  test('keeps a hidden role readable on a phone (#130)', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    const roles = page.getByRole('region', { name: 'Roles' });
+    await roles
+      .getByRole('button', { name: 'Hide Software Developer' })
+      .click();
+    const title = roles.getByText('Software Developer', { exact: true });
+    expect((await title.boundingBox())!.width).toBeGreaterThanOrEqual(120);
+    const overflow = await roles.evaluate(
+      (element) => element.scrollWidth - element.clientWidth
+    );
+    expect(overflow).toBe(0);
+  });
+
   test('reorders blocks with the keyboard alone', async ({ page }) => {
     await openCustomiser(page);
     const editor = page.getByRole('list', { name: 'Blocks' });

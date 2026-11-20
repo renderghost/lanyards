@@ -149,6 +149,37 @@ describe('the Roles block on existing lanyards (#130)', () => {
     ]);
   });
 
+  // Final review I2: an owner who hid their role from the badge never
+  // finds every role listed by a block they didn't turn on.
+  it.each([
+    ['badge.showRole', { badge: { showRole: false } }],
+    ['the legacy showJob', { showJob: false }],
+  ])('comes in hidden when the owner turned off %s', (_name, fields) => {
+    const config = resolveConfig({
+      $type: 'app.lanyards.actor.lanyard',
+      ...fields,
+      blocks: [
+        { type: 'links', visible: true },
+        { type: 'talks', visible: true },
+      ],
+      createdAt: '2026-11-01T09:00:00.000Z',
+    });
+    expect(config.blocks[1]).toEqual({ type: 'roles', visible: false });
+  });
+
+  it('keeps the owner’s own choice once Roles is in the record', () => {
+    const config = resolveConfig({
+      $type: 'app.lanyards.actor.lanyard',
+      badge: { showRole: false },
+      blocks: [
+        { type: 'links', visible: true },
+        { type: 'roles', visible: true },
+      ],
+      createdAt: '2026-11-01T09:00:00.000Z',
+    });
+    expect(config.blocks[1]).toEqual({ type: 'roles', visible: true });
+  });
+
   it('follows Links even when Links is missing too, which goes first', () => {
     expect(stored(['talks']).slice(0, 3)).toEqual(['links', 'roles', 'talks']);
   });
