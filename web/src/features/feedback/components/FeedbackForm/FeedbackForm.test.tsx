@@ -1,32 +1,15 @@
 import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { notify } from '@/components/Toaster/notify';
-import { MissingPermissionError, WriteFailedError } from '@/lib/atproto/writes';
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithProviders } from '@/test/render';
 
 import type { FeedbackBoard } from '../../board';
-import type { FeedbackDraft, SentFeedback } from '../../useSendFeedback';
 import { FeedbackForm } from './FeedbackForm';
-
-vi.mock('@/components/Toaster/notify', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
-
-type Callbacks = {
-  onSuccess?: (sent: SentFeedback) => void;
-  onError?: (error: unknown) => void;
-};
-const send = vi.hoisted(() => ({
-  mutate: vi.fn<(draft: FeedbackDraft, callbacks: Callbacks) => void>(),
-  isPending: false,
-}));
-vi.mock('../../useSendFeedback', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('../../useSendFeedback')>()),
-  useSendFeedback: () => send,
-}));
+import { EMPTY_FEEDBACK } from './FeedbackForm.constants';
+import type { FeedbackValues } from './FeedbackForm.types';
 
 const board = (tags: string[]): FeedbackBoard => ({
   uri: 'at://did:plc:ua3d6biqepazbq6mw4ysotfo/app.userinput.space/3mboard',
@@ -39,28 +22,42 @@ const board = (tags: string[]): FeedbackBoard => ({
   url: 'https://userinput.app/s/did:plc:ua3d6biqepazbq6mw4ysotfo/3mboard',
 });
 
-const onSent = vi.fn();
-const onNeedsPermission = vi.fn();
-const form = (tags = ['bug', 'idea', 'question']) =>
-  renderWithProviders(
+const onSend = vi.fn();
+
+/** The form, with its values held where the dialog holds them. */
+function Harness({
+  tags,
+  sending = false,
+  failure = null,
+}: {
+  tags: string[];
+  sending?: boolean;
+  failure?: string | null;
+}) {
+  const [values, setValues] = useState<FeedbackValues>(EMPTY_FEEDBACK);
+  return (
     <FeedbackForm
       board={board(tags)}
       page="/@alice.test"
-      onSent={onSent}
-      onNeedsPermission={onNeedsPermission}
+      values={values}
+      onChange={setValues}
+      sending={sending}
+      failure={failure}
+      onSend={onSend}
     />
   );
+}
+
+const form = (
+  tags = ['bug', 'idea', 'question'],
+  options: { sending?: boolean; failure?: string | null } = {}
+) => renderWithProviders(<Harness tags={tags} {...options} />);
 
 const title = () => screen.getByRole('textbox', { name: /Title/ });
 const sendButton = () => screen.getByRole('button', { name: 'Send feedback' });
 
 beforeEach(() => {
-  send.isPending = false;
-  send.mutate.mockClear();
-  vi.mocked(notify.success).mockClear();
-  vi.mocked(notify.error).mockClear();
-  onSent.mockClear();
-  onNeedsPermission.mockClear();
+  onSend.mockClear();
 });
 
 describe('FeedbackForm (#134)', () => {
@@ -75,7 +72,7 @@ describe('FeedbackForm (#134)', () => {
     expect(types).toHaveAccessibleDescription('Choose what this is about');
     expect(title()).toHaveAttribute('aria-invalid', 'true');
     expect(title()).toHaveAccessibleDescription(/Give it a title/);
-    expect(send.mutate).not.toHaveBeenCalled();
+    expect(onSend).not.toHaveBeenCalled();
     await expectNoAxeViolations(container);
   });
 
@@ -125,61 +122,48 @@ describe('FeedbackForm (#134)', () => {
     );
   }
 
-  it('sends what was written', async () => {
+  it('counts the technical details within the details’ limit', async () => {
     form();
-    await fillIn();
-    await userEvent.click(sendButton());
-    expect(send.mutate).toHaveBeenCalledWith(
-      {
-        type: 'bug',
-        title: 'The badge overlaps',
-        details: 'At 320 px.',
-        screenshots: [],
-      },
-      expect.anything()
+    await userEvent.click(screen.getByRole('radio', { name: 'Bug' }));
+    await userEvent.type(title(), 'The badge overlaps');
+    await userEvent.click(screen.getByRole('textbox', { name: /Details/ }));
+    await userEvent.paste('x'.repeat(9990));
+    await userEvent.click(
+      screen.getByRole('checkbox', { name: 'Include technical details' })
     );
+    await userEvent.click(sendButton());
+    expect(
+      screen.getByText(
+        'Keep the details and technical details to 10,000 characters'
+      )
+    ).toBeInTheDocument();
+    expect(onSend).not.toHaveBeenCalled();
   });
 
-  it('thanks them, and hands over the post, once it’s sent', async () => {
+  it('hands over what was written, ready to send', async () => {
     form();
     await fillIn();
     await userEvent.click(sendButton());
-    const sent = {
-      uri: 'at://did:plc:b/app.userinput.discussion/3k',
-      url: 'u',
-    };
-    send.mutate.mock.calls.at(-1)![1].onSuccess!(sent);
-    expect(notify.success).toHaveBeenCalledWith('Feedback sent');
-    expect(onSent).toHaveBeenCalledWith(sent);
+    expect(onSend).toHaveBeenCalledWith({
+      type: 'bug',
+      title: 'The badge overlaps',
+      details: 'At 320 px.',
+      screenshots: [],
+    });
   });
 
-  it('keeps everything, and says so, when sending fails', async () => {
-    form();
-    await fillIn();
-    await userEvent.click(sendButton());
-    send.mutate.mock.calls.at(-1)![1].onError!(new WriteFailedError('down'));
-    expect(notify.error).toHaveBeenCalledWith(
-      "Couldn't send your feedback. Please try again."
+  it('says by the button why sending failed', () => {
+    form(undefined, { failure: "Couldn't send your feedback." });
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      "Couldn't send your feedback."
     );
-    expect(title()).toHaveValue('The badge overlaps');
-    expect(screen.getByRole('radio', { name: 'Bug' })).toBeChecked();
-  });
-
-  it('asks for permission, keeping everything, when it’s missing', async () => {
-    form();
-    await fillIn();
-    await userEvent.click(sendButton());
-    send.mutate.mock.calls.at(-1)![1].onError!(new MissingPermissionError('x'));
-    expect(onNeedsPermission).toHaveBeenCalled();
-    expect(title()).toHaveValue('The badge overlaps');
   });
 
   it('is busy while sending, and never sends twice', async () => {
-    send.isPending = true;
-    form();
+    form(undefined, { sending: true });
     expect(sendButton()).toHaveAttribute('aria-busy', 'true');
     await userEvent.click(sendButton());
-    expect(send.mutate).not.toHaveBeenCalled();
+    expect(onSend).not.toHaveBeenCalled();
     expect(within(sendButton()).queryByText('Send feedback')).not.toBeNull();
   });
 });

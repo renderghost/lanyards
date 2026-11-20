@@ -11,6 +11,7 @@ import {
 import { canSendFeedback, parseGrantedScope } from '@/lib/atproto/permissions';
 
 import { discussionUrl, fetchFeedbackBoard } from './board';
+import { feedbackBody } from './body';
 import type { Screenshot } from './images';
 
 /** What the person wrote, as the form hands it over. */
@@ -30,13 +31,6 @@ export type SentFeedback = { uri: string; url: string };
 export class BoardUnavailableError extends Error {
   override name = 'BoardUnavailableError';
 }
-
-const bodyOf = (draft: FeedbackDraft): string => {
-  const details = draft.details.trim();
-  if (!draft.techDetails) return details;
-  const block = `---\n\n\`\`\`\n${draft.techDetails}\n\`\`\``;
-  return details ? `${details}\n\n${block}` : block;
-};
 
 /**
  * Sends feedback to our UserInput board, from the person's own account
@@ -64,7 +58,7 @@ export function useSendFeedback() {
           image: await uploadBlob(writer, shot.blob),
         });
       }
-      const body = bodyOf(draft);
+      const body = feedbackBody(draft.details, draft.techDetails);
       const { uri } = await createRecord(writer, USERINPUT_NSID.discussion, {
         space: { uri: board.value.uri, cid: board.value.cid },
         title: draft.title.trim(),

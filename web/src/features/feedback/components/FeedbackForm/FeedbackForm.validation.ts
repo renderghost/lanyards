@@ -1,5 +1,7 @@
 import { tooLong } from '@/lib/validation';
 
+import { feedbackBody } from '../../body';
+
 import {
   DETAILS_MAX_BYTES,
   DETAILS_MAX_GRAPHEMES,
@@ -17,7 +19,11 @@ const longerThan = (value: string, maxGraphemes: number, maxBytes: number) =>
 /** Problems with the feedback, by field; empty when it can be sent. */
 export function validateFeedback(
   values: Pick<FeedbackValues, 'type' | 'title' | 'details'>,
-  options: { needsType: boolean }
+  options: {
+    needsType: boolean;
+    /** The technical details to be sent, which share the details' limit. */
+    techDetails?: string;
+  }
 ): FeedbackErrors {
   const errors: FeedbackErrors = {};
   if (options.needsType && !values.type) errors.type = 'required';
@@ -26,9 +32,8 @@ export function validateFeedback(
   else if (longerThan(title, TITLE_MAX_GRAPHEMES, TITLE_MAX_BYTES)) {
     errors.title = 'tooLong';
   }
-  if (
-    longerThan(values.details.trim(), DETAILS_MAX_GRAPHEMES, DETAILS_MAX_BYTES)
-  ) {
+  const body = feedbackBody(values.details, options.techDetails);
+  if (longerThan(body, DETAILS_MAX_GRAPHEMES, DETAILS_MAX_BYTES)) {
     errors.details = 'tooLong';
   }
   return errors;

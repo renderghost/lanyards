@@ -5,17 +5,11 @@ import { Button } from '@/components/Button/Button';
 import { SelectField } from '@/components/SelectField/SelectField';
 import { TextAreaField } from '@/components/TextAreaField/TextAreaField';
 import { TextField } from '@/components/TextField/TextField';
-import { notify } from '@/components/Toaster/notify';
-import {
-  MissingPermissionError,
-  ScopeRefusedError,
-} from '@/lib/atproto/writes';
 import { cn } from '@/lib/utils';
 
 import { techDetails } from '../../techDetails';
-import { useSendFeedback } from '../../useSendFeedback';
 import { ScreenshotPicker } from '../ScreenshotPicker/ScreenshotPicker';
-import { EMPTY_FEEDBACK, RADIO_MAX } from './FeedbackForm.constants';
+import { RADIO_MAX } from './FeedbackForm.constants';
 import * as styles from './FeedbackForm.styles';
 import type {
   FeedbackErrors,
@@ -28,19 +22,22 @@ import { validateFeedback } from './FeedbackForm.validation';
  * Feedback to our UserInput board (#134): what it's about (the board's
  * own tags), a title, details, screenshots and, if wanted, technical
  * details shown in full. It says before sending that all of it is public.
+ * The dialog holds the draft and sends it; the form checks it first.
  */
 export function FeedbackForm({
   board,
   page,
-  onSent,
-  onNeedsPermission,
+  values,
+  onChange,
+  sending,
+  onSend,
+  failure,
   capture,
   className,
 }: FeedbackFormProps) {
   const { t } = useLingui();
-  const send = useSendFeedback();
   const typeId = useId();
-  const [values, setValues] = useState<FeedbackValues>(EMPTY_FEEDBACK);
+  const failureId = useId();
   const [errors, setErrors] = useState<FeedbackErrors>({});
   const firstType = useRef<HTMLInputElement>(null);
   const typeSelect = useRef<HTMLSelectElement>(null);
@@ -57,58 +54,46 @@ export function FeedbackForm({
       required: t`Give it a title`,
       tooLong: t`Keep the title to 300 characters`,
     },
-    details: { tooLong: t`Keep the details to 10,000 characters` },
+    details: {
+      tooLong: values.techDetails
+        ? t`Keep the details and technical details to 10,000 characters`
+        : t`Keep the details to 10,000 characters`,
+    },
   };
 
   const change =
     <K extends keyof FeedbackValues>(key: K) =>
     (value: FeedbackValues[K]) => {
-      setValues((current) => ({ ...current, [key]: value }));
+      onChange((current) => ({ ...current, [key]: value }));
       if (key in errors)
         setErrors((current) => ({ ...current, [key]: undefined }));
     };
 
   // Validate on blur: only the field just left, once it has something.
+  const rules = { needsType, ...(details ? { techDetails: details } : {}) };
+
   const check = (key: 'title' | 'details') => () => {
-    const found = validateFeedback(values, { needsType });
+    const found = validateFeedback(values, rules);
     if (key === 'title' && !values.title.trim()) return;
     setErrors((current) => ({ ...current, [key]: found[key] }));
   };
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (send.isPending) return;
-    const found = validateFeedback(values, { needsType });
+    if (sending) return;
+    const found = validateFeedback(values, rules);
     setErrors(found);
     if (found.type) return (firstType.current ?? typeSelect.current)?.focus();
     if (found.title) return titleRef.current?.focus();
     if (found.details) return detailsRef.current?.focus();
 
-    send.mutate(
-      {
-        type: values.type,
-        title: values.title,
-        details: values.details,
-        screenshots: values.screenshots,
-        ...(details ? { techDetails: details } : {}),
-      },
-      {
-        onSuccess: (sent) => {
-          notify.success(t`Feedback sent`);
-          onSent(sent);
-        },
-        onError: (error) => {
-          if (
-            error instanceof MissingPermissionError ||
-            error instanceof ScopeRefusedError
-          ) {
-            onNeedsPermission();
-            return;
-          }
-          notify.error(t`Couldn't send your feedback. Please try again.`);
-        },
-      }
-    );
+    onSend({
+      type: values.type,
+      title: values.title,
+      details: values.details,
+      screenshots: values.screenshots,
+      ...(details ? { techDetails: details } : {}),
+    });
   }
 
   const typeError = errors.type && messages.type[errors.type];
@@ -204,8 +189,18 @@ export function FeedbackForm({
       <p className={styles.notice}>
         {t`Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal.`}
       </p>
+      {failure && (
+        <p id={failureId} role="alert" className={styles.error}>
+          {failure}
+        </p>
+      )}
       <div className={styles.actions}>
-        <Button type="submit" size="lg" loading={send.isPending}>
+        <Button
+          type="submit"
+          size="lg"
+          loading={sending}
+          aria-describedby={failure ? failureId : undefined}
+        >
           {t`Send feedback`}
         </Button>
       </div>

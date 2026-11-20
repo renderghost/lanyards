@@ -13,9 +13,13 @@ import type { DialogProps } from './Dialog.types';
 const FIELDS =
   'input:not([type=hidden]):not(:disabled), select:not(:disabled), textarea:not(:disabled)';
 
+/** What the content asks to open on instead, e.g. a result's heading. */
+const MARKED = '[data-autofocus]';
+
 /**
  * A modal dialog for a short form: a visible title, a Close button, and
- * focus on its first field when it opens. Escape and Close close it; a
+ * focus on its first field when it opens (or on what the content marks
+ * with `data-autofocus`). Escape and Close close it; a
  * click outside doesn't, so nothing typed is lost by accident. On close,
  * focus goes back to whatever opened it.
  */
@@ -52,9 +56,10 @@ export function Dialog({
                 ? document.activeElement
                 : null;
             event.preventDefault();
-            const field =
+            const target =
+              contentRef.current?.querySelector<HTMLElement>(MARKED) ??
               contentRef.current?.querySelector<HTMLElement>(FIELDS);
-            (field ?? contentRef.current)?.focus();
+            (target ?? contentRef.current)?.focus();
           }}
           onPointerDownOutside={(event) => event.preventDefault()}
           onInteractOutside={(event) => event.preventDefault()}

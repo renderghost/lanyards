@@ -53,6 +53,20 @@ describe('Dialog', () => {
     );
   });
 
+  it('opens on what its content marks to take focus (#134)', async () => {
+    renderWithProviders(
+      <Dialog open onOpenChange={vi.fn()} title="Send feedback">
+        <h3 tabIndex={-1} data-autofocus="">
+          Thank you
+        </h3>
+        <TextField label="Title" name="title" value="" onChange={vi.fn()} />
+      </Dialog>
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('heading', { name: 'Thank you' })).toHaveFocus()
+    );
+  });
+
   it('skips fields that can’t be used', async () => {
     renderWithProviders(
       <Dialog open onOpenChange={vi.fn()} title="Edit Episode one">

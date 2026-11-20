@@ -1,3 +1,4 @@
+import type { FeedbackValues } from './FeedbackForm.types';
 import discussion from '../../../../../lexicons/vendor/app/userinput/discussion.json';
 
 const fields = discussion.defs.main.record.properties;
@@ -11,7 +12,7 @@ export const DETAILS_MAX_BYTES = fields.body.maxLength;
 /** Up to this many types are radios; more are a list (Form Standards). */
 export const RADIO_MAX = 5;
 
-export const EMPTY_FEEDBACK = {
+export const EMPTY_FEEDBACK: FeedbackValues = {
   type: '',
   title: '',
   details: '',
