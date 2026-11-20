@@ -2,7 +2,8 @@
 
 - **Status:** design, for the owner's approval
 - **Issues:** epic #127 (a sub-issue of #94), with follow-up #131 for
-  the link-preview badge. #127 is delivered as three PRs:
+  the link-preview badge. #127 is delivered as four PRs:
+  - #132: the lexicons (first, so they're republished once);
   - #128: the design language;
   - #129: the badge (cover patterns, the hero and the Show QR badge);
   - #130: Roles.
@@ -95,6 +96,109 @@ These would make the work a failure even if it ships:
   no image requests.
 - **Layout shift** when the cover, the avatar or Sifa's data arrives.
 
+## 4a. Lexicon organisation (first PR, #132)
+
+The owner had the `app.lanyards.*` lexicons audited against Bluesky's
+(`app.bsky.*`) and Sifa's (`id.sifa.*`) to keep them well named and
+well organised, and to stop them duplicating anything. Every schema
+change in this epic lands in this one PR, so the owner republishes once.
+The app code that uses the new fields arrives in the later PRs.
+
+### Retired: duplicates of Bluesky and Sifa
+
+- **`app.lanyards.actor.biography.honorific`** duplicates Sifa's
+  `honorificPrefix`, `honorificSuffix` and `showHonorifics`.
+- **`app.lanyards.link.web`** duplicates Bluesky's profile links
+  (`app.bsky.actor.link`) and Sifa's `id.sifa.profile.externalAccount`.
+
+The new app hasn't read or written either since #122. They leave:
+- `web/lexicons` and the generated types;
+- `validate.ts` and `LANYARDS_NSID`;
+- `AUTH_FULL_COLLECTIONS` and `app.lanyards.authFull`.
+
+Their published copies, and the records on people's PDSes, stay. The
+frozen app keeps using them until #103 deletes it.
+
+### `app.lanyards.actor.lanyard`, organised
+
+- **`#blockType`:** one string definition holding the block types'
+  `knownValues`, now including `roles`. `block.type` and
+  `eventOverride.emphasise` both refer to it.
+- **`badge` (`#badgePrefs`):** the badge's settings in one object,
+  matching `connect`:
+  - `cover`: a string, max 32, with the eight patterns as
+    `knownValues` (§6). It is derived from the DID when absent.
+  - `showRole`: boolean, default true.
+  - `showLocation`: boolean, default true.
+  - `showOpenTo`: boolean, default true.
+- **`showJob`:** stays in the schema, described as legacy. It is read
+  as `badge.showRole` when that is absent. The app writes `badge` and
+  drops `showJob` on save.
+- **`accent`:** `knownValues` lists blue, mint, lime and pink first,
+  then the eight old values, described as legacy and mapped (§5.3).
+- **Stale descriptions:** `limit` no longer mentions "all links (up to
+  20)".
+
+### Podcasts and videos: `app.lanyards.media.item`
+
+One record type replaces `app.lanyards.link.media.audio` and `.video`.
+They aren't links, and two collections made changing a podcast into a
+video a delete and re-add.
+
+| Field         | Type                                | Notes |
+| ------------- | ----------------------------------- | ----- |
+| `url`         | uri, required                       | |
+| `kind`        | string, required, `knownValues` audio, video | Editing can change it (this lifts #118's "kind is locked" ruling) |
+| `platform`    | string, `knownValues` spotify, apple-podcasts, soundcloud, anchor, youtube, vimeo, twitch, tiktok, other | An open list: a new platform isn't a breaking change |
+| `type`        | string, `knownValues` podcast-episode, interview, panel-discussion, tutorial, other | lecture, presentation and conference-talk are dropped: recordings of talks belong on Sifa talks (`linkRecording`) |
+| `title`       | string, max 200                     | |
+| `description` | string, max 1000                    | |
+| `seriesName`  | string, max 200                     | |
+| `duration`    | integer, min 0                      | in seconds |
+| `publishedAt` | datetime                            | renamed from `publishedDate`, matching Sifa |
+| `related`     | at-uri                              | "a related Sifa presentation or publication"; renamed from `relatedWork`, which pointed at the frozen app's work records |
+| `createdAt`   | datetime, required                  | |
+| `updatedAt`   | datetime                            | |
+
+**The media form:**
+- It drops the talk types.
+- When the kind is video, a hint links to the owner's Sifa talks:
+  "Recording of a talk? Add it to the talk on Sifa."
+
+**Reading:**
+- The Lanyards source lists `app.lanyards.media.item` **and** both
+  legacy collections.
+- Visitors see the same podcasts and videos before and after a move.
+- A legacy record takes its kind from its collection. Its dropped types
+  read as `other`, and `publishedDate` and `relatedWork` map to the new
+  names.
+
+**Writing:** only `app.lanyards.media.item`.
+
+**Moving** (when the owner opens the customiser with write access and
+any legacy records exist):
+- One move per legacy record:
+  - create the `media.item`, under the same rkey unless that's taken
+    (otherwise a new TID);
+  - delete the legacy record;
+  - the two writes travel in the same `applyWrites` batch.
+- **Hidden keys:** the lanyard record's hidden keys that point at moved
+  records are rewritten to the new AT-URIs, after the moves.
+- **Repeats:** the move runs again whenever legacy records reappear,
+  because the frozen app may still write them until #103. It is
+  idempotent.
+- **Failure:** a failed batch changes nothing that it didn't land. Its
+  error is captured and it's retried on the next visit. Nothing is ever
+  lost, because reads include both collections.
+- **Feedback:** one toast: "Your podcasts and videos were updated to
+  the new format."
+
+**The permission set** (`app.lanyards.authFull`) covers:
+- `app.lanyards.actor.lanyard`;
+- `app.lanyards.media.item`;
+- the two legacy media collections, so moved records can be deleted
+  until #103.
+
 ## 5. The design language (PR 1, #128)
 
 ### 5.1 Type
@@ -186,8 +290,7 @@ The existing contrast tests change:
 - The mapping happens on read. The owner's next save writes the new
   value.
 
-The lexicon's `accent` gains the four new `knownValues` and keeps the
-old eight, documented as legacy values that map.
+The lexicon's `accent` values change in #132 (§4a).
 
 ### 5.4 Shape and depth
 
@@ -288,8 +391,7 @@ Covers look the same in light and dark: they carry their own ground.
 
 ### 6.4 Choosing
 
-- **The lexicon:** gains `cover` (string, max 32, with the eight
-  `knownValues`).
+- **The record:** the choice is stored in `badge.cover` (§4a).
 - **Absent or unknown:**
   - The cover is derived from the owner's DID: a stable hash, mod 8.
     Lanyards differ from the start, and the same person always gets the
@@ -345,11 +447,13 @@ primary one if marked, otherwise the latest started. It is today's
 `currentJob()`, minus hidden positions.
 
 **Badge settings** (Style → Badge), each defaulting to on:
-- **Show current role:** today's `showJob`, renamed in the interface;
-- **Show location:** a new `showLocation`;
-- **Show what you're open to:** a new `showOpenTo`.
+- **Show current role:** `badge.showRole`, falling back to the legacy
+  `showJob`;
+- **Show location:** `badge.showLocation`;
+- **Show what you're open to:** `badge.showOpenTo`.
 
-All three join the lexicon, the draft and the merge.
+All three, and the cover, join the draft, the change count and the
+merge.
 
 **Around the hero:**
 - **Signed-out visitors:** Sign in and Create account move from under
@@ -496,6 +600,12 @@ they cost requests and can't recolour.
 - The mockups as approved ("Let's go").
 - **The link-preview image:** restyle it now (§8a), and turn it into the
   billboard badge in #131.
+- **Badge switches:** keep Show location and Show what you're open to.
+- **Lexicons** (§4a):
+  - retire the honorific and web-link lexicons;
+  - group the badge settings into a `badge` object;
+  - move podcasts and videos to one record type with a `kind`;
+  - drop the talk types, which point to Sifa.
 
 ## 12. My calls (correctable)
 
@@ -505,9 +615,16 @@ they cost requests and can't recolour.
   there. Lime goes unused by the mapping.
 - **Default cover:** derived from the DID, so lanyards differ without
   setup.
-- **Two new badge settings,** Show location and Show what you're open
-  to, beside Show current role. A conference badge is more public than
-  a profile.
+- **Audio's "lecture" type goes too,** not only video's three talk
+  types: a lecture is a talk.
+- **Field names:** `media.item` takes `publishedAt` (as Sifa names it)
+  and `related` (pointing at Sifa records) in place of `publishedDate`
+  and `relatedWork`.
+- **The move** happens when the owner opens the customiser, without
+  asking. It only changes where the app keeps its own records, never
+  what the lanyard shows.
+- **`showJob`** is dropped from the record on the owner's next save,
+  once `badge.showRole` holds the setting.
 - **Roles visibility:** Roles is shown by default, also on existing
   lanyards, second after Links. The positions are already public on
   Sifa.
@@ -544,21 +661,26 @@ they cost requests and can't recolour.
 
 ## 14. Release order and checks
 
-1. **PR 1 (#128):** tokens, font, accents (with the lexicon values and
-   the mapping), corners and shadows, plus the restyled blocks, chips,
-   cards and chrome.
+0. **First PR (#132):** every lexicon change (§4a), retiring the
+   duplicates, `app.lanyards.media.item` with legacy reads, and the
+   move.
+   - Unit tests: legacy media mapping, the move batch and the hidden-key
+     rewrite.
+   - e2e: an owner with legacy podcasts opens the customiser; they
+     move, and the public page still shows them.
+1. **PR 1 (#128):** tokens, font, accents (with the mapping), corners
+   and shadows, plus the restyled blocks, chips, cards and chrome.
    - Unit tests: contrast and the mapping.
    - e2e: axe in light and dark, on two accents.
-2. **PR 2 (#129):** the cover patterns and the cover setting (lexicon),
-   the hero (with its loading rule), the badge settings, the header
+2. **PR 2 (#129):** the cover patterns and the cover setting, the hero (with its loading rule), the badge settings, the header
    actions for signed-out visitors, the Show QR badge, and the
    link-preview restyle.
    - Unit tests: the board cells, hidden roles and cover derivation.
    - e2e: the hero for the owner, a visitor and a signed-out visitor;
      choosing a cover and saving it; Show QR showing the badge and a
      scannable code; axe on the badge.
-3. **PR 3 (#130):** the Roles block (lexicon), its insertion into
-   existing configs, and the "+N more roles" link.
+3. **PR 3 (#130):** the Roles block, its insertion into existing
+   configs, and the "+N more roles" link.
    - e2e: the Roles block and hiding a role.
 
 Each PR passes lint, typecheck, `lex:check`, `i18n:check`, unit tests,
@@ -566,9 +688,12 @@ the bundle budget and e2e.
 
 ## 15. Owner follow-ups
 
-- **Publish the lexicon changes** to the PDS, as before:
-  - `accent` and `cover` values;
-  - `showLocation` and `showOpenTo`;
-  - the `roles` block type.
+- **Publish the lexicons** to the PDS once #132 merges, as before:
+  - `app.lanyards.actor.lanyard`;
+  - the new `app.lanyards.media.item`;
+  - `app.lanyards.authFull`.
+
+  The honorific and web-link lexicons stay published, but nothing new
+  uses them.
 - **Check on a phone at a real distance:** the badge's legibility and
   QR scanning, with a phone held up.

@@ -64,8 +64,11 @@ The approved mockups are on the design canvas the spec names.
   - **Legacy:** violet, indigo, ocean → blue; moss, teal → mint; rose,
     plum, ember → pink.
 
-**Lexicon:** changes to `app.lanyards.actor.lanyard` only add things.
-The owner republishes the lexicon after each PR that changes it.
+**Lexicon:**
+- Every schema change lands in the first PR (#132). Later PRs only
+  consume the generated types.
+- Changes to `app.lanyards.actor.lanyard` only add things.
+- The owner republishes once, after #132 merges.
 
 **Git:**
 - Commits are authored as Barry Prendergast with the session trailers.
@@ -84,13 +87,192 @@ The owner republishes the lexicon after each PR that changes it.
 3. **Opening Show QR while viewing someone else's lanyard in another
    accent:** the badge uses the owner's accent, and the page's accent is
    unchanged after Close (Task 10).
-4. **A stored record with a legacy accent and no cover, saved by the
-   new app:** it writes the mapped accent, writes no `cover` unless one
-   was picked, and keeps unknown fields (Tasks 2 and 5).
+4. **An existing owner's records: a legacy accent, `showJob: false`, no
+   `badge`, and legacy podcasts, one of them hidden.**
+   - Saving writes the mapped accent and `badge.showRole: false`, writes
+     no `cover` unless one was picked, and keeps unknown fields.
+   - The podcasts move, and the hidden one stays hidden (Tasks L2, L3,
+     2 and 5).
 5. **A hidden current role that is the primary one, and partial dates
    (`2019`, `2019-03`):** the hero takes the next visible current role,
    "+N" counts only visible roles, and the dates read "Mar 2019 – now"
    (Tasks 8 and 12).
+
+---
+
+## First PR: the lexicons (#132)
+
+Branch: `feature/issue-132-lexicons` from `origin/main`. The spec is
+§4a.
+
+### Task L1: Every schema change, and retiring the duplicates
+
+**Files:**
+- Modify:
+  - `web/lexicons/lanyards/app/lanyards/actor/lanyard.json`
+  - `web/lexicons/lanyards/app/lanyards/authFull.json`
+  - `web/src/lib/lexicons/nsids.ts` (`LANYARDS_NSID`,
+    `AUTH_FULL_COLLECTIONS`)
+  - `web/src/lib/lexicons/validate.ts`
+  - `web/src/lib/atproto/writes.ts` (`WRITABLE_COLLECTIONS`)
+  - `web/src/test/person.ts`
+  - the generated `web/src/lexicons/**`
+- Create:
+  `web/lexicons/lanyards/app/lanyards/media/item.json`
+- Delete:
+  - `web/lexicons/lanyards/app/lanyards/actor/biography/honorific.json`
+  - `web/lexicons/lanyards/app/lanyards/link/web.json`
+- Test:
+  - `web/src/lib/atproto/permissions.test.ts`
+  - `web/src/lib/lexicons/validate.test.ts`
+  - `web/scripts/lexiconDocs.test.ts`
+
+**Interfaces:**
+- **Produces** `LANYARDS_NSID`: `{ lanyard, mediaItem:
+  'app.lanyards.media.item', legacyAudio:
+  'app.lanyards.link.media.audio', legacyVideo:
+  'app.lanyards.link.media.video', authFull }`. `honorific` and
+  `webLink` are gone.
+- **Produces** `AUTH_FULL_COLLECTIONS`: `[lanyard, mediaItem,
+  legacyAudio, legacyVideo]`.
+- **Produces generated types:**
+  - `AppLanyardsMediaItem.Main`;
+  - `AppLanyardsActorLanyard.BadgePrefs` (`cover?`, `showRole?`,
+    `showLocation?`, `showOpenTo?`);
+  - the `blockType` definition.
+
+- [ ] **Step 1: Write the failing tests.**
+  - `permissions.test.ts`: the requested scope covers
+    `app.lanyards.media.item`, and none of the honorific or web-link
+    collections.
+  - `validate.test.ts`:
+    - a `media.item` with `kind: 'video'`, a url and `createdAt` is
+      valid;
+    - a `kind: 'hologram'` is also valid (an open set);
+    - a lanyard record with `badge: { cover: 'orb', showRole: false }`
+      is valid;
+    - so is one with the block type `roles`.
+- [ ] **Step 2: Run them to watch them fail.** Run:
+  `npx vitest run src/lib/atproto src/lib/lexicons`. Expected: FAIL.
+- [ ] **Step 3: Implement the schemas exactly as in spec §4a.**
+  - `#blockType` is a top-level string definition, referenced from
+    `block.type` and `eventOverride.emphasise.items`.
+  - `badge` is a ref to `#badgePrefs`.
+  - `accent` and `limit` get their new descriptions, and `showJob` is
+    described as legacy.
+  - The permission set's `detail` reads "Create, update and delete your
+    lanyard settings, and your podcast and video links."
+
+  Then run `npm run lex:gen`, and fix the compile errors from the
+  removed NSIDs. Media code keeps compiling against the legacy names
+  until L2.
+- [ ] **Step 4: Run them to watch them pass,** then run `npm test`,
+  `lex:check` and `typecheck`. Expected: PASS.
+- [ ] **Step 5: Commit:** `feat: organise the lexicons and retire the
+  duplicates (#132)`.
+
+### Task L2: Podcasts and videos as `app.lanyards.media.item`
+
+**Files:**
+- Modify:
+  - `web/src/lib/sources/lanyards/lanyards.ts` and `.types.ts`
+  - `web/src/lib/person/blocks.ts` (`COLLECTION_BLOCKS`)
+  - `web/src/features/lanyard/hooks/useKeptRecordsDraft.ts`
+  - `useCustomiserDraft.ts` (`KEPT_LISTS`)
+  - `MediaForm/*` (types, the Sifa hint, kind no longer locked)
+  - `MediaEditor/*`
+- Test:
+  - `lanyards.test.ts`
+  - `useKeptRecordsDraft.test.ts`
+  - `MediaForm.test.tsx`
+
+**Interfaces:**
+- **Produces** `MediaLink` with `kind: 'audio' | 'video'`, `legacy?:
+  true` and `key` (the AT-URI in whichever collection it lives in).
+- **Reads:** `fetchLanyardRecords` lists all three collections.
+- **Produces** `fromLegacy(kind, record): MediaFields`, which maps:
+  - the dropped types (lecture, presentation, conference-talk) →
+    `other`;
+  - `publishedDate` → `publishedAt`;
+  - `relatedWork` → `related`.
+- **Writes:** creates and updates go only to `media.item`.
+  - Editing a legacy item writes a `media.item` (same rkey) and deletes
+    the legacy record, in one batch.
+  - Editing can change the kind.
+
+- [ ] **Step 1: Write the failing tests.**
+  - `lanyards.test.ts`: one record in each of the three collections
+    gives three items; the legacy video with `type: 'conference-talk'`
+    reads as `other`.
+  - `useKeptRecordsDraft.test.ts`:
+    - adding writes `app.lanyards.media.item` with `kind`;
+    - changing a stored item's kind is one update, not a delete and
+      create;
+    - editing a legacy item is a create in `media.item` plus a delete
+      of the legacy record.
+  - `MediaForm.test.tsx`:
+    - the kind radios are enabled when editing;
+    - there is no "Conference talk" type;
+    - with video chosen, a link "Add it to the talk on Sifa" points to
+      the owner's Sifa talks.
+- [ ] **Step 2: Run them to watch them fail.** Expected: FAIL.
+- [ ] **Step 3: Implement.** This removes `FORM_FIELDS`' kind lock and
+  the `MEDIA_COLLECTION` map. The Sifa link comes from
+  `EDIT_LINKS.talks`.
+- [ ] **Step 4: Run them to watch them pass,** then run `npm test`.
+  Expected: PASS.
+- [ ] **Step 5: Commit:** `feat: podcasts and videos as one record type
+  (#132)`.
+
+### Task L3: Moving legacy media, and the first PR
+
+**Files:**
+- Create:
+  `web/src/features/lanyard/hooks/useMediaMove.ts` and its test
+- Modify: `CustomisePage.tsx` (runs it once the records and config are
+  ready)
+- Test: `web/e2e/customise.spec.ts` and `web/e2e/mocks.ts`
+
+**Interfaces:**
+- **Produces** `planMediaMove(records: LanyardRecords, hidden: string[],
+  did: Did): { writes: WriteOp[]; hidden: string[] } | null`, a pure
+  function:
+  - for each legacy item, a create in `media.item` (the same rkey,
+    unless it's taken by a `media.item`, then a new TID) followed by a
+    delete of the legacy record;
+  - `hidden` rewritten from old to new AT-URIs;
+  - `null` when there's nothing to move.
+- **Produces** `useMediaMove(did)`:
+  - it runs once per mount when the owner can write;
+  - it applies the writes, chunked so each create and delete pair stays
+    in one batch;
+  - after the moves, it saves the lanyard record's rewritten `hidden`
+    through the existing config write;
+  - it invalidates the Lanyards source and shows the toast "Your
+    podcasts and videos were updated to the new format.";
+  - on failure, it captures the error and changes nothing more.
+
+- [ ] **Step 1: Write the failing tests.**
+  - `useMediaMove.test.ts`:
+    - `planMediaMove` for two legacy items (one of them hidden) gives
+      create and delete pairs and a rewritten `hidden`;
+    - an rkey collision gets a new TID;
+    - no legacy items gives `null`;
+    - the hook shows the toast once, and a second run with nothing left
+      writes nothing.
+  - `customise.spec.ts`: an owner whose mock repository has a legacy
+    podcast opens the customiser. The writes create
+    `app.lanyards.media.item` and delete
+    `app.lanyards.link.media.audio`, and the podcast still shows on the
+    page.
+- [ ] **Step 2: Run them to watch them fail.** Expected: FAIL.
+- [ ] **Step 3: Implement.**
+- [ ] **Step 4: Run all the checks,** including the full e2e run.
+  Expected: PASS.
+- [ ] **Step 5: Commit** `feat: move legacy podcasts and videos to the
+  new record (#132)`, then push and open the PR with "Closes #132".
+  The PR body asks the owner to republish the lanyard, media item and
+  permission set lexicons.
 
 ---
 
@@ -171,8 +353,6 @@ Branch: `feature/issue-128-design-language` from `origin/main`.
   - `web/src/lib/person/config.ts`
   - `web/src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts`
     and `.tsx` (its doc comment: "four")
-  - `web/lexicons/lanyards/app/lanyards/actor/lanyard.json`
-  - the generated `web/src/lexicons/**` (run `npm run lex:gen`)
   - the e2e fixtures and mocks that set an accent
 - Test:
   - `web/src/design/accents.test.ts`
@@ -217,17 +397,12 @@ Branch: `feature/issue-128-design-language` from `origin/main`.
   - Write the four palettes. The light accent text for mint, lime and
     pink is deepened until it passes 7:1 (start from 075A35, 4A5200
     and 96193A).
-  - `resolveConfig` uses `resolveAccent`.
-  - In the lexicon, `accent.knownValues` lists blue, mint, lime and
-    pink first, then the old eight, with the description
-    "Accent palette; blue when absent or unknown. violet, indigo,
-    ocean, moss, teal, rose, plum and ember are legacy values, read as
-    blue, mint or pink".
-  - Run `npm run lex:gen`.
+  - `resolveConfig` uses `resolveAccent`. The lexicon values already
+    changed in L1.
   - Name the accents in `ACCENT_NAMES`: Blue, Mint, Lime, Pink.
   - Update the fixtures that set old accents.
-- [ ] **Step 4: Run them to watch them pass,** then run `npm test`
-  and `npm run lex:check`. Expected: PASS.
+- [ ] **Step 4: Run them to watch them pass,** then run `npm test`.
+  Expected: PASS.
 - [ ] **Step 5: Commit:**
   `feat: four brand accents, mapping the old eight (#128)`.
 
@@ -314,12 +489,10 @@ rounded-xs bg-accent ring-1 ring-border-strong`).
 Branch: `feature/issue-129-billboard-badge` from `origin/main` once PR 1
 has merged, or stacked on PR 1's branch if it hasn't.
 
-### Task 5: The lexicon and config gain the cover and badge settings
+### Task 5: The config gains the cover and badge settings
 
 **Files:**
 - Modify:
-  - `web/lexicons/lanyards/app/lanyards/actor/lanyard.json`
-  - the generated lexicon types
   - `web/src/lib/person/config.ts`
   - `web/src/features/lanyard/hooks/useLanyardDraft.ts`
 - Create: `web/src/design/covers.ts` and `covers.test.ts`
@@ -334,9 +507,16 @@ has merged, or stacked on PR 1's branch if it hasn't.
     mod 8;
   - `initialsOf(name: string): string`: the first grapheme of the
     first and last words, upper-cased, at most 2.
-- **Produces** on `LanyardConfig`: `cover: CoverPattern | null` (null
-  means not chosen), `showLocation: boolean` and `showOpenTo: boolean`.
-  `CONFIG_FIELDS` and the draft's change count include all three.
+- **Produces** on `LanyardConfig`:
+  - `cover: CoverPattern | null` (null means not chosen);
+  - `showRole: boolean` (replaces `showJob` in the config type);
+  - `showLocation: boolean`;
+  - `showOpenTo: boolean`.
+
+  They are read from the record's `badge` object (L1's `BadgePrefs`),
+  with `showRole` falling back to the legacy `showJob`.
+  `serialiseConfig` writes `badge` and drops `showJob`.
+  `CONFIG_FIELDS` and the draft's change count include all four.
 
 - [ ] **Step 1: Write the failing tests.**
   - `covers.test.ts`:
@@ -346,27 +526,23 @@ has merged, or stacked on PR 1's branch if it hasn't.
       `initialsOf('Ada') === 'A'`, and
       `initialsOf('Ada Lovelace King') === 'AK'`.
   - `config.test.ts`:
-    - an absent `cover` gives `null`, and an unknown one gives `null`;
-    - `cover: 'orb'` round-trips;
+    - an absent `badge.cover` gives `null`, and an unknown one gives
+      `null`;
+    - `badge.cover: 'orb'` round-trips;
     - `showLocation` and `showOpenTo` default to `true`;
-    - `serialiseConfig` writes no `cover` key when it is `null`;
+    - a record with `showJob: false` and no `badge` gives `showRole:
+      false`, and saving it writes `badge.showRole: false` with no
+      `showJob`;
+    - `serialiseConfig` writes no `badge.cover` when it is `null`;
     - `mergeConfig` takes our `cover` when only we changed it.
 - [ ] **Step 2: Run them to watch them fail.** Run:
   `npx vitest run src/design/covers.test.ts src/lib/person/config.test.ts`.
   Expected: FAIL.
-- [ ] **Step 3: Implement.** The lexicon gains:
-  - `cover` (string, maxLength 32, the eight as `knownValues`,
-    description "Badge cover pattern; derived from the DID when
-    absent");
-  - `showLocation` and `showOpenTo` (boolean, default true, described
-    as "Show the location on the badge" and "Show what the owner is
-    open to on the badge");
-  - for `showJob`, the description "Show the current role on the
-    badge".
-
-  Then run `npm run lex:gen`.
-- [ ] **Step 4: Run them to watch them pass,** then run `npm test`
-  and `lex:check`. Expected: PASS.
+- [ ] **Step 3: Implement.** Rename `showJob` to `showRole` through
+  the app (the hero, `StylePanel` and tests). The schema is already
+  in place from L1.
+- [ ] **Step 4: Run them to watch them pass,** then run `npm test`.
+  Expected: PASS.
 - [ ] **Step 5: Commit:**
   `feat: the lanyard record keeps a cover and badge settings (#129)`.
 
@@ -649,8 +825,7 @@ has merged, or stacked on PR 1's branch if it hasn't.
 - [ ] **Step 4: Run all the checks,** including the full e2e run.
   Expected: PASS.
 - [ ] **Step 5: Commit** `feat: restyle the link-preview image
-  (#129)`, then push and open PR 2 with "Closes #129". The PR names the
-  lexicon republish.
+  (#129)`, then push and open PR 2 with "Closes #129".
 
 ---
 
@@ -662,9 +837,8 @@ Branch: `feature/issue-130-roles`.
 
 **Files:**
 - Modify:
-  - `web/src/lib/lexicons/nsids.ts` (`BLOCK_TYPES` gains `'roles'`)
-  - `lanyard.json` (the block type's `knownValues`) and the generated
-    types
+  - `web/src/lib/lexicons/nsids.ts` (`BLOCK_TYPES` gains `'roles'`;
+    the lexicon's `#blockType` already lists it, from L1)
   - `config.ts`:
     - `DEFAULT_BLOCK_ORDER` puts `roles` after `links`;
     - `DEFAULT_VISIBLE` gains it;
@@ -695,8 +869,8 @@ undated roles last.
     - a position's AT-URI maps to the `roles` block for hiding.
 - [ ] **Step 2: Run them to watch them fail.** Expected: FAIL.
 - [ ] **Step 3: Implement.**
-- [ ] **Step 4: Run them to watch them pass,** then run `npm test`
-  and `lex:check`. Expected: PASS.
+- [ ] **Step 4: Run them to watch them pass,** then run `npm test`.
+  Expected: PASS.
 - [ ] **Step 5: Commit:** `feat: the Roles block's data (#130)`.
 
 ### Task 13: The Roles block, "+N more roles", and PR 3
@@ -744,4 +918,4 @@ Rows use the shared `ItemFrame`, so they can be hidden.
 - [ ] **Step 4: Run all the checks,** including the full e2e run.
   Expected: PASS.
 - [ ] **Step 5: Commit** `feat: the Roles block (#130)`, then push and
-  open PR 3 with "Closes #130". The PR names the lexicon republish.
+  open PR 3 with "Closes #130".
