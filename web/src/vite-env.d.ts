@@ -15,3 +15,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv;
 }
+
+/** The deployed commit's short hash, or 'dev' (vite.config.ts). */
+declare const __APP_VERSION__: string;

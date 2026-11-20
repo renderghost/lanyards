@@ -11,6 +11,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { oauthMetadataPlugin } from './plugins/oauthMetadata.ts';
 
 export default defineConfig({
+  define: {
+    // The deployed commit, for feedback's technical details (#134).
+    __APP_VERSION__: JSON.stringify(
+      process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'dev'
+    ),
+  },
   plugins: [
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),

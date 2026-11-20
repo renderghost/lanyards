@@ -189,9 +189,17 @@ msgstr "Checking your ORCID iD…"
 msgid "Choose a platform"
 msgstr "Choose a platform"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:159
+msgid "Choose one"
+msgstr "Choose one"
+
 #: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:66
 msgid "Choose PNG, JPEG, WebP or GIF images"
 msgstr "Choose PNG, JPEG, WebP or GIF images"
+
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:55
+msgid "Choose what this is about"
+msgstr "Choose what this is about"
 
 #: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:333
 msgid "Clear"
@@ -270,6 +278,10 @@ msgstr "Couldn't open your QR code. Please try again."
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:108
+msgid "Couldn't send your feedback. Please try again."
+msgstr "Couldn't send your feedback. Please try again."
+
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:126
 msgid "Couldn't show this block"
 msgstr "Couldn't show this block"
@@ -320,6 +332,7 @@ msgstr "Describe screenshot {number}"
 msgid "Description"
 msgstr "Description"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:178
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:36
 msgid "Details"
 msgstr "Details"
@@ -390,6 +403,10 @@ msgstr "Failed to save. Please try again."
 msgid "Failed to unfollow. Please try again."
 msgstr "Failed to unfollow. Please try again."
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:97
+msgid "Feedback sent"
+msgstr "Feedback sent"
+
 #: src/features/lanyard/components/FollowButton/FollowButton.tsx:52
 msgid "Follow"
 msgstr "Follow"
@@ -442,6 +459,10 @@ msgstr "For example alice.bsky.social"
 msgid "Full-time roles"
 msgstr "Full-time roles"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:57
+msgid "Give it a title"
+msgstr "Give it a title"
+
 #: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:61
 msgid "Give permission"
 msgstr "Give permission"
@@ -471,6 +492,10 @@ msgstr "Hide {title}"
 msgid "Host"
 msgstr "Host"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:200
+msgid "Include technical details"
+msgstr "Include technical details"
+
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:18
 msgid "Interview"
 msgstr "Interview"
@@ -483,9 +508,17 @@ msgstr "Items to show for {name}"
 msgid "Keep the description to 1,000 characters or fewer"
 msgstr "Keep the description to 1,000 characters or fewer"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:60
+msgid "Keep the details to 10,000 characters"
+msgstr "Keep the details to 10,000 characters"
+
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:72
 msgid "Keep the title to 200 characters or fewer"
 msgstr "Keep the title to 200 characters or fewer"
+
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:58
+msgid "Keep the title to 300 characters"
+msgstr "Keep the title to 300 characters"
 
 #: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:6
 msgid "Keynote"
@@ -789,6 +822,10 @@ msgstr "See our feedback board"
 msgid "Semble"
 msgstr "Semble"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:209
+msgid "Send feedback"
+msgstr "Send feedback"
+
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:50
 msgid "Show"
 msgstr "Show"
@@ -950,6 +987,7 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:168
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:178
 msgid "Title"
 msgstr "Title"
@@ -1067,6 +1105,15 @@ msgstr "We couldn't read your lanyard settings"
 msgid "Web address"
 msgstr "Web address"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:181
+msgid "What happened, and what did you expect? Steps to repeat it help."
+msgstr "What happened, and what did you expect? Steps to repeat it help."
+
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:121
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:156
+msgid "What is this about?"
+msgstr "What is this about?"
+
 #: src/features/lanyard/components/SharedContextStrip/SharedContextStrip.tsx:43
 msgid "What you share"
 msgstr "What you share"
@@ -1112,6 +1159,10 @@ msgstr "Your account"
 #: src/features/auth/components/LandingPage/LandingPage.tsx:35
 msgid "Your conference lanyard, from your AT Protocol account"
 msgstr "Your conference lanyard, from your AT Protocol account"
+
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:205
+msgid "Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal."
+msgstr "Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal."
 
 #: src/features/auth/components/SignInForm/SignInForm.tsx:88
 msgid "Your handle"
