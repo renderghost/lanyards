@@ -13,7 +13,7 @@ import type { SampleLanyardProps } from './SampleLanyard.types';
  */
 export function SampleLanyard({ handle, className }: SampleLanyardProps) {
   const { t } = useLingui();
-  const href = `/@${handle}`;
+  const href = `/${handle}`;
   return (
     <div className={cn(styles.sample, className)}>
       <p aria-hidden="true" className={styles.label}>

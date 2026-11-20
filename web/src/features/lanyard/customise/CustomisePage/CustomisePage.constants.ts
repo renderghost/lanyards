@@ -1,5 +1,2 @@
-/** The customiser's own path, to come back to after sign-in or approval. */
+/** Forwards to the owner's own customiser, `/<handle>/edit` (#150). */
 export const CUSTOMISE_PATH = '/lanyard';
-
-/** Where signed-out visitors are sent, returning here after sign-in. */
-export const SIGN_IN_PATH = `/?returnTo=${encodeURIComponent(CUSTOMISE_PATH)}`;

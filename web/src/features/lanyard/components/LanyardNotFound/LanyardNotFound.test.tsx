@@ -29,7 +29,7 @@ describe('LanyardNotFound', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: 'Show lanyard' }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/@bob.test')
+      expect(router.state.location.pathname).toBe('/bob.test')
     );
     await expectNoAxeViolations(container);
   });

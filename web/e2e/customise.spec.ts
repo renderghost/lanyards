@@ -424,7 +424,7 @@ test.describe('lanyard customiser', () => {
     await page.getByRole('link', { name: 'Lanyards' }).click();
     await page.goBack();
     await expect.poll(() => dialogs).toEqual(['confirm', 'confirm']);
-    await expect(page).toHaveURL(/\/lanyard$/);
+    await expect(page).toHaveURL(/\/alice\.test\/edit$/);
     // Dismissing the prompt cancels the reload, so don't wait for a load.
     await page.evaluate(() => window.location.reload());
     await expect.poll(() => dialogs).toContain('beforeunload');

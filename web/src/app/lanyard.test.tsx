@@ -37,7 +37,7 @@ beforeEach(() => {
 describe('public lanyard routes', () => {
   it('shows the badge for a handle', async () => {
     servePerson();
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(await hero()).toBeInTheDocument();
     expect(screen.getByText('she/her · @alice.test')).toBeInTheDocument();
     expect(
@@ -54,7 +54,7 @@ describe('public lanyard routes', () => {
 
   it("keeps the lanyard's own background on its public page", async () => {
     servePerson();
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     const name = await hero();
     // The app chrome is neutral (#118); the lanyard keeps its brand ground.
     expect(name.closest('.bg-background')).not.toBeNull();
@@ -67,8 +67,12 @@ describe('public lanyard routes', () => {
   });
 
   it.each([
-    ['/@Alice.Test', '/@alice.test'],
-    ['/%40alice.test', '/@alice.test'],
+    ['/Alice.Test', '/alice.test'],
+    // The beta's links, and some apps' encoding of them (#150).
+    ['/@alice.test', '/alice.test'],
+    ['/@Alice.Test', '/alice.test'],
+    ['/%40alice.test', '/alice.test'],
+    [`/${ADA.did}`, `/d/${ADA.did}`],
     [`/@${ADA.did}`, `/d/${ADA.did}`],
   ])('redirects %s to %s', async (from, to) => {
     servePerson();
@@ -77,7 +81,7 @@ describe('public lanyard routes', () => {
     expect(await hero()).toBeInTheDocument();
   });
 
-  it.each(['/%40alice%', '/@alice%'])(
+  it.each(['/%40alice%', '/@alice%', '/alice%', '/not-a-handle'])(
     'shows the not-found page, not an error, for a malformed escape in %s',
     async (path) => {
       renderRoute(path);
@@ -100,7 +104,7 @@ describe('public lanyard routes', () => {
 describe('lanyard page states', () => {
   it('offers search when a handle does not exist', async () => {
     servePerson();
-    const { container } = renderRoute('/@nobody.test');
+    const { container } = renderRoute('/nobody.test');
     expect(
       await screen.findByRole('heading', {
         name: "We couldn't find @nobody.test",
@@ -122,7 +126,7 @@ describe('lanyard page states', () => {
         }
       )
     );
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     const loading = await screen.findByText('Loading lanyard…', undefined, {
       timeout: 5000,
     });
@@ -137,7 +141,7 @@ describe('lanyard page states', () => {
         return HttpResponse.json({});
       })
     );
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(
       await screen.findByText('Loading lanyard…', undefined, { timeout: 5000 })
     ).toBeInTheDocument();
@@ -154,7 +158,7 @@ describe('lanyard page states', () => {
 
   it("keeps the lanyard's own ground and palette for an unknown handle", async () => {
     servePerson();
-    renderRoute('/@nobody.test');
+    renderRoute('/nobody.test');
     const heading = await screen.findByRole('heading', {
       name: "We couldn't find @nobody.test",
     });
@@ -168,7 +172,7 @@ describe('lanyard page states', () => {
     servePerson({
       profileError: { error: 'AccountDeactivated', status: 400 },
     });
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(
       await screen.findByRole('heading', {
         name: "This account isn't available",
@@ -189,7 +193,7 @@ describe('lanyard page states', () => {
         ],
       },
     });
-    const { container } = renderRoute('/@alice.test');
+    const { container } = renderRoute('/alice.test');
     expect(
       await screen.findByText(
         'This person has chosen to show their lanyard only to people who are signed in.'
@@ -197,7 +201,7 @@ describe('lanyard page states', () => {
     ).toBeInTheDocument();
     expect(
       within(screen.getByRole('main')).getByRole('link', { name: 'Sign in' })
-    ).toHaveAttribute('href', '/?returnTo=%2F%40alice.test');
+    ).toHaveAttribute('href', '/?returnTo=%2Falice.test');
     expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
     // The name must not leak through the tab title either.
     await waitFor(() =>
@@ -222,7 +226,7 @@ describe('lanyard page states', () => {
     });
     serveViewerReads();
     vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(await hero()).toBeInTheDocument();
   });
 
@@ -232,7 +236,7 @@ describe('lanyard page states', () => {
       relationship: { blockedBy: `at://${ADA.did}/app.bsky.graph.block/3m` },
     });
     vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(
       await screen.findByText("This lanyard isn't available to you.")
     ).toBeInTheDocument();
@@ -241,7 +245,7 @@ describe('lanyard page states', () => {
 
   it('passes axe on a loaded lanyard', async () => {
     servePerson();
-    const { container } = renderRoute('/@alice.test');
+    const { container } = renderRoute('/alice.test');
     await hero();
     await expectNoAxeViolations(container);
   });
@@ -252,7 +256,7 @@ describe('shared context', () => {
     servePerson();
     serveViewerReads();
     vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(
       await screen.findByText('You follow each other')
     ).toBeInTheDocument();
@@ -265,7 +269,7 @@ describe('shared context', () => {
 
   it('is absent for signed-out visitors and on your own lanyard', async () => {
     servePerson();
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     await hero();
     expect(screen.queryByText('You follow each other')).not.toBeInTheDocument();
   });
@@ -274,7 +278,7 @@ describe('shared context', () => {
 describe('accent', () => {
   it('applies the owner’s accent while their lanyard is open', async () => {
     servePerson({ config: { accent: 'mint' } });
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     await hero();
     await waitFor(() =>
       expect(document.documentElement.dataset.accent).toBe('mint')
@@ -285,7 +289,7 @@ describe('accent', () => {
 describe('lanyard blocks', () => {
   it('shows the default blocks: links and talks', async () => {
     servePerson();
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     const links = await screen.findByRole('region', { name: 'Links' });
     expect(
       within(links).getByRole('link', { name: 'GitHub (opens in a new tab)' })
@@ -307,7 +311,7 @@ describe('lanyard blocks', () => {
         ],
       },
     });
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     await screen.findByRole('region', { name: 'Skills' });
     const headings = screen
       .getAllByRole('heading', { level: 2 })
@@ -331,7 +335,7 @@ describe('lanyard blocks', () => {
       )
     );
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     const talks = await screen.findByRole(
       'region',
       { name: 'Talks' },
@@ -351,7 +355,7 @@ describe('lanyard blocks', () => {
 describe('visitor actions on the page', () => {
   it('offers signed-out visitors Bluesky, with sign-in and sign-up in the header', async () => {
     servePerson();
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(
       await screen.findByRole('link', {
         name: 'Follow on Bluesky (opens in a new tab)',
@@ -362,7 +366,7 @@ describe('visitor actions on the page', () => {
       within(header).getByRole('link', { name: 'Sign in' })
     ).toHaveAttribute(
       'href',
-      `/?returnTo=${encodeURIComponent('/@alice.test')}`
+      `/?returnTo=${encodeURIComponent('/alice.test')}`
     );
     expect(
       within(header).getByRole('button', { name: 'Make your lanyard' })
@@ -395,7 +399,7 @@ describe('visitor actions on the page', () => {
   it('gives owners Edit lanyard and Show QR on the badge', async () => {
     servePerson();
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     const badge = await screen.findByRole('region', { name: /Ada/ });
     expect(
       within(badge).getByRole('link', { name: 'Edit lanyard' })
@@ -436,7 +440,7 @@ describe('blocks between viewer and owner', () => {
       )
     );
     vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     await new Promise((resolve) => setTimeout(resolve, 400));
     expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
     release();
@@ -460,7 +464,7 @@ describe('owner settings that cannot be read', () => {
       )
     );
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-    renderRoute('/@alice.test');
+    renderRoute('/alice.test');
     expect(
       await screen.findByText(
         "Couldn't load your lanyard settings",

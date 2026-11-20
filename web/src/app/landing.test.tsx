@@ -4,6 +4,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { TYPEAHEAD_URL } from '@/test/fixtures';
+import { ADA } from '@/test/people';
+import { servePerson, signedInSession } from '@/test/person';
 import { server } from '@/test/msw';
 import { renderRoute, waitForRoute } from '@/test/router';
 
@@ -79,10 +81,11 @@ describe('landing page', () => {
     expect(document.title).toBe('Sign in · Lanyards');
   });
 
-  it('sends a signed-in visitor to their lanyard', async () => {
-    vi.mocked(useSession).mockReturnValue(signedIn);
+  it('sends a signed-in visitor to their own customiser (#150)', async () => {
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    servePerson();
     const { router } = renderRoute('/');
-    await waitForRoute(router, '/lanyard', LAZY_ROUTE_TIMEOUT);
+    await waitForRoute(router, `/${ADA.handle}/edit`, LAZY_ROUTE_TIMEOUT);
   });
 
   it('honours a safe return path for signed-in visitors', async () => {
@@ -92,8 +95,9 @@ describe('landing page', () => {
   });
 
   it('ignores an unsafe return path', async () => {
-    vi.mocked(useSession).mockReturnValue(signedIn);
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    servePerson();
     const { router } = renderRoute('/?returnTo=%2F%2Fevil.com');
-    await waitForRoute(router, '/lanyard', LAZY_ROUTE_TIMEOUT);
+    await waitForRoute(router, `/${ADA.handle}/edit`, LAZY_ROUTE_TIMEOUT);
   });
 });

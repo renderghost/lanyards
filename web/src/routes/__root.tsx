@@ -30,7 +30,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
         // A malformed escape (a stray %) names nobody.
         throw notFound();
       }
-      throw redirect({ href: `/@${handle}${location.searchStr}` });
+      throw redirect({ href: `/${handle}${location.searchStr}` });
     }
   },
   component: RootLayout,

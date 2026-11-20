@@ -104,11 +104,11 @@ describe('HomePage (#145)', () => {
     home();
     const frame = screen.getByTitle('Sample lanyard');
     expect(frame.tagName).toBe('IFRAME');
-    expect(frame).toHaveAttribute('src', '/@renderg.host');
+    expect(frame).toHaveAttribute('src', '/renderg.host');
     expect(frame).toHaveAttribute('loading', 'lazy');
     expect(
       screen.getByRole('link', { name: /View sample profile/ })
-    ).toHaveAttribute('href', '/@renderg.host');
+    ).toHaveAttribute('href', '/renderg.host');
   });
 
   it('takes “Create your lanyard” to the sign-in form', async () => {

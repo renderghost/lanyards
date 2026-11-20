@@ -24,7 +24,7 @@ async function coldLoad(browser: Browser, baseURL: string): Promise<Metrics> {
       uploadThroughput: (750 * 1024) / 8,
     });
 
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(
       page.getByRole('heading', { level: 1, name: 'Dr Ada Example' })
     ).toBeVisible({ timeout: 15_000 });

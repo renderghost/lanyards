@@ -1,0 +1,25 @@
+/** Bluesky's stand-in for a handle that no longer verifies. */
+const INVALID_HANDLE = 'handle.invalid';
+
+export type OwnPaths = {
+  /** Customise: `/<handle>/edit`. */
+  edit: string;
+  /** View: the public lanyard, `/<handle>`. */
+  view: string;
+  /** Show QR: `/<handle>/share`. */
+  share: string;
+};
+
+/**
+ * Someone's own pages (#150), by handle; by DID while the handle is
+ * unknown or doesn't verify, which every one of them also accepts.
+ */
+export function ownPaths(did: string, handle?: string): OwnPaths {
+  const valid = Boolean(handle) && handle !== INVALID_HANDLE;
+  const id = valid ? (handle as string) : did;
+  return {
+    edit: `/${id}/edit`,
+    view: valid ? `/${id}` : `/d/${did}`,
+    share: `/${id}/share`,
+  };
+}

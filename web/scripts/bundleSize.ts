@@ -8,7 +8,7 @@ export const INITIAL_JS_BUDGET_BYTES = 200 * 1024;
  * own (spec §2: initial JS for the public lanyard route ≤ 200 KB gzipped).
  */
 export const PUBLIC_LANYARD_ROUTES = [
-  'routes/@{$handle}.tsx',
+  'routes/$handle.tsx',
   'routes/d.$did.tsx',
 ] as const;
 

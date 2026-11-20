@@ -22,7 +22,7 @@ export function LanyardNotFound({ handle, className }: LanyardNotFoundProps) {
     event.preventDefault();
     const target = query.trim().replace(/^@/, '').toLowerCase();
     if (!target) return;
-    void navigate({ to: '/@{$handle}', params: { handle: target } });
+    void navigate({ to: '/$handle', params: { handle: target } });
   }
 
   return (

@@ -15,6 +15,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 type Config = {
   ignoreCommand: string;
   functions?: Record<string, { includeFiles?: string }>;
+  redirects?: { source: string; destination: string; permanent: boolean }[];
   rewrites: { source: string; destination: string }[];
   headers: { source: string; headers: { key: string; value: string }[] }[];
 };
@@ -24,9 +25,21 @@ const config = JSON.parse(
 ) as Config;
 
 describe('vercel.json', () => {
+  // The beta's /@handle links, link previews included (#150).
+  it('sends /@handle on to /handle for good', () => {
+    expect(config.redirects).toEqual([
+      { source: '/@:handle', destination: '/:handle', permanent: true },
+    ]);
+  });
+
+  // A lanyard is one path segment with a dot in it: a handle. Files such
+  // as /sw.js are served before any rewrite.
   it('sends lanyard and image paths to the preview functions before the app', () => {
     expect(config.rewrites).toEqual([
-      { source: '/@:handle', destination: '/api/meta?handle=:handle' },
+      {
+        source: '/:handle([^/]+\\.[^/]+)',
+        destination: '/api/meta?handle=:handle',
+      },
       { source: '/d/:did', destination: '/api/meta?did=:did' },
       { source: '/og/p/:did.png', destination: '/api/og?did=:did' },
       { source: '/og/default.png', destination: '/api/og' },

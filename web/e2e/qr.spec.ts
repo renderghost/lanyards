@@ -287,7 +287,7 @@ test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', ()
   test('wears the owner’s accent, and leaves the page’s alone', async ({
     page,
   }) => {
-    await page.goto('/@alice.test');
+    await page.goto('/alice.test');
     await expect(
       page.getByRole('heading', { level: 1, name: 'Dr Ada Example' })
     ).toBeVisible();

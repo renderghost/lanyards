@@ -16,7 +16,7 @@ type Options = {
 /** The handle or DID asked for, from the rewrite's query or the path. */
 function subject(url: URL): { handle?: string; did?: string } {
   const handle =
-    url.searchParams.get('handle') ?? /^\/@([^/]+)$/.exec(url.pathname)?.[1];
+    url.searchParams.get('handle') ?? /^\/@?([^/]+)$/.exec(url.pathname)?.[1];
   const did =
     url.searchParams.get('did') ?? /^\/d\/([^/]+)$/.exec(url.pathname)?.[1];
   const clean = (value?: string) => {
@@ -36,7 +36,7 @@ function subject(url: URL): { handle?: string; did?: string } {
 }
 
 /**
- * Serves the app's index.html for /@handle and /d/did with that person's
+ * Serves the app's index.html for /handle and /d/did with that person's
  * title, description and badge image, so link previews show who it is.
  * Anything unknown or failing gets the default meta, briefly cached.
  */

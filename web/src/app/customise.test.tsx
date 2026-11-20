@@ -8,7 +8,7 @@ import { useSession } from '@/features/auth/session/useSession';
 import { expectNoAxeViolations } from '@/test/axe';
 import { server } from '@/test/msw';
 import { mockListRecords } from '@/test/handlers';
-import { ADA } from '@/test/people';
+import { ADA, BEA } from '@/test/people';
 import {
   servePerson,
   signedInSession,
@@ -118,6 +118,9 @@ async function jobCheckbox() {
 const saveChanges = () =>
   userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
+/** The owner's customiser (#150). */
+const EDIT = `/${ADA.handle}/edit`;
+
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
   document.documentElement.dataset.accent = 'blue';
@@ -125,17 +128,31 @@ beforeEach(() => {
 
 // Lazily loaded routes and Sifa's retry-then-fallback path take a few
 // seconds under a full parallel run.
-describe('/lanyard', { timeout: 20_000 }, () => {
-  it('sends signed-out visitors to sign in first', async () => {
+describe('/<handle>/edit', { timeout: 20_000 }, () => {
+  it('sends signed-out visitors to sign in, then back here', async () => {
     vi.mocked(useSession).mockReturnValue(signedOutSession());
+    const { router } = renderRoute(EDIT);
+    await waitForRoute(router, `/?returnTo=${encodeURIComponent(EDIT)}`, 5000);
+  });
+
+  it('forwards /lanyard to your own /<handle>/edit (#150)', async () => {
+    servePerson();
     const { router } = renderRoute('/lanyard');
-    await waitForRoute(router, '/?returnTo=%2Flanyard', 5000);
+    await waitForRoute(router, EDIT, 5000);
+    expect(await preview()).toBeInTheDocument();
+  });
+
+  it('sends anyone else to that person’s lanyard (#150)', async () => {
+    vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
+    servePerson();
+    const { router } = renderRoute(EDIT);
+    await waitForRoute(router, `/${ADA.handle}`, 5000);
   });
 
   it('previews the owner’s lanyard as the owner sees it', async () => {
     servePerson();
     sifaDown();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     // The title comes from Sifa: without it, the name stands alone.
     expect(
@@ -155,7 +172,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('the lanyard sits on its own ground, with no box round it', async () => {
     servePerson();
-    const { container } = renderRoute('/lanyard');
+    const { container } = renderRoute(EDIT);
     const region = await preview();
     await within(region).findByRole(
       'heading',
@@ -184,7 +201,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('shows only its own header, with the customiser’s actions', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await preview();
     const banners = screen.getAllByRole('banner');
     expect(banners).toHaveLength(1);
@@ -197,7 +214,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('keeps support at the foot of the sidebar, even viewed as public (#134)', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await preview();
     expect(screen.queryByRole('contentinfo')).toBeNull();
     const support = screen.getByRole('region', { name: 'Beta support' });
@@ -214,7 +231,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('keeps support at the foot of the Style sheet on phones (#134)', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await preview();
     const toolbar = screen.getByRole('toolbar', { name: 'Customiser' });
     expect(
@@ -241,7 +258,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('lays the lanyard out beside a pinned style sidebar', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const sidebar = await screen.findByRole(
       'complementary',
       { name: 'Style' },
@@ -260,7 +277,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('View as public hides the sidebar and edit controls, and Edit brings them back', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     await within(region).findByRole(
       'button',
@@ -289,7 +306,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('asks before leaving with unsaved changes', async () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     servePerson();
-    const { router } = renderRoute('/lanyard');
+    const { router } = renderRoute(EDIT);
     const mint = await accent('Mint');
     await waitFor(() => expect(mint).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(mint);
@@ -297,13 +314,13 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(confirm).toHaveBeenCalledWith(
       'You have unsaved changes. Leave without saving?'
     );
-    expect(router.state.location.pathname).toBe('/lanyard');
+    expect(router.state.location.pathname).toBe(EDIT);
     confirm.mockRestore();
   });
 
   it('gives the page one level-one heading, its purpose', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     await within(region).findByRole(
       'heading',
@@ -318,7 +335,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('switches the preview to what visitors see', async () => {
     servePerson();
     sifaDown();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     await within(region).findAllByText("Couldn't load Sifa", undefined, {
       timeout: 8000,
@@ -333,7 +350,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('applies and saves a new accent, announcing progress', async () => {
     servePerson();
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const mint = await accent('Mint');
     await waitFor(() => expect(mint).toBeEnabled(), { timeout: 5000 });
     await userEvent.click(mint);
@@ -356,7 +373,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('resets unsaved changes to the last save, writing nothing', async () => {
     servePerson();
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const mint = await accent('Mint');
     await waitFor(() => expect(mint).toBeEnabled(), { timeout: 5000 });
     const save = screen.getByRole('button', { name: 'Save' });
@@ -379,7 +396,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('saves the current-role switch', async () => {
     servePerson();
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const job = await jobCheckbox();
     await waitFor(() => expect(job).toBeEnabled(), { timeout: 5000 });
     expect(job).toBeChecked();
@@ -395,7 +412,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('asks for permission instead of letting an identity-only session edit', async () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did, 'atproto'));
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     expect(
       await screen.findByRole(
         'heading',
@@ -418,7 +435,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
           : undefined
       )
     );
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await preview();
     expect(
       await screen.findByText(
@@ -433,7 +450,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('saves a new block order', async () => {
     servePerson();
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const links = await screen.findByRole(
       'listitem',
       { name: 'Links' },
@@ -455,7 +472,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('hides a record in place, then shows it again', async () => {
     servePerson();
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     const hide = await within(region).findByRole(
       'button',
@@ -487,7 +504,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       },
     });
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     await userEvent.click(
       await within(region).findByRole(
@@ -508,7 +525,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('links can only be hidden', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const links = await linksBlock();
     expect(
       await within(links).findByRole(
@@ -527,7 +544,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('has no Title control: the title comes from Sifa', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await enabled('Hide GitHub');
     expect(screen.queryByRole('combobox', { name: 'Title' })).toBeNull();
   });
@@ -546,7 +563,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       )
     );
     servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     expect(await enabled('Add a podcast or video')).toBeEnabled();
     expect(
       screen.queryByRole('heading', { name: 'Lanyards needs your permission' })
@@ -575,7 +592,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
         () => new Promise<never>(() => {})
       )
     );
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     expect(
       await screen.findByText('Updating your podcasts and videos…', undefined, {
         timeout: 8000,
@@ -596,7 +613,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
         ],
       },
     });
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     const region = await preview();
     const publications = await within(region).findByRole(
       'listitem',
@@ -615,7 +632,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
   it('adds a podcast in a dialog; it’s saved only on Save', async () => {
     servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
     const batches = captureWrites();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await userEvent.click(await enabled('Add a podcast or video'));
     const dialog = screen.getByRole('dialog', {
       name: 'Add a podcast or video',
@@ -660,7 +677,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
     const batches = captureWrites();
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     await userEvent.click(await enabled('Add a podcast or video'));
     const dialog = screen.getByRole('dialog', {
       name: 'Add a podcast or video',
@@ -700,7 +717,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       config: { blocks: [{ type: 'links', visible: true, limit: 0 }] },
     });
     const saves = captureSaves();
-    renderRoute('/lanyard');
+    renderRoute(EDIT);
     expect(
       await screen.findByText(
         "We couldn't read your lanyard settings",
@@ -723,7 +740,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
 
   it('has no accessibility violations', async () => {
     servePerson();
-    const { container } = renderRoute('/lanyard');
+    const { container } = renderRoute(EDIT);
     const region = await preview();
     await within(region).findByRole(
       'heading',

@@ -1,7 +1,14 @@
 import type { Did } from '@atcute/lexicons';
 import { useLingui } from '@lingui/react/macro';
-import { useRouter } from '@tanstack/react-router';
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useLocation, useRouter } from '@tanstack/react-router';
+import {
+  useEffect,
+  useEffectEvent,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { Button } from '@/components/Button/Button';
@@ -26,7 +33,6 @@ import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
 import { CustomiserSidebar } from '../CustomiserSidebar/CustomiserSidebar';
-import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
 import * as styles from './CustomisePage.styles';
 import type { CustomisePageProps } from './CustomisePage.types';
 
@@ -36,18 +42,27 @@ import type { CustomisePageProps } from './CustomisePage.types';
  * lanyard itself. Changes show at once and are one draft until Save, in
  * the route's own header (#118).
  */
-export function CustomisePage({ className }: CustomisePageProps) {
+export function CustomisePage({
+  pending = false,
+  className,
+}: CustomisePageProps) {
   const { t } = useLingui();
   const router = useRouter();
+  const path = useLocation({ select: (location) => location.pathname });
   const session = useSession();
   const signedOut = session.status === 'signedOut';
   useDocumentTitle(t`Your lanyard`);
 
+  // Signed out: sign in, then come back to this page. Once, from where
+  // they are: the page is still here while the sign-in page loads.
+  const signIn = useEffectEvent(() => {
+    router.history.replace(`/?returnTo=${encodeURIComponent(path)}`);
+  });
   useEffect(() => {
-    if (signedOut) router.history.replace(SIGN_IN_PATH);
-  }, [signedOut, router]);
+    if (signedOut) signIn();
+  }, [signedOut]);
 
-  if (session.status !== 'signedIn') {
+  if (pending || session.status !== 'signedIn') {
     return (
       <>
         <AppHeader title={t`Your lanyard`} />
@@ -78,6 +93,7 @@ function Customiser({
   className?: string;
 }) {
   const { t } = useLingui();
+  const path = useLocation({ select: (location) => location.pathname });
   const headingId = useId();
   const draft = useCustomiserDraft(did);
   // For the monogram cover's preview.
@@ -153,7 +169,7 @@ function Customiser({
                 {t`Customise your lanyard`}
               </h1>
               {(!canEdit || !canKeep || draft.permissionLost) && (
-                <PermissionNotice returnTo={CUSTOMISE_PATH} />
+                <PermissionNotice returnTo={path} />
               )}
               <p role="status" className={styles.moving}>
                 {move.moving ? t`Updating your podcasts and videos…` : ''}
