@@ -8,9 +8,9 @@ import * as styles from './CardLink.styles';
 import type { CardLinkProps } from './CardLink.types';
 
 /**
- * A card's one link (#122). On the public lanyard it covers the card, so
- * a click anywhere opens it; in the customiser it's a plain link, so a
- * stray click while arranging doesn't leave the page.
+ * A card's one link (#122): what keyboards and screen readers meet. On the
+ * public lanyard its card opens it from a click anywhere (CardItem), and
+ * shows its focus ring.
  */
 export function CardLink({ href, children, label, className }: CardLinkProps) {
   const editing = use(ItemActionsContext) !== null;
@@ -19,7 +19,7 @@ export function CardLink({ href, children, label, className }: CardLinkProps) {
       tone="accent"
       href={href}
       label={label}
-      className={cn(styles.link, !editing && styles.stretched, className)}
+      className={cn(styles.link, !editing && styles.onCard, className)}
     >
       {children}
     </ExternalLink>

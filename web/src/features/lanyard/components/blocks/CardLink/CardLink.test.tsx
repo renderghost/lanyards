@@ -9,13 +9,12 @@ import { CardLink } from './CardLink';
 const ACTIONS = { isHidden: () => false, renderToggle: () => null };
 
 describe('CardLink', () => {
-  it('public: the link stretches over the whole card', () => {
+  it('is a plain link: nothing covers the card, so its text stays selectable', () => {
     renderWithProviders(
       <CardLink href="https://ada.example/post">A post</CardLink>
     );
-    expect(screen.getByRole('link', { name: /A post/ })).toHaveClass(
-      'after:absolute',
-      'after:inset-0'
+    expect(screen.getByRole('link', { name: /A post/ })).not.toHaveClass(
+      'after:absolute'
     );
   });
 

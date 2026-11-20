@@ -1,7 +1,11 @@
-// A bordered card; its one link may cover it, so its focus ring and hover
-// show on the card itself (#122).
+// A bordered card (#122).
 export const card =
-  'relative flex min-h-11 flex-wrap items-start gap-3 rounded-xl border border-border p-3 has-[a:hover]:bg-accent-subtle has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-accent';
+  'relative flex min-h-11 flex-wrap items-start gap-3 rounded-xl border border-border p-3';
+
+// On the public lanyard a card with a link opens it from a click anywhere,
+// so it looks clickable, and shows its link's focus ring.
+export const opens =
+  'has-[a]:cursor-pointer has-[a]:hover:bg-accent-subtle has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-accent';
 
 // Hidden from visitors: dashed and tagged, in place.
 export const hidden = 'border-dashed';

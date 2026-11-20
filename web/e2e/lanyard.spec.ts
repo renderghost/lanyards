@@ -264,4 +264,47 @@ test.describe('cards', () => {
     });
     expect(outline).not.toBe('none');
   });
+
+  test('a click on a card opens it; dragging selects its text instead', async ({
+    page,
+  }) => {
+    await mockPerson(page);
+    await page.goto('/@alice.test');
+    const talks = page.getByRole('region', { name: 'Talks' });
+    const card = talks.locator('[data-card]:has(a)').first();
+    await expect(card).toBeVisible();
+    // Count the link's clicks without leaving the page.
+    await card.locator('a').evaluate((link) => {
+      (window as unknown as { opened: number }).opened = 0;
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        (window as unknown as { opened: number }).opened += 1;
+      });
+    });
+    const opened = () =>
+      page.evaluate(() => (window as unknown as { opened: number }).opened);
+    const meta = card.locator('p').last();
+    await meta.click();
+    expect(await opened()).toBe(1);
+    const box = (await meta.boundingBox())!;
+    await page.mouse.move(box.x + 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width - 2, box.y + box.height / 2, {
+      steps: 5,
+    });
+    await page.mouse.up();
+    expect(
+      await page.evaluate(() => window.getSelection()?.toString())
+    ).not.toBe('');
+    expect(await opened()).toBe(1);
+    expect(await card.evaluate((el) => getComputedStyle(el).cursor)).toBe(
+      'pointer'
+    );
+    const linkless = talks.locator('[data-card]:not(:has(a))');
+    if ((await linkless.count()) > 0) {
+      expect(
+        await linkless.first().evaluate((el) => getComputedStyle(el).cursor)
+      ).not.toBe('pointer');
+    }
+  });
 });

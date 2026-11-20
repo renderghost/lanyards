@@ -1,5 +1,6 @@
-import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithProviders } from '@/test/render';
@@ -24,6 +25,76 @@ const card = (
 );
 
 describe('CardItem', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  /** Counts the link's clicks without leaving the page. */
+  const watchLink = () => {
+    const opened = vi.fn();
+    screen
+      .getByRole('link', { name: /A post/ })
+      .addEventListener('click', (event) => {
+        event.preventDefault();
+        opened();
+      });
+    return opened;
+  };
+  const meta = () => screen.getByText('Ada’s notes · 4 Nov 2026');
+
+  it('public: a click anywhere on the card opens its link', async () => {
+    renderWithProviders(card);
+    const opened = watchLink();
+    await userEvent.click(meta());
+    expect(opened).toHaveBeenCalledTimes(1);
+  });
+
+  it('public: a click on the link itself opens it once', async () => {
+    renderWithProviders(card);
+    const opened = watchLink();
+    await userEvent.click(screen.getByRole('link', { name: /A post/ }));
+    expect(opened).toHaveBeenCalledTimes(1);
+  });
+
+  it('public: selecting text, or a double-click, opens nothing more', () => {
+    renderWithProviders(card);
+    const opened = watchLink();
+    vi.spyOn(window, 'getSelection').mockReturnValue({
+      toString: () => 'notes',
+    } as Selection);
+    fireEvent.click(meta(), { detail: 1 });
+    expect(opened).not.toHaveBeenCalled();
+    vi.restoreAllMocks();
+    fireEvent.click(meta(), { detail: 1 });
+    fireEvent.click(meta(), { detail: 2 });
+    expect(opened).toHaveBeenCalledTimes(1);
+  });
+
+  it('editor: a click on the card opens nothing', async () => {
+    renderWithProviders(
+      <ItemActionsContext value={actions([])}>{card}</ItemActionsContext>
+    );
+    const opened = watchLink();
+    await userEvent.click(meta());
+    expect(opened).not.toHaveBeenCalled();
+  });
+
+  it('public: a card with a link shows it can be clicked; one without doesn’t', () => {
+    renderWithProviders(
+      <>
+        {card}
+        <CardItem itemKey="k2" title="Example University">
+          <p>Example University</p>
+        </CardItem>
+      </>
+    );
+    // has-[a]: only a card holding a link gets the pointer.
+    expect(meta().closest('[data-card]')).toHaveClass('has-[a]:cursor-pointer');
+    expect(
+      screen.getByText('Example University').querySelector('a')
+    ).toBeNull();
+  });
+
   it('one link per card, and its focus ring shows on the card', async () => {
     const { container } = renderWithProviders(
       <ul>
@@ -36,18 +107,6 @@ describe('CardItem', () => {
     expect(frame).toHaveClass('relative', 'has-[a:focus-visible]:outline-2');
     expect(screen.getByText('thumb')).toBeInTheDocument();
     await expectNoAxeViolations(container);
-  });
-
-  it('a card with no link has no pointer', () => {
-    renderWithProviders(
-      <CardItem itemKey="k2" title="Example University">
-        <p>Example University</p>
-      </CardItem>
-    );
-    expect(screen.queryByRole('link')).toBeNull();
-    expect(
-      screen.getByText('Example University').closest('[data-card]')
-    ).not.toHaveClass('cursor-pointer');
   });
 
   it('editor: its controls sit beside the link, never in it', () => {
