@@ -11,6 +11,7 @@ import {
 import type { RouterContext } from '@/app/routerContext';
 import { AppError } from '@/components/AppError/AppError';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
+import { MobileNav } from '@/components/MobileNav/MobileNav';
 import { NotFound } from '@/components/NotFound/NotFound';
 import { OfflineBanner } from '@/components/OfflineBanner/OfflineBanner';
 import { FeedbackProvider } from '@/features/feedback/components/FeedbackProvider/FeedbackProvider';
@@ -69,6 +70,8 @@ function RootLayout() {
             </main>
           </>
         )}
+        {/* On phones, signed in: the bottom bar (#150). */}
+        {!fullScreen && <MobileNav />}
         <OfflineBanner />
       </div>
     </FeedbackProvider>

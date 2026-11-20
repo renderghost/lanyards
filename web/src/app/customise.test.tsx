@@ -188,15 +188,6 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
     expect(ground).toContainElement(
       screen.getByRole('heading', { level: 1, name: 'Customise your lanyard' })
     );
-    await userEvent.click(
-      screen.getByRole('button', { name: 'View as public' })
-    );
-    await within(await preview()).findByRole(
-      'heading',
-      { level: 2, name: 'Dr Ada Example' },
-      { timeout: 5000 }
-    );
-    expect(grounds()).toHaveLength(1);
   });
 
   it('shows only its own header, with the customiser’s actions', async () => {
@@ -205,14 +196,32 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
     await preview();
     const banners = screen.getAllByRole('banner');
     expect(banners).toHaveLength(1);
-    expect(banners[0]).toHaveTextContent('Your lanyard');
+    const banner = banners[0] as HTMLElement;
+    // Customise is where you are (#150).
     expect(
-      within(banners[0] as HTMLElement).getByRole('button', { name: 'Save' })
+      within(
+        within(banner).getByRole('navigation', { name: 'Your Lanyards' })
+      ).getByRole('link', { name: 'Customise' })
+    ).toHaveAttribute('aria-current', 'page');
+    expect(
+      within(banner).getByRole('button', { name: 'Save' })
     ).toBeInTheDocument();
     expect(screen.getAllByRole('main')).toHaveLength(1);
   });
 
-  it('keeps support at the foot of the sidebar, even viewed as public (#134)', async () => {
+  it('View takes you to your lanyard as visitors see it (#150)', async () => {
+    servePerson();
+    const { router } = renderRoute(EDIT);
+    await preview();
+    await userEvent.click(
+      within(screen.getByRole('banner')).getByRole('link', { name: 'View' })
+    );
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(`/${ADA.handle}`)
+    );
+  });
+
+  it('keeps support at the foot of the sidebar (#134)', async () => {
     servePerson();
     renderRoute(EDIT);
     await preview();
@@ -221,24 +230,15 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
     expect(
       within(support).getByRole('button', { name: 'Give feedback' })
     ).toBeInTheDocument();
-    await userEvent.click(
-      screen.getByRole('button', { name: 'View as public' })
-    );
-    expect(
-      screen.getByRole('region', { name: 'Beta support' })
-    ).toBeInTheDocument();
   });
 
   it('keeps support at the foot of the Style sheet on phones (#134)', async () => {
     servePerson();
     renderRoute(EDIT);
     await preview();
-    const toolbar = screen.getByRole('toolbar', { name: 'Customiser' });
-    expect(
-      within(toolbar).queryByRole('button', { name: 'Support' })
-    ).toBeNull();
+    // On phones, Style is in the top bar (#150).
     await userEvent.click(
-      within(toolbar).getByRole('button', { name: 'Style' })
+      within(screen.getByRole('banner')).getByRole('button', { name: 'Style' })
     );
     const sheet = await screen.findByRole('dialog', { name: 'Style' });
     const support = within(sheet).getByRole('region', {
@@ -275,34 +275,6 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
     expect(screen.queryByRole('region', { name: 'More settings' })).toBeNull();
   });
 
-  it('View as public hides the sidebar and edit controls, and Edit brings them back', async () => {
-    servePerson();
-    renderRoute(EDIT);
-    const region = await preview();
-    await within(region).findByRole(
-      'button',
-      { name: 'Hide Building on ATProto at Example Conf 2024' },
-      { timeout: 8000 }
-    );
-    await userEvent.click(
-      screen.getByRole('button', { name: 'View as public' })
-    );
-    expect(screen.queryByRole('complementary', { name: 'Style' })).toBeNull();
-    expect(screen.queryByRole('switch', { name: 'Show Links' })).toBeNull();
-    expect(
-      screen.getByText('You’re seeing your lanyard as the public sees it.')
-    ).toBeInTheDocument();
-    expect(
-      within(await preview()).queryByRole('button', {
-        name: /^(Hide|Show) /,
-      })
-    ).toBeNull();
-    await userEvent.click(screen.getByRole('button', { name: 'Edit' }));
-    expect(
-      screen.getByRole('complementary', { name: 'Style' })
-    ).toBeInTheDocument();
-  });
-
   it('asks before leaving with unsaved changes', async () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     servePerson();
@@ -330,21 +302,6 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
     expect(
       screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)
     ).toEqual(['Customise your lanyard']);
-  });
-
-  it('switches the preview to what visitors see', async () => {
-    servePerson();
-    sifaDown();
-    renderRoute(EDIT);
-    const region = await preview();
-    await within(region).findAllByText("Couldn't load Sifa", undefined, {
-      timeout: 8000,
-    });
-    const toggle = screen.getByRole('button', { name: 'View as public' });
-    expect(toggle).toHaveAttribute('aria-pressed', 'false');
-    await userEvent.click(toggle);
-    expect(toggle).toHaveAttribute('aria-pressed', 'true');
-    expect(within(region).queryAllByText("Couldn't load Sifa")).toHaveLength(0);
   });
 
   it('applies and saves a new accent, announcing progress', async () => {
@@ -747,6 +704,11 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
       { level: 2, name: 'Dr Ada Example' },
       { timeout: 5000 }
     );
-    await expectNoAxeViolations(container);
+    // The bottom bar and the header's links are never shown together,
+    // but jsdom applies no CSS. MobileNav has its own axe test, and e2e
+    // runs axe in a real browser.
+    await expectNoAxeViolations(container, {
+      exclude: ['[data-bottom-toolbar]'],
+    });
   });
 });

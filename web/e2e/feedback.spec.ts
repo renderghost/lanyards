@@ -132,7 +132,7 @@ test.describe('feedback (#134)', () => {
 
     // On phones, support is at the foot of the Style sheet.
     await page
-      .getByRole('toolbar', { name: 'Customiser' })
+      .getByRole('banner')
       .getByRole('button', { name: 'Style' })
       .click();
     const sheet = page.getByRole('dialog', { name: 'Style' });

@@ -403,7 +403,7 @@ describe('visitor actions on the page', () => {
     const badge = await screen.findByRole('region', { name: /Ada/ });
     expect(
       within(badge).getByRole('link', { name: 'Edit lanyard' })
-    ).toHaveAttribute('href', '/lanyard');
+    ).toHaveAttribute('href', '/alice.test/edit');
     expect(
       within(badge).getByRole('link', { name: 'Show QR' })
     ).toBeInTheDocument();

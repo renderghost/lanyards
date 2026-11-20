@@ -9,7 +9,7 @@ import * as styles from './AccountLink.styles';
 import type { AccountLinkProps } from './AccountLink.types';
 
 /** The signed-in person's avatar, linking to their account settings. */
-export function AccountLink({ className }: AccountLinkProps) {
+export function AccountLink({ labelled = false, className }: AccountLinkProps) {
   const { t } = useLingui();
   const session = useSession();
   const did = session.status === 'signedIn' ? session.session.did : undefined;
@@ -19,13 +19,14 @@ export function AccountLink({ className }: AccountLinkProps) {
     <Link
       to="/settings"
       aria-label={t`Your account`}
-      className={cn(styles.link, className)}
+      className={cn(labelled ? styles.labelled : styles.link, className)}
     >
       {profile.data?.avatar ? (
         <img src={profile.data.avatar} alt="" className={styles.avatar} />
       ) : (
         <span className={styles.avatar} aria-hidden="true" />
       )}
+      {labelled && t`Account`}
     </Link>
   );
 }

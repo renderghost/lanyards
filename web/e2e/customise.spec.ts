@@ -389,28 +389,70 @@ test.describe('lanyard customiser', () => {
     expect(lanyardSaves(writes)[0]?.hidden).toEqual([]);
   });
 
-  test('switches to View as public and back', async ({ page }) => {
+  test('moves between Customise and View from the top bar (#150)', async ({
+    page,
+  }) => {
     await openCustomiser(page);
     const sidebar = page.getByRole('complementary', { name: 'Style' });
     await expect(sidebar).toBeVisible();
-    await page.getByRole('button', { name: 'View as public' }).click();
+    const nav = page
+      .getByRole('banner')
+      .getByRole('navigation', { name: 'Your Lanyards' });
+    await expect(nav.getByRole('link', { name: 'Customise' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    await nav.getByRole('link', { name: 'View' }).click();
+    await expect(page).toHaveURL(/\/alice\.test$/);
     await expect(sidebar).toBeHidden();
-    await expect(
-      page.getByText('You’re seeing your lanyard as the public sees it.')
-    ).toBeVisible();
     await expect(page.getByRole('switch', { name: 'Show Links' })).toBeHidden();
-    await expect(
-      page.getByRole('button', { name: 'View as public' })
-    ).toHaveAttribute('aria-pressed', 'true');
-    await page.getByRole('button', { name: 'Edit' }).click();
+    await expect(nav.getByRole('link', { name: 'View' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    await nav.getByRole('link', { name: 'Customise' }).click();
+    await expect(page).toHaveURL(/\/alice\.test\/edit$/);
     await expect(sidebar).toBeVisible();
+  });
+
+  test('gives phones a bottom bar, Show QR first among equals (#150)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 640 });
+    await openCustomiser(page);
+    const bar = page.getByRole('navigation', { name: 'Your Lanyards' });
+    // Only the bottom bar's: the top bar's links are hidden on phones.
+    await expect(bar).toHaveCount(1);
+    const box = await bar.boundingBox();
+    expect((box?.y ?? 0) + (box?.height ?? 0)).toBeCloseTo(640, 0);
+    const widths: Record<string, number> = {};
+    for (const name of ['Customise', 'View', 'Show QR', 'Your account']) {
+      const link = bar.getByRole('link', { name });
+      await expect(link).toBeVisible();
+      widths[name] = (await link.boundingBox())?.width ?? 0;
+    }
+    expect(widths['Show QR']).toBeGreaterThan(
+      Math.max(
+        widths.Customise ?? 0,
+        widths.View ?? 0,
+        widths['Your account'] ?? 0
+      )
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth)
+    ).toBeLessThanOrEqual(320);
+    await bar.getByRole('link', { name: 'Show QR' }).click();
+    await expect(page).toHaveURL(/\/alice\.test\/share$/);
   });
 
   test('asks before leaving unsaved changes: a link, Back and reload', async ({
     page,
   }) => {
     await page.goto('/settings');
-    await page.getByRole('link', { name: 'My lanyard' }).click();
+    await page
+      .getByRole('banner')
+      .getByRole('link', { name: 'Customise' })
+      .click();
     await expect(
       page.getByRole('button', { name: 'Reorder Links' })
     ).toBeEnabled();
@@ -431,18 +473,16 @@ test.describe('lanyard customiser', () => {
     await expect(page.locator('html')).toHaveAttribute('data-accent', 'mint');
   });
 
-  test('never hides keyboard focus under the phone toolbar', async ({
-    page,
-  }) => {
+  test('never hides keyboard focus under the bottom bar', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);
-    const toolbar = page.getByRole('toolbar', { name: 'Customiser' });
+    const toolbar = page.getByRole('navigation', { name: 'Your Lanyards' });
     const hidden: string[] = [];
     for (let step = 0; step < 120; step += 1) {
       await page.keyboard.press('Tab');
       const covered = await page.evaluate(() => {
         const focused = document.activeElement as HTMLElement | null;
-        const bar = document.querySelector('[role="toolbar"]');
+        const bar = document.querySelector('[data-bottom-toolbar]');
         if (!focused || !bar || bar.contains(focused)) return null;
         // Tabbing past the last control returns to the page itself.
         if (focused === document.body) return null;
@@ -531,8 +571,10 @@ test.describe('lanyard customiser', () => {
     await expect(
       page.getByRole('complementary', { name: 'Style' })
     ).toBeHidden();
-    const toolbar = page.getByRole('toolbar', { name: 'Customiser' });
-    const style = toolbar.getByRole('button', { name: 'Style' });
+    // On phones, Style is in the top bar (#150).
+    const style = page
+      .getByRole('banner')
+      .getByRole('button', { name: 'Style' });
     await style.click();
     const sheet = page.getByRole('dialog', { name: 'Style' });
     await expect(sheet).toBeVisible();

@@ -26,3 +26,9 @@ export function ownPaths(did: string, handle?: string): OwnPaths {
     share: `/${id}/share`,
   };
 }
+
+/**
+ * When a link to one of your own pages is the current page: only there.
+ * The router otherwise counts /<handle> as current on /<handle>/edit.
+ */
+export const OWN_PAGE_ACTIVE = { exact: true, includeSearch: false } as const;

@@ -1,42 +1,32 @@
 import { useLingui } from '@lingui/react/macro';
 
-import { AccountLink } from '@/components/AccountLink/AccountLink';
+import { Palette } from 'lucide-react';
+
 import { Button } from '@/components/Button/Button';
-import { ToggleGroup } from '@/components/ToggleGroup/ToggleGroup';
-import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
 
 import { RESET_WITHOUT_ASKING } from './CustomiserActions.constants';
 import * as styles from './CustomiserActions.styles';
-import type { CustomiserActionsProps, ViewAs } from './CustomiserActions.types';
+import type { CustomiserActionsProps } from './CustomiserActions.types';
 
 /**
- * The customiser's top-bar controls: Edit / View as public, the save
- * status, Reset and Save, then Show QR and the account link. Save and
- * Reset stay focusable but unavailable when there's nothing to save.
+ * The customiser's own top-bar controls (#150): the save status, Style on
+ * phones, Reset and Save. The header puts Show QR and Account after them.
+ * Save and Reset stay focusable but unavailable with nothing to save.
  */
 export function CustomiserActions({
-  viewAs,
-  onViewAsChange,
   dirty,
   changes,
   saving,
   onSave,
   onReset,
+  onOpenStyle,
+  styleButtonRef,
 }: CustomiserActionsProps) {
   const { t } = useLingui();
   const resetMessage = t`Discard your unsaved changes?`;
 
   return (
     <div className={styles.actions}>
-      <ToggleGroup<ViewAs>
-        label={t`Preview mode`}
-        value={viewAs}
-        onValueChange={onViewAsChange}
-        options={[
-          { value: 'edit', label: t`Edit` },
-          { value: 'public', label: t`View as public`, shortLabel: t`Public` },
-        ]}
-      />
       <p role="status" className={styles.status}>
         {saving ? (
           t`Saving…`
@@ -50,10 +40,19 @@ export function CustomiserActions({
         )}
       </p>
       <Button
+        ref={styleButtonRef}
+        size="sm"
+        variant="secondary"
+        className={styles.style}
+        onClick={onOpenStyle}
+      >
+        <Palette aria-hidden="true" className={styles.icon} />
+        {t`Style`}
+      </Button>
+      <Button
         size="sm"
         variant="secondary"
         aria-disabled={!dirty || saving || undefined}
-        className={styles.reset}
         onClick={() => {
           if (!dirty || saving) return;
           if (changes > RESET_WITHOUT_ASKING && !window.confirm(resetMessage)) {
@@ -74,10 +73,6 @@ export function CustomiserActions({
       >
         {t`Save`}
       </Button>
-      <div className={styles.account}>
-        <ShowQrButton />
-        <AccountLink />
-      </div>
     </div>
   );
 }
