@@ -2,7 +2,7 @@
 // Opaque on the lanyard's ground, so a block being dragged never shows the
 // one beneath it.
 export const section =
-  'flex flex-col gap-3 rounded-2xl border border-border bg-background p-4';
+  'flex flex-col gap-3 rounded-sm border border-border bg-background p-4';
 
 // Hidden from visitors: only its header row, in a dashed frame.
 export const collapsed = 'border-dashed py-2';
@@ -27,9 +27,9 @@ export const edit =
 export const skeleton = 'flex flex-col gap-2';
 
 export const skeletonLine =
-  'h-5 w-full rounded bg-accent-subtle motion-safe:animate-pulse';
+  'h-5 w-full rounded-xs bg-accent-subtle motion-safe:animate-pulse';
 
 export const problem =
-  'flex flex-wrap items-center gap-3 rounded-md border border-border px-4 py-3';
+  'flex flex-wrap items-center gap-3 rounded-sm border border-border px-4 py-3';
 
 export const problemText = 'text-sm leading-5 text-muted-foreground';

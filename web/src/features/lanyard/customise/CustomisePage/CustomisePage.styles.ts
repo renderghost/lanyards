@@ -17,7 +17,7 @@ export const moving =
   'text-[15px] leading-[22px] text-ui-text-muted empty:sr-only';
 
 export const publicNote =
-  'rounded-lg border border-ui-border bg-ui-surface px-4 py-3 text-[13px] leading-[18px] text-ui-text-muted';
+  'rounded-sm border border-ui-border bg-ui-surface px-4 py-3 text-[13px] leading-[18px] text-ui-text-muted';
 
 export const frame = 'w-full max-w-[640px]';
 
@@ -26,7 +26,7 @@ export const loading =
   'px-4 py-6 text-[15px] leading-[22px] text-ui-text-muted';
 
 export const notice =
-  'flex flex-col items-start gap-3 rounded-xl border border-ui-border bg-ui-surface p-4';
+  'flex flex-col items-start gap-3 rounded-sm border border-ui-border bg-ui-surface p-4';
 
 export const noticeHeading =
   'text-[15px] leading-[22px] font-semibold text-ui-text';

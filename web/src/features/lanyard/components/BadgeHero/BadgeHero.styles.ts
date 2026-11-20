@@ -1,5 +1,5 @@
 export const badge =
-  'flex flex-col items-center gap-4 rounded-md border border-border bg-surface px-6 py-8 text-center';
+  'flex flex-col items-center gap-4 rounded-sm border border-border bg-surface px-6 py-8 text-center';
 
 export const avatar =
   'size-24 shrink-0 rounded-full bg-accent-subtle object-cover';

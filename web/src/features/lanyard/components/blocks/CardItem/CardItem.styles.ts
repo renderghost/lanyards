@@ -1,6 +1,6 @@
 // A bordered card (#122).
 export const card =
-  'relative flex min-h-11 flex-wrap items-start gap-3 rounded-xl border border-border p-3';
+  'relative flex min-h-11 flex-wrap items-start gap-3 rounded-sm border border-border p-3';
 
 // On the public lanyard a card with a link opens it from a click anywhere,
 // so it looks clickable, and shows its link's focus ring.
@@ -11,7 +11,7 @@ export const opens =
 export const hidden = 'border-dashed';
 
 export const thumbnail =
-  'flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-accent-subtle text-accent-text [&_img]:size-full [&_img]:object-cover [&_svg]:size-6';
+  'flex h-12 w-16 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-accent-subtle text-accent-text [&_img]:size-full [&_img]:object-cover [&_svg]:size-6';
 
 // At least 10rem: on a narrow card the controls wrap below the text
 // rather than squeezing it.
@@ -22,6 +22,6 @@ export const faded = 'opacity-50 grayscale';
 
 // Under the text, as a hidden block's header says it under its name.
 export const tag =
-  'self-start rounded-sm bg-accent-subtle px-1.5 text-xs font-medium leading-5 text-accent-text';
+  'self-start rounded-xs bg-accent-subtle px-1.5 text-xs font-medium leading-5 text-accent-text';
 
 export const controls = 'flex shrink-0 items-start';

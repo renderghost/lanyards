@@ -1,5 +1,5 @@
 export const card =
-  'flex flex-col gap-6 rounded-xl border border-ui-border bg-ui-surface p-6';
+  'flex flex-col gap-6 rounded-sm border border-ui-border bg-ui-surface p-6';
 
 export const identity = 'flex items-center gap-4';
 

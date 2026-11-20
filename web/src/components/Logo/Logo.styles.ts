@@ -1,1 +1,1 @@
-export const image = 'block size-10 rounded-lg';
+export const image = 'block size-10 rounded-sm';
