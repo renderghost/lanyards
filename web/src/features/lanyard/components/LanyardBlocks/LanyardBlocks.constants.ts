@@ -13,6 +13,7 @@ import { LinksBlock } from '../blocks/LinksBlock/LinksBlock';
 import { MediaBlock } from '../blocks/MediaBlock/MediaBlock';
 import { OpenToBlock } from '../blocks/OpenToBlock/OpenToBlock';
 import { PublicationsBlock } from '../blocks/PublicationsBlock/PublicationsBlock';
+import { RolesBlock } from '../blocks/RolesBlock/RolesBlock';
 import { SkillsBlock } from '../blocks/SkillsBlock/SkillsBlock';
 import { TalksBlock } from '../blocks/TalksBlock/TalksBlock';
 
@@ -21,6 +22,7 @@ export const BLOCK_HEADINGS: Record<
   ReturnType<typeof msg>
 > = {
   links: msg`Links`,
+  roles: msg`Roles`,
   talks: msg`Talks`,
   openTo: msg`Open to`,
   blogPosts: msg`Articles`,
@@ -40,6 +42,7 @@ export const BLOCK_COMPONENTS: Record<
   ComponentType<{ items: never[] }>
 > = {
   links: LinksBlock,
+  roles: RolesBlock,
   talks: TalksBlock,
   openTo: OpenToBlock,
   blogPosts: BlogPostsBlock,
@@ -51,4 +54,12 @@ export const BLOCK_COMPONENTS: Record<
   collections: CollectionsBlock,
   media: MediaBlock,
   details: DetailsBlock,
+};
+
+/**
+ * Blocks other parts of the page link to, by their section's id: the
+ * badge's "+N more roles" (#130).
+ */
+export const BLOCK_ANCHORS: Partial<Record<RenderableBlockType, string>> = {
+  roles: 'roles',
 };

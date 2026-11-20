@@ -17,7 +17,7 @@ msgid "(opens in a new tab)"
 msgstr "(opens in a new tab)"
 
 #. placeholder {0}: role.others
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:59
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:72
 msgid "{0, plural, one {+# more role} other {+# more roles}}"
 msgstr "{0, plural, one {+# more role} other {+# more roles}}"
 
@@ -53,7 +53,11 @@ msgstr "{name} updated"
 msgid "{others, plural, one {# other} other {# others}}"
 msgstr "{others, plural, one {# other} other {# others}}"
 
-#: src/features/lanyard/components/blocks/itemTitle.ts:21
+#: src/features/lanyard/components/blocks/RolesBlock/RolesBlock.tsx:34
+msgid "{start} – now"
+msgstr "{start} – now"
+
+#: src/features/lanyard/components/blocks/itemTitle.ts:22
 msgid "{title} at {eventName}"
 msgstr "{title} at {eventName}"
 
@@ -111,7 +115,7 @@ msgstr "Apple Podcasts"
 msgid "Arrows"
 msgstr "Arrows"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:26
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:28
 msgid "Articles"
 msgstr "Articles"
 
@@ -123,7 +127,7 @@ msgstr "Audio"
 msgid "Badge"
 msgstr "Badge"
 
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:71
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:84
 #: src/features/qr/components/QrSheet/QrSheet.tsx:104
 msgid "Based"
 msgstr "Based"
@@ -187,7 +191,7 @@ msgstr "Clear"
 msgid "Close"
 msgstr "Close"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:31
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:33
 msgid "Code"
 msgstr "Code"
 
@@ -195,7 +199,7 @@ msgstr "Code"
 msgid "Collaborations"
 msgstr "Collaborations"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:32
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:34
 msgid "Collections"
 msgstr "Collections"
 
@@ -225,11 +229,11 @@ msgstr "Couldn't check your ORCID iD right now."
 msgid "Couldn't copy the link. Please try again."
 msgstr "Couldn't copy the link. Please try again."
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:125
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:127
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:130
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:139
 #: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:247
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
@@ -242,7 +246,7 @@ msgstr "Couldn't open your QR code. Please try again."
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:124
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:126
 msgid "Couldn't show this block"
 msgstr "Couldn't show this block"
 
@@ -284,7 +288,7 @@ msgstr "Delete {title}"
 msgid "Description"
 msgstr "Description"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:34
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:36
 msgid "Details"
 msgstr "Details"
 
@@ -321,7 +325,7 @@ msgstr "Edit lanyard"
 msgid "Edit on Sifa"
 msgstr "Edit on Sifa"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:30
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:32
 msgid "Education"
 msgstr "Education"
 
@@ -459,11 +463,11 @@ msgstr "Kind of content"
 msgid "Languages"
 msgstr "Languages"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:60
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:63
 msgid "Lanyard"
 msgstr "Lanyard"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:59
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:62
 #: src/features/lanyard/components/LanyardProblem/LanyardProblem.tsx:34
 msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
@@ -495,7 +499,7 @@ msgstr "Link copied"
 msgid "Link to add"
 msgstr "Link to add"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:23
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:24
 msgid "Links"
 msgstr "Links"
 
@@ -517,7 +521,7 @@ msgstr "Loading…"
 msgid "Location"
 msgstr "Location"
 
-#: src/features/lanyard/components/blocks/itemTitle.ts:37
+#: src/features/lanyard/components/blocks/itemTitle.ts:38
 msgid "Location and languages"
 msgstr "Location and languages"
 
@@ -567,7 +571,8 @@ msgstr "Not verified yet. ORCID can take a few minutes to update."
 msgid "Nothing to show yet"
 msgstr "Nothing to show yet"
 
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:54
+#: src/features/lanyard/components/blocks/RolesBlock/RolesBlock.tsx:60
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:67
 msgid "Now"
 msgstr "Now"
 
@@ -579,8 +584,8 @@ msgstr "Open ORCID"
 msgid "Open Sifa"
 msgstr "Open Sifa"
 
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:77
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:25
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:90
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:27
 msgid "Open to"
 msgstr "Open to"
 
@@ -638,7 +643,7 @@ msgstr "Platform"
 msgid "Podcast episode"
 msgstr "Podcast episode"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:33
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:35
 msgid "Podcasts and videos"
 msgstr "Podcasts and videos"
 
@@ -658,7 +663,7 @@ msgstr "Preview mode"
 msgid "Public"
 msgstr "Public"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:28
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:30
 msgid "Publications"
 msgstr "Publications"
 
@@ -692,13 +697,17 @@ msgstr "Reset"
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
-#: src/features/lanyard/components/BlockSection/BlockSection.tsx:134
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:136
+#: src/features/lanyard/components/BlockSection/BlockSection.tsx:136
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:145
 #: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:250
 #: src/features/lanyard/hooks/useCustomiserDraft.ts:98
 #: src/features/lanyard/hooks/useLanyardDraft.ts:354
 msgid "Retry"
 msgstr "Retry"
+
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:25
+msgid "Roles"
+msgstr "Roles"
 
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:75
 msgid "Save"
@@ -761,12 +770,12 @@ msgstr "Sifa"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:95
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:98
 msgid "Sign in"
 msgstr "Sign in"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:57
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:90
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:60
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:93
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -790,11 +799,11 @@ msgstr "Signing in"
 msgid "Signing you in…"
 msgstr "Signing you in…"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:29
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:31
 msgid "Skills"
 msgstr "Skills"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:27
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:29
 msgid "Social posts"
 msgstr "Social posts"
 
@@ -837,7 +846,7 @@ msgstr "Style"
 msgid "Symbols"
 msgstr "Symbols"
 
-#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:24
+#: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:26
 msgid "Talks"
 msgstr "Talks"
 
@@ -861,11 +870,11 @@ msgstr "This account isn't available"
 msgid "This item can't be hidden."
 msgstr "This item can't be hidden."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:103
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:106
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:92
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:95
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 

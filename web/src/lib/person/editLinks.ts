@@ -30,6 +30,7 @@ export const EDIT_LINKS: Record<
   (profile: string) => EditLink[]
 > = {
   links: (profile) => [sifa('other-profiles')(profile), bluesky(profile)],
+  roles: (profile) => [sifa('career')(profile)],
   talks: (profile) => [sifa('presentations')(profile)],
   openTo: (profile) => [sifa('career')(profile)],
   publications: (profile) => [sifa('publications')(profile)],

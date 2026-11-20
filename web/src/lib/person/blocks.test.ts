@@ -8,7 +8,7 @@ import type {
 import type { LanyardRecords } from '@/lib/sources/lanyards/lanyards.types';
 import type { OrcidWork } from '@/lib/sources/orcid/orcid.types';
 import { SourceError } from '@/lib/sources/result';
-import type { SifaProfile } from '@/lib/sources/sifa/sifa.types';
+import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { ADA } from '@/test/people';
 
 import {
@@ -17,6 +17,7 @@ import {
   hiddenItems,
   hiddenMatcher,
   orphanedHiddenKeys,
+  sortRoles,
 } from './blocks';
 import { type LanyardConfig, resolveConfig } from './config';
 import type { LinkItem, SourceSnapshot } from './personView.types';
@@ -661,5 +662,58 @@ describe('links come only from Bluesky and Sifa', () => {
         orcidVerified: false,
       })
     ).toEqual(['https://ada.example/cv']);
+  });
+});
+
+describe('the Roles block (#130)', () => {
+  const role = (
+    rkey: string,
+    fields: Partial<SifaPosition> = {}
+  ): SifaPosition => ({
+    key: sifaKey('position', rkey),
+    title: rkey,
+    isPrimary: false,
+    ...fields,
+  });
+
+  it('puts current roles first, primary then newest, then past by end, undated last', () => {
+    const sorted = sortRoles([
+      role('past-2019', { startedAt: '2015', endedAt: '2019' }),
+      role('undated'),
+      role('current-2020', { startedAt: '2020-01' }),
+      role('past-2023', { startedAt: '2020', endedAt: '2023-06' }),
+      role('primary', { startedAt: '2010', isPrimary: true }),
+      role('current-2024', { startedAt: '2024-03' }),
+      role('current-2001', { startedAt: '2001', endedAt: undefined }),
+    ]);
+    expect(sorted.map((item) => item.title)).toEqual([
+      'primary',
+      'current-2024',
+      'current-2020',
+      'current-2001',
+      'past-2023',
+      'past-2019',
+      'undated',
+    ]);
+  });
+
+  it('shows Sifa’s positions, and a hidden one under Roles', () => {
+    const positions = [
+      role('a', { startedAt: '2024' }),
+      role('b', { startedAt: '2019', endedAt: '2022' }),
+    ];
+    const sources = {
+      ...allSources,
+      sifa: { status: 'ready' as const, value: { ...sifa, positions } },
+    };
+    const config = showOnly(['roles'], { hidden: [positions[1]!.key] });
+    const [block] = compose(config, sources);
+    expect(block).toMatchObject({ type: 'roles', status: 'ready' });
+    expect(
+      block?.status === 'ready' && block.items.map((item) => item.key)
+    ).toEqual([positions[0]!.key]);
+    expect(hiddenItems({ config, sources, orcidVerified: false })).toEqual([
+      { key: positions[1]!.key, type: 'roles', item: positions[1] },
+    ]);
   });
 });

@@ -59,7 +59,7 @@ test.describe('lanyard customiser', () => {
       .getByRole('button', { name: 'Move Links down' })
       .click();
     await expect(
-      page.getByText('Links moved to position 2 of 12')
+      page.getByText('Links moved to position 2 of 13')
     ).toBeAttached();
     await expect(
       editor.getByRole('button', { name: 'Move Links down' })
@@ -70,7 +70,21 @@ test.describe('lanyard customiser', () => {
       lanyardSaves(writes)[0]
         ?.blocks.slice(0, 2)
         .map((block) => block.type)
-    ).toEqual(['talks', 'links']);
+    ).toEqual(['roles', 'links']);
+  });
+
+  test('hides a role in place and saves it (#130)', async ({ page }) => {
+    await openCustomiser(page);
+    const roles = page.getByRole('region', { name: 'Roles' });
+    await roles.getByRole('button', { name: 'Hide Visiting Fellow' }).click();
+    await expect(
+      roles.getByRole('button', { name: 'Show Visiting Fellow' })
+    ).toBeFocused();
+    await saveChanges(page);
+    await expect.poll(() => lanyardSaves(writes).length).toBe(1);
+    expect(lanyardSaves(writes)[0]?.hidden).toContain(
+      `at://${ADA.did}/id.sifa.profile.position/3mpos2`
+    );
   });
 
   test('reorders blocks with the keyboard alone', async ({ page }) => {
@@ -80,19 +94,19 @@ test.describe('lanyard customiser', () => {
     // Each step waits for its announcement, as a screen-reader user would.
     await page.keyboard.press('Space');
     await expect(
-      page.getByText('Picked up Links, at position 1 of 12.')
+      page.getByText('Picked up Links, at position 1 of 13.')
     ).toBeAttached();
     await page.keyboard.press('ArrowDown');
     await expect(
-      page.getByText('Links is over position 2 of 12.')
+      page.getByText('Links is over position 2 of 13.')
     ).toBeAttached();
     await page.keyboard.press('Space');
     await expect(
-      page.getByText('Links moved to position 2 of 12')
+      page.getByText('Links moved to position 2 of 13')
     ).toBeAttached();
     await expect(editor.getByRole('listitem').first()).toHaveAttribute(
       'data-block',
-      'talks'
+      'roles'
     );
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
@@ -100,7 +114,7 @@ test.describe('lanyard customiser', () => {
       lanyardSaves(writes)[0]
         ?.blocks.slice(0, 2)
         .map((block) => block.type)
-    ).toEqual(['talks', 'links']);
+    ).toEqual(['roles', 'links']);
   });
 
   test('moves blocks without animation when motion is reduced', async ({
@@ -112,11 +126,11 @@ test.describe('lanyard customiser', () => {
     await editor.getByRole('button', { name: 'Reorder Links' }).focus();
     await page.keyboard.press('Space');
     await expect(
-      page.getByText('Picked up Links, at position 1 of 12.')
+      page.getByText('Picked up Links, at position 1 of 13.')
     ).toBeAttached();
     await page.keyboard.press('ArrowDown');
     await expect(
-      page.getByText('Links is over position 2 of 12.')
+      page.getByText('Links is over position 2 of 13.')
     ).toBeAttached();
     const animated = await editor.getByRole('listitem').evaluateAll((rows) =>
       rows.filter((row) => {
@@ -132,7 +146,7 @@ test.describe('lanyard customiser', () => {
     expect(animated).toHaveLength(0);
     await page.keyboard.press('Space');
     await expect(
-      page.getByText('Links moved to position 2 of 12')
+      page.getByText('Links moved to position 2 of 13')
     ).toBeAttached();
   });
 
@@ -630,7 +644,7 @@ test.describe('lanyard customiser on a touch screen', () => {
     }
     await touch('touchEnd');
     await expect(
-      page.getByText(/^Links moved to position \d+ of 12$/)
+      page.getByText(/^Links moved to position \d+ of 13$/)
     ).toBeAttached();
     const order = await page
       .getByRole('list', { name: 'Blocks' })

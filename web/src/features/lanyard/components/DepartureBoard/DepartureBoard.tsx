@@ -1,6 +1,7 @@
 import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { ArrowDown } from 'lucide-react';
+import type { MouseEvent } from 'react';
 
 import { cn } from '@/lib/utils';
 
@@ -44,6 +45,18 @@ export function DepartureBoard({
     );
   }
 
+  // The link moves focus to the block's heading, not just the view, so
+  // keyboard and screen-reader users land there too (spec §9).
+  function toRoles(event: MouseEvent<HTMLAnchorElement>) {
+    const target = rolesHref
+      ? document.getElementById(rolesHref.slice(1))
+      : null;
+    const heading = target?.querySelector<HTMLElement>('h2[tabindex="-1"]');
+    if (!heading) return;
+    event.preventDefault();
+    heading.focus();
+  }
+
   const shown = openTo.slice(0, OPEN_TO_SHOWN);
   const rest = openTo.length - shown.length;
 
@@ -55,7 +68,7 @@ export function DepartureBoard({
           <dd className={styles.value}>
             {[role.title, role.company].filter(Boolean).join(' · ')}
             {rolesHref && role.others > 0 && (
-              <a href={rolesHref} className={styles.more}>
+              <a href={rolesHref} onClick={toRoles} className={styles.more}>
                 {plural(role.others, {
                   one: '+# more role',
                   other: '+# more roles',

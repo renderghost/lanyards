@@ -9,7 +9,7 @@ import { movedKeyOf } from '@/lib/sources/lanyards/media';
 import type { OrcidWork } from '@/lib/sources/orcid/orcid.types';
 import type { SourceName } from '@/lib/sources/result';
 import type { SembleCollection } from '@/lib/sources/semble/semble.types';
-import type { SifaProfile } from '@/lib/sources/sifa/sifa.types';
+import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import type { BlogPost } from '@/lib/sources/standardSite/standardSite.types';
 import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 
@@ -36,6 +36,7 @@ import { detectPlatform } from './platform';
 /** Which queries feed each block. */
 export const BLOCK_SOURCES: Record<RenderableBlockType, SourceKey[]> = {
   links: ['bluesky', 'sifa'],
+  roles: ['sifa'],
   talks: ['sifa'],
   openTo: ['sifa'],
   blogPosts: ['standardSite'],
@@ -192,11 +193,35 @@ type Builders = {
   ) => BlockItems[T][];
 };
 
+const newestFirst = (a?: string, b?: string) =>
+  (b ?? '').localeCompare(a ?? '');
+
+/**
+ * The Roles block's order (spec §9): current roles first, the primary one
+ * then the newest start; then past roles, the newest end first; roles with
+ * no dates at all last.
+ */
+export function sortRoles(positions: SifaPosition[]): SifaPosition[] {
+  const rank = (position: SifaPosition) => {
+    if (!position.startedAt && !position.endedAt) return 3;
+    if (position.endedAt) return 2;
+    return position.isPrimary ? 0 : 1;
+  };
+  return [...positions].sort(
+    (a, b) =>
+      rank(a) - rank(b) ||
+      (a.endedAt || b.endedAt
+        ? newestFirst(a.endedAt, b.endedAt)
+        : newestFirst(a.startedAt, b.startedAt))
+  );
+}
+
 /** An Open to item's key, which the owner can hide. */
 export const openToKey = (value: string): string => `openTo:${value}`;
 
 const BUILDERS: Builders = {
   links: (values) => mergeLinks(values),
+  roles: (values) => sortRoles(values.sifa?.positions ?? []),
   talks: (values) => values.sifa?.talks ?? [],
   openTo: (values) =>
     (values.sifa?.openTo ?? []).map((value) => ({
@@ -374,6 +399,7 @@ export type HiddenItem =
 /** The collection of each record that a block shows, by item key. */
 const COLLECTION_BLOCKS: Record<string, RenderableBlockType> = {
   'app.bsky.feed.post': 'bskyPosts',
+  'id.sifa.profile.position': 'roles',
   'id.sifa.profile.presentation': 'talks',
   'id.sifa.profile.presentationDelivery': 'talks',
   'id.sifa.profile.publication': 'publications',

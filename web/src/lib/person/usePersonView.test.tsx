@@ -102,6 +102,7 @@ describe('usePersonView', () => {
     await settled(result);
     expect(result.current.blocks.map((block) => block.type)).toEqual([
       'links',
+      'roles',
       'talks',
     ]);
     expect(requests.some((url) => url.includes('getAuthorFeed'))).toBe(false);
@@ -197,7 +198,9 @@ describe(
       const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
       await waitFor(
         () =>
+          // Roles (#130), which this record predates, shows by default.
           expect(result.current.blocks.map((block) => block.type)).toEqual([
+            'roles',
             'skills',
           ]),
         { timeout: 5000 }
@@ -217,7 +220,10 @@ describe(
         { wrapper: local }
       );
       await waitFor(
-        () => expect(result.current.blocks[0]?.type).toBe('skills'),
+        () =>
+          expect(result.current.blocks.map((block) => block.type)).toContain(
+            'skills'
+          ),
         { timeout: 5000 }
       );
       const before = result.current.blocks.map((block) => block.type);

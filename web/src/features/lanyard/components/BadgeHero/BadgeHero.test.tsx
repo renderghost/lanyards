@@ -1,3 +1,4 @@
+import userEvent from '@testing-library/user-event';
 import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
@@ -77,5 +78,41 @@ describe('BadgeHero', () => {
     expect(
       screen.getByRole('button', { name: 'Follow' }).closest('[data-field]')
     ).not.toBeNull();
+  });
+
+  it('links other current roles to the Roles block, when it is shown (#130)', () => {
+    const role = { title: 'Research Engineer', others: 2 };
+    const { rerender } = renderWithProviders(
+      <BadgeHero hero={{ ...hero, role }} rolesHref="#roles" />
+    );
+    expect(screen.getByRole('link', { name: '+2 more roles' })).toHaveAttribute(
+      'href',
+      '#roles'
+    );
+    rerender(
+      <BadgeHero
+        hero={{ ...hero, role: { ...role, others: 0 } }}
+        rolesHref="#roles"
+      />
+    );
+    expect(screen.queryByRole('link', { name: /more role/ })).toBeNull();
+  });
+
+  it('moves focus to the Roles block’s heading from the link', async () => {
+    renderWithProviders(
+      <>
+        <BadgeHero
+          hero={{ ...hero, role: { title: 'Research Engineer', others: 1 } }}
+          rolesHref="#roles"
+        />
+        <section id="roles" aria-labelledby="roles-heading">
+          <h2 id="roles-heading" tabIndex={-1}>
+            Roles
+          </h2>
+        </section>
+      </>
+    );
+    await userEvent.click(screen.getByRole('link', { name: '+1 more role' }));
+    expect(screen.getByRole('heading', { name: 'Roles' })).toHaveFocus();
   });
 });

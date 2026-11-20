@@ -13,6 +13,7 @@ import {
 
 const ALL_TYPES = [
   'links',
+  'roles',
   'talks',
   'openTo',
   'blogPosts',
@@ -36,13 +37,13 @@ describe('resolveConfig', () => {
       showOpenTo: true,
       blocks: ALL_TYPES.map((type) => ({
         type,
-        visible: type === 'links' || type === 'talks',
+        visible: type === 'links' || type === 'roles' || type === 'talks',
       })),
       hidden: [],
     });
   });
 
-  it('keeps the owner’s order, visibility and limits, appending blocks they never saw', () => {
+  it('keeps the owner’s order, visibility and limits, adding blocks they never saw', () => {
     const config = resolveConfig({
       $type: 'app.lanyards.actor.lanyard',
       accent: 'mint',
@@ -61,18 +62,35 @@ describe('resolveConfig', () => {
     // The legacy showJob reads as the badge's showRole (#129).
     expect(config.showRole).toBe(false);
     expect(config.hidden).toEqual(['https://ada.example/']);
-    expect(config.blocks.slice(0, 3)).toEqual([
-      { type: 'publications', visible: true, limit: 5 },
-      { type: 'links', visible: false },
-      { type: 'talks', visible: true },
-    ]);
+    expect(config.blocks[0]).toEqual({
+      type: 'publications',
+      visible: true,
+      limit: 5,
+    });
+    // Blocks it never saw go after their neighbour in the default order
+    // (#130), with their default visibility.
     expect(config.blocks.map((block) => block.type)).toEqual([
       'publications',
+      'skills',
+      'education',
+      'code',
+      'collections',
+      'media',
+      'details',
       'links',
-      ...ALL_TYPES.filter(
-        (type) => type !== 'publications' && type !== 'links'
-      ),
+      'roles',
+      'talks',
+      'openTo',
+      'blogPosts',
+      'bskyPosts',
     ]);
+    expect(config.blocks.find((block) => block.type === 'links')).toEqual({
+      type: 'links',
+      visible: false,
+    });
+    expect(config.blocks.find((block) => block.type === 'talks')?.visible).toBe(
+      true
+    );
   });
 
   it('falls back to blue for an accent it does not know', () => {
@@ -104,6 +122,59 @@ describe('resolveConfig', () => {
 
   it('uses the defaults when the record is malformed', () => {
     expect(resolveConfig({ blocks: 'nope' })).toEqual(resolveConfig(null));
+  });
+});
+
+describe('the Roles block on existing lanyards (#130)', () => {
+  const stored = (types: string[]) =>
+    resolveConfig({
+      $type: 'app.lanyards.actor.lanyard',
+      blocks: types.map((type) => ({ type, visible: true })),
+      createdAt: '2026-11-01T09:00:00.000Z',
+    }).blocks.map((block) => block.type);
+
+  it('goes in after Links, shown, when the record doesn’t mention it', () => {
+    const config = resolveConfig({
+      $type: 'app.lanyards.actor.lanyard',
+      blocks: [
+        { type: 'links', visible: true },
+        { type: 'talks', visible: false },
+      ],
+      createdAt: '2026-11-01T09:00:00.000Z',
+    });
+    expect(config.blocks.slice(0, 3)).toEqual([
+      { type: 'links', visible: true },
+      { type: 'roles', visible: true },
+      { type: 'talks', visible: false },
+    ]);
+  });
+
+  it('follows Links even when Links is missing too, which goes first', () => {
+    expect(stored(['talks']).slice(0, 3)).toEqual(['links', 'roles', 'talks']);
+  });
+
+  it('otherwise keeps the stored order, missing blocks after their neighbours', () => {
+    // Each goes after the nearest block before it in the default order.
+    expect(stored(['skills', 'links', 'talks'])).toEqual([
+      'skills',
+      'education',
+      'code',
+      'collections',
+      'media',
+      'details',
+      'links',
+      'roles',
+      'talks',
+      'openTo',
+      'blogPosts',
+      'bskyPosts',
+      'publications',
+    ]);
+  });
+
+  it('stays where the owner put it', () => {
+    const kept = ['talks', 'roles', 'links'];
+    expect(stored(kept).filter((type) => kept.includes(type))).toEqual(kept);
   });
 });
 
@@ -244,13 +315,15 @@ describe('serialiseConfig', () => {
     });
     expect(
       (fields.blocks as { type: string }[]).slice(0, 3).map((b) => b.type)
-    ).toEqual(['links', 'events', 'talks']);
+      // Roles (#130) goes in after Links; events keeps its place.
+    ).toEqual(['links', 'events', 'roles']);
   });
 
   it('keeps an unrendered block at its position when blocks move', () => {
     const config = resolveConfig(previous);
-    const [links, talks, ...rest] = config.blocks;
-    const reordered = { ...config, blocks: [talks!, links!, ...rest] };
+    const talks = config.blocks.find((block) => block.type === 'talks')!;
+    const others = config.blocks.filter((block) => block !== talks);
+    const reordered = { ...config, blocks: [talks, ...others] };
     const fields = serialiseConfig(reordered, previous, NOW);
     expect(
       (fields.blocks as { type: string }[]).slice(0, 3).map((b) => b.type)

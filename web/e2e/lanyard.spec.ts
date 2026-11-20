@@ -134,6 +134,41 @@ test.describe('public lanyard, signed out', () => {
     }
   }
 
+  test('lists every role, and the badge’s link goes to them (#130)', async ({
+    page,
+  }) => {
+    await mockPerson(page);
+    await page.goto('/@alice.test');
+    const roles = page.getByRole('region', { name: 'Roles' });
+    const rows = roles.getByRole('listitem');
+    await expect(rows).toHaveCount(3);
+    await expect(rows.nth(0)).toContainText('Research Engineer');
+    await expect(rows.nth(0)).toContainText('Mar 2024 – now');
+    await expect(rows.nth(1)).toContainText('Visiting Fellow');
+    await expect(rows.nth(2)).toContainText('Jan 2018 – Feb 2024');
+    await expect(rows.nth(2)).not.toContainText('Now');
+    await page.getByRole('link', { name: '+1 more role' }).click();
+    await expect(roles.getByRole('heading', { name: 'Roles' })).toBeFocused();
+  });
+
+  test('a hidden role leaves the block and the badge’s count (#130)', async ({
+    page,
+  }) => {
+    await mockPerson(page, {
+      config: {
+        hidden: [`at://${ADA.did}/id.sifa.profile.position/3mpos2`],
+      },
+    });
+    await page.goto('/@alice.test');
+    const roles = page.getByRole('region', { name: 'Roles' });
+    await expect(roles.getByRole('listitem')).toHaveCount(2);
+    await expect(roles).not.toContainText('Visiting Fellow');
+    await expect(page.locator('dl', { hasText: 'Now' }).first()).toContainText(
+      'Research Engineer · Example Lab'
+    );
+    await expect(page.getByRole('link', { name: /more role/ })).toHaveCount(0);
+  });
+
   test('redirects an encoded @ to the canonical URL', async ({ page }) => {
     await mockPerson(page);
     await page.goto('/%40alice.test');

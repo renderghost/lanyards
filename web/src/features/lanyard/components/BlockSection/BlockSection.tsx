@@ -16,6 +16,7 @@ import type { BlockSectionProps } from './BlockSection.types';
  * §12.3): visitors don't see the block, and the owner can retry it.
  */
 export function BlockSection({
+  id,
   heading,
   status,
   failedSources = [],
@@ -60,6 +61,7 @@ export function BlockSection({
 
   return (
     <section
+      id={id}
       aria-labelledby={headingId}
       aria-busy={(!collapsed && status === 'loading') || undefined}
       data-collapsed={collapsed ? '' : undefined}

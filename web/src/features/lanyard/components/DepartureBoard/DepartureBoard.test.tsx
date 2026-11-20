@@ -47,6 +47,11 @@ describe('DepartureBoard', () => {
       'href',
       '#roles'
     );
+    // On the ink board the page's ring (brand blue) is 2.4:1: the link
+    // takes the board's label colour for its ring (final review, #129).
+    expect(screen.getByRole('link', { name: '+2 more roles' })).toHaveClass(
+      'focus-visible:outline-board-label'
+    );
   });
 
   it('shows nothing with nothing to show', () => {

@@ -10,6 +10,7 @@ import type { SembleCollection } from '@/lib/sources/semble/semble.types';
 import type {
   OpenToValue,
   SifaEducation,
+  SifaPosition,
   SifaSkill,
   SifaTalk,
 } from '@/lib/sources/sifa/sifa.types';
@@ -89,6 +90,7 @@ export type DetailsItem = {
 /** The item type each block shows. Every item's `key` can be hidden. */
 export type BlockItems = {
   links: LinkItem;
+  roles: SifaPosition;
   talks: SifaTalk;
   openTo: OpenToItem;
   blogPosts: BlogPost;
