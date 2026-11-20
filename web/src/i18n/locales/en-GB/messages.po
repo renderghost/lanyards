@@ -91,7 +91,7 @@ msgstr "Add it to the talk on Sifa"
 msgid "Add media"
 msgstr "Add media"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:180
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:221
 msgid "Add screenshots"
 msgstr "Add screenshots"
 
@@ -168,7 +168,7 @@ msgstr "Board positions"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:189
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:230
 msgid "Capture this screen"
 msgstr "Capture this screen"
 
@@ -189,15 +189,15 @@ msgstr "Checking your ORCID iD…"
 msgid "Choose a platform"
 msgstr "Choose a platform"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:159
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:144
 msgid "Choose one"
 msgstr "Choose one"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:66
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:83
 msgid "Choose PNG, JPEG, WebP or GIF images"
 msgstr "Choose PNG, JPEG, WebP or GIF images"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:55
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:52
 msgid "Choose what this is about"
 msgstr "Choose what this is about"
 
@@ -205,7 +205,7 @@ msgstr "Choose what this is about"
 msgid "Clear"
 msgstr "Clear"
 
-#: src/components/Dialog/Dialog.tsx:70
+#: src/components/Dialog/Dialog.tsx:75
 #: src/components/Sheet/Sheet.tsx:58
 #: src/features/qr/components/QrSheet/QrSheet.tsx:123
 msgid "Close"
@@ -240,7 +240,7 @@ msgstr "Copy link"
 msgid "Copy Signal username"
 msgstr "Copy Signal username"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:139
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:185
 msgid "Couldn't capture the screen. Please try again."
 msgstr "Couldn't capture the screen. Please try again."
 
@@ -270,7 +270,7 @@ msgstr "Couldn't load {sources}"
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
-#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:44
+#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:45
 msgid "Couldn't open feedback. Please try again."
 msgstr "Couldn't open feedback. Please try again."
 
@@ -282,7 +282,7 @@ msgstr "Couldn't open your QR code. Please try again."
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:108
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:133
 msgid "Couldn't send your feedback. Please try again."
 msgstr "Couldn't send your feedback. Please try again."
 
@@ -300,11 +300,11 @@ msgstr "Couldn't start creating an account. Please try again."
 
 #: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:40
 #: src/features/auth/components/SignInForm/SignInForm.tsx:69
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:60
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:149
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:89
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:109
 msgid "Couldn't use that image. Please try another."
 msgstr "Couldn't use that image. Please try another."
 
@@ -329,7 +329,7 @@ msgstr "Customiser"
 msgid "Delete {title}"
 msgstr "Delete {title}"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:217
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:258
 msgid "Describe screenshot {number}"
 msgstr "Describe screenshot {number}"
 
@@ -337,7 +337,7 @@ msgstr "Describe screenshot {number}"
 msgid "Description"
 msgstr "Description"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:178
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:163
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:36
 msgid "Details"
 msgstr "Details"
@@ -408,11 +408,11 @@ msgstr "Failed to save. Please try again."
 msgid "Failed to unfollow. Please try again."
 msgstr "Failed to unfollow. Please try again."
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:149
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:261
 msgid "Feedback isn’t open yet."
 msgstr "Feedback isn’t open yet."
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:97
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:116
 msgid "Feedback sent"
 msgstr "Feedback sent"
 
@@ -468,12 +468,12 @@ msgstr "For example alice.bsky.social"
 msgid "Full-time roles"
 msgstr "Full-time roles"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:57
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:54
 msgid "Give it a title"
 msgstr "Give it a title"
 
 #: src/features/auth/components/PermissionNotice/PermissionNotice.tsx:61
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:97
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:201
 msgid "Give permission"
 msgstr "Give permission"
 
@@ -502,7 +502,7 @@ msgstr "Hide {title}"
 msgid "Host"
 msgstr "Host"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:200
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:185
 msgid "Include technical details"
 msgstr "Include technical details"
 
@@ -518,6 +518,10 @@ msgstr "Items to show for {name}"
 msgid "Keep the description to 1,000 characters or fewer"
 msgstr "Keep the description to 1,000 characters or fewer"
 
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:59
+msgid "Keep the details and technical details to 10,000 characters"
+msgstr "Keep the details and technical details to 10,000 characters"
+
 #: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:60
 msgid "Keep the details to 10,000 characters"
 msgstr "Keep the details to 10,000 characters"
@@ -526,7 +530,7 @@ msgstr "Keep the details to 10,000 characters"
 msgid "Keep the title to 200 characters or fewer"
 msgstr "Keep the title to 200 characters or fewer"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:58
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:55
 msgid "Keep the title to 300 characters"
 msgstr "Keep the title to 300 characters"
 
@@ -565,7 +569,7 @@ msgstr "Lanyards"
 msgid "Lanyards needs your permission"
 msgstr "Lanyards needs your permission"
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:90
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:185
 msgid "Lanyards needs your permission to post feedback"
 msgstr "Lanyards needs your permission to post feedback"
 
@@ -596,7 +600,7 @@ msgstr "Loading your profile…"
 
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:134
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:246
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:55
 msgid "Loading…"
 msgstr "Loading…"
@@ -695,9 +699,13 @@ msgstr "ORCID iD"
 msgid "Other"
 msgstr "Other"
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:78
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:167
 msgid "Other ways to reach us"
 msgstr "Other ways to reach us"
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:130
+msgid "Our board can’t take this feedback as it is. Try a shorter title, details or screenshot descriptions."
+msgstr "Our board can’t take this feedback as it is. Try a shorter title, details or screenshot descriptions."
 
 #: src/components/NotFound/NotFound.tsx:12
 msgid "Page not found"
@@ -743,7 +751,7 @@ msgstr "Podcasts and videos"
 msgid "Post on Bluesky, {date}"
 msgstr "Post on Bluesky, {date}"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:195
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:236
 msgid "Preparing screenshot…"
 msgstr "Preparing screenshot…"
 
@@ -776,7 +784,7 @@ msgstr "Recording of a talk?"
 msgid "Reload"
 msgstr "Reload"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:237
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:278
 msgid "Remove screenshot {number}"
 msgstr "Remove screenshot {number}"
 
@@ -813,6 +821,10 @@ msgstr "Roles"
 msgid "Save"
 msgstr "Save"
 
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:192
+msgid "Save or reset your lanyard changes first: giving permission leaves this page."
+msgstr "Save or reset your lanyard changes first: giving permission leaves this page."
+
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:42
 msgid "Saving…"
 msgstr "Saving…"
@@ -821,11 +833,11 @@ msgstr "Saving…"
 msgid "Scan to see my lanyard"
 msgstr "Scan to see my lanyard"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:212
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:253
 msgid "Screenshot {number}"
 msgstr "Screenshot {number}"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:156
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:197
 msgid "Screenshots (optional)"
 msgstr "Screenshots (optional)"
 
@@ -841,13 +853,13 @@ msgstr "See our feedback board"
 msgid "Semble"
 msgstr "Semble"
 
-#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:76
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:181
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:209
+#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:79
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:301
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:204
 msgid "Send feedback"
 msgstr "Send feedback"
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:125
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:237
 msgid "Send more"
 msgstr "Send more"
 
@@ -913,7 +925,7 @@ msgstr "Sign-in was cancelled."
 msgid "Signal username copied"
 msgstr "Signal username copied"
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:141
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:253
 msgid "Signed in, you can send us feedback, with screenshots, right from Lanyards. Or reach us here:"
 msgstr "Signed in, you can send us feedback, with screenshots, right from Lanyards. Or reach us here:"
 
@@ -984,7 +996,7 @@ msgstr "Talks"
 msgid "Tangled"
 msgstr "Tangled"
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:109
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:221
 msgid "Thank you"
 msgstr "Thank you"
 
@@ -1020,7 +1032,7 @@ msgstr "This sign-in link has expired or was already used."
 msgid "TikTok"
 msgstr "TikTok"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:168
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:153
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:178
 msgid "Title"
 msgstr "Title"
@@ -1058,11 +1070,11 @@ msgstr "Unfollowed @{handle}"
 msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:69
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:86
 msgid "Up to 4 screenshots"
 msgstr "Up to 4 screenshots"
 
-#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:158
+#: src/features/feedback/components/ScreenshotPicker/ScreenshotPicker.tsx:199
 msgid "Up to 4. Choose, paste or drop images."
 msgstr "Up to 4. Choose, paste or drop images."
 
@@ -1098,7 +1110,7 @@ msgstr "Video"
 msgid "View as public"
 msgstr "View as public"
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:117
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:229
 msgid "View it on UserInput"
 msgstr "View it on UserInput"
 
@@ -1142,12 +1154,12 @@ msgstr "We couldn't read your lanyard settings"
 msgid "Web address"
 msgstr "Web address"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:181
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:166
 msgid "What happened, and what did you expect? Steps to repeat it help."
 msgstr "What happened, and what did you expect? Steps to repeat it help."
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:121
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:156
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:106
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:141
 msgid "What is this about?"
 msgstr "What is this about?"
 
@@ -1197,15 +1209,15 @@ msgstr "Your account"
 msgid "Your conference lanyard, from your AT Protocol account"
 msgstr "Your conference lanyard, from your AT Protocol account"
 
-#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:205
+#: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:190
 msgid "Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal."
 msgstr "Your feedback and screenshots are posted publicly from your account. For anything private, including security issues, message us on Signal."
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:112
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:224
 msgid "Your feedback is on our board, where you can follow what happens to it."
 msgstr "Your feedback is on our board, where you can follow what happens to it."
 
-#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:93
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:188
 msgid "Your feedback is posted from your own account to our board on UserInput. To do that, Lanyards needs permission to post there and upload your screenshots."
 msgstr "Your feedback is posted from your own account to our board on UserInput. To do that, Lanyards needs permission to post there and upload your screenshots."
 
@@ -1231,6 +1243,10 @@ msgstr "Your ORCID iD is verified"
 #: src/features/lanyard/hooks/useMediaMove.ts:244
 msgid "Your podcasts and videos were updated to the new format."
 msgstr "Your podcasts and videos were updated to the new format."
+
+#: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:278
+msgid "Your screenshots were too big to keep while you gave permission. Please add them again."
+msgstr "Your screenshots were too big to keep while you gave permission. Please add them again."
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:9
 msgid "YouTube"

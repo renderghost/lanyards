@@ -1,6 +1,6 @@
-import { screen } from '@testing-library/react';
+import { act, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { signedOutSession } from '@/test/person';
@@ -18,10 +18,6 @@ beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedOutSession());
 });
 
-afterEach(() => {
-  window.history.replaceState(null, '', '/');
-});
-
 describe('FeedbackButton (#134)', () => {
   it('opens the feedback dialog', async () => {
     renderInRouter(<FeedbackButton />);
@@ -33,19 +29,40 @@ describe('FeedbackButton (#134)', () => {
     ).toBeInTheDocument();
   });
 
-  it('reopens itself after the permission sign-in, and tidies the address', async () => {
-    window.history.replaceState(null, '', '/settings#feedback');
-    renderInRouter(<FeedbackButton autoOpen />, '/settings#feedback');
+  it('reopens itself on arriving at #feedback, and tidies the address', async () => {
+    const { router } = renderInRouter(
+      <FeedbackButton autoOpen />,
+      '/settings#feedback'
+    );
     expect(
       await screen.findByRole('dialog', { name: 'Send feedback' })
     ).toBeInTheDocument();
-    expect(window.location.hash).toBe('');
+    expect(router.state.location.hash).toBe('');
+    expect(router.state.location.pathname).toBe('/settings');
+  });
+
+  it('reopens itself when the sign-in callback sends the person back', async () => {
+    // The footer is already mounted on the callback page, which then
+    // navigates in the app, without a reload.
+    const { router } = renderInRouter(
+      <FeedbackButton autoOpen />,
+      '/oauth/callback'
+    );
+    await screen.findByRole('button', { name: 'Send feedback' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    act(() => {
+      router.history.replace('/settings#feedback');
+    });
+    expect(
+      await screen.findByRole('dialog', { name: 'Send feedback' })
+    ).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.hash).toBe(''));
   });
 
   it('leaves the address alone without autoOpen', async () => {
-    window.history.replaceState(null, '', '/settings#feedback');
-    renderInRouter(<FeedbackButton />, '/settings#feedback');
+    const { router } = renderInRouter(<FeedbackButton />, '/settings#feedback');
     await screen.findByRole('button', { name: 'Send feedback' });
     expect(screen.queryByRole('dialog')).toBeNull();
+    expect(router.state.location.hash).toBe('feedback');
   });
 });

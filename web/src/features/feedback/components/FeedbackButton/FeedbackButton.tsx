@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
-import { useLocation } from '@tanstack/react-router';
+import { useLocation, useRouter } from '@tanstack/react-router';
 import { MessageSquare } from 'lucide-react';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
@@ -8,7 +8,7 @@ import { captureError } from '@/lib/analytics/analytics';
 import { cn } from '@/lib/utils';
 
 import type { FeedbackDialog } from '../FeedbackDialog/FeedbackDialog';
-import { REOPEN_HASH } from '../FeedbackDialog/FeedbackDialog.constants';
+import { REOPEN_FRAGMENT } from '../FeedbackDialog/FeedbackDialog.constants';
 import * as styles from './FeedbackButton.styles';
 import type { FeedbackButtonProps } from './FeedbackButton.types';
 
@@ -27,6 +27,7 @@ export function FeedbackButton({
   className,
 }: FeedbackButtonProps) {
   const { t } = useLingui();
+  const router = useRouter();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [Dialog, setDialog] = useState<Dialog | null>(null);
@@ -50,19 +51,21 @@ export function FeedbackButton({
   }
 
   // Back from the permission sign-in: open again, and tidy the address.
-  const arrive = useEffectEvent(() => {
-    if (!autoOpen || window.location.hash !== REOPEN_HASH) return;
-    window.history.replaceState(
-      window.history.state,
-      '',
-      `${window.location.pathname}${window.location.search}`
+  // The callback page navigates here in the app, so this follows the
+  // router's location rather than reading the address once (#134).
+  const arrive = useEffectEvent((hash: string) => {
+    if (!autoOpen || hash !== REOPEN_FRAGMENT) return;
+    router.history.replace(
+      `${location.pathname}${location.searchStr}`,
+      router.history.location.state,
+      { ignoreBlocker: true }
     );
     loadDialog().then(
       (loaded) => reveal(loaded),
       (cause: unknown) => fail(cause)
     );
   });
-  useEffect(() => arrive(), []);
+  useEffect(() => arrive(location.hash), [location.hash]);
 
   return (
     <>
