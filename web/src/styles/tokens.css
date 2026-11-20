@@ -37,6 +37,8 @@
   --ui-primary: #06011e;
   --ui-on-primary: #ffffff;
   --ui-primary-subtle: #eeebfd;
+  /* Links and selection: brand blue, since the primary action is ink. */
+  --ui-link: #4020df;
   --ui-warning: oklch(0.6 0.15 55);
   --ui-danger: oklch(0.53 0.2 27);
 }
@@ -66,6 +68,7 @@
     --ui-primary: #f6f5ff;
     --ui-on-primary: #06011e;
     --ui-primary-subtle: #1c1550;
+    --ui-link: #b3a6ff;
     --ui-warning: oklch(0.78 0.15 70);
     --ui-danger: oklch(0.74 0.16 22);
   }

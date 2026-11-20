@@ -82,18 +82,25 @@ describe('resolveConfig', () => {
     ).toBe('blue');
   });
 
-  it('maps a legacy accent and writes the new value on save (#128)', () => {
-    const record = {
-      $type: 'app.lanyards.actor.lanyard',
-      accent: 'pink',
-      createdAt: '2026-11-01T09:00:00Z',
-    };
-    const config = resolveConfig(record);
-    expect(config.accent).toBe('pink');
-    expect(
-      serialiseConfig(config, record, '2026-11-20T09:00:00Z')
-    ).toMatchObject({ accent: 'pink' });
-  });
+  it.each([
+    ['rose', 'pink'],
+    ['teal', 'mint'],
+    ['violet', 'blue'],
+  ])(
+    'maps the legacy accent %s to %s and writes it on save (#128)',
+    (legacy, accent) => {
+      const record = {
+        $type: 'app.lanyards.actor.lanyard',
+        accent: legacy,
+        createdAt: '2026-11-01T09:00:00Z',
+      };
+      const config = resolveConfig(record);
+      expect(config.accent).toBe(accent);
+      expect(
+        serialiseConfig(config, record, '2026-11-20T09:00:00Z')
+      ).toMatchObject({ accent });
+    }
+  );
 
   it('uses the defaults when the record is malformed', () => {
     expect(resolveConfig({ blocks: 'nope' })).toEqual(resolveConfig(null));

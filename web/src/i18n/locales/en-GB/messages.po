@@ -404,7 +404,7 @@ msgstr "Go to the home page"
 msgid "Hazard"
 msgstr "Hazard"
 
-#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:69
+#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:70
 #: src/features/lanyard/components/blocks/ItemFrame/ItemFrame.tsx:34
 msgid "Hidden"
 msgstr "Hidden"

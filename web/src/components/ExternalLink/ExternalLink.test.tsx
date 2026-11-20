@@ -22,7 +22,10 @@ describe('ExternalLink', () => {
     renderWithProviders(
       <ExternalLink href="https://example.com">Docs</ExternalLink>
     );
-    expect(screen.getByRole('link').className).toContain('text-ui-primary');
+    const { className } = screen.getByRole('link');
+    // Brand blue, underlined at rest: colour alone can't mark a link.
+    expect(className).toContain('text-ui-link');
+    expect(className.split(' ')).toContain('underline');
   });
 
   it('uses the lanyard accent with tone="accent"', () => {
@@ -33,7 +36,7 @@ describe('ExternalLink', () => {
     );
     const { className } = screen.getByRole('link');
     expect(className).toContain('text-accent-text');
-    expect(className).not.toContain('text-ui-primary');
+    expect(className).not.toContain('text-ui-link');
   });
 
   it('renders plain text for an unsafe URL', () => {

@@ -104,9 +104,25 @@ describe('CardItem', () => {
     expect(screen.getAllByRole('link')).toHaveLength(1);
     const link = screen.getByRole('link', { name: /A post/ });
     const frame = link.closest('[data-card]');
-    expect(frame).toHaveClass('relative', 'has-[a:focus-visible]:outline-2');
+    expect(frame).toHaveClass(
+      'relative',
+      'has-[a:focus-visible]:outline-2',
+      // The page's focus ring: 3:1 on every ground, whatever the accent.
+      'has-[a:focus-visible]:outline-focus-ring'
+    );
     expect(screen.getByText('thumb')).toBeInTheDocument();
     await expectNoAxeViolations(container);
+  });
+
+  it('public: a card shows a muted arrow; the editor doesn’t (#128)', () => {
+    const { unmount } = renderWithProviders(card);
+    const arrow = document.querySelector('[data-card-arrow]');
+    expect(arrow).toHaveAttribute('aria-hidden', 'true');
+    unmount();
+    renderWithProviders(
+      <ItemActionsContext value={actions([])}>{card}</ItemActionsContext>
+    );
+    expect(document.querySelector('[data-card-arrow]')).toBeNull();
   });
 
   it('editor: its controls sit beside the link, never in it', () => {

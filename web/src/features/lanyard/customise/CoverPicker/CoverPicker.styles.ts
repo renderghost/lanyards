@@ -6,7 +6,7 @@ export const label = 'sr-only';
 export const options = 'grid grid-cols-2 gap-2';
 
 export const option =
-  'flex flex-col items-stretch gap-1.5 rounded-sm border border-ui-border bg-ui-surface p-1.5 text-left text-sm leading-5 text-ui-text motion-safe:transition-colors hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60 data-[state=checked]:border-ui-primary data-[state=checked]:ring-2 data-[state=checked]:ring-ui-primary';
+  'flex flex-col items-stretch gap-1.5 rounded-sm border border-ui-border bg-ui-surface p-1.5 text-left text-sm leading-5 text-ui-text motion-safe:transition-colors hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60 data-[state=checked]:border-ui-link data-[state=checked]:ring-2 data-[state=checked]:ring-ui-link';
 
 export const preview = 'relative h-12 overflow-hidden rounded-xs';
 

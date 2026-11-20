@@ -152,6 +152,18 @@ describe('style rules', () => {
     ).toEqual([]);
   });
 
+  // The accent fill is pale on mint, lime and pink, and dark blue on the
+  // dark ground: as a focus ring or an edge it can fall below 3:1 (#128).
+  it('never marks focus or edges with the accent fill', () => {
+    expect(
+      offending((_variants, utility) =>
+        /^(?:outline|ring|border(?:-[trblxyse])?|decoration)-accent(?:\/\d+)?$/.test(
+          utility
+        )
+      )
+    ).toEqual([]);
+  });
+
   it('uses no serif font: Rethink Sans throughout (#128)', () => {
     expect(offending((_variants, utility) => utility === 'font-serif')).toEqual(
       []

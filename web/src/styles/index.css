@@ -29,6 +29,7 @@
   --color-ui-primary: var(--ui-primary);
   --color-ui-on-primary: var(--ui-on-primary);
   --color-ui-primary-subtle: var(--ui-primary-subtle);
+  --color-ui-link: var(--ui-link);
   --color-ui-warning: var(--ui-warning);
   --color-ui-danger: var(--ui-danger);
   --font-sans: 'Rethink Sans Variable', ui-sans-serif, system-ui, sans-serif;

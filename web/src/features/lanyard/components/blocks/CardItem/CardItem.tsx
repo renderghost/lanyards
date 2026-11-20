@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
+import { ArrowUpRight } from 'lucide-react';
 import { use, useEffect, useRef } from 'react';
 
 import { cn } from '@/lib/utils';
@@ -68,6 +69,13 @@ export function CardItem({
         {children}
         {hidden && <span className={styles.tag}>{t`Hidden`}</span>}
       </div>
+      {!editing && (
+        <ArrowUpRight
+          data-card-arrow=""
+          aria-hidden="true"
+          className={styles.arrow}
+        />
+      )}
       {actions && (
         <div className={styles.controls}>
           {actions.renderToggle(itemKey, title)}

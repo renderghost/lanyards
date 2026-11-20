@@ -32,7 +32,7 @@ export const tones: Record<HandleComboboxTone, ToneStyles> = {
     option:
       'flex min-h-11 cursor-pointer items-center gap-3 rounded-sm px-2 py-1.5',
     // The ring keeps the active option visible at 3:1, not by tint alone.
-    optionActive: 'bg-ui-primary-subtle ring-1 ring-inset ring-ui-primary',
+    optionActive: 'bg-ui-primary-subtle ring-1 ring-inset ring-ui-link',
     avatar: 'size-8 shrink-0 rounded-full bg-ui-surface-muted',
     displayName: 'truncate text-sm font-medium leading-5 text-ui-text',
     handle: 'truncate text-sm leading-5 text-ui-text-muted',
