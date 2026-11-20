@@ -34,7 +34,18 @@ describe('vercel.json', () => {
   // subdomain's pages move to lanyards.app (#154); only page visits, so
   // an installed copy's service worker can still fetch its update there.
   it('sends next.lanyards.app pages to lanyards.app, and /@handle to /handle', () => {
+    const beta = [
+      { type: 'host', value: 'next.lanyards.app' },
+      { type: 'header', key: 'sec-fetch-dest', value: 'document' },
+    ];
     expect(config.redirects).toEqual([
+      // Vercel's /:path* doesn't match the bare root, so it has its own.
+      {
+        source: '/',
+        has: beta,
+        destination: 'https://lanyards.app/',
+        permanent: true,
+      },
       {
         source: '/:path*',
         has: [
