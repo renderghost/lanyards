@@ -1,4 +1,4 @@
-import { ACCENTS, type Accent, DEFAULT_ACCENT } from '@/design/accents';
+import { type Accent, resolveAccent } from '@/design/accents';
 import { LANYARDS_NSID, type BlockType } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { tooLong } from '@/lib/validation';
@@ -95,9 +95,6 @@ type StoredConfig = {
 const isRenderable = (type: string): type is RenderableBlockType =>
   (DEFAULT_BLOCK_ORDER as readonly string[]).includes(type);
 
-const isAccent = (value: string | undefined): value is Accent =>
-  (ACCENTS as readonly string[]).includes(value ?? '');
-
 /**
  * The owner's lanyard settings, or the smart defaults when there is no
  * valid app.lanyards.actor.lanyard record. Unknown and duplicate block types
@@ -126,7 +123,8 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
   }
 
   return {
-    accent: isAccent(stored.accent) ? stored.accent : DEFAULT_ACCENT,
+    // A legacy accent reads as the nearest of the four (#128).
+    accent: resolveAccent(stored.accent),
     showJob: stored.showJob ?? true,
     blocks,
     hidden: stored.hidden ?? [],

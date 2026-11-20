@@ -9,7 +9,7 @@ import { ACCENT_NAMES } from './AccentPicker.constants';
 import * as styles from './AccentPicker.styles';
 import type { AccentPickerProps } from './AccentPicker.types';
 
-/** The eight accent palettes as swatches with visible names (spec §7.4). */
+/** The four brand accents as swatches with visible names (#128). */
 export function AccentPicker({
   value,
   onChange,

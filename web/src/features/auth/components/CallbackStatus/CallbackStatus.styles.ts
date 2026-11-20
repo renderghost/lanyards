@@ -7,4 +7,4 @@ export const heading =
 export const message = 'text-[17px] leading-6 text-ui-text';
 
 export const link =
-  'inline-flex min-h-11 items-center rounded-lg px-4 text-[15px] leading-[22px] font-medium text-ui-primary underline underline-offset-4';
+  'inline-flex min-h-11 items-center rounded-sm px-4 text-[15px] leading-[22px] font-medium text-ui-link underline underline-offset-4';

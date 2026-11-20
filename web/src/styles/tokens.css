@@ -1,87 +1,74 @@
 /* =============================================================================
-   BRAND TOKENS
-   Ported from the legacy app (src/app/globals.css). Base semantic colours for
-   light and dark mode. Accent colours live in accents.css.
+   BRAND TOKENS (#128)
+   The Lanyards brand: black 06011E, grays 312D49 / 8F8CA4 / F6F5FF / FAF9FD
+   and white. Muted text is a derived 5C5873 (light) and A9A6BD (dark): Gray
+   03 is too faint for text. --border is a hairline between surfaces;
+   controls whose border is their only edge use --border-strong (3:1).
+   Accent colours live in accents.css.
    Contrast is enforced by src/design/accents.test.ts.
    ============================================================================= */
 
 :root {
-  /* Purple muted: low saturation, light → dark */
-  --color-purple-muted-50: oklch(0.958 0.009 292.95);
-  --color-purple-muted-100: oklch(0.924 0.016 293.82);
-  --color-purple-muted-200: oklch(0.846 0.032 293.73);
-  --color-purple-muted-300: oklch(0.772 0.045 292.49);
-  --color-purple-muted-400: oklch(0.694 0.061 292.38);
-  --color-purple-muted-500: oklch(0.618 0.071 292.02);
-  --color-purple-muted-600: oklch(0.539 0.079 291.62);
-  --color-purple-muted-700: oklch(0.438 0.083 290.67);
-  --color-purple-muted-800: oklch(0.341 0.069 291.51);
-  --color-purple-muted-900: oklch(0.238 0.049 291.04);
-  --color-purple-muted-950: oklch(0.19 0.042 290.64);
-
-  /* Purple vivid: high saturation, light → dark (500 is #4020DF) */
-  --color-purple-vivid-50: oklch(0.96 0.019 289.4);
-  --color-purple-vivid-500: oklch(0.451 0.258 275.99);
-  --color-purple-vivid-950: oklch(0.11 0.059 278.79);
-
-  --color-yellow-vivid-500: hsl(65 100% 50%);
-}
-
-:root {
-  --background: oklch(0.958 0.009 292.95);
-  --foreground: oklch(0.19 0.042 290.64);
-  --muted-foreground: oklch(0.438 0.083 290.67);
-  --surface: oklch(1 0 0);
-  --border: oklch(0.438 0.083 290.67);
-  --focus-ring: oklch(0.451 0.258 275.99);
-  --radius: 0.375rem;
+  --background: #faf9fd;
+  --foreground: #06011e;
+  --muted-foreground: #5c5873;
+  --surface: #ffffff;
+  --subtle: #f6f5ff;
+  --border: rgb(6 1 30 / 0.09);
+  --border-strong: #8f8ca4;
+  --focus-ring: #4020df;
 }
 
 /* =============================================================================
-   UI TOKENS (#118)
-   The app chrome's own neutral palette: top bar, sidebar, controls and app
-   screens. The lanyard keeps the brand tokens above and its accent palettes.
+   UI TOKENS (#118, #128)
+   The app chrome's own palette: top bar, sidebar, controls and app screens.
+   The same brand neutrals; the primary action is ink.
    Contrast is enforced by src/design/uiTokens.test.ts.
    ============================================================================= */
 
 :root {
-  --ui-canvas: oklch(0.967 0.003 265);
-  --ui-surface: oklch(1 0 0);
-  --ui-surface-muted: oklch(0.985 0.002 265);
-  --ui-border: oklch(0.92 0.004 265);
-  --ui-border-strong: oklch(0.62 0.008 265);
-  --ui-text: oklch(0.21 0.006 265);
-  --ui-text-muted: oklch(0.44 0.01 265);
-  --ui-primary: oklch(0.451 0.258 275.99);
-  --ui-on-primary: oklch(1 0 0);
-  --ui-primary-subtle: oklch(0.95 0.025 276);
+  --ui-canvas: #faf9fd;
+  --ui-surface: #ffffff;
+  --ui-surface-muted: #f6f5ff;
+  --ui-border: rgb(6 1 30 / 0.09);
+  --ui-border-strong: #8f8ca4;
+  --ui-text: #06011e;
+  --ui-text-muted: #5c5873;
+  --ui-primary: #06011e;
+  --ui-on-primary: #ffffff;
+  --ui-primary-subtle: #eeebfd;
+  /* Links and selection: brand blue, since the primary action is ink. */
+  --ui-link: #4020df;
   --ui-warning: oklch(0.6 0.15 55);
   --ui-danger: oklch(0.53 0.2 27);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: oklch(0.11 0.059 278.79);
-    --foreground: oklch(0.96 0.019 289.4);
-    --muted-foreground: oklch(0.694 0.061 292.38);
-    --surface: oklch(0.19 0.042 290.64);
-    --border: oklch(0.539 0.079 291.62);
-    --focus-ring: hsl(65 100% 50%);
+    --background: #06011e;
+    --foreground: #f6f5ff;
+    --muted-foreground: #a9a6bd;
+    --surface: #0e0a26;
+    --subtle: #17122f;
+    --border: rgb(246 245 255 / 0.1);
+    --border-strong: #6e6a88;
+    --focus-ring: #eaff00;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --ui-canvas: oklch(0.17 0.004 265);
-    --ui-surface: oklch(0.215 0.005 265);
-    --ui-surface-muted: oklch(0.25 0.005 265);
-    --ui-border: oklch(0.3 0.006 265);
-    --ui-border-strong: oklch(0.55 0.008 265);
-    --ui-text: oklch(0.97 0.002 265);
-    --ui-text-muted: oklch(0.72 0.008 265);
-    --ui-primary: oklch(0.72 0.15 280);
-    --ui-on-primary: oklch(0.17 0.004 265);
-    --ui-primary-subtle: oklch(0.3 0.06 280);
+    --ui-canvas: #06011e;
+    --ui-surface: #0e0a26;
+    --ui-surface-muted: #17122f;
+    --ui-border: rgb(246 245 255 / 0.1);
+    --ui-border-strong: #6e6a88;
+    --ui-text: #f6f5ff;
+    --ui-text-muted: #a9a6bd;
+    --ui-primary: #f6f5ff;
+    --ui-on-primary: #06011e;
+    --ui-primary-subtle: #1c1550;
+    --ui-link: #b3a6ff;
     --ui-warning: oklch(0.78 0.15 70);
     --ui-danger: oklch(0.74 0.16 22);
   }

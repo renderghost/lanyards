@@ -8,7 +8,7 @@ export const labelHidden = 'sr-only';
 export const options = 'grid grid-cols-2 gap-2';
 
 export const option =
-  'flex min-h-11 items-center gap-3 rounded-lg border border-ui-border bg-ui-surface px-3 text-left text-sm leading-5 text-ui-text motion-safe:transition-colors hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60 data-[state=checked]:border-ui-primary data-[state=checked]:ring-2 data-[state=checked]:ring-ui-primary';
+  'flex min-h-11 items-center gap-3 rounded-sm border border-ui-border bg-ui-surface px-3 text-left text-sm leading-5 text-ui-text motion-safe:transition-colors hover:bg-ui-surface-muted disabled:cursor-not-allowed disabled:opacity-60 data-[state=checked]:border-ui-link data-[state=checked]:ring-2 data-[state=checked]:ring-ui-link';
 
 /** Scoped with data-accent, so each swatch shows its own palette. */
 export const swatch = 'size-6 shrink-0 rounded-full bg-accent';

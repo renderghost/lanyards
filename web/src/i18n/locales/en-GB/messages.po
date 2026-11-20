@@ -126,6 +126,10 @@ msgstr "Blocks"
 msgid "Blocks, links and items are edited on your lanyard."
 msgstr "Blocks, links and items are edited on your lanyard."
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:7
+msgid "Blue"
+msgstr "Blue"
+
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:6
 msgid "Bluesky"
 msgstr "Bluesky"
@@ -298,10 +302,6 @@ msgstr "Edit on Sifa"
 msgid "Education"
 msgstr "Education"
 
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:11
-msgid "Ember"
-msgstr "Ember"
-
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:68
 msgid "Enter a web address"
 msgstr "Enter a web address"
@@ -387,7 +387,7 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
-#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:69
+#: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:70
 #: src/features/lanyard/components/blocks/ItemFrame/ItemFrame.tsx:34
 msgid "Hidden"
 msgstr "Hidden"
@@ -403,10 +403,6 @@ msgstr "Hide {title}"
 #: src/features/lanyard/components/blocks/TalksBlock/TalksBlock.constants.ts:9
 msgid "Host"
 msgstr "Host"
-
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:8
-msgid "Indigo"
-msgstr "Indigo"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:18
 msgid "Interview"
@@ -459,6 +455,10 @@ msgstr "Lanyards"
 msgid "Lanyards needs your permission"
 msgstr "Lanyards needs your permission"
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:9
+msgid "Lime"
+msgstr "Lime"
+
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:91
 #: src/features/qr/components/QrSheet/QrSheet.tsx:35
 msgid "Link copied"
@@ -498,9 +498,9 @@ msgstr "Location and languages"
 msgid "Mentoring others"
 msgstr "Mentoring others"
 
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:12
-msgid "Moss"
-msgstr "Moss"
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:8
+msgid "Mint"
+msgstr "Mint"
 
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:82
 msgid "Move {name} down"
@@ -531,10 +531,6 @@ msgstr "Not verified yet. ORCID can take a few minutes to update."
 #: src/features/lanyard/customise/MediaEditor/MediaEditor.tsx:81
 msgid "Nothing to show yet"
 msgstr "Nothing to show yet"
-
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:14
-msgid "Ocean"
-msgstr "Ocean"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:152
 msgid "Open ORCID"
@@ -582,13 +578,13 @@ msgstr "Part-time roles"
 msgid "Picked up {name}, at position {position} of {total}."
 msgstr "Picked up {name}, at position {position} of {total}."
 
+#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:10
+msgid "Pink"
+msgstr "Pink"
+
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:165
 msgid "Platform"
 msgstr "Platform"
-
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:9
-msgid "Plum"
-msgstr "Plum"
 
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:17
 msgid "Podcast episode"
@@ -655,10 +651,6 @@ msgstr "Reset to defaults"
 #: src/features/lanyard/hooks/useLanyardDraft.ts:349
 msgid "Retry"
 msgstr "Retry"
-
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:10
-msgid "Rose"
-msgstr "Rose"
 
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:75
 msgid "Save"
@@ -789,10 +781,6 @@ msgstr "Talks"
 msgid "Tangled"
 msgstr "Tangled"
 
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:13
-msgid "Teal"
-msgstr "Teal"
-
 #: src/features/auth/components/SignInForm/SignInForm.constants.ts:11
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
@@ -897,10 +885,6 @@ msgstr "View as public"
 #: src/features/lanyard/components/blocks/MediaBlock/MediaBlock.constants.ts:10
 msgid "Vimeo"
 msgstr "Vimeo"
-
-#: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:7
-msgid "Violet"
-msgstr "Violet"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:33
 msgid "We couldn't find @{handle}"

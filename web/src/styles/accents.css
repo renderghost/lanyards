@@ -1,126 +1,110 @@
 /* =============================================================================
-   ACCENT PALETTES
-   Selected with <html data-accent="…">; violet is the default. Any other
-   element with data-accent (an accent swatch) gets that palette too.
+   ACCENT PALETTES (#128)
+   The brand's four: blue 4020DF, mint 8BF9BE, lime EAFF00 and pink F7879A.
+   Selected with <html data-accent="…">; blue is the default. Any other
+   element with data-accent (a swatch, the Show QR badge) gets that palette.
+
+   --accent fills the badge field, tags and marks; --on-accent is text on
+   it. --accent-text is the accent as text on the page: the light fills are
+   too pale for that, so it is a deeper shade in light mode. The focus ring
+   inside an accent field is --focus-ring-on-accent. --cover-* colour the
+   badge's cover patterns.
+
    Every pair is contrast-checked by src/design/accents.test.ts:
    on-accent/accent ≥ 7:1, accent-text/background ≥ 7:1,
-   accent-text/accent-subtle ≥ 4.5:1, accent/background ≥ 3:1.
+   accent-text/accent-subtle ≥ 4.5:1, focus-ring-on-accent/accent ≥ 3:1.
    ============================================================================= */
 
 :root,
-:root[data-accent='violet'],
-[data-accent='violet'] {
-  --accent: oklch(0.451 0.258 275.99);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.451 0.258 275.99);
-  --accent-subtle: oklch(0.925 0.036 276);
+:root[data-accent='blue'],
+[data-accent='blue'] {
+  --accent: #4020df;
+  --on-accent: #ffffff;
+  --accent-text: #4020df;
+  --accent-subtle: #eeebfd;
+  --focus-ring-on-accent: #ffffff;
+  --cover-ground: #f6f5ff;
+  --cover-mark: #4020df;
+  --cover-partner: #06011e;
 }
-:root[data-accent='indigo'],
-[data-accent='indigo'] {
-  --accent: oklch(0.435 0.201 262);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.435 0.201 262);
-  --accent-subtle: oklch(0.925 0.036 262);
+:root[data-accent='mint'],
+[data-accent='mint'] {
+  --accent: #8bf9be;
+  --on-accent: #06011e;
+  --accent-text: #075a35;
+  --accent-subtle: #e8fdf1;
+  --focus-ring-on-accent: #06011e;
+  --cover-ground: #06011e;
+  --cover-mark: #8bf9be;
+  --cover-partner: #f6f5ff;
 }
-:root[data-accent='plum'],
-[data-accent='plum'] {
-  --accent: oklch(0.455 0.216 322);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.455 0.216 322);
-  --accent-subtle: oklch(0.925 0.045 322);
+:root[data-accent='lime'],
+[data-accent='lime'] {
+  --accent: #eaff00;
+  --on-accent: #06011e;
+  --accent-text: #4a5200;
+  --accent-subtle: #f9ffd1;
+  --focus-ring-on-accent: #06011e;
+  --cover-ground: #06011e;
+  --cover-mark: #eaff00;
+  --cover-partner: #f7879a;
 }
-:root[data-accent='rose'],
-[data-accent='rose'] {
-  --accent: oklch(0.445 0.178 12);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.445 0.178 12);
-  --accent-subtle: oklch(0.925 0.039 12);
-}
-:root[data-accent='ember'],
-[data-accent='ember'] {
-  --accent: oklch(0.435 0.131 42);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.435 0.131 42);
-  --accent-subtle: oklch(0.925 0.04 42);
-}
-:root[data-accent='moss'],
-[data-accent='moss'] {
-  --accent: oklch(0.41 0.127 138);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.41 0.127 138);
-  --accent-subtle: oklch(0.925 0.045 138);
-}
-:root[data-accent='teal'],
-[data-accent='teal'] {
-  --accent: oklch(0.415 0.072 190);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.415 0.072 190);
-  --accent-subtle: oklch(0.925 0.045 190);
-}
-:root[data-accent='ocean'],
-[data-accent='ocean'] {
-  --accent: oklch(0.42 0.09 236);
-  --on-accent: oklch(1 0 0);
-  --accent-text: oklch(0.42 0.09 236);
-  --accent-subtle: oklch(0.925 0.042 236);
+:root[data-accent='pink'],
+[data-accent='pink'] {
+  --accent: #f7879a;
+  --on-accent: #06011e;
+  --accent-text: #96193a;
+  --accent-subtle: #feedf0;
+  --focus-ring-on-accent: #06011e;
+  --cover-ground: #06011e;
+  --cover-mark: #f7879a;
+  --cover-partner: #eaff00;
 }
 
 @media (prefers-color-scheme: dark) {
   :root,
-  :root[data-accent='violet'],
-  [data-accent='violet'] {
-    --accent: oklch(0.71 0.152 276);
-    --on-accent: oklch(0.16 0.05 276);
-    --accent-text: oklch(0.71 0.152 276);
-    --accent-subtle: oklch(0.26 0.06 276);
+  :root[data-accent='blue'],
+  [data-accent='blue'] {
+    --accent: #4020df;
+    --on-accent: #ffffff;
+    --accent-text: #b3a6ff;
+    --accent-subtle: #1c1550;
+    --focus-ring-on-accent: #ffffff;
+    --cover-ground: #f6f5ff;
+    --cover-mark: #4020df;
+    --cover-partner: #06011e;
   }
-  :root[data-accent='indigo'],
-  [data-accent='indigo'] {
-    --accent: oklch(0.705 0.154 262);
-    --on-accent: oklch(0.16 0.05 262);
-    --accent-text: oklch(0.705 0.154 262);
-    --accent-subtle: oklch(0.26 0.06 262);
+  :root[data-accent='mint'],
+  [data-accent='mint'] {
+    --accent: #8bf9be;
+    --on-accent: #06011e;
+    --accent-text: #8bf9be;
+    --accent-subtle: #0e2a21;
+    --focus-ring-on-accent: #06011e;
+    --cover-ground: #06011e;
+    --cover-mark: #8bf9be;
+    --cover-partner: #f6f5ff;
   }
-  :root[data-accent='plum'],
-  [data-accent='plum'] {
-    --accent: oklch(0.72 0.16 322);
-    --on-accent: oklch(0.16 0.05 322);
-    --accent-text: oklch(0.72 0.16 322);
-    --accent-subtle: oklch(0.26 0.06 322);
+  :root[data-accent='lime'],
+  [data-accent='lime'] {
+    --accent: #eaff00;
+    --on-accent: #06011e;
+    --accent-text: #eaff00;
+    --accent-subtle: #24280a;
+    --focus-ring-on-accent: #06011e;
+    --cover-ground: #06011e;
+    --cover-mark: #eaff00;
+    --cover-partner: #f7879a;
   }
-  :root[data-accent='rose'],
-  [data-accent='rose'] {
-    --accent: oklch(0.72 0.16 12);
-    --on-accent: oklch(0.16 0.05 12);
-    --accent-text: oklch(0.72 0.16 12);
-    --accent-subtle: oklch(0.26 0.06 12);
-  }
-  :root[data-accent='ember'],
-  [data-accent='ember'] {
-    --accent: oklch(0.72 0.16 42);
-    --on-accent: oklch(0.16 0.048 42);
-    --accent-text: oklch(0.72 0.16 42);
-    --accent-subtle: oklch(0.26 0.06 42);
-  }
-  :root[data-accent='moss'],
-  [data-accent='moss'] {
-    --accent: oklch(0.69 0.16 138);
-    --on-accent: oklch(0.16 0.049 138);
-    --accent-text: oklch(0.69 0.16 138);
-    --accent-subtle: oklch(0.26 0.06 138);
-  }
-  :root[data-accent='teal'],
-  [data-accent='teal'] {
-    --accent: oklch(0.69 0.119 190);
-    --on-accent: oklch(0.16 0.028 190);
-    --accent-text: oklch(0.69 0.119 190);
-    --accent-subtle: oklch(0.26 0.045 190);
-  }
-  :root[data-accent='ocean'],
-  [data-accent='ocean'] {
-    --accent: oklch(0.7 0.151 236);
-    --on-accent: oklch(0.16 0.034 236);
-    --accent-text: oklch(0.7 0.151 236);
-    --accent-subtle: oklch(0.26 0.056 236);
+  :root[data-accent='pink'],
+  [data-accent='pink'] {
+    --accent: #f7879a;
+    --on-accent: #06011e;
+    --accent-text: #f7879a;
+    --accent-subtle: #2e1520;
+    --focus-ring-on-accent: #06011e;
+    --cover-ground: #06011e;
+    --cover-mark: #f7879a;
+    --cover-partner: #eaff00;
   }
 }

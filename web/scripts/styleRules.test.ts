@@ -87,9 +87,17 @@ const LANYARD_COLOUR = new RegExp(
 );
 const UI_COLOUR = new RegExp(`^${COLOUR}-(?:ui-|${throughVar('ui-[a-z-]+')})`);
 
-// Spec #118: the product UI's corners are 8–14px (rounded-lg, rounded-xl).
-const OFF_SCALE_RADIUS =
-  /^rounded(?:-[trblse]{1,2})?(?:-(?:xs|sm|md|2xl|3xl|4xl))?$/;
+// Spec #128: corners are 1 px (rounded-xs) or 3 px (rounded-sm), on any
+// side; fully round only for round things.
+const RADIUS = /^rounded(?:-[trblse]{1,2})?(?:-([a-z0-9]+|\[[^\]]+\]))?$/;
+const ON_SCALE = new Set(['xs', 'sm', 'none', 'full']);
+
+/** Round things: avatars, dots, spinners and colour swatches. */
+const isRound = ({ file, path = '' }: ClassString) =>
+  /(?:^|\.)(?:avatar|dot|spinner|swatch)$/.test(path) ||
+  // The account link is a round focus target around its avatar.
+  (file === 'src/components/AccountLink/AccountLink.styles.ts' &&
+    path === 'link');
 
 /** The product UI: everything but the lanyard itself. */
 const CHROME = [
@@ -144,6 +152,24 @@ describe('style rules', () => {
     ).toEqual([]);
   });
 
+  // The accent fill is pale on mint, lime and pink, and dark blue on the
+  // dark ground: as a focus ring or an edge it can fall below 3:1 (#128).
+  it('never marks focus or edges with the accent fill', () => {
+    expect(
+      offending((_variants, utility) =>
+        /^(?:outline|ring|border(?:-[trblxyse])?|decoration)-accent(?:\/\d+)?$/.test(
+          utility
+        )
+      )
+    ).toEqual([]);
+  });
+
+  it('uses no serif font: Rethink Sans throughout (#128)', () => {
+    expect(offending((_variants, utility) => utility === 'font-serif')).toEqual(
+      []
+    );
+  });
+
   // The global :focus-visible ring is the keyboard focus indicator. An
   // unconditional outline-none removes it (WCAG 2.4.7).
   it('never removes the focus ring outright', () => {
@@ -164,11 +190,21 @@ describe('style rules', () => {
     ).toEqual([]);
   });
 
-  it('chrome corners are 8–14px', () => {
+  it('corners are 1px, 3px or full, everywhere (#128)', () => {
+    expect(
+      offending((_variants, utility) => {
+        const size = RADIUS.exec(utility);
+        return size !== null && !ON_SCALE.has(size[1] ?? '');
+      })
+    ).toEqual([]);
+  });
+
+  it('only round things are fully round (#128)', () => {
     expect(
       offending(
-        (_variants, utility) => OFF_SCALE_RADIUS.test(utility),
-        (entry) => inChrome(entry) && !isLanyardInChrome(entry)
+        (_variants, utility) =>
+          /^rounded(?:-[trblse]{1,2})?-full$/.test(utility),
+        (entry) => !isRound(entry)
       )
     ).toEqual([]);
   });

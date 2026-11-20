@@ -3,7 +3,8 @@ import type { ExternalLinkTone } from './ExternalLink.types';
 const base = 'underline-offset-4 hover:underline [overflow-wrap:anywhere]';
 
 export const tones: Record<ExternalLinkTone, string> = {
-  ui: `${base} text-ui-primary`,
+  // Underlined at rest: next to body text, colour alone can't mark a link.
+  ui: `${base} text-ui-link underline`,
   accent: `${base} text-accent-text`,
 };
 

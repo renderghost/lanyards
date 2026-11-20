@@ -31,7 +31,7 @@ const hero = () =>
 
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedOutSession());
-  document.documentElement.dataset.accent = 'violet';
+  document.documentElement.dataset.accent = 'blue';
 });
 
 describe('public lanyard routes', () => {
@@ -252,11 +252,11 @@ describe('shared context', () => {
 
 describe('accent', () => {
   it('applies the owner’s accent while their lanyard is open', async () => {
-    servePerson({ config: { accent: 'teal' } });
+    servePerson({ config: { accent: 'mint' } });
     renderRoute('/@alice.test');
     await hero();
     await waitFor(() =>
-      expect(document.documentElement.dataset.accent).toBe('teal')
+      expect(document.documentElement.dataset.accent).toBe('mint')
     );
   });
 });

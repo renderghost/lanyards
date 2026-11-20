@@ -4,7 +4,7 @@ export const page =
 export const intro = 'flex flex-col items-center gap-2 text-center';
 
 export const heading =
-  'break-all font-serif text-2xl leading-tight text-foreground';
+  'break-all font-sans text-2xl font-[650] leading-tight text-foreground';
 
 export const hint = 'text-base leading-6 text-muted-foreground';
 

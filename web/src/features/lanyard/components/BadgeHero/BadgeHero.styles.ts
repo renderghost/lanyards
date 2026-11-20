@@ -1,5 +1,5 @@
 export const badge =
-  'flex flex-col items-center gap-4 rounded-md border border-border bg-surface px-6 py-8 text-center';
+  'flex flex-col items-center gap-4 rounded-sm border border-border bg-surface px-6 py-8 text-center';
 
 export const avatar =
   'size-24 shrink-0 rounded-full bg-accent-subtle object-cover';
@@ -7,7 +7,7 @@ export const avatar =
 export const text = 'flex min-w-0 max-w-full flex-col items-center gap-1';
 
 export const name =
-  'break-words font-serif text-3xl leading-tight text-foreground [overflow-wrap:anywhere]';
+  'break-words font-sans text-3xl font-[650] leading-tight text-foreground [overflow-wrap:anywhere]';
 
 export const pronouns =
   'max-w-full text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]';

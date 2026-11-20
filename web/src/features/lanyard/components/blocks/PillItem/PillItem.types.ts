@@ -8,7 +8,7 @@ export type PillItemProps = {
   label: string;
   /** Links only: on the public lanyard the whole pill is the link. */
   href?: string;
-  /** Links only: a favicon or platform icon, on the left. */
+  /** A favicon, platform icon or marker, on the left. */
   icon?: ReactNode;
   className?: string;
 };

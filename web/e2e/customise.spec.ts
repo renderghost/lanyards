@@ -157,14 +157,14 @@ test.describe('lanyard customiser', () => {
   }) => {
     await openCustomiser(page);
     await page.getByRole('switch', { name: 'Show Talks' }).click();
-    await page.getByRole('radio', { name: 'Teal' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
+    await page.getByRole('radio', { name: 'Mint' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-accent', 'mint');
     await expect(page.getByText('Unsaved changes')).toBeVisible();
     await saveChanges(page);
     await expect(page.getByText('All changes saved')).toBeVisible();
     const saves = lanyardSaves(writes);
     expect(saves).toHaveLength(1);
-    expect(saves[0]?.accent).toBe('teal');
+    expect(saves[0]?.accent).toBe('mint');
     expect(saves[0]?.blocks.find((block) => block.type === 'talks')).toEqual({
       type: 'talks',
       visible: false,
@@ -368,7 +368,7 @@ test.describe('lanyard customiser', () => {
     await expect(
       page.getByRole('button', { name: 'Reorder Links' })
     ).toBeEnabled();
-    await page.getByRole('radio', { name: 'Teal' }).click();
+    await page.getByRole('radio', { name: 'Mint' }).click();
 
     const dialogs: string[] = [];
     page.on('dialog', (dialog) => {
@@ -382,7 +382,7 @@ test.describe('lanyard customiser', () => {
     // Dismissing the prompt cancels the reload, so don't wait for a load.
     await page.evaluate(() => window.location.reload());
     await expect.poll(() => dialogs).toContain('beforeunload');
-    await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
+    await expect(page.locator('html')).toHaveAttribute('data-accent', 'mint');
   });
 
   test('never hides keyboard focus under the phone toolbar', async ({
@@ -489,8 +489,8 @@ test.describe('lanyard customiser', () => {
     await style.click();
     const sheet = page.getByRole('dialog', { name: 'Style' });
     await expect(sheet).toBeVisible();
-    await sheet.getByRole('radio', { name: 'Teal' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-accent', 'teal');
+    await sheet.getByRole('radio', { name: 'Mint' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-accent', 'mint');
     await page.keyboard.press('Escape');
     await expect(sheet).toBeHidden();
     await expect(style).toBeFocused();

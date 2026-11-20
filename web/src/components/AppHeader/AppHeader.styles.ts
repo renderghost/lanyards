@@ -4,7 +4,7 @@ export const header =
 
 export const start = 'flex min-w-0 items-center gap-3';
 
-export const homeLink = 'inline-flex min-h-11 min-w-11 items-center rounded-lg';
+export const homeLink = 'inline-flex min-h-11 min-w-11 items-center rounded-sm';
 
 export const title =
   'hidden truncate text-sm leading-5 text-ui-text-muted md:block';
@@ -14,4 +14,4 @@ export const actions = 'flex min-w-0 items-center gap-2';
 export const nav = 'flex items-center gap-1';
 
 export const navLink =
-  'inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium leading-5 text-ui-text hover:bg-ui-surface-muted';
+  'inline-flex min-h-11 items-center rounded-sm px-3 text-sm font-medium leading-5 text-ui-text hover:bg-ui-surface-muted';

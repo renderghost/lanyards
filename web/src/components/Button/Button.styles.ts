@@ -6,16 +6,16 @@ export const base =
 export const tones: Record<ButtonTone, Record<ButtonVariant, string>> = {
   ui: {
     primary:
-      'rounded-lg bg-ui-primary text-ui-on-primary hover:bg-ui-primary/90',
+      'rounded-sm bg-ui-primary text-ui-on-primary hover:bg-ui-primary/90',
     secondary:
-      'rounded-lg border border-ui-border-strong bg-ui-surface text-ui-text hover:bg-ui-surface-muted',
-    ghost: 'rounded-lg text-ui-text hover:bg-ui-surface-muted',
+      'rounded-sm border border-ui-border-strong bg-ui-surface text-ui-text hover:bg-ui-surface-muted',
+    ghost: 'rounded-sm text-ui-text hover:bg-ui-surface-muted',
   },
   accent: {
-    primary: 'rounded-md bg-accent text-on-accent hover:opacity-90',
+    primary: 'rounded-sm bg-accent text-on-accent hover:opacity-90',
     secondary:
-      'rounded-md border border-border bg-surface text-foreground hover:bg-accent-subtle',
-    ghost: 'rounded-md text-accent-text hover:bg-accent-subtle',
+      'rounded-sm border border-border bg-surface text-foreground hover:bg-accent-subtle',
+    ghost: 'rounded-sm text-accent-text hover:bg-accent-subtle',
   },
 };
 

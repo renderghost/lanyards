@@ -94,8 +94,50 @@ describe('UI tokens', () => {
         ratio(mode, '--ui-border-strong', '--ui-surface')
       ).toBeGreaterThanOrEqual(3);
       expect(
+        ratio(mode, '--ui-border-strong', '--ui-canvas')
+      ).toBeGreaterThanOrEqual(3);
+      expect(
         ratio(mode, '--ui-warning', '--ui-surface')
       ).toBeGreaterThanOrEqual(3);
     }
   );
+});
+
+/** The brand neutrals (#128): black 06011E, grays and white. */
+describe('UI tokens draw on the brand neutrals', () => {
+  const value = (mode: (typeof MODES)[number], name: string) =>
+    ui(mode)[name]?.trim().toLowerCase();
+
+  it.each([
+    ['light', '--ui-canvas', '#faf9fd'],
+    ['light', '--ui-surface', '#ffffff'],
+    ['light', '--ui-surface-muted', '#f6f5ff'],
+    ['light', '--ui-text', '#06011e'],
+    ['light', '--ui-text-muted', '#5c5873'],
+    ['light', '--ui-primary', '#06011e'],
+    ['light', '--ui-on-primary', '#ffffff'],
+    ['dark', '--ui-canvas', '#06011e'],
+    ['dark', '--ui-surface', '#0e0a26'],
+    ['dark', '--ui-text', '#f6f5ff'],
+    ['dark', '--ui-text-muted', '#a9a6bd'],
+    ['dark', '--ui-primary', '#f6f5ff'],
+    ['dark', '--ui-on-primary', '#06011e'],
+  ] as const)('%s %s is %s', (mode, name, expected) => {
+    expect(value(mode, name)).toBe(expected);
+  });
+});
+
+describe('links and selection in the app (#128)', () => {
+  it.each(MODES)('are the brand blue, at least 4.5:1 (%s)', (mode) => {
+    expect(ui(mode)['--ui-link']?.trim().toLowerCase()).toBe(
+      mode === 'light' ? '#4020df' : '#b3a6ff'
+    );
+    for (const ground of [
+      '--ui-surface',
+      '--ui-canvas',
+      '--ui-surface-muted',
+    ]) {
+      expect(ratio(mode, '--ui-link', ground)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
 });

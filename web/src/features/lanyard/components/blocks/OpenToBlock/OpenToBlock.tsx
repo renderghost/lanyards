@@ -19,6 +19,8 @@ export function OpenToBlock({ items, className }: OpenToBlockProps) {
             itemKey={item.key}
             title={itemTitle('openTo', item, i18n)}
             label={i18n._(OPEN_TO_LABELS[item.value])}
+            icon={<span aria-hidden="true" className={styles.marker} />}
+            className={styles.chip}
           />
         </li>
       ))}

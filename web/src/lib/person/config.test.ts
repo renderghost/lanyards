@@ -29,7 +29,7 @@ const ALL_TYPES = [
 describe('resolveConfig', () => {
   it('uses the smart defaults when there is no config record', () => {
     expect(resolveConfig(null)).toEqual({
-      accent: 'violet',
+      accent: 'blue',
       showJob: true,
       blocks: ALL_TYPES.map((type) => ({
         type,
@@ -42,7 +42,7 @@ describe('resolveConfig', () => {
   it('keeps the owner’s order, visibility and limits, appending blocks they never saw', () => {
     const config = resolveConfig({
       $type: 'app.lanyards.actor.lanyard',
-      accent: 'teal',
+      accent: 'mint',
       showJob: false,
       blocks: [
         { type: 'publications', visible: true, limit: 5 },
@@ -54,7 +54,7 @@ describe('resolveConfig', () => {
       hidden: ['https://ada.example/'],
       createdAt: '2026-11-01T09:00:00.000Z',
     });
-    expect(config.accent).toBe('teal');
+    expect(config.accent).toBe('mint');
     expect(config.showJob).toBe(false);
     expect(config.hidden).toEqual(['https://ada.example/']);
     expect(config.blocks.slice(0, 3)).toEqual([
@@ -71,12 +71,32 @@ describe('resolveConfig', () => {
     ]);
   });
 
-  it('falls back to violet for an accent it does not know', () => {
+  it('falls back to blue for an accent it does not know', () => {
     expect(
       resolveConfig({ accent: 'chartreuse', createdAt: '2026-11-01T09:00:00Z' })
         .accent
-    ).toBe('violet');
+    ).toBe('blue');
   });
+
+  it.each([
+    ['rose', 'pink'],
+    ['teal', 'mint'],
+    ['violet', 'blue'],
+  ])(
+    'maps the legacy accent %s to %s and writes it on save (#128)',
+    (legacy, accent) => {
+      const record = {
+        $type: 'app.lanyards.actor.lanyard',
+        accent: legacy,
+        createdAt: '2026-11-01T09:00:00Z',
+      };
+      const config = resolveConfig(record);
+      expect(config.accent).toBe(accent);
+      expect(
+        serialiseConfig(config, record, '2026-11-20T09:00:00Z')
+      ).toMatchObject({ accent });
+    }
+  );
 
   it('uses the defaults when the record is malformed', () => {
     expect(resolveConfig({ blocks: 'nope' })).toEqual(resolveConfig(null));
@@ -121,7 +141,7 @@ describe('serialiseConfig', () => {
     'at://did:plc:fixtureeventaaaaaaaaaaaaa/community.lexicon.calendar.event/3mevent';
   const previous = {
     $type: 'app.lanyards.actor.lanyard',
-    accent: 'violet',
+    accent: 'blue',
     blocks: [
       { type: 'links', visible: true },
       { type: 'events', visible: true },
@@ -135,12 +155,12 @@ describe('serialiseConfig', () => {
   it('keeps what this slice does not edit, in place, and stamps updatedAt', () => {
     const config = {
       ...resolveConfig(previous),
-      accent: 'teal' as const,
+      accent: 'mint' as const,
       showJob: false,
     };
     const fields = serialiseConfig(config, previous, NOW);
     expect(fields).toMatchObject({
-      accent: 'teal',
+      accent: 'mint',
       showJob: false,
       connect: previous.connect,
       events: previous.events,
@@ -206,17 +226,17 @@ describe('mergeConfig', () => {
 
   it('keeps the other side’s change to a field this side left alone', () => {
     const ours = { ...base, hidden: ['k1'] };
-    const theirs = { ...base, accent: 'teal' as const };
+    const theirs = { ...base, accent: 'mint' as const };
     expect(mergeConfig(base, ours, theirs)).toEqual({
       ...base,
-      accent: 'teal',
+      accent: 'mint',
       hidden: ['k1'],
     });
   });
 
   it('takes this side’s value for a field both changed', () => {
-    const ours = { ...base, accent: 'rose' as const };
-    const theirs = { ...base, accent: 'teal' as const };
-    expect(mergeConfig(base, ours, theirs).accent).toBe('rose');
+    const ours = { ...base, accent: 'pink' as const };
+    const theirs = { ...base, accent: 'mint' as const };
+    expect(mergeConfig(base, ours, theirs).accent).toBe('pink');
   });
 });
