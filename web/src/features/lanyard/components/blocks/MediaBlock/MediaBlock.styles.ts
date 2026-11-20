@@ -1,1 +1,1 @@
-export { item, list, meta, title } from '../shared.styles';
+export { list, meta, title } from '../shared.styles';

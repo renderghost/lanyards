@@ -55,6 +55,39 @@ describe('fetchBlogPosts', () => {
     });
   });
 
+  it('gives a post its cover image as a thumbnail, through Bluesky’s CDN', async () => {
+    const [first, ...rest] = documents.records;
+    mockListRecords(ADA.pds, ADA.did, 'site.standard.document', [
+      {
+        ...first!,
+        value: {
+          ...first!.value,
+          coverImage: {
+            $type: 'blob',
+            ref: {
+              $link:
+                'bafkreibme22gw2h7y2h7tg2fhqotaqjucnbc24deqo72b6mkl2egezxhvy',
+            },
+            mimeType: 'image/jpeg',
+            size: 2000,
+          },
+        },
+      },
+      ...rest,
+    ]);
+    const result = await fetchBlogPosts(ADA.did, 10);
+    if (!result.ok) throw result.error;
+    const withCover = result.value.find((post) => post.key === key('3mdocone'));
+    expect(withCover?.thumbnail).toBe(
+      `https://cdn.bsky.app/img/feed_thumbnail/plain/${ADA.did}/bafkreibme22gw2h7y2h7tg2fhqotaqjucnbc24deqo72b6mkl2egezxhvy@jpeg`
+    );
+    expect(result.value.filter((post) => post.key !== key('3mdocone'))).toEqual(
+      expect.not.arrayContaining([
+        expect.objectContaining({ thumbnail: expect.anything() }),
+      ])
+    );
+  });
+
   it('drops posts with unsafe URLs and records that fail their schema', async () => {
     const result = await fetchBlogPosts(ADA.did, 10);
     const titles = result.ok ? result.value.map((post) => post.title) : [];

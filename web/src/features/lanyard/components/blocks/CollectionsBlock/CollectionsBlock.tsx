@@ -1,49 +1,34 @@
 import { useLingui } from '@lingui/react/macro';
 
-import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { CardItem } from '../CardItem/CardItem';
+import { CardLink } from '../CardLink/CardLink';
 import { itemTitle } from '../itemTitle';
 import * as styles from './CollectionsBlock.styles';
 import type { CollectionsBlockProps } from './CollectionsBlock.types';
 
-/** Semble collections and their latest links (no third-party images). */
+/**
+ * Semble collections, as cards opening each collection (#122). Their
+ * links aren't listed: the collection is the thing to open.
+ */
 export function CollectionsBlock({ items, className }: CollectionsBlockProps) {
   const { i18n } = useLingui();
   return (
     <ul className={cn(styles.list, className)}>
       {items.map((collection) => (
-        <li key={collection.key} className={styles.item}>
-          <ItemFrame
+        <li key={collection.key}>
+          <CardItem
             itemKey={collection.key}
             title={itemTitle('collections', collection, i18n)}
           >
-            <ExternalLink
-              tone="accent"
-              href={collection.url}
-              className={styles.title}
-            >
+            <CardLink href={collection.url} className={styles.title}>
               {collection.name}
-            </ExternalLink>
+            </CardLink>
             {collection.description && (
               <p className={styles.description}>{collection.description}</p>
             )}
-            {collection.links.length > 0 && (
-              <ul className={styles.links}>
-                {collection.links.map((link) => (
-                  <li key={link.key} className={styles.link}>
-                    <ExternalLink tone="accent" href={link.url}>
-                      {link.title}
-                    </ExternalLink>
-                    {link.siteName && (
-                      <span className={styles.meta}> · {link.siteName}</span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </ItemFrame>
+          </CardItem>
         </li>
       ))}
     </ul>

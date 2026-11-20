@@ -1,5 +1,6 @@
 import type { Did } from '@atcute/lexicons';
 
+import { blobThumbnail } from '@/lib/atproto/avatar';
 import { listRecords } from '@/lib/atproto/pds';
 import { validRecords } from '@/lib/lexicons/validate';
 import { safeHref } from '@/lib/normalise';
@@ -15,6 +16,7 @@ type Document = {
   path?: string;
   title: string;
   publishedAt: string;
+  coverImage?: unknown;
 };
 type Publication = { url: string; name: string };
 
@@ -60,6 +62,7 @@ export async function fetchBlogPosts(
       if (!publication && value.site.startsWith('at://')) return [];
       const url = safeHref(join(base, value.path));
       if (!url) return [];
+      const thumbnail = blobThumbnail(did, value.coverImage);
       return [
         {
           key: uri,
@@ -67,6 +70,7 @@ export async function fetchBlogPosts(
           url,
           ...(publication ? { publicationName: publication.name } : {}),
           publishedAt: value.publishedAt,
+          ...(thumbnail ? { thumbnail } : {}),
         },
       ];
     })

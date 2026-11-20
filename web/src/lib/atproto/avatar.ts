@@ -29,3 +29,22 @@ export function cdnImage(url: string | undefined): string | undefined {
     return undefined;
   }
 }
+
+const CDN_FEED_THUMBNAIL = 'https://cdn.bsky.app/img/feed_thumbnail/plain/';
+
+/**
+ * A small thumbnail of an image blob in `did`'s repository, served by
+ * Bluesky's CDN (which fetches it from any PDS), else undefined. Keeps
+ * Slice 1b's rule: images only ever load from cdn.bsky.app.
+ */
+export function blobThumbnail(did: string, blob: unknown): string | undefined {
+  if (!blob || typeof blob !== 'object') return undefined;
+  const { ref, mimeType } = blob as { ref?: unknown; mimeType?: unknown };
+  const cid =
+    ref && typeof ref === 'object' ? (ref as { $link?: unknown }).$link : null;
+  if (typeof cid !== 'string' || !/^[a-z0-9]+$/.test(cid)) return undefined;
+  if (typeof mimeType !== 'string' || !mimeType.startsWith('image/')) {
+    return undefined;
+  }
+  return `${CDN_FEED_THUMBNAIL}${did}/${cid}@jpeg`;
+}

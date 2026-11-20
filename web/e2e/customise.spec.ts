@@ -408,6 +408,20 @@ test.describe('lanyard customiser', () => {
     expect(Math.min(...heights)).toBeGreaterThanOrEqual(44);
   });
 
+  test('a hidden card keeps its text readable at 320 px', async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 800 });
+    await openCustomiser(page);
+    const talks = page.locator('[data-block="talks"]');
+    await talks
+      .getByRole('button', { name: /^Hide / })
+      .first()
+      .click();
+    const width = await talks
+      .locator('[data-card][data-hidden] [data-card-content]')
+      .evaluate((content) => content.getBoundingClientRect().width);
+    expect(width).toBeGreaterThanOrEqual(150);
+  });
+
   test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);

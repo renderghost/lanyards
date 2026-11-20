@@ -5,4 +5,6 @@ export type BlogPost = {
   url: string;
   publicationName?: string;
   publishedAt: string;
+  /** Its cover image, from Bluesky's CDN. */
+  thumbnail?: string;
 };

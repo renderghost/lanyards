@@ -3,12 +3,12 @@ import { useLingui } from '@lingui/react/macro';
 import { formatPartialDate } from '@/lib/person/format';
 import { cn } from '@/lib/utils';
 
-import { ItemFrame } from '../ItemFrame/ItemFrame';
+import { CardItem } from '../CardItem/CardItem';
 import { itemTitle } from '../itemTitle';
 import * as styles from './EducationBlock.styles';
 import type { EducationBlockProps } from './EducationBlock.types';
 
-/** Education from Sifa. */
+/** Education from Sifa, as cards that open nothing (#122). */
 export function EducationBlock({ items, className }: EducationBlockProps) {
   const { i18n } = useLingui();
   return (
@@ -23,14 +23,14 @@ export function EducationBlock({ items, className }: EducationBlockProps) {
           .join('–');
         const meta = [course, years].filter(Boolean).join(' · ');
         return (
-          <li key={entry.key} className={styles.item}>
-            <ItemFrame
+          <li key={entry.key}>
+            <CardItem
               itemKey={entry.key}
               title={itemTitle('education', entry, i18n)}
             >
               <p className={styles.title}>{entry.institution}</p>
               {meta && <p className={styles.meta}>{meta}</p>}
-            </ItemFrame>
+            </CardItem>
           </li>
         );
       })}

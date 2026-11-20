@@ -7,7 +7,7 @@ import { renderWithProviders } from '@/test/render';
 import { CollectionsBlock } from './CollectionsBlock';
 
 describe('CollectionsBlock', () => {
-  it('shows each collection with its latest links and no images', async () => {
+  it('shows each collection, without its links or images', async () => {
     const { container } = renderWithProviders(
       <CollectionsBlock
         items={[
@@ -36,11 +36,8 @@ describe('CollectionsBlock', () => {
       'href',
       'https://semble.so/profile/alice.test/collections/3m'
     );
-    expect(
-      screen.getByRole('link', {
-        name: 'The protocol spec (opens in a new tab)',
-      })
-    ).toBeInTheDocument();
+    // The collection is the thing to open: its links aren't listed.
+    expect(screen.queryByText('The protocol spec')).toBeNull();
     expect(container.querySelector('img')).toBeNull();
     await expectNoAxeViolations(container);
   });
@@ -60,5 +57,25 @@ describe('CollectionsBlock', () => {
       />
     );
     expect(screen.getByText('z'.repeat(5000))).toHaveClass('line-clamp-3');
+  });
+
+  it('is a card opening the collection, without listing its links', () => {
+    renderWithProviders(
+      <CollectionsBlock
+        items={[
+          {
+            key: 'c',
+            name: 'Reading',
+            url: 'https://semble.so/collection/c',
+            links: [
+              { key: 'l', title: 'An article', url: 'https://x.example/a' },
+            ],
+          },
+        ]}
+      />
+    );
+    expect(document.querySelectorAll('[data-card]')).toHaveLength(1);
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+    expect(screen.queryByText('An article')).toBeNull();
   });
 });
