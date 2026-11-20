@@ -11,8 +11,12 @@ export const SIGNAL_USERNAME = 'renderghost.101';
 
 export const USERINPUT_ORIGIN = 'https://userinput.app';
 
-/** Boards read to find our newest valid one. */
-export const BOARDS_READ = 10;
+/**
+ * Our board's record key: feedback goes to exactly this board, never to
+ * another @lanyards.app may make (#144).
+ * https://userinput.app/s/did:plc:ua3d6biqepazbq6mw4ysotfo/3n2rdjjovcm2o
+ */
+export const BOARD_RKEY = '3n2rdjjovcm2o';
 
 /** Our user documentation, in the GitHub wiki. */
 export const DOCS_URL = 'https://github.com/renderghost/lanyards/wiki/';

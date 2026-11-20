@@ -149,7 +149,7 @@ test.describe('feedback (#134)', () => {
     await sheetSupport.getByRole('button', { name: 'Give feedback' }).click();
     await expect(sheet).toBeHidden();
     const form = dialog(page);
-    await form.getByRole('radio', { name: 'Bug' }).check();
+    await form.getByRole('radio', { name: 'bug' }).check();
     await form.getByLabel('Title').fill('The QR code is cut off');
     await form
       .getByLabel('Details', { exact: true })

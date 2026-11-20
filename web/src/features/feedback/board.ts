@@ -1,11 +1,11 @@
 import { USERINPUT_NSID } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
-import { listRecords } from '@/lib/atproto/pds';
+import { getRecord } from '@/lib/atproto/pds';
 import { ok, type Result } from '@/lib/sources/result';
 
 import {
   BOARD_OWNER_DID,
-  BOARDS_READ,
+  BOARD_RKEY,
   USERINPUT_ORIGIN,
 } from './feedback.constants';
 
@@ -39,24 +39,26 @@ export function discussionUrl(uri: string): string {
 }
 
 /**
- * Our board: the newest valid `app.userinput.space` in @lanyards.app's
- * repository, or null when there is none yet (#134).
+ * Our board: the `app.userinput.space` at `BOARD_RKEY` in @lanyards.app's
+ * repository, or null when it's missing or isn't a valid board (#134,
+ * #144).
  */
 export async function fetchFeedbackBoard(
   signal?: AbortSignal
 ): Promise<Result<FeedbackBoard | null>> {
-  const spaces = await listRecords(
+  const record = await getRecord(
     'userinput',
     BOARD_OWNER_DID,
     USERINPUT_NSID.space,
-    { limit: BOARDS_READ, ...(signal ? { signal } : {}) }
+    BOARD_RKEY,
+    signal
   );
-  if (!spaces.ok) return spaces;
+  if (!record.ok) return record;
 
-  const board = spaces.value.find(
-    (record) => validateRecord(USERINPUT_NSID.space, record.value).ok
-  );
-  if (!board) return ok(null);
+  const board = record.value;
+  if (!board || !validateRecord(USERINPUT_NSID.space, board.value).ok) {
+    return ok(null);
+  }
   const space = board.value as Space;
   const [did, rkey] = parts(board.uri);
   return ok({
