@@ -75,4 +75,20 @@ test.describe('the homepage (#145)', () => {
     await expect(handle).toBeFocused();
     await expect(handle).toBeInViewport();
   });
+
+  test('offers Sign in at the top, taking people to the form (#148)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto('/');
+    const signIn = page
+      .getByRole('banner')
+      .getByRole('link', { name: 'Sign in' });
+    await expect(signIn).toBeInViewport();
+    const handle = page.getByRole('combobox', { name: 'Your handle' });
+    await expect(handle).not.toBeInViewport();
+    await signIn.click();
+    await expect(handle).toBeFocused();
+    await expect(handle).toBeInViewport();
+  });
 });
