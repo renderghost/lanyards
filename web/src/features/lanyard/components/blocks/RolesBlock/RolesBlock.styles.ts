@@ -16,10 +16,9 @@ export const title =
 export const company =
   'text-[0.9375rem] leading-[1.375rem] text-muted-foreground [overflow-wrap:anywhere]';
 
-export const aside = 'flex shrink-0 flex-col items-end gap-1.5';
-
+// The dates sit under the company, so the title keeps the row's width on
+// a phone; only the small Now tag stays beside it.
 export const now =
-  'rounded-xs bg-accent px-1.5 py-0.5 text-[0.6875rem] font-extrabold uppercase leading-[0.875rem] tracking-[0.12em] text-on-accent';
+  'shrink-0 rounded-xs bg-accent px-1.5 py-0.5 text-[0.6875rem] font-extrabold uppercase leading-[0.875rem] tracking-[0.12em] text-on-accent';
 
-export const dates =
-  'text-sm leading-5 text-muted-foreground tabular-nums whitespace-nowrap';
+export const dates = 'text-sm leading-5 text-muted-foreground tabular-nums';
