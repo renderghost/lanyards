@@ -30,8 +30,8 @@ describe('movedTo (#154)', () => {
 
   it('leaves every other origin alone: previews, local, Vercel URLs', () => {
     for (const href of [
-      'https://lanyards-next-git-x-renderghost.vercel.app/',
-      'https://lanyards-next.vercel.app/',
+      'https://lanyards-git-x-renderghost.vercel.app/',
+      'https://lanyards-three.vercel.app/',
       'http://127.0.0.1:5173/',
     ]) {
       expect(movedTo(href, HOME)).toBeNull();

@@ -74,7 +74,7 @@ The repository holds two apps during the rebuild (epic #94):
 - **Protocol**: `@atcute/*` packages (client, lexicons, identity resolver)
 - **Copy**: British English via Lingui (`web/src/i18n/`)
 - **Tests**: Vitest + Testing Library + MSW + axe-core; Playwright for e2e
-- **Hosting**: Vercel project `lanyards-next` with Root Directory `web`, serving `lanyards.app` (`PUBLIC_BASE_URL=https://lanyards.app` in Production). `www` and the retired `next.lanyards.app` redirect to it (#154)
+- **Hosting**: Vercel project `lanyards` with Root Directory `web`, serving `lanyards.app` (`PUBLIC_BASE_URL=https://lanyards.app` in Production). `www` and the retired `next.lanyards.app` redirect to it (#154)
 
 **Repository root: the legacy Next.js app.** It is frozen and no longer served: `lanyards.app` moved to the new app (#154), and Slice 1c (#103) deletes it. Don't start new work on it.
 

@@ -121,23 +121,23 @@ Lanyards' lexicons are published from the `@lanyards.app` account
 bsky.social caches a failed lexicon lookup for about 5 minutes, so sign-in may
 keep falling back to broad permissions for a few minutes after publishing.
 
-## Deploying the beta (`next.lanyards.app`)
+## Deploying (`lanyards.app`)
 
-The app deploys from a **second** Vercel project. The legacy project keeps
-serving `lanyards.app` from the repository root until Slice 1c (#103).
+The app deploys from the Vercel project **`lanyards`** (team `renderghost`,
+Git repo `renderghost/lanyards`), with Root Directory `web`. Until the swap
+(#154), that project served the legacy Next.js app from the repository root,
+and the beta ran on a second project, `lanyards-next`, at
+`next.lanyards.app`.
 
-### 1. Create the Vercel project
+### 1. Project settings
 
-In the Vercel dashboard (team `renderghost`): **Add New → Project →** import
-`renderghost/lanyards`, then set:
-
-| Setting           | Value                                           |
-| ----------------- | ----------------------------------------------- |
-| Project name      | `lanyards-next`                                 |
-| Framework preset  | Vite                                            |
-| Root Directory    | `web`                                           |
-| Build and output  | leave as detected (`web/vercel.json` sets them) |
-| Production branch | `main` (Settings → Git, after creation)         |
+| Setting                   | Value                                              |
+| ------------------------- | -------------------------------------------------- |
+| Root Directory            | `web`                                              |
+| Framework preset          | Vite                                               |
+| Build, output and install | no overrides (`web/vercel.json` sets build/output) |
+| Node.js version           | from `engines` in `web/package.json`               |
+| Production branch         | `main`                                             |
 
 Keep **Settings → Environment Variables → "Automatically expose System
 Environment Variables"** on, because preview builds use `VERCEL_ENV` and
@@ -145,37 +145,49 @@ Environment Variables"** on, because preview builds use `VERCEL_ENV` and
 
 ### 2. Environment variables
 
-| Name                | Environment | Value                       |
-| ------------------- | ----------- | --------------------------- |
-| `PUBLIC_BASE_URL`   | Production  | `https://next.lanyards.app` |
-| `VITE_POSTHOG_KEY`  | —           | leave unset during the beta |
-| `VITE_POSTHOG_HOST` | —           | leave unset during the beta |
+| Name                | Environment         | Value                              |
+| ------------------- | ------------------- | ---------------------------------- |
+| `PUBLIC_BASE_URL`   | Production only     | `https://lanyards.app`             |
+| `VITE_POSTHOG_KEY`  | Production, Preview | optional: analytics is off without |
+| `VITE_POSTHOG_HOST` | Production, Preview | optional: defaults to PostHog's EU |
 
 Production builds fail on purpose without `PUBLIC_BASE_URL`, because the
-OAuth client metadata is generated from it.
+OAuth client metadata is generated from it. Don't set it for Preview:
+previews use their own branch URL.
 
-### 3. Domain
+### 3. Domains
 
-1. In the project: **Settings → Domains → Add** `next.lanyards.app`.
-2. `lanyards.app` uses Cloudflare DNS. Add this record in Cloudflare:
+| Domain              | Setting                                                   |
+| ------------------- | --------------------------------------------------------- |
+| `lanyards.app`      | Production, primary                                       |
+| `www.lanyards.app`  | Redirect to `lanyards.app`, 308                           |
+| `next.lanyards.app` | Production, **no** redirect: `web/vercel.json` handles it |
 
-   | Type  | Name   | Target                 | Proxy status          |
-   | ----- | ------ | ---------------------- | --------------------- |
-   | CNAME | `next` | `cname.vercel-dns.com` | DNS only (grey cloud) |
+`next.lanyards.app` is the retired beta. `web/vercel.json` redirects its
+page visits to the same path on `lanyards.app`, and only page visits, so a
+copy installed from the beta can still fetch its update. The updated app
+then sends it to `lanyards.app` (`src/lib/origin/movedOrigin.ts`). A Vercel
+domain redirect would cut installed copies off from their update.
 
-   Keep the proxy off so Vercel can issue the certificate.
+DNS is on Cloudflare. Keep every Vercel record **DNS only** (grey cloud) so
+Vercel can issue certificates. The `_atproto` TXT record verifies the
+`@lanyards.app` Bluesky handle, and the `_lexicon` TXT records publish the
+lexicons (see above).
 
 ### 4. Check the deployment
 
-After the first production deployment from `main`:
+After a production deployment from `main`:
 
 ```bash
-curl -s https://next.lanyards.app/oauth-client-metadata.json
-# → JSON whose client_id is https://next.lanyards.app/oauth-client-metadata.json
-curl -sI https://next.lanyards.app/oauth-client-metadata.json | grep -i content-type
+curl -s https://lanyards.app/oauth-client-metadata.json
+# → JSON whose client_id is https://lanyards.app/oauth-client-metadata.json
+curl -sI https://lanyards.app/oauth-client-metadata.json | grep -i content-type
 # → application/json
-curl -s -o /dev/null -w '%{http_code}\n' https://next.lanyards.app/settings
-# → 200
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.lanyards.app/renderg.host
+# → 308 https://lanyards.app/renderg.host
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
+  -H 'sec-fetch-dest: document' https://next.lanyards.app/renderg.host
+# → 308 https://lanyards.app/renderg.host
 ```
 
 Then sign in with a real account, check your name and handle on `/settings`,
@@ -185,5 +197,5 @@ sign out, and install the app on a phone and open it offline.
 
 Preview builds work, but Vercel protects previews with Vercel Authentication
 by default. Bluesky's servers can't fetch a protected preview's OAuth
-metadata, so **sign-in only works on `next.lanyards.app`** (or locally)
-unless you relax deployment protection for previews.
+metadata, so **sign-in only works on `lanyards.app`** (or locally) unless
+you relax deployment protection for previews.
