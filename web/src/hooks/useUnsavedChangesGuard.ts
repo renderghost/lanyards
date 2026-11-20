@@ -1,5 +1,36 @@
 import { useBlocker } from '@tanstack/react-router';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useSyncExternalStore,
+} from 'react';
+
+/** Guards that currently have changes to save, and who's listening. */
+let unsaved = 0;
+const listeners = new Set<() => void>();
+
+function changeUnsaved(by: number) {
+  unsaved += by;
+  for (const listener of listeners) listener();
+}
+
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+
+/**
+ * Whether any part of the app has unsaved changes: for things that are
+ * about to leave the page, such as the feedback permission sign-in (#134).
+ */
+export function useHasUnsavedChanges(): boolean {
+  return useSyncExternalStore(
+    subscribe,
+    () => unsaved > 0,
+    () => false
+  );
+}
 
 /**
  * While `dirty`, asks before leaving: `message` in a confirm for any move
@@ -20,6 +51,12 @@ export function useUnsavedChangesGuard(dirty: boolean, message: string): void {
     // Handled below, only while there are changes.
     enableBeforeUnload: false,
   });
+
+  useEffect(() => {
+    if (!dirty) return;
+    changeUnsaved(1);
+    return () => changeUnsaved(-1);
+  }, [dirty]);
 
   useEffect(() => {
     if (!dirty) return;

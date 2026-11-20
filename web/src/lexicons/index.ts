@@ -2,6 +2,8 @@ export * as AppLanyardsActorLanyard from "./types/app/lanyards/actor/lanyard.js"
 export * as AppLanyardsLinkMediaAudio from "./types/app/lanyards/link/media/audio.js";
 export * as AppLanyardsLinkMediaVideo from "./types/app/lanyards/link/media/video.js";
 export * as AppLanyardsMediaItem from "./types/app/lanyards/media/item.js";
+export * as AppUserinputDiscussion from "./types/app/userinput/discussion.js";
+export * as AppUserinputSpace from "./types/app/userinput/space.js";
 export * as CommunityLexiconLocationAddress from "./types/community/lexicon/location/address.js";
 export * as IdSifaDefs from "./types/id/sifa/defs.js";
 export * as IdSifaGetProfileView from "./types/id/sifa/getProfileView.js";

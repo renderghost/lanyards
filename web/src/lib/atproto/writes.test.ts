@@ -17,8 +17,10 @@ import {
   ScopeRefusedError,
   WRITABLE_COLLECTIONS,
   type WriteOp,
+  uploadBlob,
   WriteFailedError,
 } from './writes';
+import { FEEDBACK_SCOPE, GRANULAR_SCOPE } from './oauthConfig';
 
 const NOW = '2026-11-10T09:00:00.000Z';
 const CID = `bafyrei${'a'.repeat(52)}`;
@@ -169,13 +171,14 @@ describe('deleteRecord', () => {
 });
 
 describe('writable collections', () => {
-  it('are the five Lanyards writes', () => {
+  it('are the five Lanyards writes, and feedback to our board (#134)', () => {
     expect([...WRITABLE_COLLECTIONS].sort()).toEqual([
       'app.bsky.graph.follow',
       'app.lanyards.actor.lanyard',
       'app.lanyards.link.media.audio',
       'app.lanyards.link.media.video',
       'app.lanyards.media.item',
+      'app.userinput.discussion',
     ]);
   });
 
@@ -416,5 +419,77 @@ describe('applyWriteGroups', () => {
     );
     expect(failure).toBeInstanceOf(WriteFailedError);
     expect((failure as WriteFailedError).applied).toBe(9);
+  });
+});
+
+// Screenshots for feedback to our UserInput board (#134).
+describe('uploadBlob', () => {
+  const BLOB_CID = `bafkrei${'b'.repeat(52)}`;
+
+  it('uploads a blob and returns its reference', async () => {
+    const seen: { type: string | null; size: number }[] = [];
+    server.use(
+      http.post(
+        `${VIEWER_PDS}/xrpc/com.atproto.repo.uploadBlob`,
+        async ({ request }) => {
+          const body = await request.arrayBuffer();
+          seen.push({
+            type: request.headers.get('content-type'),
+            size: body.byteLength,
+          });
+          return HttpResponse.json({
+            blob: {
+              $type: 'blob',
+              ref: { $link: BLOB_CID },
+              mimeType: 'image/webp',
+              size: body.byteLength,
+            },
+          });
+        }
+      )
+    );
+    const image = new Blob([new Uint8Array(1234)], { type: 'image/webp' });
+    const ref = await uploadBlob(
+      session(`${GRANULAR_SCOPE} ${FEEDBACK_SCOPE}`),
+      image
+    );
+    expect(seen).toEqual([{ type: 'image/webp', size: 1234 }]);
+    expect(ref).toEqual({
+      $type: 'blob',
+      ref: { $link: BLOB_CID },
+      mimeType: 'image/webp',
+      size: 1234,
+    });
+  });
+
+  it('refuses an upload without the image permission, sending nothing', async () => {
+    let calls = 0;
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.uploadBlob`, () => {
+        calls += 1;
+        return HttpResponse.json({});
+      })
+    );
+    await expect(
+      uploadBlob(session(GRANULAR_SCOPE), new Blob([], { type: 'image/png' }))
+    ).rejects.toBeInstanceOf(MissingPermissionError);
+    expect(calls).toBe(0);
+  });
+
+  it('says a PDS that refuses the scope did so', async () => {
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.uploadBlob`, () =>
+        HttpResponse.json(
+          { error: 'InsufficientScope', message: 'Missing blob scope' },
+          { status: 403 }
+        )
+      )
+    );
+    await expect(
+      uploadBlob(
+        session(`${GRANULAR_SCOPE} ${FEEDBACK_SCOPE}`),
+        new Blob([new Uint8Array(4)], { type: 'image/webp' })
+      )
+    ).rejects.toBeInstanceOf(ScopeRefusedError);
   });
 });

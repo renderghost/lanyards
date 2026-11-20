@@ -17,6 +17,7 @@ export type AnalyticsEvent =
   | 'follow_deleted'
   | 'signed_out'
   | 'session_expired'
-  | 'pwa_update_applied';
+  | 'pwa_update_applied'
+  | 'feedback_sent';
 
 export type AnalyticsProps = Record<string, string | number | boolean>;

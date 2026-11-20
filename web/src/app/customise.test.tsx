@@ -195,6 +195,19 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(screen.getAllByRole('main')).toHaveLength(1);
   });
 
+  it('has the site footer, to send feedback (#134)', async () => {
+    servePerson();
+    renderRoute('/lanyard');
+    await preview();
+    const footers = screen.getAllByRole('contentinfo');
+    expect(footers).toHaveLength(1);
+    expect(
+      within(footers[0] as HTMLElement).getByRole('button', {
+        name: 'Send feedback',
+      })
+    ).toBeInTheDocument();
+  });
+
   it('lays the lanyard out beside a pinned style sidebar', async () => {
     servePerson();
     renderRoute('/lanyard');

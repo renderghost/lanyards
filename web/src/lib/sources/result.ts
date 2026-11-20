@@ -6,7 +6,9 @@ export type SourceName =
   | 'orcid'
   | 'tangled'
   | 'semble'
-  | 'lanyards';
+  | 'lanyards'
+  /** Our feedback board, not a lanyard's (#134). */
+  | 'userinput';
 
 export type SourceErrorKind =
   /** The person or record does not exist there. */

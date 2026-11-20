@@ -13,6 +13,7 @@ import { AppError } from '@/components/AppError/AppError';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { NotFound } from '@/components/NotFound/NotFound';
 import { OfflineBanner } from '@/components/OfflineBanner/OfflineBanner';
+import { SiteFooter } from '@/components/SiteFooter/SiteFooter';
 import { useFocusOnNavigation } from '@/hooks/useFocusOnNavigation';
 import { usePwaUpdatePrompt } from '@/hooks/usePwaUpdatePrompt';
 
@@ -62,6 +63,7 @@ function RootLayout() {
           </main>
         </>
       )}
+      <SiteFooter />
       <OfflineBanner />
     </div>
   );

@@ -10,4 +10,5 @@ export const SOURCE_LABELS: Record<SourceName, ReturnType<typeof msg>> = {
   tangled: msg`Tangled`,
   semble: msg`Semble`,
   lanyards: msg`Lanyards`,
+  userinput: msg`UserInput`,
 };

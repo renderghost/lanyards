@@ -15,11 +15,20 @@ export const GRANULAR_SCOPE = [
   'rpc?lxm=app.bsky.actor.getPreferences&lxm=app.bsky.graph.getBlocks&lxm=app.bsky.graph.getKnownFollowers&lxm=app.bsky.graph.getMutes&lxm=app.bsky.graph.getRelationships&aud=did:web:api.bsky.app%23bsky_appview',
 ].join(' ');
 
+/**
+ * Asked for only from the feedback page, on top of the granular scopes:
+ * posting feedback to our UserInput board, with screenshots (#134).
+ */
+export const FEEDBACK_SCOPE = [
+  'repo:app.userinput.discussion?action=create',
+  'blob:image/*',
+].join(' ');
+
 /** For servers that reject the granular scopes. */
 export const FALLBACK_SCOPE = 'atproto transition:generic';
 
 /** Everything the client may request, declared in its metadata. */
-export const CLIENT_SCOPE = `${GRANULAR_SCOPE} transition:generic`;
+export const CLIENT_SCOPE = `${GRANULAR_SCOPE} ${FEEDBACK_SCOPE} transition:generic`;
 
 /** Where new accounts are created when someone has no AT Protocol account. */
 export const SIGN_UP_PDS = 'https://bsky.social';

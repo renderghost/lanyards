@@ -41,6 +41,9 @@ export default defineLexiconConfig({
           'network.cosmik.collectionLink',
           'network.cosmik.card',
           'network.cosmik.defs',
+          // In-app feedback to our UserInput board (#134).
+          'app.userinput.discussion',
+          'app.userinput.space',
           // Referenced by the schemas above.
           'community.lexicon.location.address',
           'org.tangled.actor.defs',

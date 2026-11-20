@@ -8,13 +8,26 @@ import {
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { useUnsavedChangesGuard } from './useUnsavedChangesGuard';
+import {
+  useHasUnsavedChanges,
+  useUnsavedChangesGuard,
+} from './useUnsavedChangesGuard';
 
 const MESSAGE = 'Leave without saving? Your changes will be lost.';
 
 function Customiser({ dirty }: { dirty: boolean }) {
   useUnsavedChangesGuard(dirty, MESSAGE);
-  return <p>Customiser</p>;
+  return (
+    <>
+      <p>Customiser</p>
+      <Elsewhere />
+    </>
+  );
+}
+
+/** Another part of the app, e.g. feedback about to leave for sign-in. */
+function Elsewhere() {
+  return <p>{useHasUnsavedChanges() ? 'Unsaved' : 'All saved'}</p>;
 }
 
 /** The customiser at /lanyard, having come from /. */
@@ -100,5 +113,13 @@ describe('useUnsavedChangesGuard', () => {
     cleanup();
     await renderGuarded(false);
     expect(closing()).toBe(false);
+  });
+
+  it('tells the rest of the app while there are unsaved changes (#134)', async () => {
+    await renderGuarded(true);
+    expect(screen.getByText('Unsaved')).toBeInTheDocument();
+    cleanup();
+    await renderGuarded(false);
+    expect(screen.getByText('All saved')).toBeInTheDocument();
   });
 });

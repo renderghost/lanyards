@@ -1,0 +1,81 @@
+{
+  "id": "app.userinput.discussion",
+  "defs": {
+    "main": {
+      "key": "tid",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "required": [
+          "createdAt",
+          "space",
+          "title"
+        ],
+        "properties": {
+          "body": {
+            "type": "string",
+            "maxLength": 20000,
+            "maxGraphemes": 10000
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 64
+            },
+            "maxLength": 8,
+            "description": "Tag values drawn from the space's tag list."
+          },
+          "space": {
+            "ref": "com.atproto.repo.strongRef",
+            "type": "ref",
+            "description": "Strong reference to the app.userinput.space this belongs to. Indexed by constellation at space.uri."
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 600,
+            "maxGraphemes": 300
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "ref": "#image",
+              "type": "ref"
+            },
+            "maxLength": 4,
+            "description": "Optional image attachments."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          }
+        }
+      },
+      "description": "A piece of feedback posted into a space. Lives in the author's repo and points at the space."
+    },
+    "image": {
+      "type": "object",
+      "required": [
+        "image"
+      ],
+      "properties": {
+        "alt": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "image": {
+          "type": "blob",
+          "accept": [
+            "image/gif",
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+          ],
+          "maxSize": 1000000
+        }
+      }
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}

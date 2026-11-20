@@ -23,6 +23,11 @@ test.describe('QR sheet', () => {
     // The signed-in home is the customiser: '/' sends you on to it, and a
     // press on the header that's about to go is lost (a separate fix).
     await expect(page).toHaveURL('/lanyard');
+    // The URL changes before the customiser's header replaces the landing
+    // page's: wait for the customiser itself.
+    await expect(
+      page.getByRole('heading', { name: 'Customise your lanyard' })
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Show QR' }).click();
     await expect(
       page.getByRole('dialog', { name: 'Dr Ada Example' })

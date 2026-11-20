@@ -250,3 +250,105 @@ export async function mockOwnerWrites(page: Page): Promise<OwnerWrite[]> {
   );
   return writes;
 }
+
+/** @lanyards.app, whose UserInput board takes feedback (#134). */
+export const BOARD = {
+  owner: 'did:plc:ua3d6biqepazbq6mw4ysotfo',
+  uri: 'at://did:plc:ua3d6biqepazbq6mw4ysotfo/app.userinput.space/3mboard',
+  cid: `bafyrei${'b'.repeat(52)}`,
+};
+
+const BOARD_PDS = 'https://pds.lanyards.test';
+
+export type FeedbackSent = {
+  uploads: { type: string; size: number }[];
+  created: {
+    collection: string;
+    repo: string;
+    record: Record<string, unknown>;
+  }[];
+};
+
+/**
+ * Answers reads of our feedback board (none when `board` is false) and
+ * records feedback sent from the signed-in session (#134).
+ */
+export async function mockFeedback(
+  page: Page,
+  options: { board?: boolean } = {}
+): Promise<FeedbackSent> {
+  const sent: FeedbackSent = { uploads: [], created: [] };
+  // The resolver percent-encodes the DID in the path.
+  const ownerDocument = (url: URL) =>
+    url.hostname === 'plc.directory' &&
+    decodeURIComponent(url.pathname) === `/${BOARD.owner}`;
+  await page.route(ownerDocument, (route) =>
+    json(route, {
+      '@context': ['https://www.w3.org/ns/did/v1'],
+      id: BOARD.owner,
+      alsoKnownAs: ['at://lanyards.app'],
+      verificationMethod: [],
+      service: [
+        {
+          id: '#atproto_pds',
+          type: 'AtprotoPersonalDataServer',
+          serviceEndpoint: BOARD_PDS,
+        },
+      ],
+    })
+  );
+  await page.route(
+    `${BOARD_PDS}/xrpc/com.atproto.repo.listRecords**`,
+    (route) =>
+      json(route, {
+        records:
+          options.board === false
+            ? []
+            : [
+                {
+                  uri: BOARD.uri,
+                  cid: BOARD.cid,
+                  value: {
+                    $type: 'app.userinput.space',
+                    name: 'Lanyards',
+                    tags: [
+                      { value: 'bug', label: 'Bug' },
+                      { value: 'idea', label: 'Idea' },
+                      { value: 'question', label: 'Question' },
+                    ],
+                    createdAt: '2026-11-20T09:00:00.000Z',
+                  },
+                },
+              ],
+      })
+  );
+  await page.route(
+    'https://pds.e2e.test/xrpc/com.atproto.repo.uploadBlob',
+    (route) => {
+      const request = route.request();
+      const size = request.postDataBuffer()?.length ?? 0;
+      const type = request.headers()['content-type'] ?? '';
+      sent.uploads.push({ type, size });
+      return json(route, {
+        blob: {
+          $type: 'blob',
+          ref: { $link: `bafkrei${'c'.repeat(52)}` },
+          mimeType: type,
+          size,
+        },
+      });
+    }
+  );
+  await page.route(
+    'https://pds.e2e.test/xrpc/com.atproto.repo.createRecord',
+    (route) => {
+      const body = route.request().postDataJSON() as FeedbackSent['created'][0];
+      sent.created.push(body);
+      return json(route, {
+        uri: `at://${body.repo}/${body.collection}/3mfeedback`,
+        cid: CID,
+      });
+    }
+  );
+  return sent;
+}
