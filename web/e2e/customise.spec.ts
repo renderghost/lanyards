@@ -17,6 +17,7 @@ const LANYARD = 'app.lanyards.actor.lanyard';
 
 type Lanyard = {
   accent?: string;
+  badge?: { cover?: string; showRole?: boolean };
   blocks: { type: string; visible: boolean }[];
   hidden: string[];
 };
@@ -169,6 +170,21 @@ test.describe('lanyard customiser', () => {
       type: 'talks',
       visible: false,
     });
+  });
+
+  test('picks a cover in Style and saves it (#129)', async ({ page }) => {
+    await openCustomiser(page);
+    await page.getByRole('button', { name: 'Cover' }).click();
+    // Ada's cover until she picks one comes from her DID: Pixels.
+    await expect(page.getByRole('radio', { name: 'Pixels' })).toBeChecked();
+    await page.getByRole('radio', { name: 'Hazard' }).click();
+    await expect(page.getByRole('radio', { name: 'Hazard' })).toBeChecked();
+    await expect(page.getByText('Unsaved changes')).toBeVisible();
+    await saveChanges(page);
+    await expect(page.getByText('All changes saved')).toBeVisible();
+    const saves = lanyardSaves(writes);
+    expect(saves).toHaveLength(1);
+    expect(saves[0]?.badge).toMatchObject({ cover: 'hazard' });
   });
 
   test('adds a podcast in the dialog and saves it', async ({ page }) => {

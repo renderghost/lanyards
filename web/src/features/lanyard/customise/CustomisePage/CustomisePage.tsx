@@ -6,10 +6,12 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { AppHeader } from '@/components/AppHeader/AppHeader';
 import { Button } from '@/components/Button/Button';
 import { PermissionNotice } from '@/features/auth/components/PermissionNotice/PermissionNotice';
+import { initialsOf } from '@/design/covers';
 import { useSession } from '@/features/auth/session/useSession';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { useUnsavedChangesGuard } from '@/hooks/useUnsavedChangesGuard';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
+import { useProfile } from '@/lib/atproto/useProfile';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
 
@@ -77,6 +79,11 @@ function Customiser({
   const { t } = useLingui();
   const headingId = useId();
   const draft = useCustomiserDraft(did);
+  // For the monogram cover's preview.
+  const profile = useProfile(did);
+  const initials = initialsOf(
+    profile.data?.displayName || profile.data?.handle || ''
+  );
   const { settings, records } = draft;
   const [viewAs, setViewAs] = useState<ViewAs>('edit');
   /** On phones, the style sheet opened from the bottom toolbar. */
@@ -130,6 +137,8 @@ function Customiser({
         <div className={cn(styles.workspace, className)}>
           {editing && (
             <StyleSidebar
+              did={did}
+              initials={initials}
               config={settings.config}
               disabled={disabled}
               onChange={update}
@@ -197,6 +206,8 @@ function Customiser({
         open={styleOpen}
         onOpenChange={setStyleOpen}
         returnFocus={() => styleButton.current?.focus()}
+        did={did}
+        initials={initials}
         config={settings.config}
         disabled={disabled}
         onChange={update}

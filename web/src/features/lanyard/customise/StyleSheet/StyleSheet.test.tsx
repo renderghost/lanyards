@@ -19,6 +19,8 @@ function Harness() {
       <StyleSheet
         open={open}
         onOpenChange={setOpen}
+        did="did:plc:fixturealiceaaaaaaaaaaaa"
+        initials="AE"
         config={resolveConfig(null)}
         disabled={false}
         onChange={vi.fn()}

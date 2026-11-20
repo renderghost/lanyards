@@ -61,7 +61,7 @@ msgid "A new version of Lanyards is available"
 msgstr "A new version of Lanyards is available"
 
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.tsx:26
-#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:23
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:41
 msgid "Accent colour"
 msgstr "Accent colour"
 
@@ -102,6 +102,10 @@ msgstr "Anchor"
 msgid "Apple Podcasts"
 msgstr "Apple Podcasts"
 
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:13
+msgid "Arrows"
+msgstr "Arrows"
+
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:26
 msgid "Articles"
 msgstr "Articles"
@@ -110,7 +114,7 @@ msgstr "Articles"
 msgid "Audio"
 msgstr "Audio"
 
-#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:37
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:70
 msgid "Badge"
 msgstr "Badge"
 
@@ -122,7 +126,7 @@ msgstr "Being mentored"
 msgid "Blocks"
 msgstr "Blocks"
 
-#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:57
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:95
 msgid "Blocks, links and items are edited on your lanyard."
 msgstr "Blocks, links and items are edited on your lanyard."
 
@@ -245,6 +249,11 @@ msgstr "Couldn't start creating an account. Please try again."
 msgid "Couldn't start sign-in. Please try again."
 msgstr "Couldn't start sign-in. Please try again."
 
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.tsx:27
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:55
+msgid "Cover"
+msgstr "Cover"
+
 #: src/features/lanyard/components/VisitorActions/VisitorActions.tsx:65
 msgid "Create account"
 msgstr "Create account"
@@ -253,7 +262,7 @@ msgstr "Create account"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:141
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:150
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -277,6 +286,10 @@ msgstr "Details"
 #: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:27
 msgid "Discard your unsaved changes?"
 msgstr "Discard your unsaved changes?"
+
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:7
+msgid "Dots"
+msgstr "Dots"
 
 #: src/features/lanyard/customise/CustomiserActions/CustomiserActions.tsx:36
 msgid "Edit"
@@ -323,7 +336,7 @@ msgid "Failed to follow. Please try again."
 msgstr "Failed to follow. Please try again."
 
 #: src/features/lanyard/hooks/useCustomiserDraft.ts:96
-#: src/features/lanyard/hooks/useLanyardDraft.ts:346
+#: src/features/lanyard/hooks/useLanyardDraft.ts:351
 msgid "Failed to save. Please try again."
 msgstr "Failed to save. Please try again."
 
@@ -387,6 +400,10 @@ msgstr "Give permission"
 msgid "Go to the home page"
 msgstr "Go to the home page"
 
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:12
+msgid "Hazard"
+msgstr "Hazard"
+
 #: src/features/lanyard/components/blocks/CardItem/CardItem.tsx:69
 #: src/features/lanyard/components/blocks/ItemFrame/ItemFrame.tsx:34
 msgid "Hidden"
@@ -442,7 +459,7 @@ msgid "Lanyard unavailable"
 msgstr "Lanyard unavailable"
 
 #: src/features/lanyard/hooks/useCustomiserDraft.ts:106
-#: src/features/lanyard/hooks/useLanyardDraft.ts:329
+#: src/features/lanyard/hooks/useLanyardDraft.ts:334
 msgid "Lanyard updated"
 msgstr "Lanyard updated"
 
@@ -482,7 +499,7 @@ msgstr "Loading your profile…"
 
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:55
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -501,6 +518,10 @@ msgstr "Mentoring others"
 #: src/features/lanyard/customise/AccentPicker/AccentPicker.constants.ts:8
 msgid "Mint"
 msgstr "Mint"
+
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:14
+msgid "Monogram"
+msgstr "Monogram"
 
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:82
 msgid "Move {name} down"
@@ -544,6 +565,10 @@ msgstr "Open Sifa"
 msgid "Open to"
 msgstr "Open to"
 
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:10
+msgid "Orb"
+msgstr "Orb"
+
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:9
 msgid "ORCID"
 msgstr "ORCID"
@@ -582,6 +607,10 @@ msgstr "Picked up {name}, at position {position} of {total}."
 msgid "Pink"
 msgstr "Pink"
 
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:9
+msgid "Pixels"
+msgstr "Pixels"
+
 #: src/features/lanyard/customise/MediaForm/MediaForm.tsx:165
 msgid "Platform"
 msgstr "Platform"
@@ -598,7 +627,7 @@ msgstr "Podcasts and videos"
 msgid "Post on Bluesky, {date}"
 msgstr "Post on Bluesky, {date}"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:172
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:181
 msgid "Preview"
 msgstr "Preview"
 
@@ -640,7 +669,7 @@ msgstr "Reordering cancelled. {name} stayed where it was."
 msgid "Reset"
 msgstr "Reset"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:162
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:171
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
@@ -648,7 +677,7 @@ msgstr "Reset to defaults"
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:131
 #: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:244
 #: src/features/lanyard/hooks/useCustomiserDraft.ts:98
-#: src/features/lanyard/hooks/useLanyardDraft.ts:349
+#: src/features/lanyard/hooks/useLanyardDraft.ts:354
 msgid "Retry"
 msgstr "Retry"
 
@@ -684,17 +713,25 @@ msgstr "Show {name}"
 msgid "Show {title}"
 msgstr "Show {title}"
 
-#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:50
-msgid "Show current job"
-msgstr "Show current job"
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:30
+msgid "Show current role"
+msgstr "Show current role"
 
 #: src/features/lanyard/components/LanyardNotFound/LanyardNotFound.tsx:48
 msgid "Show lanyard"
 msgstr "Show lanyard"
 
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:31
+msgid "Show location"
+msgstr "Show location"
+
 #: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:54
 msgid "Show QR"
 msgstr "Show QR"
+
+#: src/features/lanyard/customise/StylePanel/StylePanel.tsx:32
+msgid "Show what you’re open to"
+msgstr "Show what you’re open to"
 
 #: src/features/lanyard/components/BlockSection/BlockSection.constants.ts:7
 msgid "Sifa"
@@ -767,11 +804,19 @@ msgstr "Spotify"
 msgid "standard.site"
 msgstr "standard.site"
 
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:8
+msgid "Stripes"
+msgstr "Stripes"
+
 #: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:57
 #: src/features/lanyard/customise/StyleSheet/StyleSheet.tsx:21
 #: src/features/lanyard/customise/StyleSidebar/StyleSidebar.tsx:16
 msgid "Style"
 msgstr "Style"
+
+#: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:11
+msgid "Symbols"
+msgstr "Symbols"
 
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:24
 msgid "Talks"
@@ -785,7 +830,7 @@ msgstr "Tangled"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:155
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:164
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -858,7 +903,7 @@ msgstr "Unsaved changes"
 msgid "Update"
 msgstr "Update"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:147
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:156
 msgid "Updating your podcasts and videos…"
 msgstr "Updating your podcasts and videos…"
 
@@ -914,7 +959,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:152
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:161
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
@@ -938,7 +983,7 @@ msgstr "You can hide up to 500 items. Show some again first."
 msgid "You follow each other"
 msgstr "You follow each other"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:110
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:117
 msgid "You have unsaved changes. Leave without saving?"
 msgstr "You have unsaved changes. Leave without saving?"
 
@@ -950,7 +995,7 @@ msgstr "You're offline. Connect to sign in."
 msgid "You're offline. Some things won't work until you reconnect."
 msgstr "You're offline. Some things won't work until you reconnect."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:168
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:177
 msgid "You’re seeing your lanyard as the public sees it."
 msgstr "You’re seeing your lanyard as the public sees it."
 
@@ -972,9 +1017,9 @@ msgstr "Your conference lanyard, from your AT Protocol account"
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:41
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:50
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:116
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:43
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:52
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:123
 #: src/features/qr/components/QrSheet/QrSheet.tsx:28
 msgid "Your lanyard"
 msgstr "Your lanyard"

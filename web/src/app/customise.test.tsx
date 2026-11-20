@@ -111,7 +111,7 @@ async function jobCheckbox() {
     { timeout: 5000 }
   );
   await userEvent.click(within(sidebar).getByRole('button', { name: 'Badge' }));
-  return within(sidebar).getByRole('checkbox', { name: 'Show current job' });
+  return within(sidebar).getByRole('checkbox', { name: 'Show current role' });
 }
 
 /** Presses the customiser's Save. */
@@ -332,7 +332,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(saves).toEqual([]);
   });
 
-  it('saves the current-job switch', async () => {
+  it('saves the current-role switch', async () => {
     servePerson();
     const saves = captureSaves();
     renderRoute('/lanyard');
