@@ -1,6 +1,6 @@
 // One line, never wider than its row; long labels truncate (#122).
 export const pill =
-  'inline-flex min-h-11 max-w-full items-center rounded-sm border border-border text-foreground';
+  'inline-flex min-h-11 max-w-full items-center rounded-sm border border-border bg-surface text-foreground';
 
 // On the public lanyard: the pill's own padding.
 export const plain = 'gap-2 px-4';
@@ -22,6 +22,6 @@ export const content =
 // Only pictures fade: faded text would fall below 4.5:1 (WCAG 1.4.3).
 export const faded = '[&_img]:opacity-50 [&_img]:grayscale [&_svg]:opacity-50';
 
-export const label = 'truncate text-[15px] leading-[22px]';
+export const label = 'truncate text-[15px] font-[550] leading-[22px]';
 
 export const srOnly = 'sr-only';

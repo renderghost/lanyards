@@ -70,9 +70,7 @@ describe('PillItem', () => {
       <PillItem itemKey="mentoring" title="Mentoring" label="Mentoring" />
     );
     expect(screen.queryByRole('link')).toBeNull();
-    expect(
-      screen.getByText('Mentoring').closest('.rounded-sm')
-    ).not.toBeNull();
+    expect(screen.getByText('Mentoring').closest('.rounded-sm')).not.toBeNull();
   });
 
   it('a long label truncates inside its pill', () => {

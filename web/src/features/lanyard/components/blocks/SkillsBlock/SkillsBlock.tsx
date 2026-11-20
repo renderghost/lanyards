@@ -18,6 +18,7 @@ export function SkillsBlock({ items, className }: SkillsBlockProps) {
             itemKey={skill.key}
             title={itemTitle('skills', skill, i18n)}
             label={skill.name}
+            className={styles.chip}
           />
         </li>
       ))}

@@ -25,16 +25,31 @@ test.describe('public lanyard, signed out', () => {
   });
 
   for (const colorScheme of ['light', 'dark'] as const) {
-    test(`has no accessibility violations (${colorScheme})`, async ({
-      page,
-    }) => {
-      await mockPerson(page);
-      await page.emulateMedia({ colorScheme });
-      await page.goto('/@alice.test');
-      await expect(page.getByRole('region', { name: 'Talks' })).toBeVisible();
-      const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-      expect(result.violations).toEqual([]);
-    });
+    for (const accent of ['mint', 'blue'] as const) {
+      test(`has no accessibility violations (${colorScheme}, ${accent})`, async ({
+        page,
+      }) => {
+        await mockPerson(page, {
+          config: {
+            accent,
+            blocks: [
+              { type: 'links', visible: true },
+              { type: 'openTo', visible: true },
+              { type: 'talks', visible: true },
+              { type: 'skills', visible: true },
+            ],
+          },
+        });
+        await page.emulateMedia({ colorScheme });
+        await page.goto('/@alice.test');
+        await expect(page.getByRole('region', { name: 'Talks' })).toBeVisible();
+        await expect(
+          page.getByRole('region', { name: 'Open to' })
+        ).toBeVisible();
+        const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+        expect(result.violations).toEqual([]);
+      });
+    }
   }
 
   test('fits a 320px-wide screen without sideways scrolling', async ({

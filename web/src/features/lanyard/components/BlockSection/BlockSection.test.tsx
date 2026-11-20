@@ -23,7 +23,7 @@ describe('BlockSection', () => {
     );
     const region = screen.getByRole('region', { name: 'Links' });
     // Opaque, so a block being dragged never shows the one beneath.
-    expect(region).toHaveClass('bg-background');
+    expect(region).toHaveClass('bg-surface');
     const header = region.querySelector<HTMLElement>('[data-block-header]');
     expect(header).not.toBeNull();
     const order = [
@@ -73,6 +73,18 @@ describe('BlockSection', () => {
       screen.getByRole('heading', { level: 2, name: 'Talks' })
     ).toBeInTheDocument();
     await expectNoAxeViolations(container);
+  });
+
+  it('marks its heading with a decorative accent square (#128)', () => {
+    renderWithProviders(
+      <BlockSection heading="Talks" status="ready" owner={false}>
+        <p>Content</p>
+      </BlockSection>
+    );
+    const heading = screen.getByRole('heading', { level: 2, name: 'Talks' });
+    // Drawn by CSS: nothing for assistive technology to announce.
+    expect(heading).toHaveClass('before:bg-accent', 'before:size-2');
+    expect(heading.childElementCount).toBe(0);
   });
 
   it('marks itself busy while loading', () => {
