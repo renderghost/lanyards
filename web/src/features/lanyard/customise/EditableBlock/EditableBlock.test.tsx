@@ -57,19 +57,30 @@ function renderBlock(
 }
 
 describe('EditableBlock', () => {
-  it('shows its bar above the block and its items', () => {
+  it('names the block once, in its header row with its controls', () => {
     renderBlock(LINKS);
     expect(screen.getByRole('switch', { name: 'Show Links' })).toBeChecked();
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Links' })
-    ).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { level: 2, name: 'Links' });
+    expect(screen.getAllByText('Links')).toEqual([heading]);
+    const header = heading.closest('[data-block-header]');
+    expect(header).toContainElement(
+      screen.getByRole('switch', { name: 'Show Links' })
+    );
+    expect(header).toContainElement(
+      screen.getByRole('button', { name: 'Reorder Links' })
+    );
     expect(screen.getByText('Website')).toBeInTheDocument();
   });
 
-  it('collapses to its bar when hidden from visitors', () => {
+  it('collapses to its header row when hidden from visitors', () => {
     renderBlock({ ...LINKS, visible: false });
     expect(screen.getByText('Hidden from visitors')).toBeInTheDocument();
-    expect(screen.queryByRole('heading', { name: 'Links' })).toBeNull();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Links' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'Links' })).toHaveAttribute(
+      'data-collapsed'
+    );
     expect(screen.queryByText('Website')).toBeNull();
   });
 

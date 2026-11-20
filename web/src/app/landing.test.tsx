@@ -20,6 +20,9 @@ beforeEach(() => {
   server.use(http.get(TYPEAHEAD_URL, () => HttpResponse.json({ actors: [] })));
 });
 
+/** The redirect loads a lazy route, which compiles cold under a full run. */
+const LAZY_ROUTE_TIMEOUT = 5000;
+
 describe('landing page', () => {
   it('shows the sign-in form to signed-out visitors', async () => {
     vi.mocked(useSession).mockReturnValue({
@@ -40,18 +43,18 @@ describe('landing page', () => {
   it('sends a signed-in visitor to their lanyard', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/');
-    await waitForRoute(router, '/lanyard');
+    await waitForRoute(router, '/lanyard', LAZY_ROUTE_TIMEOUT);
   });
 
   it('honours a safe return path for signed-in visitors', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/?returnTo=%2Fsettings%3Ftab%3Ddata');
-    await waitForRoute(router, '/settings?tab=data');
+    await waitForRoute(router, '/settings?tab=data', LAZY_ROUTE_TIMEOUT);
   });
 
   it('ignores an unsafe return path', async () => {
     vi.mocked(useSession).mockReturnValue(signedIn);
     const { router } = renderRoute('/?returnTo=%2F%2Fevil.com');
-    await waitForRoute(router, '/lanyard');
+    await waitForRoute(router, '/lanyard', LAZY_ROUTE_TIMEOUT);
   });
 });

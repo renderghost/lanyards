@@ -4,8 +4,8 @@ export const main = 'flex flex-1 flex-col';
 // The style sidebar (from md up), then the canvas holding the lanyard.
 export const workspace = 'flex flex-1 items-stretch';
 
-export const canvas =
-  'flex min-w-0 flex-1 flex-col items-center gap-6 bg-ui-canvas px-4 py-6 md:px-8 md:py-8';
+// The lanyard's own ground (LanyardSurface): no box round the lanyard.
+export const canvas = 'min-w-0 items-center gap-6 px-4 py-6 md:px-8 md:py-8';
 
 export const intro = 'flex w-full max-w-[640px] flex-col gap-3';
 
@@ -15,10 +15,9 @@ export const heading =
 export const publicNote =
   'rounded-lg border border-ui-border bg-ui-surface px-4 py-3 text-[13px] leading-[18px] text-ui-text-muted';
 
-// The lanyard brings its own ground (LanyardSurface, as a card).
 export const frame = 'w-full max-w-[640px]';
 
-// A neutral canvas; the lanyard inside brings its own ground.
+// While the session loads, before the lanyard's ground is drawn.
 export const loading =
   'px-4 py-6 text-[15px] leading-[22px] text-ui-text-muted';
 

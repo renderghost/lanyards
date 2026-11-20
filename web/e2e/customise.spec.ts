@@ -258,7 +258,7 @@ test.describe('lanyard customiser', () => {
   test('changes a counted block’s count', async ({ page }) => {
     await openCustomiser(page);
     await page
-      .getByRole('combobox', { name: 'Items to show for Posts on Bluesky' })
+      .getByRole('combobox', { name: 'Items to show for Social posts' })
       .selectOption('5');
     await saveChanges(page);
     await expect.poll(() => lanyardSaves(writes).length).toBe(1);
@@ -359,22 +359,28 @@ test.describe('lanyard customiser', () => {
     expect(hidden).toEqual([]);
   });
 
-  test('names every block in full on its bar at 390 px', async ({ page }) => {
+  test('names every block in full in its header row at 390 px', async ({
+    page,
+  }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await openCustomiser(page);
-    // A hidden counted block: the longest bar, with "Hidden from visitors".
+    // A hidden counted block: the longest row, with "Hidden from visitors".
     await page.getByRole('switch', { name: 'Show Publications' }).click();
     const clipped = await page.evaluate(() =>
       [...document.querySelectorAll<HTMLElement>('[data-block]')].flatMap(
         (block) => {
-          const bar = block.firstElementChild as HTMLElement;
-          const [label, controls] = [...bar.children].slice(1) as HTMLElement[];
-          const texts = [...(label?.querySelectorAll('span') ?? [])];
+          const header = block.querySelector<HTMLElement>(
+            '[data-block-header]'
+          );
+          const title = header?.querySelector('h2')?.parentElement;
+          const controls = header?.lastElementChild as HTMLElement | null;
+          if (!header || !title || !controls) return [block.dataset.block];
+          const texts = [...title.children] as HTMLElement[];
           const cut = texts.filter(
             (text) => text.scrollWidth > text.clientWidth + 1
           );
-          const a = label!.getBoundingClientRect();
-          const b = controls!.getBoundingClientRect();
+          const a = title.getBoundingClientRect();
+          const b = controls.getBoundingClientRect();
           const overlap =
             a.right > b.left + 1 &&
             a.bottom > b.top + 1 &&
@@ -384,6 +390,22 @@ test.describe('lanyard customiser', () => {
       )
     );
     expect(clipped).toEqual([]);
+  });
+
+  test('pill links in the editor are 44 px targets at 390 px', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openCustomiser(page);
+    const heights = await page
+      .locator('[data-block="links"] [data-hidden], [data-block="links"] li a')
+      .evaluateAll((links) =>
+        links
+          .filter((link) => link.tagName === 'A')
+          .map((link) => link.getBoundingClientRect().height)
+      );
+    expect(heights.length).toBeGreaterThan(0);
+    expect(Math.min(...heights)).toBeGreaterThanOrEqual(44);
   });
 
   test('opens the style sheet on a phone (390 × 844)', async ({ page }) => {

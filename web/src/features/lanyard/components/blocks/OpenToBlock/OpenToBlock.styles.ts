@@ -1,1 +1,3 @@
-export { chip, chips } from '../shared.styles';
+export { pills } from '../shared.styles';
+
+export const item = 'max-w-full';

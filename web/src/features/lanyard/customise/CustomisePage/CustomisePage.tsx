@@ -14,6 +14,7 @@ import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 import { cn } from '@/lib/utils';
 
 import { LanyardPage } from '../../components/LanyardPage/LanyardPage';
+import { LanyardSurface } from '../../components/LanyardSurface/LanyardSurface';
 import { KEPT_LISTS, useCustomiserDraft } from '../../hooks/useCustomiserDraft';
 import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
@@ -125,7 +126,7 @@ function Customiser({
               onChange={update}
             />
           )}
-          <div className={styles.canvas}>
+          <LanyardSurface className={styles.canvas}>
             <div className={styles.intro}>
               <h1 id={headingId} className={styles.heading}>
                 {t`Customise your lanyard`}
@@ -170,7 +171,7 @@ function Customiser({
                 <LanyardPage did={did} preview="visitor" />
               )}
             </section>
-          </div>
+          </LanyardSurface>
         </div>
         <CustomiserToolbar
           onOpenStyle={() => setStyleOpen(true)}

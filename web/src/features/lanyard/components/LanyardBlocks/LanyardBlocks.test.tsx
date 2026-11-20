@@ -7,6 +7,7 @@ import type { BlockView } from '@/lib/person/personView.types';
 import { renderWithProviders } from '@/test/render';
 
 import { LanyardBlocks } from './LanyardBlocks';
+import { BLOCK_HEADINGS } from './LanyardBlocks.constants';
 
 vi.mock('@/lib/analytics/analytics', () => ({ captureError: vi.fn() }));
 // The Talks block can't render a talk titled "Bad", as a block might fail
@@ -34,6 +35,13 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.mocked(console.error).mockRestore();
+});
+
+describe('block names', () => {
+  it('calls the feeds Articles and Social posts', () => {
+    expect(BLOCK_HEADINGS.blogPosts.message).toBe('Articles');
+    expect(BLOCK_HEADINGS.bskyPosts.message).toBe('Social posts');
+  });
 });
 
 describe('LanyardBlocks', () => {

@@ -152,20 +152,33 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(document.title).toBe('Your lanyard · Lanyards');
   });
 
-  it('frames the lanyard on its own ground inside the preview', async () => {
+  it('the lanyard sits on its own ground, with no box round it', async () => {
     servePerson();
-    renderRoute('/lanyard');
+    const { container } = renderRoute('/lanyard');
     const region = await preview();
-    const name = await within(region).findByRole(
+    await within(region).findByRole(
       'heading',
       { level: 2, name: 'Dr Ada Example' },
       { timeout: 5000 }
     );
-    // The lanyard brings its own ground; the customiser around it is neutral.
-    const ground = name.closest<HTMLElement>('.bg-background');
-    expect(ground).not.toBeNull();
-    expect(ground).not.toBe(region);
-    expect(region).toContainElement(ground);
+    const grounds = () =>
+      container.querySelectorAll<HTMLElement>('[data-lanyard-surface]');
+    // One ground: the canvas itself, holding the heading and the lanyard.
+    expect(grounds()).toHaveLength(1);
+    const [ground] = grounds();
+    expect(ground).toContainElement(region);
+    expect(ground).toContainElement(
+      screen.getByRole('heading', { level: 1, name: 'Customise your lanyard' })
+    );
+    await userEvent.click(
+      screen.getByRole('button', { name: 'View as public' })
+    );
+    await within(await preview()).findByRole(
+      'heading',
+      { level: 2, name: 'Dr Ada Example' },
+      { timeout: 5000 }
+    );
+    expect(grounds()).toHaveLength(1);
   });
 
   it('shows only its own header, with the customiser’s actions', async () => {

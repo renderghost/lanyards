@@ -18,6 +18,14 @@ export type BlockSectionProps = {
   onCrash?(error: unknown): void;
   /** Where the owner edits this block's data (Sifa, Bluesky). */
   editLinks?: { label: string; url: string }[];
+  /** Before the name: the customiser's drag handle. */
+  handle?: ReactNode;
+  /** Under the name, e.g. "Hidden from visitors". */
+  note?: string;
+  /** After the Edit-on links: the customiser's block controls. */
+  controls?: ReactNode;
+  /** Only the header row, in a dashed frame (a hidden block). */
+  collapsed?: boolean;
   children?: ReactNode;
   className?: string;
 };
