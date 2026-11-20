@@ -162,10 +162,10 @@ test.describe('the homepage’s hero (#151)', () => {
     await expect
       .poll(() => swayOf(page), { timeout: 2000 })
       .toMatch(/^rotate\(-?[\d.]+deg\)$/);
-    // Never more than a couple of degrees.
+    // A few degrees at most, and still again within about three seconds.
     const angle = Number(/-?[\d.]+/.exec((await swayOf(page)) ?? '')?.[0]);
-    expect(Math.abs(angle)).toBeLessThan(2);
-    await expect.poll(() => swayOf(page), { timeout: 8000 }).toBe('');
+    expect(Math.abs(angle)).toBeLessThan(4);
+    await expect.poll(() => swayOf(page), { timeout: 4000 }).toBe('');
   });
 
   test('keeps the badge still with reduced motion', async ({ page }) => {
