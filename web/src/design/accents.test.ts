@@ -42,6 +42,12 @@ const ACCENT_VARS = [
   '--cover-ground',
   '--cover-mark',
   '--cover-partner',
+  '--board-label',
+  '--badge-button',
+  '--on-badge-button',
+  '--qr-ground',
+  '--qr-strap',
+  '--qr-close',
 ];
 
 describe('base tokens', () => {
@@ -150,6 +156,43 @@ describe('accent palettes', () => {
     expect(
       contrastRatio(p['--focus-ring-on-accent']!, p['--accent']!)
     ).toBeGreaterThanOrEqual(3);
+  });
+
+  // The badge (#129) looks the same in light and dark: its departure
+  // board is always brand ink, and its button sits on the accent field.
+  it.each(cases)('%s/%s: board labels read on the badge ink', (a, m) => {
+    const p = palette(a, m);
+    // Dark mode inherits what it doesn't redefine, as the cascade does.
+    const b = { ...base('light'), ...base(m) };
+    const ink = b['--badge-ink']!;
+    expect(contrastRatio(p['--board-label']!, ink)).toBeGreaterThanOrEqual(4.5);
+    expect(contrastRatio(b['--on-badge-ink']!, ink)).toBeGreaterThanOrEqual(7);
+  });
+
+  it.each(cases)('%s/%s: the badge button stands out on the field', (a, m) => {
+    const p = palette(a, m);
+    expect(
+      contrastRatio(p['--on-badge-button']!, p['--badge-button']!)
+    ).toBeGreaterThanOrEqual(7);
+    expect(
+      contrastRatio(p['--badge-button']!, p['--accent']!)
+    ).toBeGreaterThanOrEqual(3);
+  });
+
+  // The Show QR badge stands on brand blue, or ink when the card is blue.
+  it.each(cases)('%s/%s: the Show QR actions stand out', (a, m) => {
+    const p = palette(a, m);
+    expect(contrastRatio('#ffffff', p['--qr-close']!)).toBeGreaterThanOrEqual(
+      7
+    );
+    // Copy link is white on the ground; Close must differ from it too.
+    expect(contrastRatio('#ffffff', p['--qr-ground']!)).toBeGreaterThanOrEqual(
+      3
+    );
+    expect(p['--qr-close']).not.toBe(p['--qr-ground']);
+    expect(contrastRatio(p['--accent']!, p['--qr-ground']!)).toBeGreaterThan(
+      1.5
+    );
   });
 
   it.each([

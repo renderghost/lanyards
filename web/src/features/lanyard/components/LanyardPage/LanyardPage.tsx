@@ -10,18 +10,19 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { profileId } from '@/lib/atproto/profileId';
 import { track } from '@/lib/analytics/analytics';
 import { BLOCK_SOURCES } from '@/lib/person/blocks';
+import { boardCells } from '@/lib/person/hero';
 import { usePersonView } from '@/lib/person/usePersonView';
 import { useSharedContext } from '@/lib/person/useSharedContext';
 import { cn } from '@/lib/utils';
 
 import { BadgeHero } from '../BadgeHero/BadgeHero';
+import { HeroActions } from '../HeroActions/HeroActions';
 import { LanyardBlocks } from '../LanyardBlocks/LanyardBlocks';
 import { LanyardNotice } from '../LanyardNotice/LanyardNotice';
 import { LanyardProblem } from '../LanyardProblem/LanyardProblem';
 import { LanyardSkeleton } from '../LanyardSkeleton/LanyardSkeleton';
 import { LanyardSurface } from '../LanyardSurface/LanyardSurface';
 import { SharedContextStrip } from '../SharedContextStrip/SharedContextStrip';
-import { VisitorActions } from '../VisitorActions/VisitorActions';
 import { NO_UNAUTHENTICATED } from './LanyardPage.constants';
 import * as styles from './LanyardPage.styles';
 import type { LanyardPageProps } from './LanyardPage.types';
@@ -78,7 +79,8 @@ export function LanyardPage({
     );
   }
 
-  if (view.profile.status === 'loading' || !view.hero || shared.checkingBlock) {
+  // The hero waits briefly for Sifa and the owner's record (spec §7).
+  if (!view.heroReady || !view.hero || shared.checkingBlock) {
     return frame(<LanyardSkeleton className={className} />);
   }
 
@@ -104,42 +106,46 @@ export function LanyardPage({
 
   return frame(
     <article className={cn(styles.page, className)}>
-      <BadgeHero hero={view.hero} headingLevel={preview ? 2 : 1} />
-      {!preview && (
-        <>
+      <BadgeHero
+        hero={view.hero}
+        headingLevel={preview ? 2 : 1}
+        boardPending={view.sifaPending ? boardCells(view.config) : undefined}
+        actions={
+          !preview && (
+            <HeroActions did={did} handle={view.hero.handle} mode={view.mode} />
+          )
+        }
+      />
+      <div className={styles.column}>
+        {!preview && (
           <SharedContextStrip
             mutual={shared.mutual}
             knownFollowers={shared.knownFollowers}
           />
-          <VisitorActions
-            did={did}
-            handle={view.hero.handle}
-            owner={view.mode === 'owner'}
-          />
-        </>
-      )}
-      {view.configError && view.mode === 'owner' && (
-        <div className={styles.problem} role="status">
-          <p
-            className={styles.text}
-          >{t`Couldn't load your lanyard settings`}</p>
-          <Button
-            tone="accent"
-            variant="secondary"
-            onClick={() => view.retry('lanyards')}
-          >
-            {t`Retry`}
-          </Button>
-        </div>
-      )}
-      <LanyardBlocks
-        blocks={view.blocks}
-        owner={view.mode === 'owner'}
-        profile={profileId(did, view.hero.handle)}
-        onRetry={(type) =>
-          Promise.allSettled(BLOCK_SOURCES[type].map(view.retry))
-        }
-      />
+        )}
+        {view.configError && view.mode === 'owner' && (
+          <div className={styles.problem} role="status">
+            <p
+              className={styles.text}
+            >{t`Couldn't load your lanyard settings`}</p>
+            <Button
+              tone="accent"
+              variant="secondary"
+              onClick={() => view.retry('lanyards')}
+            >
+              {t`Retry`}
+            </Button>
+          </div>
+        )}
+        <LanyardBlocks
+          blocks={view.blocks}
+          owner={view.mode === 'owner'}
+          profile={profileId(did, view.hero.handle)}
+          onRetry={(type) =>
+            Promise.allSettled(BLOCK_SOURCES[type].map(view.retry))
+          }
+        />
+      </div>
     </article>
   );
 }

@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 
 import { expect, test } from './fixtures';
-import { ADA, mockPerson, signIn } from './mocks';
+import { ADA, BEA, mockPerson, mockViewer, signIn } from './mocks';
 
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
@@ -20,9 +20,12 @@ test.describe('QR sheet', () => {
   }) => {
     const started = Date.now();
     await page.goto('/');
+    // The signed-in home is the customiser: '/' sends you on to it, and a
+    // press on the header that's about to go is lost (a separate fix).
+    await expect(page).toHaveURL('/lanyard');
     await page.getByRole('button', { name: 'Show QR' }).click();
     await expect(
-      page.getByRole('dialog', { name: 'Ada Example' })
+      page.getByRole('dialog', { name: 'Dr Ada Example' })
     ).toBeVisible();
     expect(Date.now() - started).toBeLessThan(SIGN_IN_TO_QR_MS);
   });
@@ -40,7 +43,7 @@ test.describe('QR sheet', () => {
     ).toBeLessThanOrEqual(320);
 
     await show.click();
-    const sheet = page.getByRole('dialog', { name: 'Ada Example' });
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText('Scan to see my lanyard')).toBeVisible();
     const qr = sheet.getByRole('img', {
@@ -65,6 +68,30 @@ test.describe('QR sheet', () => {
     await expect(show).toBeFocused();
   });
 
+  test('keeps the whole code at least 240 px wide on a 320×640 screen (#129)', async ({
+    page,
+  }) => {
+    await page.goto('/lanyard');
+    await page.getByRole('button', { name: 'Show QR' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
+    const qr = sheet.getByRole('img', { name: /^QR code for / });
+    await expect(qr).toBeVisible();
+    const box = (await qr.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(240);
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(320);
+    expect(box.y + box.height).toBeLessThanOrEqual(640);
+    const overflow = await sheet.evaluate(
+      (element) => element.scrollHeight - element.clientHeight
+    );
+    expect(overflow).toBe(0);
+    for (const name of ['Copy link', 'Close']) {
+      const button = (await sheet.getByRole('button', { name }).boundingBox())!;
+      expect(button.y + button.height).toBeLessThanOrEqual(640);
+    }
+  });
+
   test('keeps the code large and on screen in phone landscape', async ({
     page,
   }) => {
@@ -72,7 +99,7 @@ test.describe('QR sheet', () => {
     await page.setViewportSize(viewport);
     await page.goto('/lanyard');
     await page.getByRole('button', { name: 'Show QR' }).click();
-    const sheet = page.getByRole('dialog', { name: 'Ada Example' });
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     const qr = sheet.getByRole('img', { name: /^QR code for / });
     await expect(qr).toBeVisible();
     const code = await qr.boundingBox();
@@ -89,6 +116,50 @@ test.describe('QR sheet', () => {
     }
   });
 
+  // Final review I2: sideways, the sheet's ground is the accent itself.
+  test('shows its focus ring sideways on every accent (#129)', async ({
+    page,
+  }) => {
+    await mockPerson(page, { config: { accent: 'lime' } });
+    await page.setViewportSize({ width: 844, height: 390 });
+    await page.goto('/lanyard');
+    await page.getByRole('button', { name: 'Show QR' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
+    await expect(sheet).toHaveAttribute('data-accent', 'lime');
+    for (const name of ['Copy link', 'Close']) {
+      const button = sheet.getByRole('button', { name });
+      // Focus from the keyboard, so the ring shows.
+      await button.focus();
+      await page.keyboard.press('Shift+Tab');
+      await page.keyboard.press('Tab');
+      await expect(button).toBeFocused();
+      // The ring fades in (transition-colors): read it once settled.
+      const ratio = () =>
+        button.evaluate((element) => {
+          const rgb = (value: string) =>
+            (value.match(/\d+(\.\d+)?/g) ?? []).slice(0, 3).map(Number);
+          const luminance = ([r, g, b]: number[]) =>
+            [r!, g!, b!]
+              .map((channel) => channel / 255)
+              .map((c) =>
+                c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+              )
+              .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i]!, 0);
+          const ring = luminance(rgb(getComputedStyle(element).outlineColor));
+          const ground = luminance(
+            rgb(
+              getComputedStyle(element.closest('[role=dialog]')!)
+                .backgroundColor
+            )
+          );
+          return (
+            (Math.max(ring, ground) + 0.05) / (Math.min(ring, ground) + 0.05)
+          );
+        });
+      await expect.poll(ratio).toBeGreaterThanOrEqual(3);
+    }
+  });
+
   test('fits a nearly square landscape window without spilling', async ({
     page,
   }) => {
@@ -96,7 +167,7 @@ test.describe('QR sheet', () => {
     await page.setViewportSize(viewport);
     await page.goto('/lanyard');
     await page.getByRole('button', { name: 'Show QR' }).click();
-    const sheet = page.getByRole('dialog', { name: 'Ada Example' });
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toBeVisible();
     // Nothing spills or scrolls, in either direction.
     const overflow = await sheet.evaluate((element) => ({
@@ -134,5 +205,106 @@ test.describe('QR sheet', () => {
     const qr = page.getByRole('img', { name: /^QR code for / });
     await expect(qr.locator('rect')).toHaveAttribute('fill', '#ffffff');
     await expect(qr.locator('path')).toHaveAttribute('fill', '#000000');
+  });
+});
+
+test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', () => {
+  const BEA_PDS = 'https://pds.bea.test';
+  const CID = `bafyrei${'b'.repeat(52)}`;
+
+  test.beforeEach(async ({ page }) => {
+    // Ada's lanyard is mint; Bea, signed in, owns a pink one.
+    await mockPerson(page, { config: { accent: 'mint' } });
+    await page.route(
+      'https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile**',
+      (route) =>
+        new URL(route.request().url()).searchParams.get('actor') === BEA.did
+          ? route.fulfill({
+              json: {
+                did: BEA.did,
+                handle: 'bea.test',
+                displayName: 'Bea Example',
+              },
+            })
+          : route.fallback()
+    );
+    // The DID is URL-encoded in the request.
+    await page.route('https://plc.directory/**', (route) =>
+      !decodeURIComponent(route.request().url()).endsWith(BEA.did)
+        ? route.fallback()
+        : route.fulfill({
+            json: {
+              '@context': ['https://www.w3.org/ns/did/v1'],
+              id: BEA.did,
+              alsoKnownAs: ['at://bea.test'],
+              verificationMethod: [],
+              service: [
+                {
+                  id: '#atproto_pds',
+                  type: 'AtprotoPersonalDataServer',
+                  serviceEndpoint: BEA_PDS,
+                },
+              ],
+            },
+          })
+    );
+    await page.route(`${BEA_PDS}/xrpc/com.atproto.repo.getRecord**`, (route) =>
+      route.fulfill({
+        json: {
+          uri: `at://${BEA.did}/app.lanyards.actor.lanyard/self`,
+          cid: CID,
+          value: {
+            $type: 'app.lanyards.actor.lanyard',
+            accent: 'pink',
+            createdAt: '2026-11-01T09:00:00.000Z',
+          },
+        },
+      })
+    );
+    await page.route(
+      `${BEA_PDS}/xrpc/com.atproto.repo.listRecords**`,
+      (route) => route.fulfill({ json: { records: [] } })
+    );
+    await page.route(
+      'https://sifa.id/xrpc/id.sifa.getProfileView**',
+      (route) =>
+        new URL(route.request().url()).searchParams.get('actor') === BEA.did
+          ? route.fulfill({
+              status: 400,
+              json: { error: 'ProfileNotFound' },
+            })
+          : route.fallback()
+    );
+    await mockViewer(page);
+    await signIn(page, { did: BEA.did, scope: 'atproto transition:generic' });
+  });
+
+  test('wears the owner’s accent, and leaves the page’s alone', async ({
+    page,
+  }) => {
+    await page.goto('/@alice.test');
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Dr Ada Example' })
+    ).toBeVisible();
+    const pageAccent = () =>
+      page.evaluate(() => document.documentElement.dataset.accent);
+    expect(await pageAccent()).toBe('mint');
+
+    const show = page.getByRole('banner').getByRole('button', {
+      name: 'Show QR',
+    });
+    await show.click();
+    const sheet = page.getByRole('dialog', { name: 'Bea Example' });
+    await expect(sheet).toBeVisible();
+    await expect(sheet).toHaveAttribute('data-accent', 'pink');
+    const card = sheet.locator('.bg-accent').first();
+    await expect(card).toHaveCSS('background-color', 'rgb(247, 135, 154)');
+    expect(await pageAccent()).toBe('mint');
+    const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(result.violations).toEqual([]);
+
+    await sheet.getByRole('button', { name: 'Close' }).click();
+    await expect(sheet).toBeHidden();
+    expect(await pageAccent()).toBe('mint');
   });
 });

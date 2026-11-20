@@ -61,7 +61,7 @@ const open = async () => {
   await userEvent.click(screen.getByRole('button', { name: 'Show QR' }));
   return screen.findByRole(
     'dialog',
-    { name: 'Ada Example' },
+    { name: 'Dr Ada Example' },
     { timeout: 5000 }
   );
 };
@@ -84,7 +84,7 @@ describe('ShowQrButton', () => {
     await user.click(screen.getByRole('button', { name: 'Show QR' }));
     await screen.findByRole(
       'dialog',
-      { name: 'Ada Example' },
+      { name: 'Dr Ada Example' },
       { timeout: 5000 }
     );
     await user.click(screen.getByRole('button', { name: 'Copy link' }));
@@ -103,7 +103,7 @@ describe('ShowQrButton', () => {
     await user.click(screen.getByRole('button', { name: 'Show QR' }));
     await screen.findByRole(
       'dialog',
-      { name: 'Ada Example' },
+      { name: 'Dr Ada Example' },
       { timeout: 5000 }
     );
     await user.click(screen.getByRole('button', { name: 'Copy link' }));
@@ -137,7 +137,7 @@ describe('ShowQrButton', () => {
     expect(
       await screen.findByRole(
         'dialog',
-        { name: 'Ada Example' },
+        { name: 'Dr Ada Example' },
         { timeout: 5000 }
       )
     ).toBeVisible();

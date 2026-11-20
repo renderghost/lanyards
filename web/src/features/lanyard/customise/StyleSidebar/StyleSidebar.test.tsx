@@ -11,6 +11,8 @@ describe('StyleSidebar', () => {
   it('is a complementary landmark named Style holding the style panel', async () => {
     const { container } = renderWithProviders(
       <StyleSidebar
+        did="did:plc:fixturealiceaaaaaaaaaaaa"
+        initials="AE"
         config={resolveConfig(null)}
         disabled={false}
         onChange={vi.fn()}

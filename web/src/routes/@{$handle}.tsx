@@ -5,6 +5,7 @@ import { LanyardProblem } from '@/features/lanyard/components/LanyardProblem/Lan
 import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/LanyardSkeleton';
 import { LanyardSurface } from '@/features/lanyard/components/LanyardSurface/LanyardSurface';
 import { useResolveHandle } from '@/features/lanyard/hooks/useResolveHandle';
+import { prefetchHandleLanyard } from '@/lib/person/personQueries';
 
 export const Route = createFileRoute('/@{$handle}')({
   beforeLoad: ({ params }) => {
@@ -18,6 +19,13 @@ export const Route = createFileRoute('/@{$handle}')({
       throw redirect({ to: '/@{$handle}', params: { handle: lower } });
     }
   },
+  // Starts the badge's reads while the page's code loads, so its short
+  // wait for them (#129) costs nothing. Loading the readers lazily instead
+  // measured slower (LCP 2.4–2.6 s against 2.3–2.4 s).
+  loader: ({ context, params }) => {
+    prefetchHandleLanyard(context.queryClient, params.handle);
+  },
+  staticData: { signedOutActions: true },
   component: HandleLanyard,
 });
 

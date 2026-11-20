@@ -1,18 +1,36 @@
 import { useLingui } from '@lingui/react/macro';
 
 import { Accordion } from '@/components/Accordion/Accordion';
+import { coverFor } from '@/design/covers';
+import { track } from '@/lib/analytics/analytics';
 
 import { AccentPicker } from '../AccentPicker/AccentPicker';
-import { OPEN_AT_FIRST, SECTIONS } from './StylePanel.constants';
+import { CoverPicker } from '../CoverPicker/CoverPicker';
+import {
+  BADGE_SETTINGS,
+  OPEN_AT_FIRST,
+  SECTIONS,
+} from './StylePanel.constants';
 import * as styles from './StylePanel.styles';
 import type { StylePanelProps } from './StylePanel.types';
 
 /**
- * The lanyard's visual settings, and nothing else (#118): the accent and
- * the badge, as stacked disclosures.
+ * The lanyard's visual settings, and nothing else (#118): the accent, the
+ * badge's cover and what the badge shows, as stacked disclosures.
  */
-export function StylePanel({ config, disabled, onChange }: StylePanelProps) {
+export function StylePanel({
+  did,
+  initials,
+  config,
+  disabled,
+  onChange,
+}: StylePanelProps) {
   const { t } = useLingui();
+  const settingNames = {
+    showRole: t`Show current role`,
+    showLocation: t`Show location`,
+    showOpenTo: t`Show what you’re open to`,
+  };
   return (
     <div className={styles.panel}>
       <Accordion
@@ -33,22 +51,42 @@ export function StylePanel({ config, disabled, onChange }: StylePanelProps) {
             ),
           },
           {
+            id: SECTIONS.cover,
+            title: t`Cover`,
+            content: (
+              <CoverPicker
+                value={config.cover ?? coverFor(did)}
+                initials={initials}
+                onChange={(cover) => {
+                  track('cover_changed', { cover });
+                  onChange((current) => ({ ...current, cover }));
+                }}
+                disabled={disabled}
+              />
+            ),
+          },
+          {
             id: SECTIONS.badge,
             title: t`Badge`,
             content: (
-              <label className={styles.checkboxRow}>
-                <input
-                  type="checkbox"
-                  checked={config.showJob}
-                  onChange={(event) => {
-                    const showJob = event.target.checked;
-                    onChange((current) => ({ ...current, showJob }));
-                  }}
-                  disabled={disabled}
-                  className={styles.checkbox}
-                />
-                <span>{t`Show current job`}</span>
-              </label>
+              <div className={styles.settings}>
+                {BADGE_SETTINGS.map((setting) => (
+                  <label key={setting} className={styles.checkboxRow}>
+                    <input
+                      type="checkbox"
+                      checked={config[setting]}
+                      onChange={(event) => {
+                        const on = event.target.checked;
+                        track('badge_setting_changed', { setting, on });
+                        onChange((current) => ({ ...current, [setting]: on }));
+                      }}
+                      disabled={disabled}
+                      className={styles.checkbox}
+                    />
+                    <span>{settingNames[setting]}</span>
+                  </label>
+                ))}
+              </div>
             ),
           },
         ]}

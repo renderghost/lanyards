@@ -17,6 +17,7 @@ const LANYARD = 'app.lanyards.actor.lanyard';
 
 type Lanyard = {
   accent?: string;
+  badge?: { cover?: string; showRole?: boolean };
   blocks: { type: string; visible: boolean }[];
   hidden: string[];
 };
@@ -169,6 +170,21 @@ test.describe('lanyard customiser', () => {
       type: 'talks',
       visible: false,
     });
+  });
+
+  test('picks a cover in Style and saves it (#129)', async ({ page }) => {
+    await openCustomiser(page);
+    await page.getByRole('button', { name: 'Cover' }).click();
+    // Ada's cover until she picks one comes from her DID: Pixels.
+    await expect(page.getByRole('radio', { name: 'Pixels' })).toBeChecked();
+    await page.getByRole('radio', { name: 'Hazard' }).click();
+    await expect(page.getByRole('radio', { name: 'Hazard' })).toBeChecked();
+    await expect(page.getByText('Unsaved changes')).toBeVisible();
+    await saveChanges(page);
+    await expect(page.getByText('All changes saved')).toBeVisible();
+    const saves = lanyardSaves(writes);
+    expect(saves).toHaveLength(1);
+    expect(saves[0]?.badge).toMatchObject({ cover: 'hazard' });
   });
 
   test('adds a podcast in the dialog and saves it', async ({ page }) => {
@@ -600,11 +616,16 @@ test.describe('lanyard customiser on a touch screen', () => {
     await touch('touchEnd');
     await expect(page.getByText(/^Picked up/)).toHaveCount(0);
 
-    // Press and hold, then drag Links down the page.
+    // Press and hold, then drag Links onto Talks, the next block: measured,
+    // since how far that is depends on how much the badge scrolled away.
+    const next = (await page
+      .getByRole('button', { name: 'Reorder Talks' })
+      .boundingBox())!;
+    const distance = next.y + next.height / 2 + 40 - y;
     await touch('touchStart', x, y);
     await page.waitForTimeout(400);
     for (let step = 1; step <= 10; step += 1) {
-      await touch('touchMove', x, y + step * 20);
+      await touch('touchMove', x, y + (step * distance) / 10);
       await page.waitForTimeout(16);
     }
     await touch('touchEnd');

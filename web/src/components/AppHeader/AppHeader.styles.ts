@@ -13,5 +13,7 @@ export const actions = 'flex min-w-0 items-center gap-2';
 
 export const nav = 'flex items-center gap-1';
 
+export const signUp = 'px-3 text-sm font-semibold leading-5';
+
 export const navLink =
   'inline-flex min-h-11 items-center rounded-sm px-3 text-sm font-medium leading-5 text-ui-text hover:bg-ui-surface-muted';

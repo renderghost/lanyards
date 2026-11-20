@@ -14,6 +14,7 @@ export function FollowButton({
   did,
   handle,
   returnTo,
+  tone = 'accent',
   className,
 }: FollowButtonProps) {
   const { t } = useLingui();
@@ -40,7 +41,7 @@ export function FollowButton({
   return (
     <div className={cn(styles.wrapper, className)}>
       <Button
-        tone="accent"
+        tone={tone}
         size="lg"
         variant={following ? 'secondary' : 'primary'}
         onClick={press}
@@ -51,7 +52,7 @@ export function FollowButton({
         {following ? t`Following` : t`Follow`}
       </Button>
       {follow.checkFailed && (
-        <p id={hintId} className={styles.hint}>
+        <p id={hintId} className={styles.hints[tone]}>
           {t`Couldn't check whether you already follow them`}
         </p>
       )}

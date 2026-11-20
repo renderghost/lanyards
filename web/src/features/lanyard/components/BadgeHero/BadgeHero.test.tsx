@@ -8,9 +8,12 @@ import { BadgeHero } from './BadgeHero';
 
 const hero = {
   did: ADA.did,
-  handle: 'alice.test',
+  handle: 'alice.test' as const,
   displayName: 'Ada Example',
   honorificPrefix: 'Dr',
+  cover: 'orb' as const,
+  initials: 'AE',
+  openTo: [],
 };
 
 describe('BadgeHero', () => {
@@ -45,5 +48,34 @@ describe('BadgeHero', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Prof Ada Example, OBE' })
     ).toBeInTheDocument();
+  });
+
+  it('wears a decorative cover and shows initials without an avatar (#129)', () => {
+    const { container } = renderWithProviders(<BadgeHero hero={hero} />);
+    const cover = container.querySelector('[data-cover] svg');
+    expect(cover).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('AE')).toBeInTheDocument();
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('breaks a very long name anywhere rather than overflowing', () => {
+    const long = 'Ada' + 'x'.repeat(57);
+    renderWithProviders(<BadgeHero hero={{ ...hero, displayName: long }} />);
+    expect(screen.getByRole('heading', { level: 1 })).toHaveClass(
+      '[overflow-wrap:anywhere]'
+    );
+  });
+
+  it('shows the departure board, and its actions in the accent field', () => {
+    renderWithProviders(
+      <BadgeHero
+        hero={{ ...hero, location: 'Berlin' }}
+        actions={<button type="button">Follow</button>}
+      />
+    );
+    expect(screen.getByText('Based')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Follow' }).closest('[data-field]')
+    ).not.toBeNull();
   });
 });

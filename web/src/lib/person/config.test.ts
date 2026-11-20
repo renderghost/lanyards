@@ -30,7 +30,10 @@ describe('resolveConfig', () => {
   it('uses the smart defaults when there is no config record', () => {
     expect(resolveConfig(null)).toEqual({
       accent: 'blue',
-      showJob: true,
+      cover: null,
+      showRole: true,
+      showLocation: true,
+      showOpenTo: true,
       blocks: ALL_TYPES.map((type) => ({
         type,
         visible: type === 'links' || type === 'talks',
@@ -55,7 +58,8 @@ describe('resolveConfig', () => {
       createdAt: '2026-11-01T09:00:00.000Z',
     });
     expect(config.accent).toBe('mint');
-    expect(config.showJob).toBe(false);
+    // The legacy showJob reads as the badge's showRole (#129).
+    expect(config.showRole).toBe(false);
     expect(config.hidden).toEqual(['https://ada.example/']);
     expect(config.blocks.slice(0, 3)).toEqual([
       { type: 'publications', visible: true, limit: 5 },
@@ -100,6 +104,77 @@ describe('resolveConfig', () => {
 
   it('uses the defaults when the record is malformed', () => {
     expect(resolveConfig({ blocks: 'nope' })).toEqual(resolveConfig(null));
+  });
+});
+
+describe('the badge settings (#129)', () => {
+  const record = (fields: Record<string, unknown>) => ({
+    $type: 'app.lanyards.actor.lanyard',
+    createdAt: '2026-11-01T09:00:00Z',
+    ...fields,
+  });
+
+  it('has no cover until one is picked, and shows everything by default', () => {
+    const config = resolveConfig(record({}));
+    expect(config.cover).toBeNull();
+    expect(config.showRole).toBe(true);
+    expect(config.showLocation).toBe(true);
+    expect(config.showOpenTo).toBe(true);
+  });
+
+  it('reads the badge object, and an unknown cover as none', () => {
+    expect(
+      resolveConfig(
+        record({
+          badge: {
+            cover: 'orb',
+            showRole: false,
+            showLocation: false,
+            showOpenTo: false,
+          },
+        })
+      )
+    ).toMatchObject({
+      cover: 'orb',
+      showRole: false,
+      showLocation: false,
+      showOpenTo: false,
+    });
+    expect(resolveConfig(record({ badge: { cover: 'plaid' } })).cover).toBe(
+      null
+    );
+  });
+
+  it('reads the legacy showJob as showRole, and writes badge instead', () => {
+    const stored = record({ showJob: false });
+    const config = resolveConfig(stored);
+    expect(config.showRole).toBe(false);
+    const written = serialiseConfig(config, stored, '2026-11-20T09:00:00Z');
+    expect(written).not.toHaveProperty('showJob');
+    expect(written.badge).toEqual({
+      showRole: false,
+      showLocation: true,
+      showOpenTo: true,
+    });
+  });
+
+  it('writes a picked cover, round trip', () => {
+    const config = { ...resolveConfig(null), cover: 'orb' as const };
+    const written = serialiseConfig(config, null, '2026-11-20T09:00:00Z');
+    expect(written.badge).toMatchObject({ cover: 'orb' });
+    expect(
+      resolveConfig({ ...written, $type: 'app.lanyards.actor.lanyard' }).cover
+    ).toBe('orb');
+  });
+
+  it('keeps our cover in a merge when only we changed it', () => {
+    const base = resolveConfig(null);
+    const ours = { ...base, cover: 'pixels' as const };
+    const theirs = { ...base, accent: 'pink' as const };
+    expect(mergeConfig(base, ours, theirs)).toMatchObject({
+      cover: 'pixels',
+      accent: 'pink',
+    });
   });
 });
 
@@ -156,12 +231,12 @@ describe('serialiseConfig', () => {
     const config = {
       ...resolveConfig(previous),
       accent: 'mint' as const,
-      showJob: false,
+      showRole: false,
     };
     const fields = serialiseConfig(config, previous, NOW);
     expect(fields).toMatchObject({
       accent: 'mint',
-      showJob: false,
+      badge: { showRole: false },
       connect: previous.connect,
       events: previous.events,
       createdAt: previous.createdAt,

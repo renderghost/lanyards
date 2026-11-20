@@ -1,10 +1,12 @@
+import { coverFor, initialsOf } from '@/design/covers';
 import { cdnImage } from '@/lib/atproto/avatar';
 import type { BlueskyProfile } from '@/lib/sources/bluesky/bluesky.types';
 import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 
+import { openToKey } from './blocks';
 import type { LanyardConfig } from './config';
 import { truncateGraphemes } from './format';
-import type { BadgeHero } from './personView.types';
+import type { BadgeHero, BadgeRole, BoardCell } from './personView.types';
 
 const HEADLINE_MAX_GRAPHEMES = 200;
 
@@ -29,6 +31,26 @@ function bioHeadline(description?: string): string | undefined {
   return first ? truncateGraphemes(first, HEADLINE_MAX_GRAPHEMES) : undefined;
 }
 
+/**
+ * The main current role (spec §7): the current job among the positions the
+ * owner hasn't hidden, and how many other visible current positions there
+ * are. A hidden role never appears on the badge.
+ */
+function mainRole(
+  positions: SifaPosition[],
+  hidden: ReadonlySet<string>
+): BadgeRole | undefined {
+  const visible = positions.filter((position) => !hidden.has(position.key));
+  const job = currentJob(visible);
+  if (!job) return undefined;
+  const current = visible.filter((position) => !position.endedAt).length;
+  return {
+    title: job.title,
+    ...(job.company ? { company: job.company } : {}),
+    others: current - 1,
+  };
+}
+
 /** The badge at the top of a lanyard; Sifa fields win over Bluesky's. */
 export function composeHero(input: {
   bluesky: BlueskyProfile;
@@ -36,16 +58,24 @@ export function composeHero(input: {
   config: LanyardConfig;
 }): BadgeHero {
   const { bluesky, sifa, config } = input;
+  const hidden = new Set(config.hidden);
   const honorifics = sifa?.showHonorifics ? sifa : undefined;
-  const job = config.showJob && sifa ? currentJob(sifa.positions) : undefined;
+  const role =
+    config.showRole && sifa ? mainRole(sifa.positions, hidden) : undefined;
+  const location = config.showLocation ? sifa?.location : undefined;
+  const openTo = config.showOpenTo
+    ? (sifa?.openTo ?? []).filter((value) => !hidden.has(openToKey(value)))
+    : [];
   const avatar = cdnImage(sifa?.avatar) ?? cdnImage(bluesky.avatar);
   const pronouns = sifa?.pronouns ?? bluesky.pronouns;
   const headline = sifa?.headline ?? bioHeadline(bluesky.description);
+  const displayName =
+    sifa?.displayName ?? bluesky.displayName ?? bluesky.handle;
 
   return {
     did: bluesky.did,
     handle: bluesky.handle,
-    displayName: sifa?.displayName ?? bluesky.displayName ?? bluesky.handle,
+    displayName,
     ...(honorifics?.honorificPrefix
       ? { honorificPrefix: honorifics.honorificPrefix }
       : {}),
@@ -55,15 +85,21 @@ export function composeHero(input: {
     ...(avatar ? { avatar } : {}),
     ...(pronouns ? { pronouns } : {}),
     ...(headline ? { headline } : {}),
-    ...(job
-      ? {
-          job: {
-            title: job.title,
-            ...(job.company ? { company: job.company } : {}),
-          },
-        }
-      : {}),
+    cover: config.cover ?? coverFor(bluesky.did),
+    initials: initialsOf(displayName),
+    ...(role ? { role } : {}),
+    ...(location ? { location } : {}),
+    openTo,
   };
+}
+
+/** The board cells the owner's badge settings show (spec §7). */
+export function boardCells(config: LanyardConfig): BoardCell[] {
+  return [
+    ...(config.showRole ? (['now'] as const) : []),
+    ...(config.showLocation ? (['based'] as const) : []),
+    ...(config.showOpenTo ? (['openTo'] as const) : []),
+  ];
 }
 
 /**

@@ -92,6 +92,48 @@ test.describe('public lanyard, signed out', () => {
     expect(width).toBeLessThanOrEqual(320);
   });
 
+  test('keeps a very long name on a 320px badge, with its board (#129)', async ({
+    page,
+  }) => {
+    const longName = `Ada${'x'.repeat(57)}`;
+    await mockPerson(page, { sifa: { displayName: longName } });
+    await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto('/@alice.test');
+    await expect(
+      page.getByRole('heading', { level: 1, name: `Dr ${longName}` })
+    ).toBeVisible();
+    const board = page.locator('dl', { hasText: 'Now' });
+    await expect(board.locator('dt')).toHaveText(['Now', 'Based', 'Open to']);
+    await expect(board).toContainText('Research Engineer · Example Lab');
+    await expect(board).toContainText('Edinburgh, Scotland, United Kingdom');
+    await expect(board).toContainText(
+      'Speaking engagements · Mentoring others'
+    );
+    const width = await page.evaluate(
+      () => document.documentElement.scrollWidth
+    );
+    expect(width).toBeLessThanOrEqual(320);
+  });
+
+  for (const colorScheme of ['light', 'dark'] as const) {
+    for (const accent of ['blue', 'mint', 'lime', 'pink'] as const) {
+      test(`the badge passes axe (${colorScheme}, ${accent})`, async ({
+        page,
+      }) => {
+        await mockPerson(page, { config: { accent } });
+        await page.emulateMedia({ colorScheme });
+        await page.goto('/@alice.test');
+        await expect(badge(page)).toBeVisible();
+        await expect(page.locator('dl', { hasText: 'Now' })).toBeVisible();
+        const result = await new AxeBuilder({ page })
+          .include('section[aria-labelledby="badge-name"]')
+          .withTags(WCAG)
+          .analyze();
+        expect(result.violations).toEqual([]);
+      });
+    }
+  }
+
   test('redirects an encoded @ to the canonical URL', async ({ page }) => {
     await mockPerson(page);
     await page.goto('/%40alice.test');

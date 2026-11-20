@@ -1,7 +1,10 @@
 import type { ReactNode } from 'react';
 
-/** `ui` for the product chrome; `accent` for links on the lanyard itself. */
-export type ExternalLinkTone = 'ui' | 'accent';
+/**
+ * `ui` for the product chrome; `accent` for links on the lanyard itself;
+ * `badge` for links on the badge's accent field (#129).
+ */
+export type ExternalLinkTone = 'ui' | 'accent' | 'badge';
 
 export type ExternalLinkProps = {
   href: string;

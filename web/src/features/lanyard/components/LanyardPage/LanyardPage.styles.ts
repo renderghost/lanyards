@@ -1,5 +1,8 @@
+// The badge is up to 1,120 px wide; the blocks under it up to 760 px (#129).
 export const page =
-  'flex w-full max-w-2xl flex-col gap-6 self-center px-4 py-8';
+  'flex w-full max-w-[70rem] flex-col items-center gap-10 self-center px-4 py-8 sm:px-6 sm:py-10';
+
+export const column = 'flex w-full max-w-[47.5rem] flex-col gap-6';
 
 export const text = 'max-w-prose text-base leading-6 text-muted-foreground';
 

@@ -73,13 +73,18 @@ export type UseLanyardDraft = {
 };
 
 /**
- * How many edits separate two configs: the accent and the badge count one
- * each, every block whose place or settings differ counts one, and every
+ * How many edits separate two configs: the accent, the cover and each
+ * badge setting count one each, every block whose place or settings differ counts one, and every
  * item hidden or shown counts one (so Reset can ask before discarding
  * several).
  */
 export function countChanges(a: LanyardConfig, b: LanyardConfig): number {
-  let count = Number(a.accent !== b.accent) + Number(a.showJob !== b.showJob);
+  let count =
+    Number(a.accent !== b.accent) +
+    Number(a.cover !== b.cover) +
+    Number(a.showRole !== b.showRole) +
+    Number(a.showLocation !== b.showLocation) +
+    Number(a.showOpenTo !== b.showOpenTo);
   const places = (config: LanyardConfig) =>
     new Map(
       config.blocks.map((block, index) => [

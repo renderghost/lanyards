@@ -14,6 +14,7 @@ import type {
   SifaTalk,
 } from '@/lib/sources/sifa/sifa.types';
 import type { BlogPost } from '@/lib/sources/standardSite/standardSite.types';
+import type { CoverPattern } from '@/design/covers';
 import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 
 import type { EditorBlock } from './blocks';
@@ -40,8 +41,21 @@ export type BadgeHero = {
   avatar?: string;
   pronouns?: string;
   headline?: string;
-  job?: { title: string; company?: string };
+  /** The owner's cover, or the one their DID gives them (#129). */
+  cover: CoverPattern;
+  /** Shown in place of a missing avatar. */
+  initials: string;
+  /** The departure board (spec §7): each part only if the owner shows it. */
+  role?: BadgeRole;
+  location?: string;
+  openTo: OpenToValue[];
 };
+
+/** The departure board's cells (spec §7). */
+export type BoardCell = 'now' | 'based' | 'openTo';
+
+/** The main current role, and how many other current roles there are. */
+export type BadgeRole = { title: string; company?: string; others: number };
 
 export type LinkItem = {
   /** The normalised URL. */
@@ -103,6 +117,13 @@ export type ViewerMode = 'owner' | 'visitor';
 export type PersonViewState = {
   profile: SourceState<BlueskyProfile>;
   hero?: BadgeHero;
+  /**
+   * Show the hero: Bluesky has answered, and Sifa and the owner's record
+   * have settled or the short wait for them is over (spec §7).
+   */
+  heroReady: boolean;
+  /** Sifa hasn't answered yet: the board keeps its height for it. */
+  sifaPending: boolean;
   blocks: BlockView[];
   /** For the owner: every block, hidden items flagged in place (#118). */
   editorBlocks: EditorBlock[];

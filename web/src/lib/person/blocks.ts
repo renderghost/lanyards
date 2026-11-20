@@ -192,12 +192,15 @@ type Builders = {
   ) => BlockItems[T][];
 };
 
+/** An Open to item's key, which the owner can hide. */
+export const openToKey = (value: string): string => `openTo:${value}`;
+
 const BUILDERS: Builders = {
   links: (values) => mergeLinks(values),
   talks: (values) => values.sifa?.talks ?? [],
   openTo: (values) =>
     (values.sifa?.openTo ?? []).map((value) => ({
-      key: `openTo:${value}`,
+      key: openToKey(value),
       value,
     })),
   blogPosts: (values) => values.standardSite ?? [],

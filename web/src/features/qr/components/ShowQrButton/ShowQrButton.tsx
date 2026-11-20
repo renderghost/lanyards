@@ -18,8 +18,8 @@ type Sheet = typeof QrSheet;
 const loadSheet = (): Promise<Sheet> =>
   import('../QrSheet/QrSheet').then((module) => module.QrSheet);
 
-/** "Show QR" in the header: opens the owner's QR sheet. */
-export function ShowQrButton({ className }: ShowQrButtonProps) {
+/** "Show QR" in the header or on the badge: opens the owner's QR sheet. */
+export function ShowQrButton({ tone = 'ui', className }: ShowQrButtonProps) {
   const { t } = useLingui();
   const session = useSession();
   const [open, setOpen] = useState(false);
@@ -48,10 +48,10 @@ export function ShowQrButton({ className }: ShowQrButtonProps) {
         ref={button}
         type="button"
         onClick={() => void show()}
-        className={cn(styles.button, className)}
+        className={cn(styles.tones[tone], className)}
       >
         <QrCode aria-hidden="true" className={styles.icon} />
-        <span className={styles.label}>{t`Show QR`}</span>
+        <span className={styles.labels[tone]}>{t`Show QR`}</span>
       </button>
       {Sheet && (
         <Sheet

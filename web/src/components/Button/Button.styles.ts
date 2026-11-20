@@ -3,6 +3,9 @@ import type { ButtonSize, ButtonTone, ButtonVariant } from './Button.types';
 export const base =
   'relative inline-flex items-center justify-center gap-2 px-4 font-medium motion-safe:transition-colors disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60';
 
+/** The focus ring on the badge's accent field (spec §7). */
+export const BADGE_FOCUS = 'focus-visible:outline-(--focus-ring-on-accent)';
+
 export const tones: Record<ButtonTone, Record<ButtonVariant, string>> = {
   ui: {
     primary:
@@ -16,6 +19,12 @@ export const tones: Record<ButtonTone, Record<ButtonVariant, string>> = {
     secondary:
       'rounded-sm border border-border bg-surface text-foreground hover:bg-accent-subtle',
     ghost: 'rounded-sm text-accent-text hover:bg-accent-subtle',
+  },
+  // On the accent field: its own focus ring, which shows on every accent.
+  badge: {
+    primary: `${BADGE_FOCUS} rounded-sm bg-badge-button font-semibold text-on-badge-button shadow-[0_1px_2px_rgb(6_1_30/0.2),0_4px_10px_rgb(6_1_30/0.15)] hover:opacity-90`,
+    secondary: `${BADGE_FOCUS} rounded-sm border-2 border-on-accent font-semibold text-on-accent hover:bg-on-accent/10`,
+    ghost: `${BADGE_FOCUS} rounded-sm font-semibold text-on-accent hover:bg-on-accent/10`,
   },
 };
 

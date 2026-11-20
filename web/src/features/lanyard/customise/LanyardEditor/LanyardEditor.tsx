@@ -34,6 +34,7 @@ import { LanyardSkeleton } from '@/features/lanyard/components/LanyardSkeleton/L
 import { useApplyAccent } from '@/hooks/useApplyAccent';
 import { profileId } from '@/lib/atproto/profileId';
 import { EDIT_LINKS } from '@/lib/person/editLinks';
+import { boardCells } from '@/lib/person/hero';
 import {
   BLOCK_SOURCES,
   type EditorBlock,
@@ -197,7 +198,8 @@ export function LanyardEditor({
       />
     );
   }
-  if (!view.hero) {
+  // The badge waits briefly for Sifa and the record, as on the lanyard.
+  if (!view.heroReady || !view.hero) {
     return <LanyardSkeleton />;
   }
 
@@ -234,7 +236,11 @@ export function LanyardEditor({
 
   return (
     <div className={styles.page}>
-      <BadgeHero hero={view.hero} headingLevel={2} />
+      <BadgeHero
+        hero={view.hero}
+        headingLevel={2}
+        boardPending={view.sifaPending ? boardCells(view.config) : undefined}
+      />
       {view.configError && (
         <div role="status" className={styles.notice}>
           <p className={styles.noticeText}>

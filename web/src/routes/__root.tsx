@@ -46,13 +46,17 @@ function RootLayout() {
     select: (matches) =>
       matches.some((match) => match.staticData.ownHeader === true),
   });
+  const signedOutActions = useMatches({
+    select: (matches) =>
+      matches.some((match) => match.staticData.signedOutActions === true),
+  });
   return (
     <div className="flex min-h-dvh flex-col">
       {ownHeader ? (
         <Outlet />
       ) : (
         <>
-          <AppHeader />
+          <AppHeader signedOutActions={signedOutActions} />
           <main className="flex flex-1 flex-col">
             <Outlet />
           </main>

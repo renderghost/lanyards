@@ -14,14 +14,18 @@ export type BadgeImageInput = {
 
 const WIDTH = 1200;
 const HEIGHT = 630;
+// The brand palette (#128): ink, brand blue, gray 04 for quieter text and
+// gray 02 behind the initials. Corners are 3 px; only the avatar is round.
 const BRAND = '#4020DF';
-const INK = '#1F1638';
-const MUTED = '#5B4E80';
+const INK = '#06011E';
+const MUTED = '#312D49';
+const SUBTLE = '#F6F5FF';
+const FONT = 'Rethink Sans';
 
 type Child = ReactElement | string | false | null | undefined;
 
 /**
- * Emoji and other pictographs, which DM Sans has no glyphs for, so satori
+ * Emoji and other pictographs, which Rethink Sans has no glyphs for, so satori
  * would draw them as empty boxes. Keeps ©, ® and ™, which it has, and a
  * zero-width joiner between letters (Devanagari and other scripts use it).
  * Built with RegExp because the `v` flag needs a newer target than the app
@@ -87,7 +91,7 @@ function personBadge(input: BadgeImageInput): ReactElement {
         alt: '',
         width: 220,
         height: 220,
-        style: { borderRadius: 110 },
+        style: { width: 220, height: 220, borderRadius: '50%' },
       })
     : h(
         'div',
@@ -98,8 +102,8 @@ function personBadge(input: BadgeImageInput): ReactElement {
             justifyContent: 'center',
             width: 220,
             height: 220,
-            borderRadius: 110,
-            background: '#E6E1FA',
+            borderRadius: '50%',
+            background: SUBTLE,
             color: BRAND,
             fontSize: 88,
             fontWeight: 700,
@@ -177,6 +181,49 @@ function defaultBadge(): ReactElement {
 }
 
 /**
+ * The 1200×630 badge for link previews, as the element tree satori draws;
+ * `null` is the generic Lanyards badge.
+ */
+export function badgeElement(input: BadgeImageInput | null): ReactElement {
+  return h(
+    'div',
+    {
+      style: {
+        display: 'flex',
+        boxSizing: 'border-box',
+        width: '100%',
+        height: '100%',
+        padding: 40,
+        background: BRAND,
+        fontFamily: FONT,
+      },
+    },
+    h(
+      'div',
+      {
+        style: {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          boxSizing: 'border-box',
+          width: '100%',
+          height: '100%',
+          padding: 64,
+          borderRadius: 3,
+          background: '#FFFFFF',
+        },
+      },
+      input ? personBadge(badgeText(input)) : defaultBadge(),
+      h(
+        'div',
+        { style: { display: 'flex', fontSize: 28, color: MUTED } },
+        'lanyards.app'
+      )
+    )
+  );
+}
+
+/**
  * A 1200×630 badge-style PNG for link previews; `null` draws the generic
  * Lanyards badge (no profile, opted out, or anything failed).
  */
@@ -184,52 +231,14 @@ export async function renderBadgePng(
   input: BadgeImageInput | null
 ): Promise<Uint8Array> {
   const fonts = await loadBadgeAssets();
-  const svg = await satori(
-    h(
-      'div',
-      {
-        style: {
-          display: 'flex',
-          boxSizing: 'border-box',
-          width: '100%',
-          height: '100%',
-          padding: 40,
-          background: BRAND,
-          fontFamily: 'DM Sans',
-        },
-      },
-      h(
-        'div',
-        {
-          style: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            boxSizing: 'border-box',
-            width: '100%',
-            height: '100%',
-            padding: 64,
-            borderRadius: 32,
-            background: '#FFFFFF',
-          },
-        },
-        input ? personBadge(badgeText(input)) : defaultBadge(),
-        h(
-          'div',
-          { style: { display: 'flex', fontSize: 28, color: MUTED } },
-          'lanyards.app'
-        )
-      )
-    ),
-    {
-      width: WIDTH,
-      height: HEIGHT,
-      fonts: [
-        { name: 'DM Sans', data: fonts.regular, weight: 400, style: 'normal' },
-        { name: 'DM Sans', data: fonts.bold, weight: 700, style: 'normal' },
-      ],
-    }
-  );
+  const svg = await satori(badgeElement(input), {
+    width: WIDTH,
+    height: HEIGHT,
+    fonts: [
+      { name: FONT, data: fonts.regular, weight: 400, style: 'normal' },
+      { name: FONT, data: fonts.bold, weight: 700, style: 'normal' },
+    ],
+  });
   return new Resvg(svg, { fitTo: { mode: 'width', value: WIDTH } })
     .render()
     .asPng();

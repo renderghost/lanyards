@@ -10,19 +10,19 @@ export type BadgeFonts = { regular: Buffer; bold: Buffer };
 let ready: Promise<BadgeFonts> | undefined;
 
 /**
- * Loads the DM Sans weights and the resvg WebAssembly module once per
- * function instance. Static weights, because satori renders only the
- * default instance of a variable font.
+ * Loads the Rethink Sans weights (the brand font, #129) and the resvg
+ * WebAssembly module once per function instance. Static weights, because
+ * satori renders only the default instance of a variable font.
  */
 export function loadBadgeAssets(): Promise<BadgeFonts> {
   ready ??= (async () => {
     const [wasm, regular, bold] = await Promise.all([
       readFile(require.resolve('@resvg/resvg-wasm/index_bg.wasm')),
       readFile(
-        require.resolve('@fontsource/dm-sans/files/dm-sans-latin-400-normal.woff2')
+        require.resolve('@fontsource/rethink-sans/files/rethink-sans-latin-400-normal.woff2')
       ),
       readFile(
-        require.resolve('@fontsource/dm-sans/files/dm-sans-latin-700-normal.woff2')
+        require.resolve('@fontsource/rethink-sans/files/rethink-sans-latin-700-normal.woff2')
       ),
     ]);
     await initWasm(wasm);
