@@ -15,11 +15,10 @@ import * as styles from './SupportLinks.styles';
 import type { SupportLinksProps } from './SupportLinks.types';
 
 /**
- * "Beta support" (#134): send feedback, read the docs, join our Signal
+ * "Beta support" (#134): give feedback, read the docs, join our Signal
  * group, or connect with us on Bluesky.
  */
 export function SupportLinks({
-  heading = true,
   onChoose,
   returnFocus,
   className,
@@ -30,16 +29,10 @@ export function SupportLinks({
   const button = useRef<HTMLButtonElement>(null);
 
   return (
-    <section
-      // In a sheet, the sheet's title names it.
-      aria-labelledby={heading ? id : undefined}
-      className={cn(styles.section, className)}
-    >
-      {heading && (
-        <h2 id={id} className={styles.heading}>
-          {t`Beta support`}
-        </h2>
-      )}
+    <section aria-labelledby={id} className={cn(styles.section, className)}>
+      <h2 id={id} className={styles.heading}>
+        {t`Beta support`}
+      </h2>
       <ul className={styles.list}>
         <li>
           <button
@@ -52,7 +45,7 @@ export function SupportLinks({
             }}
           >
             <MessageSquare aria-hidden="true" className={styles.icon} />
-            {t`Send feedback`}
+            {t`Give feedback`}
           </button>
         </li>
         <li>

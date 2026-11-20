@@ -7,6 +7,6 @@ export const list = 'flex flex-col';
 
 /** A row: icon then words, the full width, at least 44px tall. */
 export const item =
-  'flex min-h-11 w-full items-center gap-3 rounded-sm px-2 text-left text-sm font-medium leading-5 text-ui-text no-underline hover:bg-ui-surface-muted';
+  'flex min-h-11 w-full items-center gap-3 rounded-sm px-2 text-left text-sm font-medium leading-5 text-ui-text no-underline hover:bg-ui-surface-muted hover:no-underline';
 
 export const icon = 'size-4 shrink-0';

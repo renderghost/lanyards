@@ -202,7 +202,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(screen.queryByRole('contentinfo')).toBeNull();
     const support = screen.getByRole('region', { name: 'Beta support' });
     expect(
-      within(support).getByRole('button', { name: 'Send feedback' })
+      within(support).getByRole('button', { name: 'Give feedback' })
     ).toBeInTheDocument();
     await userEvent.click(
       screen.getByRole('button', { name: 'View as public' })
@@ -212,25 +212,31 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     ).toBeInTheDocument();
   });
 
-  it('offers support from the phone toolbar, in a sheet (#134)', async () => {
+  it('keeps support at the foot of the Style sheet on phones (#134)', async () => {
     servePerson();
     renderRoute('/lanyard');
     await preview();
     const toolbar = screen.getByRole('toolbar', { name: 'Customiser' });
-    await userEvent.click(
-      within(toolbar).getByRole('button', { name: 'Support' })
-    );
-    const sheet = await screen.findByRole('dialog', { name: 'Beta support' });
     expect(
-      within(sheet).getByRole('link', { name: /Signal group/ })
+      within(toolbar).queryByRole('button', { name: 'Support' })
+    ).toBeNull();
+    await userEvent.click(
+      within(toolbar).getByRole('button', { name: 'Style' })
+    );
+    const sheet = await screen.findByRole('dialog', { name: 'Style' });
+    const support = within(sheet).getByRole('region', {
+      name: 'Beta support',
+    });
+    expect(
+      within(support).getByRole('link', { name: /Signal group/ })
     ).toBeInTheDocument();
     await userEvent.click(
-      within(sheet).getByRole('button', { name: 'Send feedback' })
+      within(support).getByRole('button', { name: 'Give feedback' })
     );
     expect(
       await screen.findByRole('dialog', { name: 'Send feedback' })
     ).toBeInTheDocument();
-    expect(screen.queryByRole('dialog', { name: 'Beta support' })).toBeNull();
+    expect(screen.queryByRole('dialog', { name: 'Style' })).toBeNull();
   });
 
   it('lays the lanyard out beside a pinned style sidebar', async () => {

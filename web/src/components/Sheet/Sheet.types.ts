@@ -13,4 +13,6 @@ export type SheetProps = {
    * out, focus returns to whatever had it when the sheet opened.
    */
   returnFocus?(): void;
+  /** Pinned below the body, which scrolls above it, e.g. support links. */
+  footer?: ReactNode;
 };

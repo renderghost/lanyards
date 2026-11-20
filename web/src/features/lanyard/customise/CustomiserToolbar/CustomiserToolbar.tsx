@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
-import { LifeBuoy, Palette } from 'lucide-react';
+import { Palette } from 'lucide-react';
 import type { KeyboardEvent } from 'react';
 
 import { AccountLink } from '@/components/AccountLink/AccountLink';
@@ -13,15 +13,13 @@ import type { CustomiserToolbarProps } from './CustomiserToolbar.types';
 
 /**
  * On phones, the customiser's bottom toolbar: Style (the sheet), Reset,
- * Support (#134), Show QR and the account link (Settings, signing out). The arrow keys,
+ * Show QR and the account link (Settings, signing out). The arrow keys,
  * Home and End move between them.
  */
 export function CustomiserToolbar({
   onOpenStyle,
   styleButtonRef,
   onReset,
-  onOpenSupport,
-  supportButtonRef,
   dirty,
   changes,
 }: CustomiserToolbarProps) {
@@ -71,15 +69,6 @@ export function CustomiserToolbar({
         }}
       >
         {t`Reset`}
-      </Button>
-      <Button
-        ref={supportButtonRef}
-        variant="ghost"
-        size="sm"
-        onClick={onOpenSupport}
-      >
-        <LifeBuoy aria-hidden="true" className={styles.icon} />
-        <span className={styles.narrowLabel}>{t`Support`}</span>
       </Button>
       <ShowQrButton />
       <AccountLink />

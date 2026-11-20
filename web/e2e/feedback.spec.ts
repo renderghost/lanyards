@@ -24,7 +24,7 @@ const support = (page: Page) =>
 
 /** From the sidebar's support, from md up. */
 const openFeedback = (page: Page) =>
-  support(page).getByRole('button', { name: 'Send feedback' }).click();
+  support(page).getByRole('button', { name: 'Give feedback' }).click();
 
 /** A noisy 1,200 × 900 PNG, about 3 MB: a big phone screenshot. */
 async function largePng(page: Page): Promise<Buffer> {
@@ -130,16 +130,24 @@ test.describe('feedback (#134)', () => {
     const png = await largePng(page);
     expect(png.length).toBeGreaterThan(2_500_000);
 
-    // On phones, support is in the toolbar, in a sheet.
-    const toolbar = page.getByRole('toolbar', { name: 'Customiser' });
-    expect(
-      await toolbar.evaluate((bar) => bar.scrollWidth <= bar.clientWidth)
-    ).toBe(true);
-    await toolbar.getByRole('button', { name: 'Support' }).click();
+    // On phones, support is at the foot of the Style sheet.
     await page
-      .getByRole('dialog', { name: 'Beta support' })
-      .getByRole('button', { name: 'Send feedback' })
+      .getByRole('toolbar', { name: 'Customiser' })
+      .getByRole('button', { name: 'Style' })
       .click();
+    const sheet = page.getByRole('dialog', { name: 'Style' });
+    const sheetSupport = sheet.getByRole('region', { name: 'Beta support' });
+    const sheetBox = await sheet.boundingBox();
+    const supportBox = await sheetSupport.boundingBox();
+    expect(
+      Math.abs(
+        (sheetBox?.y ?? 0) +
+          (sheetBox?.height ?? 0) -
+          ((supportBox?.y ?? 0) + (supportBox?.height ?? 0))
+      )
+    ).toBeLessThan(2);
+    await sheetSupport.getByRole('button', { name: 'Give feedback' }).click();
+    await expect(sheet).toBeHidden();
     const form = dialog(page);
     await form.getByRole('radio', { name: 'Bug' }).check();
     await form.getByLabel('Title').fill('The QR code is cut off');

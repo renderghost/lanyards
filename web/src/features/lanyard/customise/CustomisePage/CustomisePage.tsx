@@ -23,8 +23,6 @@ import { CustomiserActions } from '../CustomiserActions/CustomiserActions';
 import type { ViewAs } from '../CustomiserActions/CustomiserActions.types';
 import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
 import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
-import { SupportSheet } from '@/features/feedback/components/SupportSheet/SupportSheet';
-
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
 import { CustomiserSidebar } from '../CustomiserSidebar/CustomiserSidebar';
@@ -92,9 +90,6 @@ function Customiser({
   /** On phones, the style sheet opened from the bottom toolbar. */
   const [styleOpen, setStyleOpen] = useState(false);
   const styleButton = useRef<HTMLButtonElement>(null);
-  /** On phones, "Beta support" opened from the bottom toolbar (#134). */
-  const [supportOpen, setSupportOpen] = useState(false);
-  const supportButton = useRef<HTMLButtonElement>(null);
 
   const granted = useMemo(() => parseGrantedScope(scope), [scope]);
   const canEdit =
@@ -206,17 +201,10 @@ function Customiser({
           onOpenStyle={() => setStyleOpen(true)}
           styleButtonRef={styleButton}
           onReset={draft.discard}
-          onOpenSupport={() => setSupportOpen(true)}
-          supportButtonRef={supportButton}
           dirty={draft.dirty}
           changes={draft.changes}
         />
       </main>
-      <SupportSheet
-        open={supportOpen}
-        onOpenChange={setSupportOpen}
-        returnFocus={() => supportButton.current?.focus()}
-      />
       <StyleSheet
         open={styleOpen}
         onOpenChange={setStyleOpen}

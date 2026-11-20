@@ -19,6 +19,7 @@ export function Sheet({
   children,
   trigger,
   returnFocus,
+  footer,
 }: SheetProps) {
   const { t } = useLingui();
   const contentRef = useRef<HTMLDivElement>(null);
@@ -58,7 +59,10 @@ export function Sheet({
               <IconButton label={t`Close`} icon={<X />} />
             </Dialog.Close>
           </div>
-          <div className={styles.body}>{children}</div>
+          <div data-sheet-body="" className={styles.body}>
+            {children}
+          </div>
+          {footer && <div className={styles.footer}>{footer}</div>}
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>

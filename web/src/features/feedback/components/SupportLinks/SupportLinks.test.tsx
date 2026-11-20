@@ -21,7 +21,7 @@ describe('SupportLinks (#134)', () => {
     const { container } = support();
     const region = screen.getByRole('region', { name: 'Beta support' });
     expect(
-      within(region).getByRole('button', { name: 'Send feedback' })
+      within(region).getByRole('button', { name: 'Give feedback' })
     ).toBeInTheDocument();
     expect(
       within(region).getByRole('link', { name: /Documentation/ })
@@ -41,7 +41,7 @@ describe('SupportLinks (#134)', () => {
   it('opens feedback, putting focus back on the button afterwards', async () => {
     show.mockClear();
     support();
-    const button = screen.getByRole('button', { name: 'Send feedback' });
+    const button = screen.getByRole('button', { name: 'Give feedback' });
     await userEvent.click(button);
     expect(show).toHaveBeenCalledTimes(1);
     button.blur();
@@ -49,14 +49,13 @@ describe('SupportLinks (#134)', () => {
     expect(button).toHaveFocus();
   });
 
-  it('can leave its heading to a sheet that names it, and say when chosen', async () => {
+  it('says when chosen, and hands over where focus returns', async () => {
     show.mockClear();
     const onChoose = vi.fn();
     const returnFocus = vi.fn();
-    support({ heading: false, onChoose, returnFocus });
-    expect(screen.queryByRole('heading', { name: 'Beta support' })).toBeNull();
+    support({ onChoose, returnFocus });
     await userEvent.click(
-      screen.getByRole('button', { name: 'Send feedback' })
+      screen.getByRole('button', { name: 'Give feedback' })
     );
     expect(onChoose).toHaveBeenCalled();
     expect(show).toHaveBeenCalledWith(returnFocus);

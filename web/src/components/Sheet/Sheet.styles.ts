@@ -9,3 +9,5 @@ export const header =
 export const title = 'text-[17px] font-semibold leading-6 text-ui-text';
 
 export const body = 'min-h-0 overflow-y-auto';
+
+export const footer = 'shrink-0 border-t border-ui-border';
