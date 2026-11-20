@@ -50,7 +50,7 @@ const CID = `bafyrei${'a'.repeat(52)}`;
 const OTHER = `bafyrei${'b'.repeat(52)}`;
 const CONFIG = {
   $type: 'app.lanyards.actor.lanyard',
-  accent: 'violet',
+  accent: 'blue',
   createdAt: '2026-11-01T09:00:00.000Z',
 };
 const RECORDS: LanyardRecords = { media: [] };
@@ -78,7 +78,7 @@ function editBoth(result: Draft) {
       platform: 'spotify',
     })
   );
-  act(() => result.current.settings.update((c) => ({ ...c, accent: 'teal' })));
+  act(() => result.current.settings.update((c) => ({ ...c, accent: 'mint' })));
 }
 
 async function save(result: Draft) {

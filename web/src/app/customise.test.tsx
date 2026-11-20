@@ -120,7 +120,7 @@ const saveChanges = () =>
 
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-  document.documentElement.dataset.accent = 'violet';
+  document.documentElement.dataset.accent = 'blue';
 });
 
 // Lazily loaded routes and Sifa's retry-then-fallback path take a few
@@ -246,9 +246,9 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     const confirm = vi.spyOn(window, 'confirm').mockReturnValue(false);
     servePerson();
     const { router } = renderRoute('/lanyard');
-    const teal = await accent('Teal');
-    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
-    await userEvent.click(teal);
+    const mint = await accent('Mint');
+    await waitFor(() => expect(mint).toBeEnabled(), { timeout: 5000 });
+    await userEvent.click(mint);
     await userEvent.click(screen.getByRole('link', { name: 'Lanyards' }));
     expect(confirm).toHaveBeenCalledWith(
       'You have unsaved changes. Leave without saving?'
@@ -290,10 +290,10 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     servePerson();
     const saves = captureSaves();
     renderRoute('/lanyard');
-    const teal = await accent('Teal');
-    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
-    await userEvent.click(teal);
-    expect(document.documentElement.dataset.accent).toBe('teal');
+    const mint = await accent('Mint');
+    await waitFor(() => expect(mint).toBeEnabled(), { timeout: 5000 });
+    await userEvent.click(mint);
+    expect(document.documentElement.dataset.accent).toBe('mint');
     const status = within(screen.getByRole('banner')).getByRole('status');
     expect(status).toHaveTextContent('Unsaved changes');
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -304,7 +304,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       repo: ADA.did,
       collection: 'app.lanyards.actor.lanyard',
       rkey: 'self',
-      record: { $type: 'app.lanyards.actor.lanyard', accent: 'teal' },
+      record: { $type: 'app.lanyards.actor.lanyard', accent: 'mint' },
     });
     await waitFor(() => expect(status).toHaveTextContent('All changes saved'));
   });
@@ -313,19 +313,19 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     servePerson();
     const saves = captureSaves();
     renderRoute('/lanyard');
-    const teal = await accent('Teal');
-    await waitFor(() => expect(teal).toBeEnabled(), { timeout: 5000 });
+    const mint = await accent('Mint');
+    await waitFor(() => expect(mint).toBeEnabled(), { timeout: 5000 });
     const save = screen.getByRole('button', { name: 'Save' });
     const reset = within(screen.getByRole('banner')).getByRole('button', {
       name: 'Reset',
     });
     expect(save).toHaveAttribute('aria-disabled', 'true');
     expect(reset).toHaveAttribute('aria-disabled', 'true');
-    await userEvent.click(teal);
+    await userEvent.click(mint);
     expect(save).not.toHaveAttribute('aria-disabled');
     await userEvent.click(reset);
-    expect(document.documentElement.dataset.accent).toBe('violet');
-    expect(await accent('Violet')).toBeChecked();
+    expect(document.documentElement.dataset.accent).toBe('blue');
+    expect(await accent('Blue')).toBeChecked();
     expect(reset).toHaveFocus();
     expect(reset).toHaveAttribute('aria-disabled', 'true');
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -357,7 +357,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
       )
     ).toBeInTheDocument();
     await preview();
-    expect(await accent('Teal')).toBeDisabled();
+    expect(await accent('Mint')).toBeDisabled();
     expect(await jobCheckbox()).toBeDisabled();
   });
 
@@ -380,7 +380,7 @@ describe('/lanyard', { timeout: 20_000 }, () => {
         { timeout: 5000 }
       )
     ).toBeInTheDocument();
-    expect(await accent('Teal')).toBeDisabled();
+    expect(await accent('Mint')).toBeDisabled();
   });
 
   it('saves a new block order', async () => {
@@ -662,15 +662,15 @@ describe('/lanyard', { timeout: 20_000 }, () => {
         }
       )
     ).toBeInTheDocument();
-    expect(await accent('Teal')).toBeDisabled();
+    expect(await accent('Mint')).toBeDisabled();
     await userEvent.click(
       screen.getByRole('button', { name: 'Reset to defaults' })
     );
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     expect(saves[0]).toMatchObject({
-      record: { accent: 'violet', createdAt: '2026-11-01T09:00:00.000Z' },
+      record: { accent: 'blue', createdAt: '2026-11-01T09:00:00.000Z' },
     });
-    await waitFor(() => expect(accent('Teal')).resolves.toBeEnabled());
+    await waitFor(() => expect(accent('Mint')).resolves.toBeEnabled());
   });
 
   it('has no accessibility violations', async () => {

@@ -57,7 +57,7 @@ async function renderEditor() {
 
 beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-  document.documentElement.dataset.accent = 'violet';
+  document.documentElement.dataset.accent = 'blue';
 });
 
 describe('LanyardEditor', { timeout: 20_000 }, () => {

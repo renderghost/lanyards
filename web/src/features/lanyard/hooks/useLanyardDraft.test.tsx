@@ -36,7 +36,7 @@ const CID = `bafyrei${'a'.repeat(52)}`;
 const OTHER = `bafyrei${'b'.repeat(52)}`;
 const STORED = {
   $type: 'app.lanyards.actor.lanyard',
-  accent: 'violet',
+  accent: 'blue',
   createdAt: '2026-11-01T09:00:00.000Z',
 };
 
@@ -105,7 +105,7 @@ afterEach(() => {
 describe('useLanyardDraft', () => {
   it('reads the owner’s stored settings, with nothing to save', () => {
     const { result } = render();
-    expect(result.current.config.accent).toBe('violet');
+    expect(result.current.config.accent).toBe('blue');
     expect(result.current.saved).toEqual(result.current.config);
     expect(result.current.dirty).toBe(false);
     expect(result.current.changes).toBe(0);
@@ -114,19 +114,19 @@ describe('useLanyardDraft', () => {
 
   it('shows a change at once but writes nothing until Save', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'rose' })));
-    expect(result.current.config.accent).toBe('rose');
+    act(() => result.current.update((c) => ({ ...c, accent: 'pink' })));
+    expect(result.current.config.accent).toBe('pink');
     await advance(5000);
     expect(putRecord).not.toHaveBeenCalled();
     expect(result.current.dirty).toBe(true);
     expect(result.current.changes).toBe(1);
-    expect(result.current.saved.accent).toBe('violet');
+    expect(result.current.saved.accent).toBe('blue');
   });
 
   it('counts each changed setting once', () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'rose' })));
-    act(() => result.current.update((c) => ({ ...c, accent: 'moss' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'pink' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
     act(() => result.current.update((c) => ({ ...c, showJob: false })));
     expect(result.current.changes).toBe(2);
   });
@@ -156,15 +156,15 @@ describe('useLanyardDraft', () => {
 
   it('is clean again when a change is undone by hand', () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'rose' })));
-    act(() => result.current.update((c) => ({ ...c, accent: 'violet' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'pink' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'blue' })));
     expect(result.current.dirty).toBe(false);
     expect(result.current.changes).toBe(0);
   });
 
   it('Save writes the draft and clears dirty', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'moss' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
     act(() => result.current.update((c) => ({ ...c, showJob: false })));
     await advance(1400);
     expect(await save(result)).toBe(true);
@@ -173,7 +173,7 @@ describe('useLanyardDraft', () => {
         collection: 'app.lanyards.actor.lanyard',
         rkey: 'self',
         fields: expect.objectContaining({
-          accent: 'moss',
+          accent: 'lime',
           showJob: false,
           createdAt: STORED.createdAt,
           updatedAt: '2026-11-10T12:00:01.400Z',
@@ -181,7 +181,7 @@ describe('useLanyardDraft', () => {
       },
     ]);
     expect(result.current.dirty).toBe(false);
-    expect(result.current.saved.accent).toBe('moss');
+    expect(result.current.saved.accent).toBe('lime');
     expect(result.current.saving).toBe(false);
     expect(notify.success).toHaveBeenCalledTimes(1);
     expect(notify.success).toHaveBeenCalledWith('Lanyard updated');
@@ -190,7 +190,7 @@ describe('useLanyardDraft', () => {
 
   it('saves quietly when asked, for a caller that announces it', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'moss' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
     let outcome = false;
     await act(async () => {
       outcome = await result.current.save({ announce: false });
@@ -215,14 +215,14 @@ describe('useLanyardDraft', () => {
         })
     );
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     let pending: Promise<boolean> = Promise.resolve(false);
     act(() => {
       pending = result.current.save();
     });
     await advance(0);
     // The owner changes their mind while the save is on its way.
-    act(() => result.current.update((c) => ({ ...c, accent: 'violet' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'blue' })));
     await act(async () => {
       land({
         uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
@@ -230,12 +230,12 @@ describe('useLanyardDraft', () => {
       });
       await pending;
     });
-    expect(result.current.saved.accent).toBe('teal');
-    expect(result.current.config.accent).toBe('violet');
+    expect(result.current.saved.accent).toBe('mint');
+    expect(result.current.config.accent).toBe('blue');
     expect(result.current.dirty).toBe(true);
     expect(result.current.changes).toBe(1);
     expect(await save(result)).toBe(true);
-    expect(saved()[1]?.fields).toMatchObject({ accent: 'violet' });
+    expect(saved()[1]?.fields).toMatchObject({ accent: 'blue' });
     expect(vi.mocked(putRecord).mock.calls[1]?.[4]).toEqual({
       swapRecord: OTHER,
     });
@@ -244,11 +244,11 @@ describe('useLanyardDraft', () => {
   it('save resolves false and keeps the draft when the write fails', async () => {
     vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     expect(await save(result)).toBe(false);
     expect(result.current.error).toBe(true);
     expect(result.current.saving).toBe(false);
-    expect(result.current.config.accent).toBe('teal');
+    expect(result.current.config.accent).toBe('mint');
     expect(result.current.dirty).toBe(true);
     expect(notify.error).toHaveBeenCalledWith(
       'Failed to save. Please try again.',
@@ -262,7 +262,7 @@ describe('useLanyardDraft', () => {
     });
 
     expect(await save(result)).toBe(true);
-    expect(saved()[1]?.fields).toMatchObject({ accent: 'teal' });
+    expect(saved()[1]?.fields).toMatchObject({ accent: 'mint' });
     expect(result.current.error).toBe(false);
     expect(result.current.dirty).toBe(false);
     expect(notify.dismiss).toHaveBeenCalledWith('lanyard-settings-save');
@@ -271,7 +271,7 @@ describe('useLanyardDraft', () => {
   it('retries from the toast’s Retry action', async () => {
     vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'ember' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
     await save(result);
     const options = vi.mocked(notify.error).mock.calls[0]?.[1];
     act(() => options?.action?.onClick());
@@ -282,23 +282,23 @@ describe('useLanyardDraft', () => {
 
   it('discard returns to the last save', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'rose' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'pink' })));
     act(() => result.current.update((c) => ({ ...c, hidden: ['k1'] })));
     act(() => result.current.discard());
     expect(result.current.config).toEqual(result.current.saved);
-    expect(result.current.config.accent).toBe('violet');
+    expect(result.current.config.accent).toBe('blue');
     expect(result.current.dirty).toBe(false);
     // The preview reads the same cache: it shows the stored settings again.
     expect(
       client.getQueryData<{ value: { accent: string } }>(key())?.value.accent
-    ).toBe('violet');
+    ).toBe('blue');
     await advance(5000);
     expect(putRecord).not.toHaveBeenCalled();
   });
 
   it('replaces only the version of the settings it read', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     await save(result);
     expect(vi.mocked(putRecord).mock.calls[0]?.[4]).toEqual({
       swapRecord: CID,
@@ -308,7 +308,7 @@ describe('useLanyardDraft', () => {
   it('creates the record only if none was saved meanwhile', async () => {
     client.setQueryData(key(), null);
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     await save(result);
     expect(vi.mocked(putRecord).mock.calls[0]?.[4]).toEqual({
       swapRecord: null,
@@ -321,7 +321,7 @@ describe('useLanyardDraft', () => {
       cid: OTHER,
     });
     const first = render();
-    act(() => first.result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => first.result.current.update((c) => ({ ...c, accent: 'mint' })));
     await save(first.result);
     first.unmount();
 
@@ -347,11 +347,11 @@ describe('useLanyardDraft', () => {
       value: { value: elsewhere, cid: OTHER, valid: true },
     });
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     expect(await save(result)).toBe(true);
     expect(putRecord).toHaveBeenCalledTimes(2);
     expect(saved()[1]?.fields).toMatchObject({
-      accent: 'teal',
+      accent: 'mint',
       connect: { follow: false },
     });
     expect(vi.mocked(putRecord).mock.calls[1]?.[4]).toEqual({
@@ -369,13 +369,13 @@ describe('useLanyardDraft', () => {
     );
     vi.mocked(fetchLanyardConfig).mockResolvedValue({
       ok: true,
-      value: { value: { ...STORED, accent: 'teal' }, cid: OTHER, valid: true },
+      value: { value: { ...STORED, accent: 'mint' }, cid: OTHER, valid: true },
     });
     const { result } = render();
     act(() => result.current.update((c) => ({ ...c, hidden: ['k1'] })));
     await save(result);
     expect(saved()[1]?.fields).toMatchObject({
-      accent: 'teal',
+      accent: 'mint',
       hidden: ['k1'],
     });
   });
@@ -389,7 +389,7 @@ describe('useLanyardDraft', () => {
       value: { value: { ...STORED, accent: 42 }, cid: OTHER, valid: false },
     });
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     await save(result);
     expect(putRecord).toHaveBeenCalledTimes(1);
     expect(result.current.invalid).toBe(true);
@@ -407,7 +407,7 @@ describe('useLanyardDraft', () => {
       value: { value: STORED, cid: OTHER, valid: true },
     });
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     expect(await save(result)).toBe(false);
     expect(putRecord).toHaveBeenCalledTimes(2);
     expect(result.current.error).toBe(true);
@@ -420,7 +420,7 @@ describe('useLanyardDraft', () => {
 
   it('swaps against the version a change was built on, after a refetch', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     vi.mocked(fetchLanyardConfig).mockResolvedValue({
       ok: true,
       value: {
@@ -447,7 +447,7 @@ describe('useLanyardDraft', () => {
     const { result } = render();
     expect(result.current.ready).toBe(false);
     expect(result.current.invalid).toBe(true);
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     await save(result);
     expect(putRecord).not.toHaveBeenCalled();
 
@@ -457,7 +457,7 @@ describe('useLanyardDraft', () => {
       expect.objectContaining({
         rkey: 'self',
         fields: expect.objectContaining({
-          accent: 'violet',
+          accent: 'blue',
           createdAt: STORED.createdAt,
         }),
       }),
@@ -491,24 +491,24 @@ describe('useLanyardDraft', () => {
 
   it('keeps the draft when the settings are fetched again', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     vi.mocked(fetchLanyardConfig).mockResolvedValue({
       ok: true,
       value: { value: { ...STORED, showJob: false }, cid: OTHER, valid: true },
     });
     await refetch();
     expect(fetchLanyardConfig).toHaveBeenCalled();
-    expect(result.current.config.accent).toBe('teal');
+    expect(result.current.config.accent).toBe('mint');
     expect(result.current.dirty).toBe(true);
     // The last save is now what the server returned.
     expect(result.current.saved.showJob).toBe(false);
     await save(result);
-    expect(saved()[0]?.fields).toMatchObject({ accent: 'teal' });
+    expect(saved()[0]?.fields).toMatchObject({ accent: 'mint' });
   });
 
   it('stays ready, keeping the draft, when a refetch of the settings fails', async () => {
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     vi.mocked(fetchLanyardConfig).mockRejectedValue(new Error('PDS down'));
     let refetched: Promise<unknown> = Promise.resolve();
     act(() => {
@@ -523,7 +523,7 @@ describe('useLanyardDraft', () => {
     });
     expect(client.getQueryState(key())?.status).toBe('error');
     expect(result.current.ready).toBe(true);
-    expect(result.current.config.accent).toBe('teal');
+    expect(result.current.config.accent).toBe('mint');
     act(() => result.current.update((c) => ({ ...c, showJob: false })));
     expect(result.current.config.showJob).toBe(false);
   });
@@ -531,18 +531,18 @@ describe('useLanyardDraft', () => {
   it('keeps a change whose save failed when the settings are fetched again', async () => {
     vi.mocked(putRecord).mockRejectedValueOnce(new Error('PDS down'));
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     await save(result);
     expect(result.current.error).toBe(true);
     await refetch();
-    expect(result.current.config.accent).toBe('teal');
+    expect(result.current.config.accent).toBe('mint');
     await save(result);
-    expect(saved()[1]?.fields).toMatchObject({ accent: 'teal' });
+    expect(saved()[1]?.fields).toMatchObject({ accent: 'mint' });
   });
 
   it('writes nothing when the page hides, backgrounds or closes', async () => {
     const { result, unmount } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'plum' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
     act(() => {
       window.dispatchEvent(new Event('pagehide'));
       Object.defineProperty(document, 'visibilityState', {
@@ -562,9 +562,9 @@ describe('useLanyardDraft', () => {
 
   it('puts back the saved settings for everyone when it closes with a draft', () => {
     const { result, unmount } = render();
-    act(() => result.current.update((c) => ({ ...c, accent: 'teal' })));
+    act(() => result.current.update((c) => ({ ...c, accent: 'mint' })));
     unmount();
     const stored = client.getQueryData<{ value: { accent: string } }>(key());
-    expect(stored?.value.accent).toBe('violet');
+    expect(stored?.value.accent).toBe('blue');
   });
 });

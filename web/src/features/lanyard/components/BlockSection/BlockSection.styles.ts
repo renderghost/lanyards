@@ -18,7 +18,8 @@ export const note = 'text-sm leading-5 text-muted-foreground';
 
 export const editLinks = 'flex flex-wrap gap-x-3 gap-y-1';
 
-export const heading = 'font-sans text-[18px] font-[650] leading-6 text-foreground';
+export const heading =
+  'font-sans text-[18px] font-[650] leading-6 text-foreground';
 
 export const edit =
   'inline-flex min-h-11 shrink-0 items-center text-sm leading-5 text-accent-text underline-offset-4 hover:underline';

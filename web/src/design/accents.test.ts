@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import { readCssVars } from '@/test/cssVars';
 
-import { ACCENTS, applyAccent, DEFAULT_ACCENT } from './accents';
+import { ACCENTS, applyAccent, DEFAULT_ACCENT, resolveAccent } from './accents';
 import { contrastRatio } from './contrast';
 
 // Vitest runs from web/; import.meta.url is not a file URL under jsdom.
@@ -38,6 +38,10 @@ const ACCENT_VARS = [
   '--on-accent',
   '--accent-text',
   '--accent-subtle',
+  '--focus-ring-on-accent',
+  '--cover-ground',
+  '--cover-mark',
+  '--cover-partner',
 ];
 
 describe('base tokens', () => {
@@ -105,8 +109,8 @@ describe('base tokens', () => {
 });
 
 describe('accent palettes', () => {
-  it('defines every accent in light and dark with all four variables', () => {
-    expect(ACCENTS).toHaveLength(8);
+  it('defines the four brand accents in light and dark, every variable', () => {
+    expect(ACCENTS).toEqual(['blue', 'mint', 'lime', 'pink']);
     for (const [accent, mode] of cases) {
       const p = palette(accent, mode);
       for (const name of ACCENT_VARS) {
@@ -139,15 +143,46 @@ describe('accent palettes', () => {
     }
   );
 
-  it.each(cases)(
-    '%s/%s: accent is at least 3:1 on background (non-text)',
-    (a, m) => {
-      const p = palette(a, m);
-      expect(
-        contrastRatio(p['--accent']!, base(m)['--background']!)
-      ).toBeGreaterThanOrEqual(3);
+  // Light fills (mint, lime, pink) carry ink, never meaning on their own:
+  // what must be seen on them is the focus ring.
+  it.each(cases)('%s/%s: the focus ring shows on the accent field', (a, m) => {
+    const p = palette(a, m);
+    expect(
+      contrastRatio(p['--focus-ring-on-accent']!, p['--accent']!)
+    ).toBeGreaterThanOrEqual(3);
+  });
+
+  it.each([
+    ['blue', '#4020df'],
+    ['mint', '#8bf9be'],
+    ['lime', '#eaff00'],
+    ['pink', '#f7879a'],
+  ] as const)('%s fills with the brand’s %s', (accent, fill) => {
+    for (const mode of MODES) {
+      expect(palette(accent, mode)['--accent']?.trim().toLowerCase()).toBe(
+        fill
+      );
     }
-  );
+  });
+});
+
+describe('resolveAccent', () => {
+  it.each([
+    ['blue', 'blue'],
+    ['lime', 'lime'],
+    ['violet', 'blue'],
+    ['indigo', 'blue'],
+    ['ocean', 'blue'],
+    ['moss', 'mint'],
+    ['teal', 'mint'],
+    ['rose', 'pink'],
+    ['plum', 'pink'],
+    ['ember', 'pink'],
+    ['nonsense', 'blue'],
+    [undefined, 'blue'],
+  ] as const)('reads %s as %s', (stored, accent) => {
+    expect(resolveAccent(stored)).toBe(accent);
+  });
 });
 
 describe('applyAccent', () => {
@@ -155,12 +190,12 @@ describe('applyAccent', () => {
     delete document.documentElement.dataset.accent;
   });
 
-  it('defaults to violet', () => {
-    expect(DEFAULT_ACCENT).toBe('violet');
+  it('defaults to blue', () => {
+    expect(DEFAULT_ACCENT).toBe('blue');
   });
 
   it('sets the accent on the root element', () => {
-    applyAccent('teal');
-    expect(document.documentElement.dataset.accent).toBe('teal');
+    applyAccent('mint');
+    expect(document.documentElement.dataset.accent).toBe('mint');
   });
 });

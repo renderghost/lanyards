@@ -17,7 +17,7 @@ function Harness() {
       title="Style"
       trigger={<button type="button">Open style</button>}
     >
-      <button type="button">Violet</button>
+      <button type="button">Blue</button>
     </Sheet>
   );
 }
@@ -40,7 +40,7 @@ function Untriggered({ handBack }: { handBack?: boolean }) {
         title="Style"
         returnFocus={handBack ? () => elsewhere.current?.focus() : undefined}
       >
-        <button type="button">Violet</button>
+        <button type="button">Blue</button>
       </Sheet>
     </>
   );

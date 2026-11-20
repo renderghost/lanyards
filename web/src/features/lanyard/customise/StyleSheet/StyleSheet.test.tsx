@@ -33,7 +33,7 @@ describe('StyleSheet', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Style' }));
     const sheet = await screen.findByRole('dialog', { name: 'Style' });
     expect(
-      within(sheet).getByRole('radio', { name: 'Teal' })
+      within(sheet).getByRole('radio', { name: 'Mint' })
     ).toBeInTheDocument();
     expect(
       within(sheet).getByRole('button', { name: 'Badge' })

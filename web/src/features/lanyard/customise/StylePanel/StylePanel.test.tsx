@@ -29,9 +29,9 @@ describe('StylePanel', () => {
     renderWithProviders(
       <StylePanel config={CONFIG} disabled={false} onChange={onChange} />
     );
-    await userEvent.click(screen.getByRole('radio', { name: 'Teal' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Mint' }));
     const patch = onChange.mock.calls[0]?.[0];
-    expect(patch(CONFIG)).toEqual({ ...CONFIG, accent: 'teal' });
+    expect(patch(CONFIG)).toEqual({ ...CONFIG, accent: 'mint' });
   });
 
   it('turns the current job on the badge off and on', async () => {
@@ -51,7 +51,7 @@ describe('StylePanel', () => {
     renderWithProviders(
       <StylePanel config={CONFIG} disabled onChange={vi.fn()} />
     );
-    expect(screen.getByRole('radio', { name: 'Teal' })).toBeDisabled();
+    expect(screen.getByRole('radio', { name: 'Mint' })).toBeDisabled();
     await userEvent.click(section('Badge'));
     expect(
       screen.getByRole('checkbox', { name: 'Show current job' })
