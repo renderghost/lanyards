@@ -47,6 +47,17 @@ export const collectionOf = (uri: string): MediaCollection =>
 export const legacyKindOf = (uri: string): MediaKind | undefined =>
   LEGACY_KINDS[collectionOf(uri)];
 
+/**
+ * Where a legacy record lives once moved: the media item with its rkey.
+ * Null for any other key. A hidden legacy key still hides the item, so a
+ * move cut short never shows what the owner hid (#132).
+ */
+export function movedKeyOf(uri: string): string | null {
+  if (!legacyKindOf(uri)) return null;
+  const [, , did, , rkey] = uri.split('/');
+  return `at://${did}/${LANYARDS_NSID.mediaItem}/${rkey}`;
+}
+
 export const isMediaKind = (value: unknown): value is MediaKind =>
   value === 'audio' || value === 'video';
 
@@ -65,6 +76,14 @@ export function itemFromLegacy(
   }
   if (typeof item.type === 'string' && TALK_TYPES.has(item.type)) {
     item.type = 'other';
+  }
+  // The legacy lexicons allowed any integer; a length is never negative.
+  const { duration } = item;
+  if (
+    duration !== undefined &&
+    !(Number.isInteger(duration) && (duration as number) >= 0)
+  ) {
+    delete item.duration;
   }
   return item;
 }

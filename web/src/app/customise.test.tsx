@@ -7,6 +7,7 @@ import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { expectNoAxeViolations } from '@/test/axe';
 import { server } from '@/test/msw';
+import { mockListRecords } from '@/test/handlers';
 import { ADA } from '@/test/people';
 import {
   servePerson,
@@ -502,6 +503,39 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     expect(
       screen.queryByRole('heading', { name: 'Lanyards needs your permission' })
     ).toBeNull();
+  });
+
+  it('holds editing while legacy podcasts move, and says so (#132)', async () => {
+    servePerson({ config: { blocks: [{ type: 'media', visible: true }] } });
+    mockListRecords(ADA.pds, ADA.did, 'app.lanyards.link.media.audio', [
+      {
+        uri: `at://${ADA.did}/app.lanyards.link.media.audio/3mlegacy`,
+        cid: CID,
+        value: {
+          $type: 'app.lanyards.link.media.audio',
+          url: 'https://pod.example/legacy',
+          platform: 'spotify',
+          title: 'Legacy episode',
+          createdAt: '2025-01-01T09:00:00.000Z',
+        },
+      },
+    ]);
+    // The move never finishes.
+    server.use(
+      http.post(
+        `${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`,
+        () => new Promise<never>(() => {})
+      )
+    );
+    renderRoute('/lanyard');
+    expect(
+      await screen.findByText('Updating your podcasts and videos…', undefined, {
+        timeout: 8000,
+      })
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole('button', { name: 'Add a podcast or video' })
+    ).toBeDisabled();
   });
 
   it('keeps the ORCID helper in Publications while editing', async () => {

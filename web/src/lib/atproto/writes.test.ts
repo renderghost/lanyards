@@ -6,6 +6,7 @@ import { ADA, BEA } from '@/test/people';
 import { signedInSession, VIEWER_PDS } from '@/test/person';
 
 import {
+  applyWriteGroups,
   applyWrites,
   createRecord,
   deleteRecord,
@@ -13,6 +14,7 @@ import {
   MissingPermissionError,
   putRecord,
   RecordChangedError,
+  ScopeRefusedError,
   WRITABLE_COLLECTIONS,
   type WriteOp,
   WriteFailedError,
@@ -334,6 +336,22 @@ describe('applyWrites', () => {
     expect((failure as WriteFailedError).applied).toBe(0);
   });
 
+  it('a PDS refusing for a missing scope says so', async () => {
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`, () =>
+        HttpResponse.json(
+          { error: 'InsufficientScope', message: 'Missing scope' },
+          { status: 403 }
+        )
+      )
+    );
+    await expect(
+      applyWrites(session(), [
+        { type: 'delete', collection: MEDIA, rkey: '3mgone' },
+      ])
+    ).rejects.toBeInstanceOf(ScopeRefusedError);
+  });
+
   it('throws WriteFailedError when the PDS refuses', async () => {
     server.use(
       http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`, () =>
@@ -345,5 +363,58 @@ describe('applyWrites', () => {
         { type: 'delete', collection: MEDIA, rkey: '3mgone' },
       ])
     ).rejects.toBeInstanceOf(WriteFailedError);
+  });
+});
+
+describe('applyWriteGroups', () => {
+  const MEDIA = 'app.lanyards.media.item' as const;
+  const remove = (rkey: string): WriteOp => ({
+    type: 'delete',
+    collection: MEDIA,
+    rkey,
+  });
+  const move: WriteOp[] = [
+    {
+      type: 'create',
+      collection: MEDIA,
+      rkey: '3mmoved',
+      fields: { url: 'https://pod.example/1', kind: 'audio', createdAt: NOW },
+    },
+    {
+      type: 'delete',
+      collection: 'app.lanyards.link.media.audio',
+      rkey: '3mmoved',
+    },
+  ];
+  const nine = Array.from({ length: 9 }, (_, index) => [
+    remove(`3mgone${index}`),
+  ]);
+
+  it('never splits a group across calls', async () => {
+    const bodies = capture('applyWrites');
+    await applyWriteGroups(session(), [...nine, move]);
+    expect(
+      bodies.map((body) => (body as { writes: unknown[] }).writes.length)
+    ).toEqual([9, 2]);
+  });
+
+  it('a failure says how many writes whole groups landed', async () => {
+    let calls = 0;
+    server.use(
+      http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.applyWrites`, () => {
+        calls += 1;
+        return calls === 1
+          ? HttpResponse.json({ results: [] })
+          : HttpResponse.json(
+              { error: 'InternalServerError' },
+              { status: 500 }
+            );
+      })
+    );
+    const failure = await applyWriteGroups(session(), [...nine, move]).catch(
+      (error: unknown) => error
+    );
+    expect(failure).toBeInstanceOf(WriteFailedError);
+    expect((failure as WriteFailedError).applied).toBe(9);
   });
 });

@@ -68,7 +68,9 @@ The approved mockups are on the design canvas the spec names.
 - Every schema change lands in the first PR (#132). Later PRs only
   consume the generated types.
 - Changes to `app.lanyards.actor.lanyard` only add things.
-- The owner republishes once, after #132 merges.
+- The owner republishes once, **before** #132 merges: the PDS grants the
+  permission set as published, so `app.lanyards.media.item` writes are
+  refused until then.
 
 **Git:**
 - Commits are authored as Barry Prendergast with the session trailers.
@@ -272,7 +274,7 @@ Branch: `feature/issue-132-lexicons` from `origin/main`. The spec is
 - [ ] **Step 5: Commit** `feat: move legacy podcasts and videos to the
   new record (#132)`, then push and open the PR with "Closes #132".
   The PR body asks the owner to republish the lanyard, media item and
-  permission set lexicons.
+  permission set lexicons before merging, then sign in again.
 
 ---
 

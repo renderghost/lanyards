@@ -56,6 +56,19 @@ describe('itemFromLegacy', () => {
   );
 });
 
+describe('itemFromLegacy: what the new record can’t hold', () => {
+  it.each([-1, 1.5])('drops a duration of %s', (duration) => {
+    expect(
+      itemFromLegacy('audio', {
+        url: 'https://pod.example/1',
+        platform: 'spotify',
+        duration,
+        createdAt: '2025-01-01T09:00:00.000Z',
+      })
+    ).not.toHaveProperty('duration');
+  });
+});
+
 describe('collectionOf', () => {
   it('reads the collection from an AT-URI', () => {
     expect(collectionOf('at://did:plc:a/app.lanyards.media.item/3m')).toBe(

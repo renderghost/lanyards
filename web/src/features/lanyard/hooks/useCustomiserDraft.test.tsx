@@ -8,9 +8,10 @@ import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
 import { getRecord } from '@/lib/atproto/pds';
 import {
-  applyWrites,
+  applyWriteGroups,
   putRecord,
   RecordChangedError,
+  ScopeRefusedError,
 } from '@/lib/atproto/writes';
 import { queryKeys } from '@/lib/query/keys';
 import {
@@ -41,7 +42,7 @@ vi.mock('@/lib/atproto/pds', async (importOriginal) => ({
 }));
 vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/atproto/writes')>()),
-  applyWrites: vi.fn(),
+  applyWriteGroups: vi.fn(),
   putRecord: vi.fn(),
 }));
 
@@ -104,7 +105,7 @@ beforeEach(() => {
     value: RECORDS,
   });
   vi.mocked(getRecord).mockResolvedValue({ ok: true, value: null } as never);
-  vi.mocked(applyWrites).mockResolvedValue(undefined);
+  vi.mocked(applyWriteGroups).mockResolvedValue(undefined);
   vi.mocked(putRecord).mockResolvedValue({
     uri: `at://${ADA.did}/app.lanyards.actor.lanyard/self`,
     cid: CID,
@@ -127,11 +128,11 @@ describe('useCustomiserDraft', () => {
     const { result } = render();
     editBoth(result);
     await save(result);
-    expect(applyWrites).toHaveBeenCalledTimes(1);
+    expect(applyWriteGroups).toHaveBeenCalledTimes(1);
     expect(putRecord).toHaveBeenCalledTimes(1);
-    expect(vi.mocked(applyWrites).mock.invocationCallOrder[0]).toBeLessThan(
-      vi.mocked(putRecord).mock.invocationCallOrder[0]!
-    );
+    expect(
+      vi.mocked(applyWriteGroups).mock.invocationCallOrder[0]
+    ).toBeLessThan(vi.mocked(putRecord).mock.invocationCallOrder[0]!);
     expect(notify.success).toHaveBeenCalledTimes(1);
     expect(notify.success).toHaveBeenCalledWith('Lanyard updated');
     expect(result.current.dirty).toBe(false);
@@ -166,7 +167,7 @@ describe('useCustomiserDraft', () => {
       retry?.onClick();
       await new Promise((resolve) => setTimeout(resolve, 0));
     });
-    expect(applyWrites).toHaveBeenCalledTimes(1);
+    expect(applyWriteGroups).toHaveBeenCalledTimes(1);
     expect(result.current.dirty).toBe(false);
   });
 
@@ -177,11 +178,25 @@ describe('useCustomiserDraft', () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did, 'atproto'));
     rerender();
     await save(result);
-    expect(applyWrites).not.toHaveBeenCalled();
+    expect(applyWriteGroups).not.toHaveBeenCalled();
     expect(putRecord).not.toHaveBeenCalled();
     expect(result.current.permissionLost).toBe(true);
     expect(result.current.dirty).toBe(true);
     expect(result.current.changes).toBe(2);
+    expect(notify.error).not.toHaveBeenCalled();
+  });
+
+  it('a PDS refusing the scope shows the permission notice and keeps the draft', async () => {
+    const { result } = render();
+    editBoth(result);
+    // The app's own check passes, but the granted permission set is older
+    // than the app's (#132).
+    vi.mocked(applyWriteGroups).mockRejectedValue(
+      new ScopeRefusedError('InsufficientScope')
+    );
+    await save(result);
+    expect(result.current.permissionLost).toBe(true);
+    expect(result.current.dirty).toBe(true);
     expect(notify.error).not.toHaveBeenCalled();
   });
 

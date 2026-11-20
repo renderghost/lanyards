@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { BLOCK_TYPES } from './nsids';
 import { stripNulls, validateRecord } from './validate';
 
 const NOW = '2026-11-10T09:00:00.000Z';
@@ -74,6 +75,19 @@ describe('validateRecord', () => {
         showLocation: true,
         showOpenTo: false,
       },
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it('lets an event override emphasise every block type, roles included', () => {
+    const result = validateRecord('app.lanyards.actor.lanyard', {
+      ...fullLanyard,
+      events: [
+        {
+          event: EVENT,
+          emphasise: [...BLOCK_TYPES, 'roles'],
+        },
+      ],
     });
     expect(result.ok).toBe(true);
   });

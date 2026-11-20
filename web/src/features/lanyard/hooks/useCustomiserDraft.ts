@@ -5,6 +5,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
 import { canWrite, parseGrantedScope } from '@/lib/atproto/permissions';
+import { ScopeRefusedError } from '@/lib/atproto/writes';
 import { LANYARDS_NSID } from '@/lib/lexicons/nsids';
 
 import {
@@ -79,7 +80,17 @@ export function useCustomiserDraft(did: Did): UseCustomiserDraft {
     setPermissionLost(false);
     if (records.dirty) {
       setSavingRecords(true);
-      const saved = await records.save();
+      let saved: boolean;
+      try {
+        saved = await records.save();
+      } catch (cause) {
+        setSavingRecords(false);
+        if (cause instanceof ScopeRefusedError) {
+          setPermissionLost(true);
+          return;
+        }
+        throw cause;
+      }
       setSavingRecords(false);
       if (!saved) {
         notify.error(t`Failed to save. Please try again.`, {

@@ -688,10 +688,17 @@ the bundle budget and e2e.
 
 ## 15. Owner follow-ups
 
-- **Publish the lexicons** to the PDS once #132 merges, as before:
+- **Publish the lexicons** to the PDS **before #132 merges**, as before:
   - `app.lanyards.actor.lanyard`;
   - the new `app.lanyards.media.item`;
   - `app.lanyards.authFull`.
+
+  The PDS grants the permission set as published. Until it lists
+  `app.lanyards.media.item`, podcast saves and the move are refused; the
+  app then asks people to sign in again. Republishing first is safe: the
+  deployed app writes nothing the new set drops.
+- **Sign in again** after the republish, so your session holds the new
+  set.
 
   The honorific and web-link lexicons stay published, but nothing new
   uses them.

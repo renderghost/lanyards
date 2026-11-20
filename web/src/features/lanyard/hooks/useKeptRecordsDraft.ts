@@ -14,7 +14,8 @@ import { useSession } from '@/features/auth/session/useSession';
 import { captureError, track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
 import {
-  applyWrites,
+  applyWriteGroups,
+  ScopeRefusedError,
   WriteFailedError,
   type WriteOp,
 } from '@/lib/atproto/writes';
@@ -45,7 +46,10 @@ export type UseKeptRecordsDraft = {
   addMedia(fields: MediaFields): void;
   updateMedia(key: string, fields: MediaFields): void;
   removeMedia(key: string): void;
-  /** Writes the changes; whatever lands leaves the draft. */
+  /**
+   * Writes the changes; whatever lands leaves the draft. Rejects with
+   * ScopeRefusedError when the PDS refuses the session's scope.
+   */
   save(): Promise<boolean>;
   discard(): void;
 };
@@ -330,9 +334,10 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
           settles: { ...NONE, added: [item] },
         })),
       ]);
-      await applyWrites(
+      // A move's create and delete never travel apart (#132).
+      await applyWriteGroups(
         owner,
-        writes.flatMap((write) => write.ops)
+        writes.map((write) => write.ops)
       );
       landed(writes);
       track('kept_record_saved', { changes: writes.length });
@@ -346,6 +351,8 @@ export function useKeptRecordsDraft(did: Did): UseKeptRecordsDraft {
         landed(landedWrites(writes, cause.applied));
       }
       captureError(cause, { source: 'kept-records' });
+      // The owner signs in again; the draft keeps what didn't land.
+      if (cause instanceof ScopeRefusedError) throw cause;
       return false;
     }
   }, [queryClient, key, settle, show]);

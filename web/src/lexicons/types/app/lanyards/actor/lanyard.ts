@@ -74,12 +74,12 @@ const _eventOverrideSchema = /*#__PURE__*/ v.object(
 		"$type": /*#__PURE__*/ v.optional(/*#__PURE__*/ v.literal("app.lanyards.actor.lanyard#eventOverride")),
 		/**
 		 * Block types moved to the top for this event
-		 * @maxLength 13
+		 * @maxLength 20
 		 */
 		get "emphasise"() {
 			return /*#__PURE__*/ v.optional(/*#__PURE__*/ v.constrain(
 				/*#__PURE__*/ v.array(blockTypeSchema),
-				[/*#__PURE__*/ v.arrayLength(0, 13)]
+				[/*#__PURE__*/ v.arrayLength(0, 20)]
 			))
 		},
 		/**

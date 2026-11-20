@@ -195,7 +195,7 @@
         },
         "emphasise": {
           "type": "array",
-          "maxLength": 13,
+          "maxLength": 20,
           "items": {
             "type": "ref",
             "ref": "#blockType"

@@ -85,6 +85,21 @@ function typed(
   return record;
 }
 
+/**
+ * The PDS refused a write for a scope the session lacks, though the app's
+ * own check passed: the granted permission set is older than the app's
+ * (#132). The owner is asked to sign in again.
+ */
+export class ScopeRefusedError extends WriteFailedError {
+  override name = 'ScopeRefusedError';
+}
+
+function refused(status: number, error: string, applied = 0): void {
+  if (status === 403 || /scope/i.test(error)) {
+    throw new ScopeRefusedError(error, applied);
+  }
+}
+
 export type Reference = { uri: string; cid: string };
 
 /** Adds a record with a new TID key to the signed-in person's repository. */
@@ -98,7 +113,10 @@ export async function createRecord(
   const response = await session.rpc.post('com.atproto.repo.createRecord', {
     input: { repo: session.did, collection, rkey: tidNow(), record },
   });
-  if (!response.ok) throw new WriteFailedError(response.data.error);
+  if (!response.ok) {
+    refused(response.status, response.data.error);
+    throw new WriteFailedError(response.data.error);
+  }
   return { uri: response.data.uri, cid: response.data.cid };
 }
 
@@ -132,6 +150,7 @@ export async function putRecord(
     if (response.data.error === 'InvalidSwap') {
       throw new RecordChangedError(response.data.error);
     }
+    refused(response.status, response.data.error);
     throw new WriteFailedError(response.data.error);
   }
   return { uri: response.data.uri, cid: response.data.cid };
@@ -147,7 +166,10 @@ export async function deleteRecord(
   const response = await session.rpc.post('com.atproto.repo.deleteRecord', {
     input: { repo: session.did, collection, rkey },
   });
-  if (!response.ok) throw new WriteFailedError(response.data.error);
+  if (!response.ok) {
+    refused(response.status, response.data.error);
+    throw new WriteFailedError(response.data.error);
+  }
 }
 
 /** At most this many writes go in one applyWrites call; each is atomic. */
@@ -181,35 +203,63 @@ const WRITE_TYPE = {
  * is checked (permission and lexicon) before anything is sent; then they go
  * in com.atproto.repo.applyWrites calls of at most 10, each all-or-nothing.
  */
-export async function applyWrites(
+export function applyWrites(
   session: WriteSession,
   ops: WriteOp[]
 ): Promise<void> {
-  const writes = ops.map((op) => {
-    allow(session, op.collection, op.type);
-    return op.type === 'delete'
-      ? { $type: WRITE_TYPE.delete, collection: op.collection, rkey: op.rkey }
-      : {
-          $type: WRITE_TYPE[op.type],
-          collection: op.collection,
-          rkey: op.rkey ?? tidNow(),
-          value: typed(op.collection, op.fields),
-        };
-  });
-  // Each chunk lands whole or not at all; a failure says how many writes
-  // earlier chunks landed, so a retry sends only the rest.
-  for (let start = 0; start < writes.length; start += BATCH_SIZE) {
+  return applyWriteGroups(
+    session,
+    ops.map((op) => [op])
+  );
+}
+
+/**
+ * Applies groups of writes, a group never split across calls: what must
+ * land together (moving a record is a create and a delete) lands together
+ * or not at all. A failure says how many writes earlier calls landed, so a
+ * retry sends only the rest.
+ */
+export async function applyWriteGroups(
+  session: WriteSession,
+  groups: WriteOp[][]
+): Promise<void> {
+  const prepared = groups.map((group) =>
+    group.map((op) => {
+      allow(session, op.collection, op.type);
+      return op.type === 'delete'
+        ? {
+            $type: WRITE_TYPE.delete,
+            collection: op.collection,
+            rkey: op.rkey,
+          }
+        : {
+            $type: WRITE_TYPE[op.type],
+            collection: op.collection,
+            rkey: op.rkey ?? tidNow(),
+            value: typed(op.collection, op.fields),
+          };
+    })
+  );
+  const calls: (typeof prepared)[number][] = [];
+  for (const group of prepared) {
+    const call = calls.at(-1);
+    if (call && call.length + group.length <= BATCH_SIZE) call.push(...group);
+    else calls.push([...group]);
+  }
+  let applied = 0;
+  for (const writes of calls) {
     let response;
     try {
       response = await session.rpc.post('com.atproto.repo.applyWrites', {
-        input: {
-          repo: session.did,
-          writes: writes.slice(start, start + BATCH_SIZE) as never,
-        },
+        input: { repo: session.did, writes: writes as never },
       });
     } catch (cause) {
-      throw new WriteFailedError('Network error', start, { cause });
+      throw new WriteFailedError('Network error', applied, { cause });
     }
-    if (!response.ok) throw new WriteFailedError(response.data.error, start);
+    if (!response.ok) {
+      refused(response.status, response.data.error, applied);
+      throw new WriteFailedError(response.data.error, applied);
+    }
+    applied += writes.length;
   }
 }

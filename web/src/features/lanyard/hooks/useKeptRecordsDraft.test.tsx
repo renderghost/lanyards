@@ -7,7 +7,7 @@ import { useSession } from '@/features/auth/session/useSession';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
 import { track } from '@/lib/analytics/analytics';
 import { getRecord } from '@/lib/atproto/pds';
-import { applyWrites, WriteFailedError } from '@/lib/atproto/writes';
+import { applyWriteGroups, WriteFailedError } from '@/lib/atproto/writes';
 import { queryKeys } from '@/lib/query/keys';
 import { fetchLanyardRecords } from '@/lib/sources/lanyards/lanyards';
 import { ok } from '@/lib/sources/result';
@@ -33,7 +33,7 @@ vi.mock('@/lib/sources/lanyards/lanyards', async (importOriginal) => {
 });
 vi.mock('@/lib/atproto/writes', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/atproto/writes')>()),
-  applyWrites: vi.fn(),
+  applyWriteGroups: vi.fn(),
 }));
 
 const NOW = '2026-11-19T12:00:00.000Z';
@@ -87,7 +87,9 @@ async function save(result: Draft) {
   return outcome;
 }
 
-const ops = () => vi.mocked(applyWrites).mock.calls.map(([, batch]) => batch);
+/** The writes each save sent, groups flattened. */
+const ops = () =>
+  vi.mocked(applyWriteGroups).mock.calls.map(([, groups]) => groups.flat());
 
 beforeEach(() => {
   vi.useFakeTimers({ toFake: ['Date'] });
@@ -95,7 +97,7 @@ beforeEach(() => {
   client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   client.setQueryData(key(), STORED);
   vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-  vi.mocked(applyWrites).mockResolvedValue(undefined);
+  vi.mocked(applyWriteGroups).mockResolvedValue(undefined);
   vi.mocked(getRecord).mockResolvedValue({
     ok: true,
     value: { value: { createdAt: OLD }, cid: 'cid' },
@@ -128,7 +130,7 @@ describe('useKeptRecordsDraft', () => {
     ).toEqual([AUDIO, added.key]);
     expect(result.current.dirty).toBe(true);
     expect(result.current.changes).toBe(1);
-    expect(applyWrites).not.toHaveBeenCalled();
+    expect(applyWriteGroups).not.toHaveBeenCalled();
   });
 
   it('holds only podcasts and videos', () => {
@@ -194,7 +196,7 @@ describe('useKeptRecordsDraft', () => {
     expect(result.current.records.media.map((item) => item.key)).toEqual([
       added,
     ]);
-    vi.mocked(applyWrites).mockClear();
+    vi.mocked(applyWriteGroups).mockClear();
     expect(await save(result)).toBe(true);
     expect(ops()).toEqual([
       [
@@ -242,7 +244,7 @@ describe('useKeptRecordsDraft', () => {
     await act(() => client.refetchQueries({ queryKey: key() }));
     expect(result.current.dirty).toBe(false);
     expect(await save(result)).toBe(true);
-    expect(applyWrites).not.toHaveBeenCalled();
+    expect(applyWriteGroups).not.toHaveBeenCalled();
   });
 
   it('a failure part-way keeps only what didn’t land; Retry sends the rest', async () => {
@@ -255,14 +257,14 @@ describe('useKeptRecordsDraft', () => {
         })
       );
     }
-    vi.mocked(applyWrites).mockRejectedValueOnce(
+    vi.mocked(applyWriteGroups).mockRejectedValueOnce(
       new WriteFailedError('InternalServerError', 10)
     );
     expect(await save(result)).toBe(false);
     expect(result.current.changes).toBe(1);
     // Everything stays on show: ten saved, one still to save.
     expect(result.current.records.media).toHaveLength(12);
-    vi.mocked(applyWrites).mockClear();
+    vi.mocked(applyWriteGroups).mockClear();
     expect(await save(result)).toBe(true);
     expect(ops()).toEqual([
       [
@@ -395,6 +397,34 @@ describe('useKeptRecordsDraft', () => {
     ]);
   });
 
+  it('keeps a legacy item’s create and delete in one group', async () => {
+    const many = Array.from({ length: 9 }, (_, index) => ({
+      key: `at://${ADA.did}/app.lanyards.media.item/3mgone${index}`,
+      kind: 'audio' as const,
+      url: `https://pod.example/gone/${index}`,
+      platform: 'spotify',
+    }));
+    client.setQueryData(key(), { media: [...many, LEGACY_ITEM] });
+    const { result } = render();
+    act(() => {
+      for (const item of many) result.current.removeMedia(item.key);
+    });
+    act(() =>
+      result.current.updateMedia(LEGACY, {
+        kind: 'audio',
+        url: 'https://pod.example/old',
+        platform: 'spotify',
+        title: 'Renamed episode',
+      })
+    );
+    await save(result);
+    const groups = vi.mocked(applyWriteGroups).mock.calls[0]![1];
+    expect(groups.at(-1)).toEqual([
+      expect.objectContaining({ type: 'create', rkey: '3mleg1' }),
+      expect.objectContaining({ type: 'delete', rkey: '3mleg1' }),
+    ]);
+  });
+
   it('deleting a legacy item deletes it from its legacy collection', async () => {
     client.setQueryData(key(), { media: [LEGACY_ITEM] });
     const { result } = render();
@@ -438,7 +468,7 @@ describe('useKeptRecordsDraft', () => {
     act(() => result.current.removeMedia(AUDIO));
     expect(result.current.changes).toBe(2);
     expect(await save(result)).toBe(true);
-    expect(applyWrites).toHaveBeenCalledTimes(1);
+    expect(applyWriteGroups).toHaveBeenCalledTimes(1);
     expect(ops()[0]).toEqual([
       {
         type: 'delete',
@@ -469,7 +499,7 @@ describe('useKeptRecordsDraft', () => {
   });
 
   it('a failed save keeps every change', async () => {
-    vi.mocked(applyWrites).mockRejectedValue(new Error('PDS down'));
+    vi.mocked(applyWriteGroups).mockRejectedValue(new Error('PDS down'));
     const { result } = render();
     act(() => result.current.addMedia(EPISODE));
     act(() => result.current.removeMedia(AUDIO));
