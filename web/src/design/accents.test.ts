@@ -45,6 +45,9 @@ const ACCENT_VARS = [
   '--board-label',
   '--badge-button',
   '--on-badge-button',
+  '--qr-ground',
+  '--qr-strap',
+  '--qr-close',
 ];
 
 describe('base tokens', () => {
@@ -174,6 +177,22 @@ describe('accent palettes', () => {
     expect(
       contrastRatio(p['--badge-button']!, p['--accent']!)
     ).toBeGreaterThanOrEqual(3);
+  });
+
+  // The Show QR badge stands on brand blue, or ink when the card is blue.
+  it.each(cases)('%s/%s: the Show QR actions stand out', (a, m) => {
+    const p = palette(a, m);
+    expect(contrastRatio('#ffffff', p['--qr-close']!)).toBeGreaterThanOrEqual(
+      7
+    );
+    // Copy link is white on the ground; Close must differ from it too.
+    expect(contrastRatio('#ffffff', p['--qr-ground']!)).toBeGreaterThanOrEqual(
+      3
+    );
+    expect(p['--qr-close']).not.toBe(p['--qr-ground']);
+    expect(contrastRatio(p['--accent']!, p['--qr-ground']!)).toBeGreaterThan(
+      1.5
+    );
   });
 
   it.each([

@@ -3,6 +3,11 @@ import { defineConfig, devices } from '@playwright/test';
 // Lets environments with a preinstalled Chromium (e.g. cloud sandboxes) use it.
 const executablePath = process.env.PW_CHROMIUM_PATH;
 
+const chromium = {
+  ...devices['Desktop Chrome'],
+  ...(executablePath ? { launchOptions: { executablePath } } : {}),
+};
+
 export default defineConfig({
   testDir: 'e2e',
   fullyParallel: true,
@@ -22,10 +27,16 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: {
-        ...devices['Desktop Chrome'],
-        ...(executablePath ? { launchOptions: { executablePath } } : {}),
-      },
+      testIgnore: /perf\.spec\.ts/,
+      use: chromium,
+    },
+    // The loading budget is measured alone, once everything else has run:
+    // other browsers working in parallel on the same machine would skew it.
+    {
+      name: 'perf',
+      testMatch: /perf\.spec\.ts/,
+      dependencies: ['chromium'],
+      use: chromium,
     },
   ],
 });

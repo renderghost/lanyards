@@ -10,7 +10,9 @@
    inside an accent field is --focus-ring-on-accent. --cover-* colour the
    badge's cover patterns. --board-label labels the badge's departure board
    (always brand ink), and --badge-button is the badge's main action on the
-   accent field. The badge looks the same in light and dark.
+   accent field. The badge looks the same in light and dark. --qr-* is the
+   Show QR badge's ground (brand blue, or ink under a blue card), its
+   lanyard straps and its Close button.
 
    Every pair is contrast-checked by src/design/accents.test.ts:
    on-accent/accent ≥ 7:1, accent-text/background ≥ 7:1,
@@ -33,6 +35,9 @@
   --board-label: #b3a6ff;
   --badge-button: #ffffff;
   --on-badge-button: #06011e;
+  --qr-ground: #06011e;
+  --qr-strap: #312d49;
+  --qr-close: #312d49;
 }
 :root[data-accent='mint'],
 [data-accent='mint'] {
@@ -47,6 +52,9 @@
   --board-label: #8bf9be;
   --badge-button: #06011e;
   --on-badge-button: #ffffff;
+  --qr-ground: #4020df;
+  --qr-strap: #06011e;
+  --qr-close: #06011e;
 }
 :root[data-accent='lime'],
 [data-accent='lime'] {
@@ -61,6 +69,9 @@
   --board-label: #eaff00;
   --badge-button: #06011e;
   --on-badge-button: #ffffff;
+  --qr-ground: #4020df;
+  --qr-strap: #06011e;
+  --qr-close: #06011e;
 }
 :root[data-accent='pink'],
 [data-accent='pink'] {
@@ -75,6 +86,9 @@
   --board-label: #f7879a;
   --badge-button: #06011e;
   --on-badge-button: #ffffff;
+  --qr-ground: #4020df;
+  --qr-strap: #06011e;
+  --qr-close: #06011e;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -92,6 +106,9 @@
     --board-label: #b3a6ff;
     --badge-button: #ffffff;
     --on-badge-button: #06011e;
+    --qr-ground: #06011e;
+    --qr-strap: #312d49;
+    --qr-close: #312d49;
   }
   :root[data-accent='mint'],
   [data-accent='mint'] {
@@ -106,6 +123,9 @@
     --board-label: #8bf9be;
     --badge-button: #06011e;
     --on-badge-button: #ffffff;
+    --qr-ground: #4020df;
+    --qr-strap: #06011e;
+    --qr-close: #06011e;
   }
   :root[data-accent='lime'],
   [data-accent='lime'] {
@@ -120,6 +140,9 @@
     --board-label: #eaff00;
     --badge-button: #06011e;
     --on-badge-button: #ffffff;
+    --qr-ground: #4020df;
+    --qr-strap: #06011e;
+    --qr-close: #06011e;
   }
   :root[data-accent='pink'],
   [data-accent='pink'] {
@@ -134,5 +157,8 @@
     --board-label: #f7879a;
     --badge-button: #06011e;
     --on-badge-button: #ffffff;
+    --qr-ground: #4020df;
+    --qr-strap: #06011e;
+    --qr-close: #06011e;
   }
 }

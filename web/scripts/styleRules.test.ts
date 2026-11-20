@@ -79,7 +79,7 @@ function offending(
 const COLOUR =
   '(?:bg|text|border(?:-[trblxyse])?|ring|outline|fill|stroke|divide|placeholder|decoration|caret|accent|from|via|to|shadow)';
 const LANYARD_TOKEN =
-  '(?:background|foreground|muted-foreground|surface|border|accent|on-accent|accent-text|accent-subtle|board-label|badge-button|on-badge-button|badge-ink|on-badge-ink|badge-line)';
+  '(?:background|foreground|muted-foreground|surface|border|accent|on-accent|accent-text|accent-subtle|board-label|badge-button|on-badge-button|badge-ink|on-badge-ink|badge-line|qr-ground|qr-strap|qr-close)';
 const throughVar = (name: string) =>
   `(?:\\((?:color:)?--(?:color-)?${name}\\)|\\[(?:color:)?var\\(--(?:color-)?${name}\\)\\])`;
 const LANYARD_COLOUR = new RegExp(
@@ -110,8 +110,15 @@ const CHROME = [
   'src/routes/',
 ];
 
-/** Shared components that render only inside the lanyard. */
-const LANYARD_ONLY = ['src/components/RichText/'];
+/**
+ * Shared components that render only inside the lanyard, and the Show QR
+ * badge, which wears the owner's accent wherever it opens (#129).
+ */
+const LANYARD_ONLY = [
+  'src/components/RichText/',
+  'src/features/qr/components/QrSheet/',
+  'src/features/qr/components/LanyardStraps/',
+];
 
 /**
  * Chrome class strings that deliberately show the lanyard's palette, known by

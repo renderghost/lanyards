@@ -124,6 +124,7 @@ msgid "Badge"
 msgstr "Badge"
 
 #: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:61
+#: src/features/qr/components/QrSheet/QrSheet.tsx:104
 msgid "Based"
 msgstr "Based"
 
@@ -182,7 +183,7 @@ msgstr "Clear"
 
 #: src/components/Dialog/Dialog.tsx:63
 #: src/components/Sheet/Sheet.tsx:58
-#: src/features/qr/components/QrSheet/QrSheet.tsx:71
+#: src/features/qr/components/QrSheet/QrSheet.tsx:123
 msgid "Close"
 msgstr "Close"
 
@@ -207,7 +208,7 @@ msgid "Contract roles"
 msgstr "Contract roles"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:149
-#: src/features/qr/components/QrSheet/QrSheet.tsx:67
+#: src/features/qr/components/QrSheet/QrSheet.tsx:119
 msgid "Copy link"
 msgstr "Copy link"
 
@@ -220,7 +221,7 @@ msgid "Couldn't check your ORCID iD right now."
 msgstr "Couldn't check your ORCID iD right now."
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:94
-#: src/features/qr/components/QrSheet/QrSheet.tsx:38
+#: src/features/qr/components/QrSheet/QrSheet.tsx:51
 msgid "Couldn't copy the link. Please try again."
 msgstr "Couldn't copy the link. Please try again."
 
@@ -486,7 +487,7 @@ msgid "Lime"
 msgstr "Lime"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:91
-#: src/features/qr/components/QrSheet/QrSheet.tsx:35
+#: src/features/qr/components/QrSheet/QrSheet.tsx:48
 msgid "Link copied"
 msgstr "Link copied"
 
@@ -707,7 +708,7 @@ msgstr "Save"
 msgid "Saving…"
 msgstr "Saving…"
 
-#: src/features/qr/components/QrSheet/QrSheet.tsx:56
+#: src/features/qr/components/QrSheet/QrSheet.tsx:97
 msgid "Scan to see my lanyard"
 msgstr "Scan to see my lanyard"
 
@@ -1034,7 +1035,7 @@ msgstr "Your handle"
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:43
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:52
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:123
-#: src/features/qr/components/QrSheet/QrSheet.tsx:28
+#: src/features/qr/components/QrSheet/QrSheet.tsx:41
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
