@@ -342,7 +342,10 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await userEvent.click(job);
     await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
-    expect(saves[0]).toMatchObject({ record: { showJob: false } });
+    expect(saves[0]).toMatchObject({
+      record: { badge: { showRole: false } },
+    });
+    expect(saves[0]!.record).not.toHaveProperty('showJob');
   });
 
   it('asks for permission instead of letting an identity-only session edit', async () => {

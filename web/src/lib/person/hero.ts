@@ -37,7 +37,7 @@ export function composeHero(input: {
 }): BadgeHero {
   const { bluesky, sifa, config } = input;
   const honorifics = sifa?.showHonorifics ? sifa : undefined;
-  const job = config.showJob && sifa ? currentJob(sifa.positions) : undefined;
+  const job = config.showRole && sifa ? currentJob(sifa.positions) : undefined;
   const avatar = cdnImage(sifa?.avatar) ?? cdnImage(bluesky.avatar);
   const pronouns = sifa?.pronouns ?? bluesky.pronouns;
   const headline = sifa?.headline ?? bioHeadline(bluesky.description);

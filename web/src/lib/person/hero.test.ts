@@ -159,7 +159,7 @@ describe('composeHero', () => {
         ...emptySifa,
         positions: [position({ title: 'Engineer', startedAt: '2024' })],
       },
-      config: { ...resolveConfig(null), showJob: false },
+      config: { ...resolveConfig(null), showRole: false },
     });
     expect(hero.job).toBeUndefined();
   });

@@ -127,7 +127,7 @@ describe('useLanyardDraft', () => {
     const { result } = render();
     act(() => result.current.update((c) => ({ ...c, accent: 'pink' })));
     act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
-    act(() => result.current.update((c) => ({ ...c, showJob: false })));
+    act(() => result.current.update((c) => ({ ...c, showRole: false })));
     expect(result.current.changes).toBe(2);
   });
 
@@ -165,7 +165,7 @@ describe('useLanyardDraft', () => {
   it('Save writes the draft and clears dirty', async () => {
     const { result } = render();
     act(() => result.current.update((c) => ({ ...c, accent: 'lime' })));
-    act(() => result.current.update((c) => ({ ...c, showJob: false })));
+    act(() => result.current.update((c) => ({ ...c, showRole: false })));
     await advance(1400);
     expect(await save(result)).toBe(true);
     expect(saved()).toEqual([
@@ -174,7 +174,7 @@ describe('useLanyardDraft', () => {
         rkey: 'self',
         fields: expect.objectContaining({
           accent: 'lime',
-          showJob: false,
+          badge: expect.objectContaining({ showRole: false }),
           createdAt: STORED.createdAt,
           updatedAt: '2026-11-10T12:00:01.400Z',
         }),
@@ -326,7 +326,7 @@ describe('useLanyardDraft', () => {
     first.unmount();
 
     const { result } = render();
-    act(() => result.current.update((c) => ({ ...c, showJob: false })));
+    act(() => result.current.update((c) => ({ ...c, showRole: false })));
     await save(result);
     expect(vi.mocked(putRecord).mock.calls[1]?.[4]).toEqual({
       swapRecord: OTHER,
@@ -501,7 +501,7 @@ describe('useLanyardDraft', () => {
     expect(result.current.config.accent).toBe('mint');
     expect(result.current.dirty).toBe(true);
     // The last save is now what the server returned.
-    expect(result.current.saved.showJob).toBe(false);
+    expect(result.current.saved.showRole).toBe(false);
     await save(result);
     expect(saved()[0]?.fields).toMatchObject({ accent: 'mint' });
   });
@@ -524,8 +524,8 @@ describe('useLanyardDraft', () => {
     expect(client.getQueryState(key())?.status).toBe('error');
     expect(result.current.ready).toBe(true);
     expect(result.current.config.accent).toBe('mint');
-    act(() => result.current.update((c) => ({ ...c, showJob: false })));
-    expect(result.current.config.showJob).toBe(false);
+    act(() => result.current.update((c) => ({ ...c, showRole: false })));
+    expect(result.current.config.showRole).toBe(false);
   });
 
   it('keeps a change whose save failed when the settings are fetched again', async () => {

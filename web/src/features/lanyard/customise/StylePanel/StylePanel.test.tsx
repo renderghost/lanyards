@@ -44,7 +44,7 @@ describe('StylePanel', () => {
     expect(job).toBeChecked();
     await userEvent.click(job);
     const patch = onChange.mock.calls[0]?.[0];
-    expect(patch(CONFIG)).toEqual({ ...CONFIG, showJob: false });
+    expect(patch(CONFIG)).toEqual({ ...CONFIG, showRole: false });
   });
 
   it('can be disabled', async () => {

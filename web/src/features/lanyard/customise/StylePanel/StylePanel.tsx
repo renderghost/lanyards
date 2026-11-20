@@ -39,10 +39,10 @@ export function StylePanel({ config, disabled, onChange }: StylePanelProps) {
               <label className={styles.checkboxRow}>
                 <input
                   type="checkbox"
-                  checked={config.showJob}
+                  checked={config.showRole}
                   onChange={(event) => {
-                    const showJob = event.target.checked;
-                    onChange((current) => ({ ...current, showJob }));
+                    const showRole = event.target.checked;
+                    onChange((current) => ({ ...current, showRole }));
                   }}
                   disabled={disabled}
                   className={styles.checkbox}

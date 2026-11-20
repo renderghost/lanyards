@@ -1,4 +1,5 @@
 import { type Accent, resolveAccent } from '@/design/accents';
+import { type CoverPattern, isCover } from '@/design/covers';
 import { LANYARDS_NSID, type BlockType } from '@/lib/lexicons/nsids';
 import { validateRecord } from '@/lib/lexicons/validate';
 import { tooLong } from '@/lib/validation';
@@ -29,7 +30,15 @@ export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
 
 export const DEFAULT_ITEM_LIMIT = 3;
 
-const CONFIG_FIELDS = ['accent', 'showJob', 'blocks', 'hidden'] as const;
+const CONFIG_FIELDS = [
+  'accent',
+  'cover',
+  'showRole',
+  'showLocation',
+  'showOpenTo',
+  'blocks',
+  'hidden',
+] as const;
 
 /**
  * A three-way merge of the customiser's settings, for when another device
@@ -78,16 +87,29 @@ export type BlockConfig = {
 
 export type LanyardConfig = {
   accent: Accent;
-  showJob: boolean;
+  /** The badge's cover; null until the owner picks one (#129). */
+  cover: CoverPattern | null;
+  /** What the badge's departure board shows. */
+  showRole: boolean;
+  showLocation: boolean;
+  showOpenTo: boolean;
   blocks: BlockConfig[];
   /** AT-URIs and URLs of items the owner hid. */
   hidden: string[];
 };
 
 type StoredBlock = { type: string; visible: boolean; limit?: number };
+type StoredBadge = {
+  cover?: string;
+  showRole?: boolean;
+  showLocation?: boolean;
+  showOpenTo?: boolean;
+};
 type StoredConfig = {
   accent?: string;
+  /** Legacy: read as badge.showRole when that is absent. */
   showJob?: boolean;
+  badge?: StoredBadge;
   blocks?: StoredBlock[];
   hidden?: string[];
 };
@@ -125,7 +147,10 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
   return {
     // A legacy accent reads as the nearest of the four (#128).
     accent: resolveAccent(stored.accent),
-    showJob: stored.showJob ?? true,
+    cover: isCover(stored.badge?.cover) ? stored.badge.cover : null,
+    showRole: stored.badge?.showRole ?? stored.showJob ?? true,
+    showLocation: stored.badge?.showLocation ?? true,
+    showOpenTo: stored.badge?.showOpenTo ?? true,
     blocks,
     hidden: stored.hidden ?? [],
   };
@@ -172,8 +197,18 @@ export function serialiseConfig(
   previous: unknown | null,
   now: string
 ): StoredFields {
-  const { $type: _type, ...kept } =
-    previous && typeof previous === 'object' ? (previous as StoredFields) : {};
+  // The badge settings replace the legacy showJob (#129).
+  const {
+    $type: _type,
+    showJob: _showJob,
+    ...kept
+  } = previous && typeof previous === 'object'
+    ? (previous as StoredFields)
+    : {};
+  const keptBadge =
+    kept.badge && typeof kept.badge === 'object'
+      ? (kept.badge as StoredFields)
+      : {};
   const previousBlocks = Array.isArray(kept.blocks) ? kept.blocks : [];
 
   const blocks: StoredBlock[] = config.blocks.map((block) => ({
@@ -190,7 +225,13 @@ export function serialiseConfig(
   return {
     ...kept,
     accent: config.accent,
-    showJob: config.showJob,
+    badge: {
+      ...keptBadge,
+      ...(config.cover ? { cover: config.cover } : {}),
+      showRole: config.showRole,
+      showLocation: config.showLocation,
+      showOpenTo: config.showOpenTo,
+    },
     blocks,
     hidden: config.hidden,
     createdAt: typeof kept.createdAt === 'string' ? kept.createdAt : now,
