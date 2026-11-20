@@ -28,7 +28,7 @@ test.describe('QR sheet', () => {
     await expect(
       page.getByRole('heading', { name: 'Customise your lanyard' })
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Show QR' }).click();
     await expect(
       page.getByRole('dialog', { name: 'Dr Ada Example' })
     ).toBeVisible();
@@ -41,13 +41,15 @@ test.describe('QR sheet', () => {
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto('/lanyard');
-    const show = page.getByRole('button', { name: 'Show QR' });
+    const show = page.getByRole('link', { name: 'Show QR' });
     await expect(show).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth)
     ).toBeLessThanOrEqual(320);
 
     await show.click();
+    // Its own page now, /<handle>/share (#150).
+    await expect(page).toHaveURL('/alice.test/share');
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByText('Scan to see my lanyard')).toBeVisible();
@@ -68,16 +70,17 @@ test.describe('QR sheet', () => {
     const copied = await page.evaluate(() => navigator.clipboard.readText());
     expect(copied).toMatch(new RegExp(`/d/${ADA.did}$`));
 
+    // Back where it was opened.
     await page.keyboard.press('Escape');
     await expect(sheet).toBeHidden();
-    await expect(show).toBeFocused();
+    await expect(page).toHaveURL('/alice.test/edit');
   });
 
   test('keeps the whole code at least 240 px wide on a 320×640 screen (#129)', async ({
     page,
   }) => {
     await page.goto('/lanyard');
-    await page.getByRole('button', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Show QR' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     const qr = sheet.getByRole('img', { name: /^QR code for / });
     await expect(qr).toBeVisible();
@@ -103,7 +106,7 @@ test.describe('QR sheet', () => {
     const viewport = { width: 844, height: 390 };
     await page.setViewportSize(viewport);
     await page.goto('/lanyard');
-    await page.getByRole('button', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Show QR' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     const qr = sheet.getByRole('img', { name: /^QR code for / });
     await expect(qr).toBeVisible();
@@ -128,7 +131,7 @@ test.describe('QR sheet', () => {
     await mockPerson(page, { config: { accent: 'lime' } });
     await page.setViewportSize({ width: 844, height: 390 });
     await page.goto('/lanyard');
-    await page.getByRole('button', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Show QR' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toHaveAttribute('data-accent', 'lime');
     for (const name of ['Copy link', 'Close']) {
@@ -171,7 +174,7 @@ test.describe('QR sheet', () => {
     const viewport = { width: 430, height: 390 };
     await page.setViewportSize(viewport);
     await page.goto('/lanyard');
-    await page.getByRole('button', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Show QR' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toBeVisible();
     // Nothing spills or scrolls, in either direction.
@@ -206,7 +209,7 @@ test.describe('QR sheet', () => {
   test('stays black on white in dark mode', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/lanyard');
-    await page.getByRole('button', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Show QR' }).click();
     const qr = page.getByRole('img', { name: /^QR code for / });
     await expect(qr.locator('rect')).toHaveAttribute('fill', '#ffffff');
     await expect(qr.locator('path')).toHaveAttribute('fill', '#000000');
@@ -223,7 +226,10 @@ test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', ()
     await page.route(
       'https://public.api.bsky.app/xrpc/app.bsky.actor.getProfile**',
       (route) =>
-        new URL(route.request().url()).searchParams.get('actor') === BEA.did
+        // By DID or by handle, as the AppView answers.
+        [BEA.did, 'bea.test'].includes(
+          new URL(route.request().url()).searchParams.get('actor') ?? ''
+        )
           ? route.fulfill({
               json: {
                 did: BEA.did,
@@ -295,7 +301,7 @@ test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', ()
       page.evaluate(() => document.documentElement.dataset.accent);
     expect(await pageAccent()).toBe('mint');
 
-    const show = page.getByRole('banner').getByRole('button', {
+    const show = page.getByRole('banner').getByRole('link', {
       name: 'Show QR',
     });
     await show.click();
@@ -304,12 +310,13 @@ test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', ()
     await expect(sheet).toHaveAttribute('data-accent', 'pink');
     const card = sheet.locator('.bg-accent').first();
     await expect(card).toHaveCSS('background-color', 'rgb(247, 135, 154)');
-    expect(await pageAccent()).toBe('mint');
     const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
     expect(result.violations).toEqual([]);
 
+    // Back on Ada's lanyard, in Ada's accent.
     await sheet.getByRole('button', { name: 'Close' }).click();
     await expect(sheet).toBeHidden();
-    expect(await pageAccent()).toBe('mint');
+    await expect(page).toHaveURL('/alice.test');
+    await expect.poll(pageAccent).toBe('mint');
   });
 });

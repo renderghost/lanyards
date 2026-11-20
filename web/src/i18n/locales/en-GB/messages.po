@@ -348,10 +348,6 @@ msgstr "Couldn't load your lanyard settings"
 msgid "Couldn't open feedback. Please try again."
 msgstr "Couldn't open feedback. Please try again."
 
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:41
-msgid "Couldn't open your QR code. Please try again."
-msgstr "Couldn't open your QR code. Please try again."
-
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:76
 msgid "Couldn't reach ORCID. Please try again."
 msgstr "Couldn't reach ORCID. Please try again."
@@ -727,6 +723,7 @@ msgstr "Loading your profile…"
 #: src/features/auth/components/LandingPage/LandingPage.tsx:45
 #: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:246
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:71
+#: src/features/qr/components/SharePage/SharePage.tsx:41
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -1072,7 +1069,7 @@ msgstr "Show lanyard"
 msgid "Show location"
 msgstr "Show location"
 
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:54
+#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:26
 msgid "Show QR"
 msgstr "Show QR"
 

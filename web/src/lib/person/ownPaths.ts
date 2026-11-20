@@ -2,6 +2,8 @@
 const INVALID_HANDLE = 'handle.invalid';
 
 export type OwnPaths = {
+  /** How the pages name you: your handle, or your DID. */
+  id: string;
   /** Customise: `/<handle>/edit`. */
   edit: string;
   /** View: the public lanyard, `/<handle>`. */
@@ -18,6 +20,7 @@ export function ownPaths(did: string, handle?: string): OwnPaths {
   const valid = Boolean(handle) && handle !== INVALID_HANDLE;
   const id = valid ? (handle as string) : did;
   return {
+    id,
     edit: `/${id}/edit`,
     view: valid ? `/${id}` : `/d/${did}`,
     share: `/${id}/share`,

@@ -122,6 +122,8 @@ const CHROME = [
 const LANYARD_ONLY = [
   'src/components/RichText/',
   'src/features/qr/components/QrSheet/',
+  // Show QR as a page (#150): the badge's ground while it loads.
+  'src/features/qr/components/SharePage/',
   'src/features/qr/components/LanyardStraps/',
 ];
 

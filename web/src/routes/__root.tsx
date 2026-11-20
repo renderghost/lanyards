@@ -47,6 +47,10 @@ function RootLayout() {
     select: (matches) =>
       matches.some((match) => match.staticData.ownHeader === true),
   });
+  const fullScreen = useMatches({
+    select: (matches) =>
+      matches.some((match) => match.staticData.fullScreen === true),
+  });
   const signedOutActions = useMatches({
     select: (matches) =>
       matches.some((match) => match.staticData.signedOutActions === true),
@@ -55,7 +59,7 @@ function RootLayout() {
     // Feedback opens over any page that offers it (#134).
     <FeedbackProvider>
       <div className="flex min-h-dvh flex-col">
-        {ownHeader ? (
+        {ownHeader || fullScreen ? (
           <Outlet />
         ) : (
           <>

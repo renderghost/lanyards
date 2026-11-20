@@ -1,66 +1,29 @@
 import { useLingui } from '@lingui/react/macro';
+import { Link } from '@tanstack/react-router';
 import { QrCode } from 'lucide-react';
-import { useRef, useState } from 'react';
 
-import { notify } from '@/components/Toaster/notify';
-import { useSession } from '@/features/auth/session/useSession';
-import { captureError, track } from '@/lib/analytics/analytics';
+import { useOwnPaths } from '@/hooks/useOwnPaths';
 import { cn } from '@/lib/utils';
 
-import type { QrSheet } from '../QrSheet/QrSheet';
 import * as styles from './ShowQrButton.styles';
 import type { ShowQrButtonProps } from './ShowQrButton.types';
 
-type Sheet = typeof QrSheet;
-
-// The sheet (QR encoder and dialog) loads on first use, outside every
-// route's initial JS; the service worker precaches it for offline use.
-const loadSheet = (): Promise<Sheet> =>
-  import('../QrSheet/QrSheet').then((module) => module.QrSheet);
-
-/** "Show QR" in the header or on the badge: opens the owner's QR sheet. */
+/**
+ * "Show QR" in the header or on the badge: goes to your own Show QR page,
+ * `/<handle>/share` (#150). Nothing when signed out.
+ */
 export function ShowQrButton({ tone = 'ui', className }: ShowQrButtonProps) {
   const { t } = useLingui();
-  const session = useSession();
-  const [open, setOpen] = useState(false);
-  /** The sheet, once its code has loaded. */
-  const [Sheet, setSheet] = useState<Sheet | null>(null);
-  const button = useRef<HTMLButtonElement>(null);
-  if (session.status !== 'signedIn') return null;
-
-  async function show() {
-    track('qr_opened');
-    try {
-      const loaded = Sheet ?? (await loadSheet());
-      setSheet(() => loaded);
-      setOpen(true);
-    } catch (cause) {
-      // Offline before the sheet was cached, or a deploy replaced it: the
-      // app keeps working and the next press tries again.
-      captureError(cause, { source: 'qr-sheet' });
-      notify.error(t`Couldn't open your QR code. Please try again.`);
-    }
-  }
-
+  const own = useOwnPaths();
+  if (!own) return null;
   return (
-    <>
-      <button
-        ref={button}
-        type="button"
-        onClick={() => void show()}
-        className={cn(styles.tones[tone], className)}
-      >
-        <QrCode aria-hidden="true" className={styles.icon} />
-        <span className={styles.labels[tone]}>{t`Show QR`}</span>
-      </button>
-      {Sheet && (
-        <Sheet
-          did={session.session.did}
-          open={open}
-          onOpenChange={setOpen}
-          returnFocus={() => button.current?.focus()}
-        />
-      )}
-    </>
+    <Link
+      to="/$handle/share"
+      params={{ handle: own.id }}
+      className={cn(styles.tones[tone], className)}
+    >
+      <QrCode aria-hidden="true" className={styles.icon} />
+      <span className={styles.labels[tone]}>{t`Show QR`}</span>
+    </Link>
   );
 }

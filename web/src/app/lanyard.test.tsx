@@ -405,7 +405,7 @@ describe('visitor actions on the page', () => {
       within(badge).getByRole('link', { name: 'Edit lanyard' })
     ).toHaveAttribute('href', '/lanyard');
     expect(
-      within(badge).getByRole('button', { name: 'Show QR' })
+      within(badge).getByRole('link', { name: 'Show QR' })
     ).toBeInTheDocument();
   });
 });

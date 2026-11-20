@@ -118,7 +118,7 @@ describe('CustomiserActions', () => {
     expect(
       await screen.findByRole('link', { name: 'Your account' })
     ).toHaveAttribute('href', '/settings');
-    expect(button('Show QR')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Show QR' })).toBeInTheDocument();
   });
 
   it('has no axe violations', async () => {

@@ -12,15 +12,22 @@ import { expect } from 'vitest';
 import { AppI18nProvider } from '@/i18n/AppI18nProvider';
 import { routeTree } from '@/routeTree.gen';
 
-/** Renders the real route tree at `path`, without the session provider. */
-export function renderRoute(path: string) {
+/**
+ * Renders the real route tree at `path`, without the session provider.
+ * Several paths are a history: the last is current, the rest behind it.
+ */
+export function renderRoute(path: string | string[]) {
+  const entries = Array.isArray(path) ? path : [path];
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
   const router = createRouter({
     routeTree,
     context: { queryClient },
-    history: createMemoryHistory({ initialEntries: [path] }),
+    history: createMemoryHistory({
+      initialEntries: entries,
+      initialIndex: entries.length - 1,
+    }),
     pathParamsAllowedCharacters: [':', '@'],
   });
   const view = render(

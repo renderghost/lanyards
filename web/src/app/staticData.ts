@@ -11,6 +11,11 @@ declare module '@tanstack/react-router' {
      * lanyard (lanyard pages, #129).
      */
     signedOutActions?: boolean;
+    /**
+     * The route fills the screen itself (Show QR, #150): the root layout
+     * renders no header, no <main> and no navigation around it.
+     */
+    fullScreen?: boolean;
   }
 }
 

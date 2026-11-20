@@ -37,7 +37,7 @@ describe('AppHeader', () => {
       screen.queryByRole('link', { name: 'My lanyard' })
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Show QR' })
+      screen.queryByRole('link', { name: 'Show QR' })
     ).not.toBeInTheDocument();
   });
 
@@ -57,7 +57,7 @@ describe('AppHeader', () => {
       'href',
       '/lanyard'
     );
-    expect(screen.getByRole('button', { name: 'Show QR' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Show QR' })).toBeInTheDocument();
   });
 
   it('renders a title and actions when given, in place of its own links', async () => {
