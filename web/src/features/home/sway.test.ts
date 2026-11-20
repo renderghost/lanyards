@@ -49,9 +49,9 @@ describe('sway', () => {
     expect(left).toBeGreaterThan(0.3);
   });
 
-  it('barely moves for a slow pointer', () => {
+  it('moves only a little for a slow pointer', () => {
     const { angles } = run(150, 1, 3);
-    expect(Math.max(...angles.map(Math.abs))).toBeLessThan(0.25);
+    expect(Math.max(...angles.map(Math.abs))).toBeLessThan(0.6);
   });
 
   it('never leans past its cap, however hard it is pushed', () => {
@@ -61,23 +61,25 @@ describe('sway', () => {
     }
   });
 
-  it('swings back lightly, each swing smaller, then rests', () => {
+  it('swings visibly, back lightly, each swing smaller, then rests', () => {
     const { angles, restedAt, sway } = run(1200, 0.5, 8);
     const [first, second, third] = turns(angles);
-    // A swing, a smaller one back the other way, a smaller one again.
-    expect(first).toBeLessThan(0);
+    // A brisk sweep: a swing you see, a smaller one back, smaller again.
+    expect(first).toBeLessThan(-1.5);
     expect(second).toBeGreaterThan(0);
     expect(Math.abs(second ?? 0)).toBeLessThan(Math.abs(first ?? 0) / 2);
     expect(Math.abs(third ?? 0)).toBeLessThan(Math.abs(second ?? 0) / 2);
+    // Still again two to three seconds after the pointer stops.
     expect(restedAt).not.toBeNull();
-    expect(restedAt).toBeLessThan(5);
+    expect((restedAt ?? 0) - 0.5).toBeGreaterThan(1.5);
+    expect((restedAt ?? 0) - 0.5).toBeLessThan(3);
     expect(sway).toEqual(REST);
   });
 
-  it('comes to rest from its cap within a few seconds', () => {
+  it('comes to rest from its cap within three seconds', () => {
     const { restedAt } = run(100_000, 3, 12);
     expect(restedAt).not.toBeNull();
-    expect((restedAt ?? 0) - 3).toBeLessThan(5);
+    expect((restedAt ?? 0) - 3).toBeLessThan(3);
   });
 
   // A tab in the background, or a long frame, doesn't fling it.
