@@ -14,6 +14,7 @@ import type {
   SifaTalk,
 } from '@/lib/sources/sifa/sifa.types';
 import type { BlogPost } from '@/lib/sources/standardSite/standardSite.types';
+import type { CoverPattern } from '@/design/covers';
 import type { CodeRepo } from '@/lib/sources/tangled/tangled.types';
 
 import type { EditorBlock } from './blocks';
@@ -40,8 +41,18 @@ export type BadgeHero = {
   avatar?: string;
   pronouns?: string;
   headline?: string;
-  job?: { title: string; company?: string };
+  /** The owner's cover, or the one their DID gives them (#129). */
+  cover: CoverPattern;
+  /** Shown in place of a missing avatar. */
+  initials: string;
+  /** The departure board (spec §7): each part only if the owner shows it. */
+  role?: BadgeRole;
+  location?: string;
+  openTo: OpenToValue[];
 };
+
+/** The main current role, and how many other current roles there are. */
+export type BadgeRole = { title: string; company?: string; others: number };
 
 export type LinkItem = {
   /** The normalised URL. */

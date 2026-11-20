@@ -28,6 +28,18 @@ describe('CoverPattern', () => {
     expect(container.textContent).toContain('BP');
   });
 
+  // On a narrow cover the wide drawing is cropped: the monogram sits at the
+  // right, as on the canvas, so it keeps to that edge rather than the middle.
+  it('keeps the monogram at the right edge of a narrow cover', () => {
+    const { container } = render(
+      <CoverPattern pattern="monogram" initials="BP" />
+    );
+    expect(container.querySelector('svg svg')).toHaveAttribute(
+      'preserveAspectRatio',
+      'xMaxYMid slice'
+    );
+  });
+
   it('fills the hazard cover with the accent itself', () => {
     const { container } = render(<CoverPattern pattern="hazard" initials="" />);
     expect(container.querySelector('[fill="var(--accent)"]')).not.toBeNull();

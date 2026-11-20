@@ -39,14 +39,13 @@ describe('public lanyard routes', () => {
     servePerson();
     renderRoute('/@alice.test');
     expect(await hero()).toBeInTheDocument();
-    expect(screen.getByText('she/her')).toBeInTheDocument();
+    expect(screen.getByText('she/her · @alice.test')).toBeInTheDocument();
     expect(
       screen.getByText('Research Engineer building open research tools')
     ).toBeInTheDocument();
     expect(
       screen.getByText('Research Engineer · Example Lab')
     ).toBeInTheDocument();
-    expect(screen.getByText('@alice.test')).toBeInTheDocument();
     expect(
       document.querySelector('header + main img, main img')
     ).toHaveAttribute('alt', '');
@@ -173,10 +172,9 @@ describe('lanyard page states', () => {
         'This person has chosen to show their lanyard only to people who are signed in.'
       )
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute(
-      'href',
-      '/?returnTo=%2F%40alice.test'
-    );
+    expect(
+      within(screen.getByRole('main')).getByRole('link', { name: 'Sign in' })
+    ).toHaveAttribute('href', '/?returnTo=%2F%40alice.test');
     expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
     // The name must not leak through the tab title either.
     await waitFor(() =>
@@ -327,7 +325,7 @@ describe('lanyard blocks', () => {
 });
 
 describe('visitor actions on the page', () => {
-  it('offers signed-out visitors Bluesky, sign-in and sign-up', async () => {
+  it('offers signed-out visitors Bluesky, with sign-in and sign-up in the header', async () => {
     servePerson();
     renderRoute('/@alice.test');
     expect(
@@ -335,8 +333,15 @@ describe('visitor actions on the page', () => {
         name: 'Follow on Bluesky (opens in a new tab)',
       })
     ).toBeInTheDocument();
+    const header = screen.getByRole('banner');
     expect(
-      screen.getByRole('button', { name: 'Create account' })
+      within(header).getByRole('link', { name: 'Sign in' })
+    ).toHaveAttribute(
+      'href',
+      `/?returnTo=${encodeURIComponent('/@alice.test')}`
+    );
+    expect(
+      within(header).getByRole('button', { name: 'Make your lanyard' })
     ).toBeInTheDocument();
   });
 
@@ -363,11 +368,17 @@ describe('visitor actions on the page', () => {
     );
   });
 
-  it('tells owners it is their own lanyard', async () => {
+  it('gives owners Edit lanyard and Show QR on the badge', async () => {
     servePerson();
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
     renderRoute('/@alice.test');
-    expect(await screen.findByText('This is your lanyard')).toBeInTheDocument();
+    const badge = await screen.findByRole('region', { name: /Ada/ });
+    expect(
+      within(badge).getByRole('link', { name: 'Edit lanyard' })
+    ).toHaveAttribute('href', '/lanyard');
+    expect(
+      within(badge).getByRole('button', { name: 'Show QR' })
+    ).toBeInTheDocument();
   });
 });
 

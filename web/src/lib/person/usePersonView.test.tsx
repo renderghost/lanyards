@@ -155,7 +155,7 @@ describe('usePersonView', () => {
       displayName: 'Ada Example',
       headline: 'Research engineer working on open protocols.',
     });
-    expect(result.current.hero?.job).toBeUndefined();
+    expect(result.current.hero?.role).toBeUndefined();
   });
 
   it('knows when the viewer is the owner', async () => {

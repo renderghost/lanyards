@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
-import { startSignIn, startSignUp } from '@/lib/atproto/session';
+import { startSignIn } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
 import { server } from '@/test/msw';
 import { ADA, BEA } from '@/test/people';
@@ -16,7 +16,7 @@ import {
 } from '@/test/person';
 import { renderInRouter } from '@/test/router';
 
-import { VisitorActions } from './VisitorActions';
+import { HeroActions } from './HeroActions';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 vi.mock('@/lib/analytics/analytics', () => ({
@@ -31,7 +31,11 @@ vi.mock('@/lib/atproto/session', async (importOriginal) => ({
 
 const actions = (path: string, owner = false) =>
   renderInRouter(
-    <VisitorActions did={ADA.did} handle="alice.test" owner={owner} />,
+    <HeroActions
+      did={ADA.did}
+      handle="alice.test"
+      mode={owner ? 'owner' : 'visitor'}
+    />,
     path
   );
 
@@ -39,10 +43,10 @@ beforeEach(() => {
   vi.mocked(useSession).mockReturnValue(signedOutSession());
 });
 
-describe('VisitorActions when signed out', () => {
+describe('HeroActions when signed out', () => {
   it('links to Bluesky by DID when the handle doesn’t verify', async () => {
     renderInRouter(
-      <VisitorActions did={ADA.did} handle="handle.invalid" owner={false} />,
+      <HeroActions did={ADA.did} handle="handle.invalid" mode="visitor" />,
       `/d/${ADA.did}`
     );
     expect(
@@ -53,7 +57,7 @@ describe('VisitorActions when signed out', () => {
   });
 
   it.each(['/@alice.test', `/d/${ADA.did}`])(
-    'offers Bluesky, sign-in and sign-up on %s',
+    'offers Follow on Bluesky only on %s; sign-in lives in the header',
     async (path) => {
       const { container } = actions(path);
       expect(
@@ -61,20 +65,16 @@ describe('VisitorActions when signed out', () => {
           name: 'Follow on Bluesky (opens in a new tab)',
         })
       ).toHaveAttribute('href', 'https://bsky.app/profile/alice.test');
-      expect(screen.getByRole('link', { name: 'Sign in' })).toHaveAttribute(
-        'href',
-        `/?returnTo=${encodeURIComponent(path)}`
-      );
-      await userEvent.click(
-        screen.getByRole('button', { name: 'Create account' })
-      );
-      expect(startSignUp).toHaveBeenCalledWith(path);
+      expect(screen.queryByRole('link', { name: 'Sign in' })).toBeNull();
+      expect(
+        screen.queryByRole('button', { name: 'Create account' })
+      ).toBeNull();
       await expectNoAxeViolations(container);
     }
   );
 });
 
-describe('VisitorActions when signed in', () => {
+describe('HeroActions when signed in', () => {
   it('shows Follow for someone else', async () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(BEA.did));
     serveViewerReads({
@@ -119,12 +119,17 @@ describe('VisitorActions when signed in', () => {
     expect(follow).toBeDisabled();
   });
 
-  it('says it is your own lanyard instead of offering Follow', async () => {
+  it('gives the owner Edit lanyard and Show QR instead of Follow', async () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-    actions('/@alice.test', true);
-    expect(await screen.findByText('This is your lanyard')).toBeInTheDocument();
+    const { container } = actions('/@alice.test', true);
+    expect(
+      await screen.findByRole('link', { name: 'Edit lanyard' })
+    ).toHaveAttribute('href', '/lanyard');
+    expect(screen.getByRole('button', { name: 'Show QR' })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Follow' })
     ).not.toBeInTheDocument();
+    expect(screen.queryByText('This is your lanyard')).toBeNull();
+    await expectNoAxeViolations(container);
   });
 });

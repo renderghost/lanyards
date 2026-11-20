@@ -19,6 +19,12 @@
   --color-on-accent: var(--on-accent);
   --color-accent-text: var(--accent-text);
   --color-accent-subtle: var(--accent-subtle);
+  --color-board-label: var(--board-label);
+  --color-badge-button: var(--badge-button);
+  --color-on-badge-button: var(--on-badge-button);
+  --color-badge-ink: var(--badge-ink);
+  --color-on-badge-ink: var(--on-badge-ink);
+  --color-badge-line: var(--badge-line);
   --color-ui-canvas: var(--ui-canvas);
   --color-ui-surface: var(--ui-surface);
   --color-ui-surface-muted: var(--ui-surface-muted);

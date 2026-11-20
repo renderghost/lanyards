@@ -9,6 +9,7 @@ export const Route = createFileRoute('/d/$did')({
   beforeLoad: ({ params }) => {
     if (!isDid(params.did)) throw notFound();
   },
+  staticData: { signedOutActions: true },
   component: DidLanyard,
 });
 

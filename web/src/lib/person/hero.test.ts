@@ -4,6 +4,8 @@ import type { BlueskyProfile } from '@/lib/sources/bluesky/bluesky.types';
 import type { SifaPosition, SifaProfile } from '@/lib/sources/sifa/sifa.types';
 import { ADA } from '@/test/people';
 
+import { coverFor } from '@/design/covers';
+
 import { resolveConfig } from './config';
 import { composeHero, currentJob, heroName } from './hero';
 
@@ -95,7 +97,10 @@ describe('composeHero', () => {
       avatar: 'https://cdn.bsky.app/img/avatar_thumbnail/plain/sifa@jpeg',
       pronouns: 'she/her',
       headline: 'Research Engineer',
-      job: { title: 'Research Engineer', company: 'Example Lab' },
+      cover: coverFor(ADA.did),
+      initials: 'AE',
+      role: { title: 'Research Engineer', company: 'Example Lab', others: 0 },
+      openTo: [],
     });
   });
 
@@ -112,6 +117,9 @@ describe('composeHero', () => {
       avatar: 'https://cdn.bsky.app/img/avatar_thumbnail/plain/bsky@jpeg',
       pronouns: 'they/them',
       headline: 'First paragraph of the bio.',
+      cover: coverFor(ADA.did),
+      initials: 'AB',
+      openTo: [],
     });
   });
 
@@ -152,7 +160,7 @@ describe('composeHero', () => {
     ).toBe('alice.test');
   });
 
-  it('leaves out the job when the owner turned it off', () => {
+  it('leaves out the role when the owner turned it off', () => {
     const hero = composeHero({
       bluesky,
       sifa: {
@@ -161,7 +169,8 @@ describe('composeHero', () => {
       },
       config: { ...resolveConfig(null), showRole: false },
     });
-    expect(hero.job).toBeUndefined();
+    expect(hero.role).toBeUndefined();
+    expect(hero).not.toHaveProperty('job');
   });
 
   it('keeps markup in names as plain text', () => {
@@ -218,5 +227,67 @@ describe('the title from Sifa', () => {
       })
     ).toBe('Dr. Ada Example, PhD');
     expect(heroName({ displayName: 'Ada Example' })).toBe('Ada Example');
+  });
+});
+
+describe('the departure board (#129)', () => {
+  const primary = position({
+    title: 'Primary',
+    isPrimary: true,
+    startedAt: '2020',
+  });
+  const latest = position({ title: 'Latest', startedAt: '2024-05' });
+  const older = position({ title: 'Older', startedAt: '2022' });
+  const ended = position({
+    title: 'Ended',
+    startedAt: '2010',
+    endedAt: '2015',
+  });
+  const sifa: SifaProfile = {
+    ...emptySifa,
+    location: 'Berlin',
+    openTo: ['speakingEngagements', 'mentoringOthers', 'collaborations'],
+    positions: [primary, latest, older, ended],
+  };
+  const hero = (config = resolveConfig(null)) =>
+    composeHero({ bluesky, sifa, config });
+
+  it('shows the main current role and counts the other current ones', () => {
+    expect(hero().role).toEqual({ title: 'Primary', others: 2 });
+  });
+
+  it('skips a hidden primary role for the next visible one', () => {
+    const config = { ...resolveConfig(null), hidden: [primary.key] };
+    expect(hero(config).role).toEqual({ title: 'Latest', others: 1 });
+  });
+
+  it('shows the location and what they’re open to, minus hidden ones', () => {
+    const config = {
+      ...resolveConfig(null),
+      hidden: ['openTo:mentoringOthers'],
+    };
+    expect(hero(config)).toMatchObject({
+      location: 'Berlin',
+      openTo: ['speakingEngagements', 'collaborations'],
+    });
+  });
+
+  it('leaves out what the owner turned off', () => {
+    const shown = hero({
+      ...resolveConfig(null),
+      showRole: false,
+      showLocation: false,
+      showOpenTo: false,
+    });
+    expect(shown.role).toBeUndefined();
+    expect(shown.location).toBeUndefined();
+    expect(shown.openTo).toEqual([]);
+  });
+
+  it('wears the owner’s cover, or the one their DID gives them', () => {
+    expect(hero().cover).toBe(coverFor(ADA.did));
+    expect(hero({ ...resolveConfig(null), cover: 'hazard' }).cover).toBe(
+      'hazard'
+    );
   });
 });

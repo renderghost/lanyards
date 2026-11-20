@@ -49,12 +49,21 @@ function Tiled({
   );
 }
 
-/** A drawing in the wide view, scaled to fill the cover. */
-function Composed({ children }: { children: ReactNode }) {
+/**
+ * A drawing in the wide view, scaled to fill the cover. A narrower cover
+ * crops it: by default to its middle, or to its right edge (`end`).
+ */
+function Composed({
+  children,
+  align = 'middle',
+}: {
+  children: ReactNode;
+  align?: 'middle' | 'end';
+}) {
   return (
     <svg
       viewBox={`0 0 ${VIEW.width} ${VIEW.height}`}
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio={`${align === 'end' ? 'xMax' : 'xMid'}YMid slice`}
       width="100%"
       height="100%"
     >
@@ -191,7 +200,7 @@ function Hazard(_props: PatternProps) {
 
 function Monogram({ initials }: PatternProps) {
   return (
-    <Composed>
+    <Composed align="end">
       <rect width={VIEW.width} height={VIEW.height} fill={GROUND} />
       <text
         x={1210}

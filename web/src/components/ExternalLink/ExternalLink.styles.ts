@@ -6,6 +6,7 @@ export const tones: Record<ExternalLinkTone, string> = {
   // Underlined at rest: next to body text, colour alone can't mark a link.
   ui: `${base} text-ui-link underline`,
   accent: `${base} text-accent-text`,
+  badge: `${base} text-on-accent underline focus-visible:outline-(--focus-ring-on-accent)`,
 };
 
 export const srOnly = 'sr-only';

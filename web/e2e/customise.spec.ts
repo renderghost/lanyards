@@ -616,11 +616,16 @@ test.describe('lanyard customiser on a touch screen', () => {
     await touch('touchEnd');
     await expect(page.getByText(/^Picked up/)).toHaveCount(0);
 
-    // Press and hold, then drag Links down the page.
+    // Press and hold, then drag Links onto Talks, the next block: measured,
+    // since how far that is depends on how much the badge scrolled away.
+    const next = (await page
+      .getByRole('button', { name: 'Reorder Talks' })
+      .boundingBox())!;
+    const distance = next.y + next.height / 2 + 40 - y;
     await touch('touchStart', x, y);
     await page.waitForTimeout(400);
     for (let step = 1; step <= 10; step += 1) {
-      await touch('touchMove', x, y + step * 20);
+      await touch('touchMove', x, y + (step * distance) / 10);
       await page.waitForTimeout(16);
     }
     await touch('touchEnd');

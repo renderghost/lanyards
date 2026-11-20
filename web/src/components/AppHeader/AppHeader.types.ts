@@ -5,5 +5,7 @@ export type AppHeaderProps = {
   title?: string;
   /** Replaces the header's own links, for a route with its own controls. */
   actions?: ReactNode;
+  /** Offer Sign in and Make your lanyard when signed out (#129). */
+  signedOutActions?: boolean;
   className?: string;
 };

@@ -79,7 +79,7 @@ function offending(
 const COLOUR =
   '(?:bg|text|border(?:-[trblxyse])?|ring|outline|fill|stroke|divide|placeholder|decoration|caret|accent|from|via|to|shadow)';
 const LANYARD_TOKEN =
-  '(?:background|foreground|muted-foreground|surface|border|accent|on-accent|accent-text|accent-subtle)';
+  '(?:background|foreground|muted-foreground|surface|border|accent|on-accent|accent-text|accent-subtle|board-label|badge-button|on-badge-button|badge-ink|on-badge-ink|badge-line)';
 const throughVar = (name: string) =>
   `(?:\\((?:color:)?--(?:color-)?${name}\\)|\\[(?:color:)?var\\(--(?:color-)?${name}\\)\\])`;
 const LANYARD_COLOUR = new RegExp(
@@ -120,7 +120,7 @@ const LANYARD_ONLY = ['src/components/RichText/'];
  * data-accent to its own palette.
  */
 const isLanyardInChrome = ({ file, path = '' }: ClassString) =>
-  /^tones\.accent(?:\.|$)/.test(path) ||
+  /^tones\.(?:accent|badge)(?:\.|$)/.test(path) ||
   (file ===
     'src/features/lanyard/customise/AccentPicker/AccentPicker.styles.ts' &&
     path === 'swatch');
@@ -143,6 +143,21 @@ describe('style rules', () => {
     expect(all.filter(inLanyard).length).toBeGreaterThan(75);
     // Button, ExternalLink and HandleCombobox accent tones, and the swatch.
     expect(all.filter(isLanyardInChrome).length).toBeGreaterThan(10);
+  });
+
+  // Tailwind generates only the classes it finds written out in the source:
+  // one put together in a template literal (`${WIDE}:h-60`) never applies.
+  it('writes every class out in full, so Tailwind generates it', () => {
+    const source = globSync('src/**/*.{ts,tsx}')
+      .map((file) => readFileSync(file, 'utf8'))
+      .join('\n');
+    const missing = classStrings().flatMap(({ file, classes }) =>
+      classes
+        .split(/\s+/)
+        .filter((token) => token && !source.includes(token))
+        .map((token) => `${file}: ${token}`)
+    );
+    expect(missing).toEqual([]);
   });
 
   // CLAUDE.md: gap between siblings, padding inside; never margins.
@@ -224,7 +239,10 @@ describe('style rules', () => {
           /<(Button|ExternalLink|HandleCombobox)\b((?:=>|[^>])*)>/g
         ),
       ]
-        .filter((match) => !/\btone="accent"/.test(match[2] ?? ''))
+        .filter(
+          (match) =>
+            !/\btone(?:="(?:accent|badge)"|=\{tone\})/.test(match[2] ?? '')
+        )
         .map((match) => `${file}: <${match[1]}>`)
     );
     expect(files.length).toBeGreaterThan(10);

@@ -8,11 +8,15 @@
    it. --accent-text is the accent as text on the page: the light fills are
    too pale for that, so it is a deeper shade in light mode. The focus ring
    inside an accent field is --focus-ring-on-accent. --cover-* colour the
-   badge's cover patterns.
+   badge's cover patterns. --board-label labels the badge's departure board
+   (always brand ink), and --badge-button is the badge's main action on the
+   accent field. The badge looks the same in light and dark.
 
    Every pair is contrast-checked by src/design/accents.test.ts:
    on-accent/accent ≥ 7:1, accent-text/background ≥ 7:1,
-   accent-text/accent-subtle ≥ 4.5:1, focus-ring-on-accent/accent ≥ 3:1.
+   accent-text/accent-subtle ≥ 4.5:1, focus-ring-on-accent/accent ≥ 3:1,
+   board-label/badge-ink ≥ 4.5:1, on-badge-button/badge-button ≥ 7:1 and
+   badge-button/accent ≥ 3:1.
    ============================================================================= */
 
 :root,
@@ -26,6 +30,9 @@
   --cover-ground: #f6f5ff;
   --cover-mark: #4020df;
   --cover-partner: #06011e;
+  --board-label: #b3a6ff;
+  --badge-button: #ffffff;
+  --on-badge-button: #06011e;
 }
 :root[data-accent='mint'],
 [data-accent='mint'] {
@@ -37,6 +44,9 @@
   --cover-ground: #06011e;
   --cover-mark: #8bf9be;
   --cover-partner: #f6f5ff;
+  --board-label: #8bf9be;
+  --badge-button: #06011e;
+  --on-badge-button: #ffffff;
 }
 :root[data-accent='lime'],
 [data-accent='lime'] {
@@ -48,6 +58,9 @@
   --cover-ground: #06011e;
   --cover-mark: #eaff00;
   --cover-partner: #f7879a;
+  --board-label: #eaff00;
+  --badge-button: #06011e;
+  --on-badge-button: #ffffff;
 }
 :root[data-accent='pink'],
 [data-accent='pink'] {
@@ -59,6 +72,9 @@
   --cover-ground: #06011e;
   --cover-mark: #f7879a;
   --cover-partner: #eaff00;
+  --board-label: #f7879a;
+  --badge-button: #06011e;
+  --on-badge-button: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -73,6 +89,9 @@
     --cover-ground: #f6f5ff;
     --cover-mark: #4020df;
     --cover-partner: #06011e;
+    --board-label: #b3a6ff;
+    --badge-button: #ffffff;
+    --on-badge-button: #06011e;
   }
   :root[data-accent='mint'],
   [data-accent='mint'] {
@@ -84,6 +103,9 @@
     --cover-ground: #06011e;
     --cover-mark: #8bf9be;
     --cover-partner: #f6f5ff;
+    --board-label: #8bf9be;
+    --badge-button: #06011e;
+    --on-badge-button: #ffffff;
   }
   :root[data-accent='lime'],
   [data-accent='lime'] {
@@ -95,6 +117,9 @@
     --cover-ground: #06011e;
     --cover-mark: #eaff00;
     --cover-partner: #f7879a;
+    --board-label: #eaff00;
+    --badge-button: #06011e;
+    --on-badge-button: #ffffff;
   }
   :root[data-accent='pink'],
   [data-accent='pink'] {
@@ -106,5 +131,8 @@
     --cover-ground: #06011e;
     --cover-mark: #f7879a;
     --cover-partner: #eaff00;
+    --board-label: #f7879a;
+    --badge-button: #06011e;
+    --on-badge-button: #ffffff;
   }
 }

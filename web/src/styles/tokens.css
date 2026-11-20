@@ -17,6 +17,10 @@
   --border: rgb(6 1 30 / 0.09);
   --border-strong: #8f8ca4;
   --focus-ring: #4020df;
+  /* The badge's departure board (#129): brand ink in light and dark. */
+  --badge-ink: #06011e;
+  --on-badge-ink: #f6f5ff;
+  --badge-line: rgb(246 245 255 / 0.14);
 }
 
 /* =============================================================================

@@ -6,6 +6,11 @@ declare module '@tanstack/react-router' {
      * own <main>, so the root layout renders neither.
      */
     ownHeader?: boolean;
+    /**
+     * The app header offers signed-out visitors Sign in and Make your
+     * lanyard (lanyard pages, #129).
+     */
+    signedOutActions?: boolean;
   }
 }
 

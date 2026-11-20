@@ -18,6 +18,7 @@ export const Route = createFileRoute('/@{$handle}')({
       throw redirect({ to: '/@{$handle}', params: { handle: lower } });
     }
   },
+  staticData: { signedOutActions: true },
   component: HandleLanyard,
 });
 
