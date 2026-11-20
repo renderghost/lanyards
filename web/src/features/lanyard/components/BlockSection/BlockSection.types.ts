@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import type { SourceName } from '@/lib/sources/result';
 
 export type BlockSectionProps = {
+  /** The section's id, for links to it from elsewhere on the page. */
+  id?: string;
   heading: string;
   status: 'loading' | 'error' | 'ready';
   /** Sources that failed; shown to the owner only. */

@@ -401,8 +401,9 @@ describe('/lanyard', { timeout: 20_000 }, () => {
     await saveChanges();
     await waitFor(() => expect(saves).toHaveLength(1), { timeout: 3000 });
     const record = saves[0]?.record as { blocks: { type: string }[] };
+    // Roles (#130) is second by default: Links moves below it.
     expect(record.blocks.slice(0, 2).map((block) => block.type)).toEqual([
-      'talks',
+      'roles',
       'links',
     ]);
   });

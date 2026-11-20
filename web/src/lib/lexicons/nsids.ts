@@ -34,6 +34,8 @@ export const BLOCK_TYPES = [
   'media',
   'events',
   'details',
+  // In the lexicon's order; the page's order is DEFAULT_BLOCK_ORDER.
+  'roles',
 ] as const;
 
 export type BlockType = (typeof BLOCK_TYPES)[number];

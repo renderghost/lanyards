@@ -65,13 +65,13 @@ describe('LanyardEditor', { timeout: 20_000 }, () => {
     servePerson();
     await renderEditor();
     const blocks = screen.getByRole('list', { name: 'Blocks' });
-    expect(order(blocks).slice(0, 2)).toEqual(['links', 'talks']);
+    expect(order(blocks).slice(0, 2)).toEqual(['links', 'roles']);
     await userEvent.click(
       screen.getByRole('button', { name: 'Move Links down' })
     );
-    expect(order(blocks).slice(0, 2)).toEqual(['talks', 'links']);
+    expect(order(blocks).slice(0, 2)).toEqual(['roles', 'links']);
     expect(
-      screen.getByText('Links moved to position 2 of 12')
+      screen.getByText('Links moved to position 2 of 13')
     ).toBeInTheDocument();
   });
 

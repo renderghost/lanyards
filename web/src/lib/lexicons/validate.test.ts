@@ -85,7 +85,7 @@ describe('validateRecord', () => {
       events: [
         {
           event: EVENT,
-          emphasise: [...BLOCK_TYPES, 'roles'],
+          emphasise: [...BLOCK_TYPES],
         },
       ],
     });

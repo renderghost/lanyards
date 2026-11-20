@@ -1,6 +1,6 @@
 import { useLingui } from '@lingui/react/macro';
 import { useLocation } from '@tanstack/react-router';
-import { type ReactNode, useEffect } from 'react';
+import { type ReactNode, useDeferredValue, useEffect } from 'react';
 
 import { Button } from '@/components/Button/Button';
 import { DEFAULT_ACCENT } from '@/design/accents';
@@ -37,6 +37,9 @@ export function LanyardPage({
   const session = useSession();
   const location = useLocation();
   const view = usePersonView(did, preview ? { mode: preview } : {});
+  // The badge is the page's largest paint: the blocks render just after
+  // it, so they never hold it up (spec §2, LCP).
+  const blocks = useDeferredValue(view.blocks, []);
   const shared = useSharedContext(did);
   const signedOut = session.status !== 'signedIn';
   const viewer = signedOut ? 'signedOut' : view.mode;
@@ -109,6 +112,12 @@ export function LanyardPage({
         hero={view.hero}
         headingLevel={preview ? 2 : 1}
         boardPending={view.sifaPending}
+        // "+N more roles" goes to the Roles block, when it is shown (#130).
+        rolesHref={
+          view.blocks.some((block) => block.type === 'roles')
+            ? '#roles'
+            : undefined
+        }
         actions={
           !preview && (
             <HeroActions did={did} handle={view.hero.handle} mode={view.mode} />
@@ -137,7 +146,7 @@ export function LanyardPage({
           </div>
         )}
         <LanyardBlocks
-          blocks={view.blocks}
+          blocks={blocks}
           owner={view.mode === 'owner'}
           profile={profileId(did, view.hero.handle)}
           onRetry={(type) =>

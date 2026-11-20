@@ -9,6 +9,7 @@ export type RenderableBlockType = Exclude<BlockType, 'events'>;
 
 export const DEFAULT_BLOCK_ORDER: readonly RenderableBlockType[] = [
   'links',
+  'roles',
   'talks',
   'openTo',
   'blogPosts',
@@ -22,9 +23,13 @@ export const DEFAULT_BLOCK_ORDER: readonly RenderableBlockType[] = [
   'details',
 ];
 
-/** Smart defaults (spec §7.2): links and talks on, everything else opt-in. */
+/**
+ * Smart defaults (spec §7.2): links, roles (#130) and talks on, everything
+ * else opt-in.
+ */
 export const DEFAULT_VISIBLE: ReadonlySet<RenderableBlockType> = new Set([
   'links',
+  'roles',
   'talks',
 ]);
 
@@ -120,8 +125,9 @@ const isRenderable = (type: string): type is RenderableBlockType =>
 /**
  * The owner's lanyard settings, or the smart defaults when there is no
  * valid app.lanyards.actor.lanyard record. Unknown and duplicate block types
- * are ignored; renderable blocks the record doesn't mention are appended in
- * default order with their default visibility.
+ * are ignored. A renderable block the record doesn't mention (Roles, on a
+ * lanyard saved before it, #130) goes in with its default visibility,
+ * after the nearest block before it in the default order, or first.
  */
 export function resolveConfig(record: unknown | null): LanyardConfig {
   const valid = record ? validateRecord(LANYARDS_NSID.lanyard, record) : null;
@@ -138,11 +144,17 @@ export function resolveConfig(record: unknown | null): LanyardConfig {
       ...(block.limit ? { limit: block.limit } : {}),
     });
   }
-  for (const type of DEFAULT_BLOCK_ORDER) {
-    if (!seen.has(type)) {
-      blocks.push({ type, visible: DEFAULT_VISIBLE.has(type) });
-    }
-  }
+  DEFAULT_BLOCK_ORDER.forEach((type, index) => {
+    if (seen.has(type)) return;
+    const before = DEFAULT_BLOCK_ORDER.slice(0, index).findLast((earlier) =>
+      seen.has(earlier)
+    );
+    const at = before
+      ? blocks.findIndex((block) => block.type === before) + 1
+      : 0;
+    blocks.splice(at, 0, { type, visible: DEFAULT_VISIBLE.has(type) });
+    seen.add(type);
+  });
 
   return {
     // A legacy accent reads as the nearest of the four (#128).

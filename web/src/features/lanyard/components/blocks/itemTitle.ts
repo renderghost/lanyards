@@ -15,6 +15,7 @@ type Titles = {
 
 const TITLES: Titles = {
   links: (item) => item.title,
+  roles: (item) => item.title,
   // One talk can be given at several events, so the event tells them apart.
   talks: (item, i18n) => {
     const { title, eventName } = item;

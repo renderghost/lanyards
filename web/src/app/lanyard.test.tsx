@@ -312,7 +312,8 @@ describe('lanyard blocks', () => {
     const headings = screen
       .getAllByRole('heading', { level: 2 })
       .map((heading) => heading.textContent);
-    expect(headings).toEqual(['Skills', 'Links']);
+    // Roles (#130), which this record predates, shows after Links.
+    expect(headings).toEqual(['Skills', 'Links', 'Roles']);
   });
 
   it('tells the owner when Sifa could not be loaded, and retries', async () => {

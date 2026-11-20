@@ -5,7 +5,11 @@ import { EDIT_LINKS } from '@/lib/person/editLinks';
 import { cn } from '@/lib/utils';
 
 import { BlockSection } from '../BlockSection/BlockSection';
-import { BLOCK_COMPONENTS, BLOCK_HEADINGS } from './LanyardBlocks.constants';
+import {
+  BLOCK_ANCHORS,
+  BLOCK_COMPONENTS,
+  BLOCK_HEADINGS,
+} from './LanyardBlocks.constants';
 import * as styles from './LanyardBlocks.styles';
 import type { LanyardBlocksProps } from './LanyardBlocks.types';
 
@@ -29,6 +33,7 @@ export function LanyardBlocks({
         return (
           <BlockSection
             key={block.type}
+            id={BLOCK_ANCHORS[block.type]}
             heading={i18n._(BLOCK_HEADINGS[block.type])}
             status={block.status}
             failedSources={

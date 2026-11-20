@@ -52,7 +52,7 @@ describe('authored lexicon documents', () => {
     );
   });
 
-  it('lists every block type the app knows, once, plus roles', () => {
+  it('lists every block type the app knows, once', () => {
     const doc = ours('actor/lanyard.json') as {
       defs: {
         blockType: { knownValues: string[] };
@@ -62,8 +62,7 @@ describe('authored lexicon documents', () => {
         };
       };
     };
-    // Roles is in the lexicon from #132; the app learns it in #130.
-    expect(doc.defs.blockType.knownValues).toEqual([...BLOCK_TYPES, 'roles']);
+    expect(doc.defs.blockType.knownValues).toEqual([...BLOCK_TYPES]);
     expect(doc.defs.block.properties.type.ref).toBe('#blockType');
     expect(doc.defs.eventOverride.properties.emphasise.items.ref).toBe(
       '#blockType'
