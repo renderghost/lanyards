@@ -12,6 +12,8 @@ export const Route = createFileRoute('/')({
     const returnTo = safeReturnTo(search.returnTo);
     return { returnTo: returnTo === '/' ? undefined : returnTo };
   },
+  // The badge fills the first screen: offer Sign in at the top (#148).
+  staticData: { signedOutActions: true },
   component: Landing,
 });
 

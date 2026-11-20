@@ -364,7 +364,7 @@ msgstr "Couldn't send your feedback. Please try again."
 msgid "Couldn't show this block"
 msgstr "Couldn't show this block"
 
-#: src/components/AppHeader/AppHeader.tsx:29
+#: src/components/AppHeader/AppHeader.tsx:40
 msgid "Couldn't start account creation. Please try again."
 msgstr "Couldn't start account creation. Please try again."
 
@@ -738,7 +738,7 @@ msgstr "Location"
 msgid "Location and languages"
 msgstr "Location and languages"
 
-#: src/components/AppHeader/AppHeader.tsx:51
+#: src/components/AppHeader/AppHeader.tsx:72
 msgid "Make your lanyard"
 msgstr "Make your lanyard"
 
@@ -770,7 +770,7 @@ msgstr "Move {name} down"
 msgid "Move {name} up"
 msgstr "Move {name} up"
 
-#: src/components/AppHeader/AppHeader.tsx:38
+#: src/components/AppHeader/AppHeader.tsx:49
 msgid "My lanyard"
 msgstr "My lanyard"
 
@@ -1084,7 +1084,8 @@ msgstr "Show what you’re open to"
 msgid "Sifa"
 msgstr "Sifa"
 
-#: src/components/AppHeader/AppHeader.tsx:48
+#: src/components/AppHeader/AppHeader.tsx:64
+#: src/components/AppHeader/AppHeader.tsx:68
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:22
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:26
@@ -1473,7 +1474,7 @@ msgstr "Your handle"
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:36
+#: src/components/AppHeader/AppHeader.tsx:47
 msgid "Your Lanyards"
 msgstr "Your Lanyards"
 

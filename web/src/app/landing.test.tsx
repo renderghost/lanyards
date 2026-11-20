@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -50,6 +50,22 @@ describe('landing page', () => {
     expect(document.title).toBe(
       'Researcher profiles on the AT Protocol · Lanyards'
     );
+  });
+
+  it('offers Sign in and Make your lanyard in the header (#148)', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    renderRoute('/');
+    const banner = await screen.findByRole('banner');
+    expect(
+      await within(banner).findByRole('link', { name: 'Sign in' })
+    ).toBeInTheDocument();
+    expect(
+      within(banner).getByRole('button', { name: 'Make your lanyard' })
+    ).toBeInTheDocument();
   });
 
   it('is titled for signing in when sent here to sign in (#145)', async () => {

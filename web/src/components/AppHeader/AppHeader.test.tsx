@@ -131,6 +131,28 @@ describe('AppHeader', () => {
     await expectNoAxeViolations(container);
   });
 
+  it('on the homepage, takes Sign in to the form on the page (#148)', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    vi.mocked(useProfile).mockReturnValue({ data: undefined } as never);
+    const { router } = renderInRouter(
+      <>
+        <AppHeader signedOutActions />
+        <input id="sign-in-handle" aria-label="Your handle" />
+      </>,
+      '/'
+    );
+    const signIn = await screen.findByRole('link', { name: 'Sign in' });
+    // Without JavaScript, still a link to the form.
+    expect(signIn).toHaveAttribute('href', '/#sign-in-handle');
+    await userEvent.click(signIn);
+    expect(screen.getByRole('textbox', { name: 'Your handle' })).toHaveFocus();
+    expect(router.state.location.href).toBe('/');
+  });
+
   it('offers neither elsewhere, nor to someone signed in', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',
