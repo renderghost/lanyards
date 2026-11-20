@@ -140,6 +140,10 @@ msgstr "Based"
 msgid "Being mentored"
 msgstr "Being mentored"
 
+#: src/features/feedback/components/SupportLinks/SupportLinks.tsx:34
+msgid "Beta support"
+msgstr "Beta support"
+
 #: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:273
 msgid "Blocks"
 msgstr "Blocks"
@@ -206,7 +210,7 @@ msgid "Clear"
 msgstr "Clear"
 
 #: src/components/Dialog/Dialog.tsx:75
-#: src/components/Sheet/Sheet.tsx:58
+#: src/components/Sheet/Sheet.tsx:59
 #: src/features/qr/components/QrSheet/QrSheet.tsx:123
 msgid "Close"
 msgstr "Close"
@@ -226,6 +230,10 @@ msgstr "Collections"
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:9
 msgid "Commissions"
 msgstr "Commissions"
+
+#: src/features/feedback/components/SupportLinks/SupportLinks.tsx:69
+msgid "Connect on Bluesky"
+msgstr "Connect on Bluesky"
 
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:8
 msgid "Contract roles"
@@ -270,7 +278,7 @@ msgstr "Couldn't load {sources}"
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
-#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:45
+#: src/features/feedback/components/FeedbackProvider/FeedbackProvider.tsx:45
 msgid "Couldn't open feedback. Please try again."
 msgstr "Couldn't open feedback. Please try again."
 
@@ -317,7 +325,7 @@ msgstr "Cover"
 msgid "Create an account"
 msgstr "Create an account"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:150
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:153
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -346,6 +354,10 @@ msgstr "Details"
 #: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:27
 msgid "Discard your unsaved changes?"
 msgstr "Discard your unsaved changes?"
+
+#: src/features/feedback/components/SupportLinks/SupportLinks.tsx:54
+msgid "Documentation"
+msgstr "Documentation"
 
 #: src/features/lanyard/customise/CoverPicker/CoverPicker.constants.ts:7
 msgid "Dots"
@@ -467,6 +479,10 @@ msgstr "For example alice.bsky.social"
 #: src/features/lanyard/components/blocks/OpenToBlock/OpenToBlock.constants.ts:6
 msgid "Full-time roles"
 msgstr "Full-time roles"
+
+#: src/features/feedback/components/SupportLinks/SupportLinks.tsx:48
+msgid "Give feedback"
+msgstr "Give feedback"
 
 #: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:54
 msgid "Give it a title"
@@ -601,7 +617,7 @@ msgstr "Loading your profile…"
 #: src/features/account/components/SettingsPage/SettingsPage.tsx:28
 #: src/features/auth/components/LandingPage/LandingPage.tsx:39
 #: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:246
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:55
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:56
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -755,7 +771,7 @@ msgstr "Post on Bluesky, {date}"
 msgid "Preparing screenshot…"
 msgstr "Preparing screenshot…"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:181
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:184
 msgid "Preview"
 msgstr "Preview"
 
@@ -801,7 +817,7 @@ msgstr "Reordering cancelled. {name} stayed where it was."
 msgid "Reset"
 msgstr "Reset"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:171
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:174
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
@@ -853,7 +869,6 @@ msgstr "See our feedback board"
 msgid "Semble"
 msgstr "Semble"
 
-#: src/features/feedback/components/FeedbackButton/FeedbackButton.tsx:79
 #: src/features/feedback/components/FeedbackDialog/FeedbackDialog.tsx:301
 #: src/features/feedback/components/FeedbackForm/FeedbackForm.tsx:204
 msgid "Send feedback"
@@ -921,6 +936,10 @@ msgstr "Sign out"
 msgid "Sign-in was cancelled."
 msgstr "Sign-in was cancelled."
 
+#: src/features/feedback/components/SupportLinks/SupportLinks.tsx:60
+msgid "Signal group"
+msgstr "Signal group"
+
 #: src/features/feedback/components/ContactLinks/ContactLinks.tsx:23
 msgid "Signal username copied"
 msgstr "Signal username copied"
@@ -979,8 +998,8 @@ msgid "Stripes"
 msgstr "Stripes"
 
 #: src/features/lanyard/customise/CustomiserToolbar/CustomiserToolbar.tsx:57
-#: src/features/lanyard/customise/StyleSheet/StyleSheet.tsx:21
-#: src/features/lanyard/customise/StyleSidebar/StyleSidebar.tsx:16
+#: src/features/lanyard/customise/StyleSheet/StyleSheet.tsx:25
+#: src/features/lanyard/customise/StyleSidebar/StyleSidebar.tsx:15
 msgid "Style"
 msgstr "Style"
 
@@ -1004,7 +1023,7 @@ msgstr "Thank you"
 msgid "That doesn't look like a handle — for example alice.bsky.social"
 msgstr "That doesn't look like a handle — for example alice.bsky.social"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:164
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:167
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -1082,7 +1101,7 @@ msgstr "Up to 4. Choose, paste or drop images."
 msgid "Update"
 msgstr "Update"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:156
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:159
 msgid "Updating your podcasts and videos…"
 msgstr "Updating your podcasts and videos…"
 
@@ -1146,7 +1165,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:161
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:164
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
@@ -1179,7 +1198,7 @@ msgstr "You can hide up to 500 items. Show some again first."
 msgid "You follow each other"
 msgstr "You follow each other"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:117
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:118
 msgid "You have unsaved changes. Leave without saving?"
 msgstr "You have unsaved changes. Leave without saving?"
 
@@ -1191,7 +1210,7 @@ msgstr "You're offline. Connect to sign in."
 msgid "You're offline. Some things won't work until you reconnect."
 msgstr "You're offline. Some things won't work until you reconnect."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:177
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:180
 msgid "You’re seeing your lanyard as the public sees it."
 msgstr "You’re seeing your lanyard as the public sees it."
 
@@ -1225,9 +1244,9 @@ msgstr "Your feedback is posted from your own account to our board on UserInput.
 msgid "Your handle"
 msgstr "Your handle"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:43
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:52
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:123
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:44
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:53
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:124
 #: src/features/qr/components/QrSheet/QrSheet.tsx:41
 msgid "Your lanyard"
 msgstr "Your lanyard"

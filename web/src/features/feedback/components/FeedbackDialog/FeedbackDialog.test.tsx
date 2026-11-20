@@ -16,12 +16,12 @@ import { useSession } from '@/features/auth/session/useSession';
 import { FEEDBACK_SCOPE, GRANULAR_SCOPE } from '@/lib/atproto/oauthConfig';
 import { startSignIn } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
-import { mockDidDocument, mockListRecords } from '@/test/handlers';
+import { mockDidDocument, mockGetRecord } from '@/test/handlers';
 import { BEA } from '@/test/people';
 import { signedInSession, signedOutSession } from '@/test/person';
 import { renderWithClient } from '@/test/render';
 
-import { BOARD_OWNER_DID } from '../../feedback.constants';
+import { BOARD_OWNER_DID, BOARD_RKEY } from '../../feedback.constants';
 import { FeedbackDialog } from './FeedbackDialog';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
@@ -66,24 +66,23 @@ vi.mock('../../useSendFeedback', async (importOriginal) => ({
 const PDS = 'https://pds.lanyards.test';
 const serveBoard = (exists = true) => {
   mockDidDocument(BOARD_OWNER_DID, PDS);
-  mockListRecords(
+  mockGetRecord(
     PDS,
     BOARD_OWNER_DID,
     'app.userinput.space',
+    BOARD_RKEY,
     exists
-      ? [
-          {
-            uri: `at://${BOARD_OWNER_DID}/app.userinput.space/3mboard`,
-            cid: `bafyrei${'c'.repeat(52)}`,
-            value: {
-              $type: 'app.userinput.space',
-              name: 'Lanyards feedback',
-              tags: [{ value: 'bug', label: 'Bug' }],
-              createdAt: '2026-11-20T09:00:00.000Z',
-            },
+      ? {
+          uri: `at://${BOARD_OWNER_DID}/app.userinput.space/${BOARD_RKEY}`,
+          cid: `bafyrei${'c'.repeat(52)}`,
+          value: {
+            $type: 'app.userinput.space',
+            name: 'Lanyards feedback',
+            tags: [{ value: 'bug', label: 'Bug' }],
+            createdAt: '2026-11-20T09:00:00.000Z',
           },
-        ]
-      : []
+        }
+      : null
   );
 };
 
@@ -331,7 +330,7 @@ describe('FeedbackDialog (#134)', () => {
   it('tries the board again when reopened after it couldn’t be read', async () => {
     canSend();
     server.use(
-      http.get(`${PDS}/xrpc/com.atproto.repo.listRecords`, () =>
+      http.get(`${PDS}/xrpc/com.atproto.repo.getRecord`, () =>
         HttpResponse.json({ error: 'InternalServerError' }, { status: 500 })
       )
     );

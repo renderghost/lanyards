@@ -25,6 +25,7 @@ import { CustomiserToolbar } from '../CustomiserToolbar/CustomiserToolbar';
 import { LanyardEditor } from '../LanyardEditor/LanyardEditor';
 import { StyleSheet } from '../StyleSheet/StyleSheet';
 import { StyleSidebar } from '../StyleSidebar/StyleSidebar';
+import { CustomiserSidebar } from '../CustomiserSidebar/CustomiserSidebar';
 import { CUSTOMISE_PATH, SIGN_IN_PATH } from './CustomisePage.constants';
 import * as styles from './CustomisePage.styles';
 import type { CustomisePageProps } from './CustomisePage.types';
@@ -118,7 +119,7 @@ function Customiser({
   );
 
   return (
-    <>
+    <div className={styles.shell}>
       <AppHeader
         title={t`Your lanyard`}
         actions={
@@ -135,15 +136,17 @@ function Customiser({
       />
       <main className={styles.main}>
         <div className={cn(styles.workspace, className)}>
-          {editing && (
-            <StyleSidebar
-              did={did}
-              initials={initials}
-              config={settings.config}
-              disabled={disabled}
-              onChange={update}
-            />
-          )}
+          <CustomiserSidebar>
+            {editing && (
+              <StyleSidebar
+                did={did}
+                initials={initials}
+                config={settings.config}
+                disabled={disabled}
+                onChange={update}
+              />
+            )}
+          </CustomiserSidebar>
           <LanyardSurface className={styles.canvas}>
             <div className={styles.intro}>
               <h1 id={headingId} className={styles.heading}>
@@ -212,6 +215,6 @@ function Customiser({
         disabled={disabled}
         onChange={update}
       />
-    </>
+    </div>
   );
 }

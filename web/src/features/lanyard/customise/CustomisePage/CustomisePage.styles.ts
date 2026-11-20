@@ -1,11 +1,20 @@
-// The route draws its own header, so it draws its <main> too.
-export const main = 'flex flex-1 flex-col';
+// From md up, the customiser fills the window: the canvas scrolls inside
+// it, so the sidebar, and support at its foot, stay in view (#134).
+// (A fixed height, not flex-1, so everything inside has one to fill.)
+export const shell = 'flex flex-1 flex-col md:h-dvh md:flex-none';
 
-// The style sidebar (from md up), then the canvas holding the lanyard.
-export const workspace = 'flex flex-1 items-stretch';
+// The route draws its own header, so it draws its <main> too.
+export const main = 'flex flex-1 flex-col md:min-h-0';
+
+// The sidebar (from md up), then the canvas holding the lanyard.
+export const workspace = 'flex flex-1 items-stretch md:min-h-0';
 
 // The lanyard's own ground (LanyardSurface): no box round the lanyard.
-export const canvas = 'min-w-0 items-center gap-6 px-4 py-6 md:px-8 md:py-8';
+// From md up it scrolls, and is positioned, so absolutely placed content
+// inside it (such as screen-reader text) scrolls with it rather than
+// stretching the page.
+export const canvas =
+  'min-w-0 items-center gap-6 px-4 py-6 md:relative md:overflow-y-auto md:px-8 md:py-8';
 
 export const intro = 'flex w-full max-w-[640px] flex-col gap-3';
 

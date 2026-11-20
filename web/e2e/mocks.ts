@@ -254,7 +254,7 @@ export async function mockOwnerWrites(page: Page): Promise<OwnerWrite[]> {
 /** @lanyards.app, whose UserInput board takes feedback (#134). */
 export const BOARD = {
   owner: 'did:plc:ua3d6biqepazbq6mw4ysotfo',
-  uri: 'at://did:plc:ua3d6biqepazbq6mw4ysotfo/app.userinput.space/3mboard',
+  uri: 'at://did:plc:ua3d6biqepazbq6mw4ysotfo/app.userinput.space/3n2rdjjovcm2o',
   cid: `bafyrei${'b'.repeat(52)}`,
 };
 
@@ -297,30 +297,28 @@ export async function mockFeedback(
       ],
     })
   );
-  await page.route(
-    `${BOARD_PDS}/xrpc/com.atproto.repo.listRecords**`,
-    (route) =>
-      json(route, {
-        records:
-          options.board === false
-            ? []
-            : [
-                {
-                  uri: BOARD.uri,
-                  cid: BOARD.cid,
-                  value: {
-                    $type: 'app.userinput.space',
-                    name: 'Lanyards',
-                    tags: [
-                      { value: 'bug', label: 'Bug' },
-                      { value: 'idea', label: 'Idea' },
-                      { value: 'question', label: 'Question' },
-                    ],
-                    createdAt: '2026-11-20T09:00:00.000Z',
-                  },
-                },
-              ],
-      })
+  // Our board, read by its record key (#144), as its server returns it.
+  await page.route(`${BOARD_PDS}/xrpc/com.atproto.repo.getRecord**`, (route) =>
+    options.board === false
+      ? json(
+          route,
+          { error: 'RecordNotFound', message: 'Could not locate record' },
+          400
+        )
+      : json(route, {
+          uri: BOARD.uri,
+          cid: BOARD.cid,
+          value: {
+            $type: 'app.userinput.space',
+            name: 'Lanyards',
+            tags: [
+              { label: 'bug', value: 'bug' },
+              { label: 'feature', value: 'feature' },
+              { label: 'question', value: 'question' },
+            ],
+            createdAt: '2026-11-20T19:37:12.820Z',
+          },
+        })
   );
   await page.route(
     'https://pds.e2e.test/xrpc/com.atproto.repo.uploadBlob',

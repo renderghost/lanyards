@@ -1,14 +1,13 @@
 import AxeBuilder from '@axe-core/playwright';
 import type { Page } from '@playwright/test';
 
-import { expect, HEADING, test } from './fixtures';
+import { expect, test } from './fixtures';
 import {
   ADA,
-  BEA,
   BOARD,
   mockFeedback,
+  mockOwnerWrites,
   mockPerson,
-  mockViewer,
   signIn,
 } from './mocks';
 
@@ -20,11 +19,12 @@ const FEEDBACK = `${GRANULAR} repo:app.userinput.discussion?action=create blob:i
 const dialog = (page: Page) =>
   page.getByRole('dialog', { name: 'Send feedback' });
 
+const support = (page: Page) =>
+  page.getByRole('region', { name: 'Beta support' });
+
+/** From the sidebar's support, from md up. */
 const openFeedback = (page: Page) =>
-  page
-    .getByRole('contentinfo')
-    .getByRole('button', { name: 'Send feedback' })
-    .click();
+  support(page).getByRole('button', { name: 'Give feedback' }).click();
 
 /** A noisy 1,200 × 900 PNG, about 3 MB: a big phone screenshot. */
 async function largePng(page: Page): Promise<Buffer> {
@@ -44,72 +44,80 @@ async function largePng(page: Page): Promise<Buffer> {
   return Buffer.from(dataUrl.split(',')[1] ?? '', 'base64');
 }
 
-/** The person's own lanyard page, as someone signed in. */
-async function signedInOnLanyard(
+/** The customiser, signed in as its owner with `scope`. */
+async function customiser(
   page: Page,
   scope: string,
   options: { board?: boolean; hash?: string } = {}
 ) {
   await mockPerson(page);
-  await mockViewer(page);
+  await mockOwnerWrites(page);
   const sent = await mockFeedback(page, options);
-  await signIn(page, { did: BEA.did, scope });
-  await page.goto(`/@${ADA.handle}${options.hash ?? ''}`);
+  await signIn(page, { did: ADA.did, scope });
+  await page.goto(`/lanyard${options.hash ?? ''}`);
   // Arriving to reopen feedback, the dialog may hide the page at once.
   if (!options.hash) {
     await expect(
-      page.getByRole('heading', { level: 1, name: 'Dr Ada Example' })
-    ).toBeVisible();
+      page.getByRole('button', { name: 'Reorder Links' })
+    ).toBeEnabled();
   }
   return sent;
 }
 
 test.describe('feedback (#134)', () => {
-  test('signed out: the other ways to reach us, and no form', async ({
-    page,
-  }) => {
-    await mockFeedback(page);
-    await page.goto('/');
-    await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
-    await openFeedback(page);
-    await expect(dialog(page)).toBeVisible();
+  test('keeps support in view at the foot of the sidebar', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await customiser(page, GRANULAR);
+    const inView = async () => {
+      const box = await support(page).boundingBox();
+      return Boolean(box && box.y >= 0 && box.y + box.height <= 720);
+    };
+    expect(await inView()).toBe(true);
+    // The lanyard scrolls; the sidebar and its support stay put.
+    await page.getByRole('region', { name: 'Preview' }).hover();
+    await page.mouse.wheel(0, 4000);
+    await expect
+      .poll(() =>
+        page
+          .getByRole('heading', { name: 'Customise your lanyard' })
+          .boundingBox()
+          .then((box) => (box ? box.y : 0))
+      )
+      .toBeLessThan(0);
+    expect(await inView()).toBe(true);
     await expect(
-      dialog(page).getByRole('link', {
-        name: /Follow @lanyards.app on Bluesky/,
-      })
+      support(page).getByRole('link', { name: /Signal group/ })
+    ).toHaveAttribute('href', /^https:\/\/signal\.group\//);
+    await expect(
+      support(page).getByRole('link', { name: /Connect on Bluesky/ })
     ).toHaveAttribute('href', 'https://bsky.app/profile/lanyards.app');
-    await expect(dialog(page)).toContainText('renderghost.101');
     await expect(
-      dialog(page).getByRole('link', { name: /See our feedback board/ })
-    ).toHaveAttribute(
-      'href',
-      'https://userinput.app/s/did:plc:ua3d6biqepazbq6mw4ysotfo/3mboard'
-    );
-    await expect(dialog(page).getByLabel('Title')).toHaveCount(0);
-    const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
-    expect(result.violations).toEqual([]);
+      support(page).getByRole('link', { name: /Documentation/ })
+    ).toHaveAttribute('href', 'https://github.com/renderghost/lanyards/wiki/');
   });
 
   test('asks for permission first', async ({ page }) => {
-    await signedInOnLanyard(page, GRANULAR);
+    await customiser(page, GRANULAR);
     await openFeedback(page);
     await expect(
       dialog(page).getByRole('button', { name: 'Give permission' })
     ).toBeVisible();
     await expect(dialog(page).getByLabel('Title')).toHaveCount(0);
+    const result = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(result.violations).toEqual([]);
   });
 
   test('reopens after the permission sign-in, and tidies the address', async ({
     page,
   }) => {
-    await signedInOnLanyard(page, FEEDBACK, { hash: '#feedback' });
+    await customiser(page, FEEDBACK, { hash: '#feedback' });
     await expect(dialog(page)).toBeVisible();
     await expect(dialog(page).getByLabel('Title')).toBeVisible();
     expect(new URL(page.url()).hash).toBe('');
   });
 
   test('says when feedback isn’t open yet', async ({ page }) => {
-    await signedInOnLanyard(page, FEEDBACK, { board: false });
+    await customiser(page, FEEDBACK, { board: false });
     await openFeedback(page);
     await expect(dialog(page)).toContainText('Feedback isn’t open yet.');
     await expect(dialog(page)).toContainText('renderghost.101');
@@ -118,13 +126,30 @@ test.describe('feedback (#134)', () => {
 
   test('sends a bug with a large screenshot at 320 px', async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 640 });
-    const sent = await signedInOnLanyard(page, FEEDBACK);
+    const sent = await customiser(page, FEEDBACK);
     const png = await largePng(page);
     expect(png.length).toBeGreaterThan(2_500_000);
 
-    await openFeedback(page);
+    // On phones, support is at the foot of the Style sheet.
+    await page
+      .getByRole('toolbar', { name: 'Customiser' })
+      .getByRole('button', { name: 'Style' })
+      .click();
+    const sheet = page.getByRole('dialog', { name: 'Style' });
+    const sheetSupport = sheet.getByRole('region', { name: 'Beta support' });
+    const sheetBox = await sheet.boundingBox();
+    const supportBox = await sheetSupport.boundingBox();
+    expect(
+      Math.abs(
+        (sheetBox?.y ?? 0) +
+          (sheetBox?.height ?? 0) -
+          ((supportBox?.y ?? 0) + (supportBox?.height ?? 0))
+      )
+    ).toBeLessThan(2);
+    await sheetSupport.getByRole('button', { name: 'Give feedback' }).click();
+    await expect(sheet).toBeHidden();
     const form = dialog(page);
-    await form.getByRole('radio', { name: 'Bug' }).check();
+    await form.getByRole('radio', { name: 'bug' }).check();
     await form.getByLabel('Title').fill('The QR code is cut off');
     await form
       .getByLabel('Details', { exact: true })
@@ -137,7 +162,7 @@ test.describe('feedback (#134)', () => {
     await expect(form.getByRole('img', { name: 'Screenshot 1' })).toBeVisible();
     await form.getByLabel('Describe screenshot 1').fill('The QR sheet');
     await form.getByLabel('Include technical details').check();
-    await expect(form.locator('pre')).toContainText('Page: /@alice.test');
+    await expect(form.locator('pre')).toContainText('Page: /lanyard');
 
     // Nothing in the dialog spills sideways at 320 px.
     const overflow = await page.evaluate(
@@ -151,14 +176,14 @@ test.describe('feedback (#134)', () => {
     ).toBeVisible();
     await expect(
       form.getByRole('link', { name: /View it on UserInput/ })
-    ).toHaveAttribute('href', `https://userinput.app/d/${BEA.did}/3mfeedback`);
+    ).toHaveAttribute('href', `https://userinput.app/d/${ADA.did}/3mfeedback`);
 
     expect(sent.uploads).toHaveLength(1);
     expect(sent.uploads[0]?.type).toBe('image/webp');
     expect(sent.uploads[0]?.size).toBeLessThanOrEqual(1_000_000);
     expect(sent.created).toHaveLength(1);
     const [post] = sent.created;
-    expect(post?.repo).toBe(BEA.did);
+    expect(post?.repo).toBe(ADA.did);
     expect(post?.collection).toBe('app.userinput.discussion');
     expect(post?.record).toMatchObject({
       $type: 'app.userinput.discussion',
@@ -175,7 +200,7 @@ test.describe('feedback (#134)', () => {
     expect(post?.record.body).toContain(
       'On my phone the bottom of the code is hidden.'
     );
-    expect(post?.record.body).toContain('Page: /@alice.test');
+    expect(post?.record.body).toContain('Page: /lanyard');
   });
 
   test('captures the page without the dialog over it', async ({ page }) => {
@@ -202,7 +227,7 @@ test.describe('feedback (#134)', () => {
         return canvas.captureStream(30);
       };
     });
-    await signedInOnLanyard(page, FEEDBACK);
+    await customiser(page, FEEDBACK);
     await openFeedback(page);
     await dialog(page)
       .getByRole('button', { name: 'Capture this screen' })

@@ -95,6 +95,28 @@ describe('Sheet', () => {
     expect(screen.getByRole('button', { name: 'Elsewhere' })).toHaveFocus();
   });
 
+  it('pins a footer below its scrolling body (#134)', async () => {
+    renderWithProviders(
+      <Sheet
+        open
+        onOpenChange={() => {}}
+        title="Style"
+        footer={<a href="/help">Help</a>}
+      >
+        <button type="button">Blue</button>
+      </Sheet>
+    );
+    const sheet = await screen.findByRole('dialog', { name: 'Style' });
+    const help = within(sheet).getByRole('link', { name: 'Help' });
+    const blue = within(sheet).getByRole('button', { name: 'Blue' });
+    // Outside the part that scrolls, after it.
+    expect(blue.closest('[data-sheet-body]')).not.toBeNull();
+    expect(help.closest('[data-sheet-body]')).toBeNull();
+    expect(
+      blue.compareDocumentPosition(help) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
+  });
+
   it('has no axe violations', async () => {
     const dialog = await openSheet();
     await expectNoAxeViolations(dialog);

@@ -1,16 +1,14 @@
 import { useLingui } from '@lingui/react/macro';
 import { useLocation, useRouter } from '@tanstack/react-router';
-import { MessageSquare } from 'lucide-react';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 
 import { notify } from '@/components/Toaster/notify';
 import { captureError } from '@/lib/analytics/analytics';
-import { cn } from '@/lib/utils';
 
+import { FeedbackContext } from '../../useFeedback';
 import type { FeedbackDialog } from '../FeedbackDialog/FeedbackDialog';
 import { REOPEN_FRAGMENT } from '../FeedbackDialog/FeedbackDialog.constants';
-import * as styles from './FeedbackButton.styles';
-import type { FeedbackButtonProps } from './FeedbackButton.types';
+import type { FeedbackProviderProps } from './FeedbackProvider.types';
 
 type Dialog = typeof FeedbackDialog;
 
@@ -21,17 +19,19 @@ const loadDialog = (): Promise<Dialog> =>
     (module) => module.FeedbackDialog
   );
 
-/** "Send feedback": opens feedback over the current page (#134). */
-export function FeedbackButton({
-  autoOpen = false,
-  className,
-}: FeedbackButtonProps) {
+/**
+ * The app's one feedback dialog (#134): wherever it's opened from, it's
+ * the same draft. It reopens when the permission sign-in sends the person
+ * back with #feedback; the callback page navigates in the app, so this
+ * follows the router's location rather than reading the address once.
+ */
+export function FeedbackProvider({ children }: FeedbackProviderProps) {
   const { t } = useLingui();
   const router = useRouter();
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const [Dialog, setDialog] = useState<Dialog | null>(null);
-  const button = useRef<HTMLButtonElement>(null);
+  const restoreFocus = useRef<(() => void) | null>(null);
   const page = `${location.pathname}${location.searchStr}`;
 
   const reveal = (loaded: Dialog) => {
@@ -45,16 +45,15 @@ export function FeedbackButton({
     notify.error(t`Couldn't open feedback. Please try again.`);
   };
 
-  function show() {
+  function show(returnFocus: () => void) {
+    restoreFocus.current = returnFocus;
     if (Dialog) setOpen(true);
     else loadDialog().then(reveal, fail);
   }
 
   // Back from the permission sign-in: open again, and tidy the address.
-  // The callback page navigates here in the app, so this follows the
-  // router's location rather than reading the address once (#134).
   const arrive = useEffectEvent((hash: string) => {
-    if (!autoOpen || hash !== REOPEN_FRAGMENT) return;
+    if (hash !== REOPEN_FRAGMENT) return;
     router.history.replace(
       `${location.pathname}${location.searchStr}`,
       router.history.location.state,
@@ -68,24 +67,16 @@ export function FeedbackButton({
   useEffect(() => arrive(location.hash), [location.hash]);
 
   return (
-    <>
-      <button
-        ref={button}
-        type="button"
-        onClick={show}
-        className={cn(styles.button, className)}
-      >
-        <MessageSquare aria-hidden="true" className={styles.icon} />
-        {t`Send feedback`}
-      </button>
+    <FeedbackContext value={{ show }}>
+      {children}
       {Dialog && (
         <Dialog
           open={open}
           onOpenChange={setOpen}
-          returnFocus={() => button.current?.focus()}
+          returnFocus={() => restoreFocus.current?.()}
           page={page}
         />
       )}
-    </>
+    </FeedbackContext>
   );
 }

@@ -11,12 +11,12 @@ import {
   ScopeRefusedError,
   WriteFailedError,
 } from '@/lib/atproto/writes';
-import { mockDidDocument, mockListRecords } from '@/test/handlers';
+import { mockDidDocument, mockGetRecord } from '@/test/handlers';
 import { server } from '@/test/msw';
 import { BEA } from '@/test/people';
 import { signedInSession, VIEWER_PDS } from '@/test/person';
 
-import { BOARD_OWNER_DID } from './feedback.constants';
+import { BOARD_OWNER_DID, BOARD_RKEY } from './feedback.constants';
 import type { Screenshot } from './images';
 import { BoardUnavailableError, useSendFeedback } from './useSendFeedback';
 
@@ -28,7 +28,7 @@ vi.mock('@/lib/analytics/analytics', () => ({
 
 const BOARD_PDS = 'https://pds.lanyards.test';
 const CURRENT_CID = `bafyrei${'e'.repeat(52)}`;
-const BOARD = `at://${BOARD_OWNER_DID}/app.userinput.space/3mboard`;
+const BOARD = `at://${BOARD_OWNER_DID}/app.userinput.space/${BOARD_RKEY}`;
 // Valid CIDs: base32, so letters a–z and digits 2–7 only.
 const BLOB_CID = (n: number) => `bafkrei${'abcd'[n]!.repeat(52)}`;
 
@@ -50,18 +50,16 @@ beforeEach(() => {
   );
   mockDidDocument(BOARD_OWNER_DID, BOARD_PDS);
   // The board was edited since the page read it: this is its current cid.
-  mockListRecords(BOARD_PDS, BOARD_OWNER_DID, 'app.userinput.space', [
-    {
-      uri: BOARD,
-      cid: CURRENT_CID,
-      value: {
-        $type: 'app.userinput.space',
-        name: 'Lanyards feedback',
-        tags: [{ value: 'bug', label: 'Bug' }],
-        createdAt: '2026-11-20T09:00:00.000Z',
-      },
+  mockGetRecord(BOARD_PDS, BOARD_OWNER_DID, 'app.userinput.space', BOARD_RKEY, {
+    uri: BOARD,
+    cid: CURRENT_CID,
+    value: {
+      $type: 'app.userinput.space',
+      name: 'Lanyards feedback',
+      tags: [{ value: 'bug', label: 'Bug' }],
+      createdAt: '2026-11-20T09:00:00.000Z',
     },
-  ]);
+  });
   server.use(
     http.post(`${VIEWER_PDS}/xrpc/com.atproto.repo.uploadBlob`, async () => {
       uploads += 1;
@@ -197,7 +195,13 @@ describe('useSendFeedback (#134)', () => {
   });
 
   it('fails clearly when the board has gone', async () => {
-    mockListRecords(BOARD_PDS, BOARD_OWNER_DID, 'app.userinput.space', []);
+    mockGetRecord(
+      BOARD_PDS,
+      BOARD_OWNER_DID,
+      'app.userinput.space',
+      BOARD_RKEY,
+      null
+    );
     const { result } = renderHook(() => useSendFeedback(), { wrapper });
     await expect(
       act(() => result.current.mutateAsync(draft))

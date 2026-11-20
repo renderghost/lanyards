@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { FeedbackContext } from '@/features/feedback/useFeedback';
 import { resolveConfig } from '@/lib/person/config';
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderWithProviders } from '@/test/render';
@@ -12,7 +13,7 @@ import { StyleSheet } from './StyleSheet';
 function Harness() {
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <FeedbackContext value={{ show: vi.fn() }}>
       <button type="button" onClick={() => setOpen(true)}>
         Style
       </button>
@@ -25,7 +26,7 @@ function Harness() {
         disabled={false}
         onChange={vi.fn()}
       />
-    </>
+    </FeedbackContext>
   );
 }
 
@@ -36,6 +37,10 @@ describe('StyleSheet', () => {
     const sheet = await screen.findByRole('dialog', { name: 'Style' });
     expect(
       within(sheet).getByRole('radio', { name: 'Mint' })
+    ).toBeInTheDocument();
+    // Support, pinned at its foot as in the sidebar (#134).
+    expect(
+      within(sheet).getByRole('region', { name: 'Beta support' })
     ).toBeInTheDocument();
     expect(
       within(sheet).getByRole('button', { name: 'Badge' })
