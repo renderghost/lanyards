@@ -40,7 +40,7 @@ export const tones: Record<HandleComboboxTone, ToneStyles> = {
   accent: {
     label: 'text-sm font-medium leading-5 text-foreground',
     input:
-      'min-h-11 w-full rounded-md border border-border bg-surface px-3 text-base leading-6 text-foreground disabled:opacity-60',
+      'min-h-11 w-full rounded-md border border-border-strong bg-surface px-3 text-base leading-6 text-foreground disabled:opacity-60',
     inputInvalid: 'border-2 border-accent-text',
     hint: 'text-sm leading-5 text-muted-foreground',
     error: 'text-sm font-medium leading-5 text-foreground',

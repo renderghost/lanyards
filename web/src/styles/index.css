@@ -1,6 +1,5 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/dm-sans';
-@import '@fontsource/dm-serif-text';
+@import '@fontsource-variable/rethink-sans';
 @import '@fontsource/dm-mono';
 @import './tokens.css';
 @import './accents.css';
@@ -12,7 +11,9 @@
   --color-foreground: var(--foreground);
   --color-muted-foreground: var(--muted-foreground);
   --color-surface: var(--surface);
+  --color-subtle: var(--subtle);
   --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
   --color-focus-ring: var(--focus-ring);
   --color-accent: var(--accent);
   --color-on-accent: var(--on-accent);
@@ -30,10 +31,31 @@
   --color-ui-primary-subtle: var(--ui-primary-subtle);
   --color-ui-warning: var(--ui-warning);
   --color-ui-danger: var(--ui-danger);
-  --font-sans: 'DM Sans Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-serif: 'DM Serif Text', ui-serif, serif;
+  --font-sans: 'Rethink Sans Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'DM Mono', ui-monospace, monospace;
-  --radius-md: var(--radius);
+  /* Corners (#128): 1 px for small things, 3 px for everything else. */
+  --radius-xs: 1px;
+  --radius-sm: 3px;
+  /* Soft, layered depth (#128). */
+  --shadow-block: var(--depth-block);
+  --shadow-badge: var(--depth-badge);
+}
+
+:root {
+  --depth-block:
+    0 1px 2px rgb(6 1 30 / 0.04), 0 4px 12px rgb(6 1 30 / 0.04),
+    0 16px 32px rgb(6 1 30 / 0.03);
+  --depth-badge:
+    0 1px 2px rgb(6 1 30 / 0.06), 0 8px 24px rgb(6 1 30 / 0.08),
+    0 32px 64px rgb(6 1 30 / 0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --depth-block:
+      0 1px 0 rgb(246 245 255 / 0.04) inset, 0 8px 24px rgb(0 0 0 / 0.35);
+    --depth-badge: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 64px rgb(0 0 0 / 0.45);
+  }
 }
 
 @layer base {

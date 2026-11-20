@@ -59,15 +59,47 @@ describe('base tokens', () => {
   );
 
   it.each(MODES)(
-    'border and focus ring are at least 3:1 on background (%s)',
+    'control borders and the focus ring are at least 3:1 (%s)',
     (mode) => {
       const b = base(mode);
-      expect(
-        contrastRatio(b['--border']!, b['--background']!)
-      ).toBeGreaterThanOrEqual(3);
+      // --border is a hairline between blocks; controls use --border-strong.
+      for (const ground of ['--background', '--surface']) {
+        expect(
+          contrastRatio(b['--border-strong']!, b[ground]!)
+        ).toBeGreaterThanOrEqual(3);
+      }
       expect(
         contrastRatio(b['--focus-ring']!, b['--background']!)
       ).toBeGreaterThanOrEqual(3);
+    }
+  );
+
+  it.each(MODES)('muted text is at least 4.5:1 on surfaces (%s)', (mode) => {
+    const b = base(mode);
+    for (const ground of ['--surface', '--subtle']) {
+      expect(
+        contrastRatio(b['--muted-foreground']!, b[ground]!)
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it.each([
+    ['light', '--background', '#faf9fd'],
+    ['light', '--foreground', '#06011e'],
+    ['light', '--muted-foreground', '#5c5873'],
+    ['light', '--surface', '#ffffff'],
+    ['light', '--subtle', '#f6f5ff'],
+    ['light', '--border', 'rgb(6 1 30 / 0.09)'],
+    ['dark', '--background', '#06011e'],
+    ['dark', '--foreground', '#f6f5ff'],
+    ['dark', '--muted-foreground', '#a9a6bd'],
+    ['dark', '--surface', '#0e0a26'],
+    ['dark', '--subtle', '#17122f'],
+    ['dark', '--border', 'rgb(246 245 255 / 0.1)'],
+  ] as const)(
+    'the lanyard’s %s %s is the brand’s %s',
+    (mode, name, expected) => {
+      expect(base(mode)[name]?.trim().toLowerCase()).toBe(expected);
     }
   );
 });

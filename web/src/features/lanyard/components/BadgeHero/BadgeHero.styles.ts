@@ -7,7 +7,7 @@ export const avatar =
 export const text = 'flex min-w-0 max-w-full flex-col items-center gap-1';
 
 export const name =
-  'break-words font-serif text-3xl leading-tight text-foreground [overflow-wrap:anywhere]';
+  'break-words font-sans text-3xl font-[650] leading-tight text-foreground [overflow-wrap:anywhere]';
 
 export const pronouns =
   'max-w-full text-sm leading-5 text-muted-foreground [overflow-wrap:anywhere]';

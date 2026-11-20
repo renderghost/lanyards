@@ -144,6 +144,12 @@ describe('style rules', () => {
     ).toEqual([]);
   });
 
+  it('uses no serif font: Rethink Sans throughout (#128)', () => {
+    expect(offending((_variants, utility) => utility === 'font-serif')).toEqual(
+      []
+    );
+  });
+
   // The global :focus-visible ring is the keyboard focus indicator. An
   // unconditional outline-none removes it (WCAG 2.4.7).
   it('never removes the focus ring outright', () => {
