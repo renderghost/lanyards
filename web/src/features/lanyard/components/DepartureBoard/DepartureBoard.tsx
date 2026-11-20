@@ -19,10 +19,20 @@ export function DepartureBoard({
   location,
   openTo,
   rolesHref,
+  pending = false,
   className,
 }: DepartureBoardProps) {
   const { t, i18n } = useLingui();
-  if (!role && !location && openTo.length === 0) return null;
+  if (!role && !location && openTo.length === 0) {
+    // Its cells all come from Sifa: only Sifa's answer can empty it.
+    return pending ? (
+      <div
+        className={cn(styles.reserved, className)}
+        aria-hidden="true"
+        data-board-pending
+      />
+    ) : null;
+  }
 
   const shown = openTo.slice(0, OPEN_TO_SHOWN);
   const rest = openTo.length - shown.length;

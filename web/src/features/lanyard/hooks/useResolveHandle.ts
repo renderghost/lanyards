@@ -1,11 +1,9 @@
 import type { Did } from '@atcute/lexicons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
+import { handleQuery } from '@/lib/person/personQueries';
 import type { SourceState } from '@/lib/person/personView.types';
-import { sourceQueryOptions, toSourceState } from '@/lib/person/sourceQuery';
-import { queryKeys } from '@/lib/query/keys';
-import { fetchProfile } from '@/lib/sources/bluesky/bluesky';
-import { ok } from '@/lib/sources/result';
+import { toSourceState } from '@/lib/person/sourceQuery';
 
 /**
  * Resolves a handle to a DID through the Bluesky profile, and seeds the
@@ -16,18 +14,7 @@ export function useResolveHandle(handle: string): {
   retry(): void;
 } {
   const queryClient = useQueryClient();
-  const query = useQuery({
-    queryKey: ['resolveHandle', handle],
-    ...sourceQueryOptions('bluesky', async (signal) => {
-      const profile = await fetchProfile(handle, signal);
-      if (!profile.ok) return profile;
-      queryClient.setQueryData(
-        queryKeys.source('bluesky', profile.value.did),
-        profile.value
-      );
-      return ok(profile.value.did);
-    }),
-  });
+  const query = useQuery(handleQuery(queryClient, handle));
   return {
     state: toSourceState(query, true) ?? { status: 'loading' },
     retry: () => {

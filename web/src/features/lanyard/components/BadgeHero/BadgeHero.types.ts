@@ -10,5 +10,7 @@ export type BadgeHeroProps = {
   actions?: ReactNode;
   /** The Roles block, when it is shown: the board links to it. */
   rolesHref?: string;
+  /** Sifa hasn't answered yet: the board keeps its place. */
+  boardPending?: boolean;
   className?: string;
 };

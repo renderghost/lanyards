@@ -53,4 +53,17 @@ describe('DepartureBoard', () => {
     const { container } = renderWithProviders(<DepartureBoard openTo={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('keeps its place while Sifa hasn’t answered, then shows or goes', () => {
+    const { container, rerender } = renderWithProviders(
+      <DepartureBoard openTo={[]} pending />
+    );
+    const reserved = container.querySelector('[data-board-pending]');
+    expect(reserved).toHaveAttribute('aria-hidden', 'true');
+    rerender(<DepartureBoard openTo={['mentoringOthers']} pending />);
+    expect(container.querySelector('dl')).not.toBeNull();
+    expect(container.querySelector('[data-board-pending]')).toBeNull();
+    rerender(<DepartureBoard openTo={[]} />);
+    expect(container).toBeEmptyDOMElement();
+  });
 });

@@ -197,7 +197,8 @@ export function LanyardEditor({
       />
     );
   }
-  if (!view.hero) {
+  // The badge waits briefly for Sifa and the record, as on the lanyard.
+  if (!view.heroReady || !view.hero) {
     return <LanyardSkeleton />;
   }
 
@@ -234,7 +235,11 @@ export function LanyardEditor({
 
   return (
     <div className={styles.page}>
-      <BadgeHero hero={view.hero} headingLevel={2} />
+      <BadgeHero
+        hero={view.hero}
+        headingLevel={2}
+        boardPending={view.sifaPending}
+      />
       {view.configError && (
         <div role="status" className={styles.notice}>
           <p className={styles.noticeText}>

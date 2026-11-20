@@ -22,6 +22,6 @@ export const name = `h-14 w-3/4 max-w-[36rem] rounded-xs bg-subtle @min-[40rem]:
 
 export const line = `h-6 w-1/2 max-w-[20rem] rounded-xs bg-subtle ${pulse}`;
 
-export const board = 'h-[5.375rem] bg-badge-ink';
+export const board = 'h-[5.5rem] bg-badge-ink';
 
 export const srOnly = 'sr-only';

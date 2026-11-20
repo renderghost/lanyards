@@ -17,15 +17,15 @@ msgid "(opens in a new tab)"
 msgstr "(opens in a new tab)"
 
 #. placeholder {0}: role.others
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:39
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:49
 msgid "{0, plural, one {+# more role} other {+# more roles}}"
 msgstr "{0, plural, one {+# more role} other {+# more roles}}"
 
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:301
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:306
 msgid "{count, plural, one {# hidden item is no longer on your lanyard} other {# hidden items are no longer on your lanyard}}"
 msgstr "{count, plural, one {# hidden item is no longer on your lanyard} other {# hidden items are no longer on your lanyard}}"
 
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:319
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:324
 msgid "{count, plural, one {Cleared # hidden item from your settings} other {Cleared # hidden items from your settings}}"
 msgstr "{count, plural, one {Cleared # hidden item from your settings} other {Cleared # hidden items from your settings}}"
 
@@ -123,7 +123,7 @@ msgstr "Audio"
 msgid "Badge"
 msgstr "Badge"
 
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:51
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:61
 msgid "Based"
 msgstr "Based"
 
@@ -131,7 +131,7 @@ msgstr "Based"
 msgid "Being mentored"
 msgstr "Being mentored"
 
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:267
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:272
 msgid "Blocks"
 msgstr "Blocks"
 
@@ -176,7 +176,7 @@ msgstr "Checking your ORCID iD…"
 msgid "Choose a platform"
 msgstr "Choose a platform"
 
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:327
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:332
 msgid "Clear"
 msgstr "Clear"
 
@@ -228,8 +228,8 @@ msgstr "Couldn't copy the link. Please try again."
 msgid "Couldn't load {sources}"
 msgstr "Couldn't load {sources}"
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:127
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:241
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:129
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:246
 msgid "Couldn't load your lanyard settings"
 msgstr "Couldn't load your lanyard settings"
 
@@ -566,7 +566,7 @@ msgstr "Not verified yet. ORCID can take a few minutes to update."
 msgid "Nothing to show yet"
 msgstr "Nothing to show yet"
 
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:34
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:44
 msgid "Now"
 msgstr "Now"
 
@@ -578,7 +578,7 @@ msgstr "Open ORCID"
 msgid "Open Sifa"
 msgstr "Open Sifa"
 
-#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:57
+#: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:67
 #: src/features/lanyard/components/LanyardBlocks/LanyardBlocks.constants.ts:25
 msgid "Open to"
 msgstr "Open to"
@@ -692,8 +692,8 @@ msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
 #: src/features/lanyard/components/BlockSection/BlockSection.tsx:134
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:133
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:244
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:135
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:249
 #: src/features/lanyard/hooks/useCustomiserDraft.ts:98
 #: src/features/lanyard/hooks/useLanyardDraft.ts:354
 msgid "Retry"
@@ -760,12 +760,12 @@ msgstr "Sifa"
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/LandingPage/LandingPage.tsx:18
 #: src/features/auth/components/SignInForm/SignInForm.tsx:104
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:93
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:94
 msgid "Sign in"
 msgstr "Sign in"
 
 #: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:56
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:88
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:89
 msgid "Sign in to see this lanyard"
 msgstr "Sign in to see this lanyard"
 
@@ -860,11 +860,11 @@ msgstr "This account isn't available"
 msgid "This item can't be hidden."
 msgstr "This item can't be hidden."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:101
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:102
 msgid "This lanyard isn't available to you."
 msgstr "This lanyard isn't available to you."
 
-#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:90
+#: src/features/lanyard/components/LanyardPage/LanyardPage.tsx:91
 msgid "This person has chosen to show their lanyard only to people who are signed in."
 msgstr "This person has chosen to show their lanyard only to people who are signed in."
 
@@ -884,7 +884,7 @@ msgstr "Title"
 msgid "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 msgstr "To follow people and save your lanyard, Lanyards needs permission to write to your account. You'll be asked to approve it."
 
-#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:259
+#: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:264
 msgid "To move a block, press Space or Enter to pick it up, use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel."
 msgstr "To move a block, press Space or Enter to pick it up, use the arrow keys to move it, then press Space or Enter to drop it, or Escape to cancel."
 

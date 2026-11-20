@@ -20,6 +20,9 @@ test.describe('QR sheet', () => {
   }) => {
     const started = Date.now();
     await page.goto('/');
+    // The signed-in home is the customiser: '/' sends you on to it, and a
+    // press on the header that's about to go is lost (a separate fix).
+    await expect(page).toHaveURL('/lanyard');
     await page.getByRole('button', { name: 'Show QR' }).click();
     await expect(
       page.getByRole('dialog', { name: 'Ada Example' })

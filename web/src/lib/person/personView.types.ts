@@ -114,6 +114,13 @@ export type ViewerMode = 'owner' | 'visitor';
 export type PersonViewState = {
   profile: SourceState<BlueskyProfile>;
   hero?: BadgeHero;
+  /**
+   * Show the hero: Bluesky has answered, and Sifa and the owner's record
+   * have settled or the short wait for them is over (spec §7).
+   */
+  heroReady: boolean;
+  /** Sifa hasn't answered yet: the board keeps its height for it. */
+  sifaPending: boolean;
   blocks: BlockView[];
   /** For the owner: every block, hidden items flagged in place (#118). */
   editorBlocks: EditorBlock[];

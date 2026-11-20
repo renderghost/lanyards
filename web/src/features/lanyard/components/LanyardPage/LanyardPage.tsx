@@ -78,7 +78,8 @@ export function LanyardPage({
     );
   }
 
-  if (view.profile.status === 'loading' || !view.hero || shared.checkingBlock) {
+  // The hero waits briefly for Sifa and the owner's record (spec §7).
+  if (!view.heroReady || !view.hero || shared.checkingBlock) {
     return frame(<LanyardSkeleton className={className} />);
   }
 
@@ -107,6 +108,7 @@ export function LanyardPage({
       <BadgeHero
         hero={view.hero}
         headingLevel={preview ? 2 : 1}
+        boardPending={view.sifaPending}
         actions={
           !preview && (
             <HeroActions did={did} handle={view.hero.handle} mode={view.mode} />

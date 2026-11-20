@@ -15,6 +15,7 @@ export function BadgeHero({
   headingLevel = 1,
   actions,
   rolesHref,
+  boardPending = false,
   className,
 }: BadgeHeroProps) {
   const Heading = headingLevel === 2 ? 'h2' : 'h1';
@@ -64,6 +65,7 @@ export function BadgeHero({
         location={hero.location}
         openTo={hero.openTo}
         rolesHref={rolesHref}
+        pending={boardPending}
       />
     </section>
   );

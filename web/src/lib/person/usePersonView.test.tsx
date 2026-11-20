@@ -16,7 +16,7 @@ import { queryKeys } from '@/lib/query/keys';
 import { server } from '@/test/msw';
 import { ADA } from '@/test/people';
 
-import { usePersonView } from './usePersonView';
+import { HERO_WAIT_MS, usePersonView } from './usePersonView';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 vi.mock('@/lib/analytics/analytics', () => ({
@@ -262,3 +262,90 @@ describe(
     });
   }
 );
+
+// The hero waits briefly for Sifa and the owner's record, so the badge
+// doesn't flash the default accent and cover, then jump (spec §7).
+describe('the hero waits up to 800 ms for its data (#129)', () => {
+  type View = { current: ReturnType<typeof usePersonView> };
+
+  /**
+   * Lets answered requests and React Query's notifications through until
+   * `done`, without moving the clock: only setTimeout is faked, so the
+   * request machinery's own macrotasks still need real turns of the loop.
+   */
+  const flushUntil = async (done: () => boolean) => {
+    for (let round = 0; round < 200 && !done(); round += 1) {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+        await new Promise((resolve) => setImmediate(resolve));
+      });
+    }
+    expect(done()).toBe(true);
+  };
+  const after = (ms: number) => act(() => vi.advanceTimersByTimeAsync(ms));
+  const blueskyReady = (result: View) =>
+    flushUntil(() => result.current.profile.status === 'ready');
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('waits for a slow Sifa until 800 ms after Bluesky answers', async () => {
+    expect(HERO_WAIT_MS).toBe(800);
+    serveLanyards(null);
+    server.use(http.get(SIFA_VIEW, () => new Promise<never>(() => {})));
+    const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
+    await blueskyReady(result);
+    expect(result.current.heroReady).toBe(false);
+    expect(result.current.sifaPending).toBe(true);
+    await after(799);
+    expect(result.current.heroReady).toBe(false);
+    await after(1);
+    expect(result.current.heroReady).toBe(true);
+    expect(result.current.sifaPending).toBe(true);
+  });
+
+  it('shows the hero as soon as both have answered', async () => {
+    serveLanyards(null);
+    let answer: (response: Response) => void = () => undefined;
+    const answered = new Promise<Response>((resolve) => {
+      answer = resolve;
+    });
+    server.use(http.get(SIFA_VIEW, () => answered));
+    const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
+    await blueskyReady(result);
+    expect(result.current.heroReady).toBe(false);
+    await after(100);
+    answer(HttpResponse.json(sifaView));
+    await flushUntil(
+      () => !result.current.sifaPending && result.current.configReady
+    );
+    expect(result.current.heroReady).toBe(true);
+  });
+
+  it('never waits on a source that has failed', async () => {
+    serveLanyards(null);
+    server.use(
+      http.get(SIFA_VIEW, () => HttpResponse.json({}, { status: 404 })),
+      http.get(`${ADA.pds}/xrpc/com.atproto.repo.listRecords`, ({ request }) =>
+        new URL(request.url).searchParams
+          .get('collection')
+          ?.startsWith('id.sifa')
+          ? HttpResponse.json({}, { status: 400 })
+          : undefined
+      )
+    );
+    const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
+    await blueskyReady(result);
+    await flushUntil(() => !result.current.sifaPending);
+    // The record's own read takes a few (fake) milliseconds: far short of
+    // the wait, which a failed Sifa never adds to.
+    await after(50);
+    expect(result.current.configReady).toBe(true);
+    expect(result.current.heroReady).toBe(true);
+  });
+});

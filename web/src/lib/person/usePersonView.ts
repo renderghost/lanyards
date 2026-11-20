@@ -1,21 +1,16 @@
 import type { Did } from '@atcute/lexicons';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { queryKeys } from '@/lib/query/keys';
-import { fetchPosts, fetchProfile } from '@/lib/sources/bluesky/bluesky';
-import {
-  fetchLanyardConfig,
-  fetchLanyardRecords,
-} from '@/lib/sources/lanyards/lanyards';
+import { fetchPosts } from '@/lib/sources/bluesky/bluesky';
 import {
   fetchOrcidVerified,
   fetchOrcidWorks,
   findOrcidId,
 } from '@/lib/sources/orcid/orcid';
 import { fetchCollections } from '@/lib/sources/semble/semble';
-import { fetchSifaProfile } from '@/lib/sources/sifa/sifa';
 import { fetchBlogPosts } from '@/lib/sources/standardSite/standardSite';
 import { fetchRepos } from '@/lib/sources/tangled/tangled';
 
@@ -26,6 +21,12 @@ import {
 } from './blocks';
 import { type RenderableBlockType, resolveConfig } from './config';
 import { composeHero } from './hero';
+import {
+  lanyardConfigQuery,
+  lanyardRecordsQuery,
+  profileQuery,
+  sifaQuery,
+} from './personQueries';
 import type {
   PersonViewState,
   SourceKey,
@@ -35,6 +36,13 @@ import { sourceQueryOptions, toSourceState } from './sourceQuery';
 
 /** List sources fetch this many items; blocks then hide and limit them. */
 const FETCH_LIMIT = 20;
+
+/**
+ * How long the hero waits, after Bluesky answers, for Sifa and the owner's
+ * record (spec §7): long enough not to flash the default accent and cover,
+ * never long enough to hold the page up.
+ */
+export const HERO_WAIT_MS = 800;
 
 /**
  * Everything a lanyard shows, loaded progressively: one query per source,
@@ -49,28 +57,12 @@ export function usePersonView(
   const viewer = session.status === 'signedIn' ? session.session.did : null;
   const mode = options.mode ?? (viewer === did ? 'owner' : 'visitor');
 
-  const profile = useQuery({
-    queryKey: queryKeys.source('bluesky', did),
-    ...sourceQueryOptions('bluesky', (signal) => fetchProfile(did, signal)),
-  });
-  const sifa = useQuery({
-    queryKey: queryKeys.source('sifa', did),
-    ...sourceQueryOptions('sifa', (signal) => fetchSifaProfile(did, signal)),
-  });
-  const lanyards = useQuery({
-    queryKey: queryKeys.source('lanyards', did),
-    ...sourceQueryOptions('lanyards', (signal) =>
-      fetchLanyardRecords(did, signal)
-    ),
-  });
+  const profile = useQuery(profileQuery(did));
+  const sifa = useQuery(sifaQuery(did));
+  const lanyards = useQuery(lanyardRecordsQuery(did));
   // The owner's choices are read on their own: if they can't be read, no
   // blocks show at all, rather than the defaults undoing what they hid.
-  const configQuery = useQuery({
-    queryKey: queryKeys.source('lanyards', did, 'config'),
-    ...sourceQueryOptions('lanyards', (signal) =>
-      fetchLanyardConfig(did, signal)
-    ),
-  });
+  const configQuery = useQuery(lanyardConfigQuery(did));
 
   const configReady = configQuery.status !== 'pending';
   const configError = configQuery.status === 'error';
@@ -86,6 +78,19 @@ export function usePersonView(
       ? config.blocks.filter((block) => block.visible).map((b) => b.type)
       : []
   );
+  // The hero waits for Sifa and the record to settle (answered or failed),
+  // for at most HERO_WAIT_MS after Bluesky answers.
+  const profileReady = profile.status === 'success';
+  const heroSettled =
+    sifa.status !== 'pending' && configQuery.status !== 'pending';
+  const [waitedFor, setWaitedFor] = useState<Did | null>(null);
+  useEffect(() => {
+    if (!profileReady || heroSettled) return;
+    const timer = setTimeout(() => setWaitedFor(did), HERO_WAIT_MS);
+    return () => clearTimeout(timer);
+  }, [did, profileReady, heroSettled]);
+  const heroReady = profileReady && (heroSettled || waitedFor === did);
+
   const handle = profile.data?.handle;
   const orcidId = sifa.data
     ? findOrcidId(sifa.data.externalAccounts)
@@ -176,6 +181,8 @@ export function usePersonView(
           config,
         })
       : undefined,
+    heroReady,
+    sifaPending: sifa.status === 'pending',
     blocks: configUsable
       ? composeBlocks({ config, sources, mode, orcidVerified })
       : [],

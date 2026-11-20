@@ -129,6 +129,29 @@ describe('lanyard page states', () => {
     expect(loading.closest('.bg-background')).not.toBeNull();
   });
 
+  it('holds the badge back briefly while Sifa is slow, then shows it (#129)', async () => {
+    servePerson();
+    server.use(
+      http.get('https://sifa.id/xrpc/id.sifa.getProfileView', async () => {
+        await delay('infinite');
+        return HttpResponse.json({});
+      })
+    );
+    renderRoute('/@alice.test');
+    expect(
+      await screen.findByText('Loading lanyard…', undefined, { timeout: 5000 })
+    ).toBeInTheDocument();
+    // Without Sifa, the name stands alone; the board keeps its place.
+    const name = await screen.findByRole(
+      'heading',
+      { level: 1, name: 'Ada Example' },
+      { timeout: 5000 }
+    );
+    expect(
+      name.closest('section')?.querySelector('[data-board-pending]')
+    ).not.toBeNull();
+  });
+
   it("keeps the lanyard's own ground and palette for an unknown handle", async () => {
     servePerson();
     renderRoute('/@nobody.test');

@@ -10,6 +10,9 @@ export const cells = {
   openTo: `${cell} flex-[1_1_15rem]`,
 };
 
+/** One row of cells: 20 px padding each side, a 16 px label and 26 px value. */
+export const reserved = 'h-[5.5rem] bg-badge-ink';
+
 export const label =
   'text-xs font-bold uppercase leading-4 tracking-[0.14em] text-board-label';
 
