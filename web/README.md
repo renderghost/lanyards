@@ -185,9 +185,11 @@ curl -sI https://lanyards.app/oauth-client-metadata.json | grep -i content-type
 # → application/json
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.lanyards.app/renderg.host
 # → 308 https://lanyards.app/renderg.host
-curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
-  -H 'sec-fetch-dest: document' https://next.lanyards.app/renderg.host
-# → 308 https://lanyards.app/renderg.host
+for path in / /renderg.host; do
+  curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
+    -H 'sec-fetch-dest: document' "https://next.lanyards.app$path"
+done
+# → 308 https://lanyards.app/ and 308 https://lanyards.app/renderg.host
 ```
 
 Then sign in with a real account, check your name and handle on `/settings`,
