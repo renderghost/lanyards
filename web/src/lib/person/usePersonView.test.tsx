@@ -348,4 +348,31 @@ describe('the hero waits up to 800 ms for its data (#129)', () => {
     expect(result.current.configReady).toBe(true);
     expect(result.current.heroReady).toBe(true);
   });
+
+  // Final review I1: a refetch of a source that failed puts its query
+  // back to pending; the hero, once shown, must stay.
+  it('keeps the hero once shown when a failed source is read again', async () => {
+    serveLanyards(null);
+    server.use(
+      http.get(SIFA_VIEW, () => HttpResponse.json({}, { status: 404 }))
+    );
+    const { result } = renderHook(() => usePersonView(ADA.did), { wrapper });
+    await blueskyReady(result);
+    await flushUntil(() => !result.current.sifaPending);
+    await after(50);
+    expect(result.current.configReady).toBe(true);
+    expect(result.current.heroReady).toBe(true);
+    // Try again: Sifa is asked again, and doesn't answer at once.
+    server.use(http.get(SIFA_VIEW, () => new Promise<never>(() => {})));
+    let retried: Promise<void> | undefined;
+    act(() => {
+      retried = result.current.retry('sifa');
+    });
+    await flushUntil(
+      () => requests.filter((url) => url.startsWith(SIFA_VIEW)).length === 2
+    );
+    expect(result.current.heroReady).toBe(true);
+    expect(result.current.sifaPending).toBe(false);
+    void retried;
+  });
 });

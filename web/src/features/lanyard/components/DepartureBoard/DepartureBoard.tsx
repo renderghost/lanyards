@@ -19,19 +19,29 @@ export function DepartureBoard({
   location,
   openTo,
   rolesHref,
-  pending = false,
+  pending = [],
   className,
 }: DepartureBoardProps) {
   const { t, i18n } = useLingui();
   if (!role && !location && openTo.length === 0) {
-    // Its cells all come from Sifa: only Sifa's answer can empty it.
-    return pending ? (
+    // Its cells all come from Sifa: only Sifa's answer can empty it. Each
+    // place is laid out as its cell is, so a phone's stacked rows keep
+    // their height too.
+    if (pending.length === 0) return null;
+    return (
       <div
-        className={cn(styles.reserved, className)}
+        className={cn(styles.board, className)}
         aria-hidden="true"
         data-board-pending
-      />
-    ) : null;
+      >
+        {pending.map((cell) => (
+          <div key={cell} className={styles.cells[cell]}>
+            <span className={styles.label}>{'\u00a0'}</span>
+            <span className={styles.value}>{'\u00a0'}</span>
+          </div>
+        ))}
+      </div>
+    );
   }
 
   const shown = openTo.slice(0, OPEN_TO_SHOWN);

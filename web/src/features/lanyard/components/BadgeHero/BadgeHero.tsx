@@ -15,7 +15,7 @@ export function BadgeHero({
   headingLevel = 1,
   actions,
   rolesHref,
-  boardPending = false,
+  boardPending,
   className,
 }: BadgeHeroProps) {
   const Heading = headingLevel === 2 ? 'h2' : 'h1';

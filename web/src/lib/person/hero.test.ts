@@ -7,7 +7,7 @@ import { ADA } from '@/test/people';
 import { coverFor } from '@/design/covers';
 
 import { resolveConfig } from './config';
-import { composeHero, currentJob, heroName } from './hero';
+import { boardCells, composeHero, currentJob, heroName } from './hero';
 
 const bluesky: BlueskyProfile = {
   did: ADA.did,
@@ -289,5 +289,23 @@ describe('the departure board (#129)', () => {
     expect(hero({ ...resolveConfig(null), cover: 'hazard' }).cover).toBe(
       'hazard'
     );
+  });
+});
+
+describe('boardCells', () => {
+  it('lists the board cells the badge settings show', () => {
+    const config = resolveConfig(null);
+    expect(boardCells(config)).toEqual(['now', 'based', 'openTo']);
+    expect(
+      boardCells({ ...config, showRole: false, showOpenTo: false })
+    ).toEqual(['based']);
+    expect(
+      boardCells({
+        ...config,
+        showRole: false,
+        showLocation: false,
+        showOpenTo: false,
+      })
+    ).toEqual([]);
   });
 });

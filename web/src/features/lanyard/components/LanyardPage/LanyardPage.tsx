@@ -10,6 +10,7 @@ import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { profileId } from '@/lib/atproto/profileId';
 import { track } from '@/lib/analytics/analytics';
 import { BLOCK_SOURCES } from '@/lib/person/blocks';
+import { boardCells } from '@/lib/person/hero';
 import { usePersonView } from '@/lib/person/usePersonView';
 import { useSharedContext } from '@/lib/person/useSharedContext';
 import { cn } from '@/lib/utils';
@@ -108,7 +109,7 @@ export function LanyardPage({
       <BadgeHero
         hero={view.hero}
         headingLevel={preview ? 2 : 1}
-        boardPending={view.sifaPending}
+        boardPending={view.sifaPending ? boardCells(view.config) : undefined}
         actions={
           !preview && (
             <HeroActions did={did} handle={view.hero.handle} mode={view.mode} />

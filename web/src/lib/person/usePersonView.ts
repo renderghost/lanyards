@@ -79,10 +79,11 @@ export function usePersonView(
       : []
   );
   // The hero waits for Sifa and the record to settle (answered or failed),
-  // for at most HERO_WAIT_MS after Bluesky answers.
+  // for at most HERO_WAIT_MS after Bluesky answers. Once settled it stays
+  // so: a refetch of a failed source puts its status back to pending, but
+  // never takes the page back to the skeleton (isFetched stays true).
   const profileReady = profile.status === 'success';
-  const heroSettled =
-    sifa.status !== 'pending' && configQuery.status !== 'pending';
+  const heroSettled = sifa.isFetched && configQuery.isFetched;
   const [waitedFor, setWaitedFor] = useState<Did | null>(null);
   useEffect(() => {
     if (!profileReady || heroSettled) return;
@@ -182,7 +183,7 @@ export function usePersonView(
         })
       : undefined,
     heroReady,
-    sifaPending: sifa.status === 'pending',
+    sifaPending: !sifa.isFetched,
     blocks: configUsable
       ? composeBlocks({ config, sources, mode, orcidVerified })
       : [],
