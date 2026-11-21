@@ -104,13 +104,17 @@ Lanyards' lexicons are published from the `@lanyards.app` account
    value `did=did:plc:ua3d6biqepazbq6mw4ysotfo`. Resolvers never walk up the
    hierarchy, so each group needs its own record:
 
-   | Name                                    | Covers                                    |
-   | --------------------------------------- | ----------------------------------------- |
-   | `_lexicon.lanyards.app`                 | `app.lanyards.authFull`                   |
-   | `_lexicon.actor.lanyards.app`           | `app.lanyards.actor.lanyard`              |
-   | `_lexicon.biography.actor.lanyards.app` | `app.lanyards.actor.biography.honorific`  |
-   | `_lexicon.link.lanyards.app`            | `app.lanyards.link.web`                   |
-   | `_lexicon.media.link.lanyards.app`      | `app.lanyards.link.media.audio`, `.video` |
+   | Name                               | Covers                                    |
+   | ---------------------------------- | ----------------------------------------- |
+   | `_lexicon.lanyards.app`            | `app.lanyards.authFull`                   |
+   | `_lexicon.actor.lanyards.app`      | `app.lanyards.actor.lanyard`              |
+   | `_lexicon.media.lanyards.app`      | `app.lanyards.media.item`                 |
+   | `_lexicon.media.link.lanyards.app` | `app.lanyards.link.media.audio`, `.video` |
+
+   `scripts/lexiconDns.test.ts` keeps this table in step with
+   `lexicons/lanyards/`. Records for retired lexicons
+   (`_lexicon.biography.actor.lanyards.app`, `_lexicon.link.lanyards.app`)
+   can be deleted.
 
 5. From `web/`, publish:
    `GOAT_USERNAME=lanyards.app GOAT_PASSWORD=<app password> goat lex publish --lexicons-dir lexicons/lanyards`.
