@@ -10,6 +10,7 @@ import { ADA } from '@/test/people';
 import { servePerson } from '@/test/person';
 import { renderWithClient } from '@/test/render';
 
+import { SWAY_MEDIA } from '../../useLanyardSway';
 import { QrSheet } from './QrSheet';
 
 vi.mock('@/lib/analytics/analytics', () => ({
@@ -230,5 +231,58 @@ describe('QrSheet, a lanyard in a clear sleeve (#169)', () => {
         "Couldn't open sharing. Copy the link instead."
       )
     );
+  });
+});
+
+describe('QrSheet, a lanyard that sways (#174)', () => {
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('sways on its clasp as a mouse moves across it, then settles', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation(
+      (query: string) =>
+        ({
+          matches: query === SWAY_MEDIA,
+          media: query,
+          addEventListener: vi.fn(),
+          removeEventListener: vi.fn(),
+        }) as unknown as MediaQueryList
+    );
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(350);
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(560);
+    servePerson();
+    sheet();
+    const dialog = await screen.findByRole('dialog', {
+      name: 'Dr Ada Example',
+    });
+    await waitFor(() =>
+      expect(dialog.querySelector('textPath')?.textContent).toContain(
+        '@alice.test'
+      )
+    );
+    vi.useFakeTimers({
+      toFake: ['requestAnimationFrame', 'cancelAnimationFrame'],
+    });
+    const sleeve = dialog.querySelector<HTMLElement>('[data-sleeve]');
+    expect(sleeve).not.toBeNull();
+    for (let x = 100; x <= 600; x += 50) {
+      fireEvent.pointerMove(sleeve as HTMLElement, {
+        pointerType: 'mouse',
+        clientX: x,
+        clientY: 300,
+      });
+      vi.advanceTimersByTime(16);
+    }
+    expect(sleeve?.style.transform).toMatch(
+      /^translateX\([\d.]+px\) rotate\(-[\d.]+deg\)$/
+    );
+    // The lanyard's tab sways with it.
+    expect(
+      dialog.querySelector('[data-tab]')?.getAttribute('transform')
+    ).toMatch(/^translate\(/);
+    vi.advanceTimersByTime(8000);
+    expect(sleeve?.style.transform).toBe('');
   });
 });

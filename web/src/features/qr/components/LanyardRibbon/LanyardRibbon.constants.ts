@@ -7,10 +7,11 @@
 export const VIEW = { width: 320, height: 210 };
 
 export const STRAPS = {
-  left: 'M-130 -410 L150 150',
-  right: 'M450 -410 L170 150',
+  /** Each strap, from far above the box down to the tab, as [x, y]. */
+  left: { from: [-130, -410], to: [150, 150] },
+  right: { from: [450, -410], to: [170, 150] },
   width: 44,
-};
+} as const;
 
 /** The hairline each side of an edged strap (#173). */
 export const EDGE = 1;
@@ -25,3 +26,10 @@ export const METAL = ['#8d8ba3', '#f1f1f7', '#77758c'] as const;
 
 /** What Lanyards' own lanyards print, where there's no person's handle. */
 export const BRAND_PRINT = 'lanyards.app';
+
+/** A strap's path, its foot moved `shift` units sideways with the tab. */
+export function strapPath(side: 'left' | 'right', shift = 0): string {
+  const { from, to } = STRAPS[side];
+  const foot = Math.round((to[0] + shift) * 100) / 100;
+  return `M${from[0]} ${from[1]} L${foot} ${to[1]}`;
+}

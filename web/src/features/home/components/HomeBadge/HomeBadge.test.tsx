@@ -3,15 +3,19 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { renderWithProviders } from '@/test/render';
 
-import { SWAY_MEDIA } from '../../usePointerSway';
+import { ARRIVAL_MEDIA, SWAY_MEDIA } from '@/features/qr/useLanyardSway';
+
 import { HomeBadge } from './HomeBadge';
 
-/** A mouse and no request for less motion, or not. */
-function pointer(fine: boolean) {
+/** A mouse and no request for less motion, or not; a wide screen, or not. */
+function pointer(fine: boolean, wide = false) {
+  vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(930);
+  vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(760);
   vi.spyOn(window, 'matchMedia').mockImplementation(
     (query: string) =>
       ({
-        matches: fine && query === SWAY_MEDIA,
+        matches:
+          (fine && query === SWAY_MEDIA) || (wide && query === ARRIVAL_MEDIA),
         media: query,
         addEventListener: vi.fn(),
         removeEventListener: vi.fn(),
@@ -26,10 +30,14 @@ function turned(heading: HTMLElement) {
   return element;
 }
 
-/** A mouse sweeping right across the badge's heading. */
+/** A mouse sweeping right across the badge's heading, low on the badge. */
 function sweep(heading: HTMLElement) {
   for (let x = 100; x <= 600; x += 50) {
-    fireEvent.pointerMove(heading, { pointerType: 'mouse', clientX: x });
+    fireEvent.pointerMove(heading, {
+      pointerType: 'mouse',
+      clientX: x,
+      clientY: 400,
+    });
     vi.advanceTimersByTime(16);
   }
 }
@@ -66,13 +74,35 @@ describe('HomeBadge (#151)', () => {
     sweep(heading);
     const badge = turned(heading);
     expect(badge).not.toBeNull();
-    // The badge turns in its sleeve, together, on the clasp (#170).
+    // The badge turns in its sleeve, together, on the clasp (#170, #174).
     expect(badge).toHaveAttribute('data-sleeve');
-    expect(badge?.style.transform).toMatch(/^rotate\(-[\d.]+deg\)$/);
-    // It turns about its clip, at the top, as the arrival swing does.
-    expect(badge?.className).toMatch(/(^|\s)origin-top(\s|$)/);
+    expect(badge?.style.transform).toMatch(
+      /^translateX\([\d.]+px\) rotate\(-[\d.]+deg\)$/
+    );
     vi.advanceTimersByTime(8000);
     expect(badge?.style.transform).toBe('');
+  });
+
+  it('hangs straight at rest, as a real badge does (#174)', () => {
+    pointer(true);
+    renderWithProviders(<HomeBadge headingId="welcome" />);
+    const heading = screen.getByRole('heading', { level: 1 });
+    const sleeve = heading.closest<HTMLElement>('[data-sleeve]');
+    expect(sleeve?.style.transform).toBe('');
+    expect(sleeve?.className).not.toMatch(/rotate-|animate-swing/);
+  });
+
+  it('swings in as it arrives on a wide screen, then settles (#174)', () => {
+    pointer(false, true);
+    vi.useFakeTimers({
+      toFake: ['requestAnimationFrame', 'cancelAnimationFrame'],
+    });
+    renderWithProviders(<HomeBadge headingId="welcome" />);
+    const heading = screen.getByRole('heading', { level: 1 });
+    vi.advanceTimersByTime(100);
+    expect(turned(heading)).toHaveAttribute('data-sleeve');
+    vi.advanceTimersByTime(8000);
+    expect(turned(heading)).toBeNull();
   });
 
   it('hangs still for touch, or with reduced motion', () => {

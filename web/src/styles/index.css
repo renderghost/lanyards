@@ -11,20 +11,6 @@
 @custom-variant wide (@media (min-width: 48rem) and (min-height: 36.0625rem));
 @custom-variant flat (@media (orientation: landscape) and (max-height: 36rem));
 
-/* The homepage's badge swings once on its straps as it arrives (#145). */
-@theme {
-  --animate-swing: swing 1.6s cubic-bezier(0.25, 1.5, 0.4, 1) both;
-
-  @keyframes swing {
-    from {
-      rotate: -7deg;
-    }
-    to {
-      rotate: -1.5deg;
-    }
-  }
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

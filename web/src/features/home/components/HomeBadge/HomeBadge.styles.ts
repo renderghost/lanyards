@@ -5,18 +5,18 @@
 
 /** Edge to edge: the ground the badge hangs on. Crops the straps' tops. */
 export const stage =
-  'flex w-full flex-col items-center overflow-hidden bg-qr-ground px-4 pb-14 md:px-8 md:pb-20';
+  'flex w-full flex-col items-center overflow-hidden bg-qr-ground px-4 pb-14 md:px-8 md:pb-28';
 
 export const hang = 'flex w-full max-w-[58rem] flex-col items-center';
 
 // The clasp's hook ends in the sleeve's slot, a little below its top edge.
+// Short enough that the badge sits in the middle of its blue (#174).
 export const ribbon =
-  'relative z-10 h-32 w-auto shrink-0 translate-y-[1.125rem] md:h-52 md:translate-y-7';
+  'relative z-10 h-32 w-auto shrink-0 translate-y-[1.125rem] md:h-40 md:translate-y-7';
 
-// Tilted on its clasp from md up, after one swing as it arrives. A mouse
-// sways it on the same clasp (#151), with a transform added to the tilt.
-export const sleeve =
-  'origin-top md:-rotate-[1.5deg] md:p-4 md:pt-12 md:motion-safe:animate-swing';
+// Straight at rest (#174). It turns on the clasp, in the middle of its
+// bigger slot.
+export const sleeve = 'md:origin-[50%_1.5rem] md:p-4 md:pt-12';
 
 /** A bigger slot for the bigger sleeve. */
 export const slot = 'md:top-4 md:h-4 md:w-24';

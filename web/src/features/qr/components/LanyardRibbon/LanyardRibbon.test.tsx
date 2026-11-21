@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { createRef } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { LanyardRibbon } from './LanyardRibbon';
@@ -56,5 +57,17 @@ describe('LanyardRibbon (#169)', () => {
     }
     // A hairline under each strap, so a pale accent reads on white.
     expect(container.querySelectorAll('[data-edge]')).toHaveLength(2);
+  });
+
+  it('hands its drawing to what sways it, straps and tab marked (#174)', () => {
+    const drawing = createRef<SVGSVGElement>();
+    const { container } = render(
+      <LanyardRibbon ref={drawing} text="@alice.test" tone="accent" />
+    );
+    expect(drawing.current).toBe(container.querySelector('svg'));
+    // Each strap, and its edge, by side; the tab and clasp in one group.
+    expect(container.querySelectorAll('[data-strap="left"]')).toHaveLength(2);
+    expect(container.querySelectorAll('[data-strap="right"]')).toHaveLength(2);
+    expect(container.querySelector('[data-tab] circle')).not.toBeNull();
   });
 });

@@ -43,7 +43,8 @@ export const ribbon =
 
 // The sleeve (BadgeSleeve), a little tighter on the narrowest phones;
 // sideways the screen is the badge, so there's no sleeve.
-export const sleeve = 'max-[22.5rem]:p-1.5 max-[22.5rem]:pt-7 flat:contents';
+export const sleeve =
+  'max-[22.5rem]:origin-[50%_0.875rem] max-[22.5rem]:p-1.5 max-[22.5rem]:pt-7 flat:contents';
 
 export const slot = 'max-[22.5rem]:top-2 flat:hidden';
 

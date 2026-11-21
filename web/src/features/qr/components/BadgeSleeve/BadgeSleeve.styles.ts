@@ -2,7 +2,9 @@
 // whose slot is where the clasp goes through, so the ground shows through
 // the slot. Callers size it with their own classes, which win over these.
 
-export const sleeve = 'relative isolate w-full rounded-sm border p-2.5 pt-8';
+// It turns about its clasp, in the middle of the slot (#174).
+export const sleeve =
+  'relative isolate w-full origin-[50%_1rem] rounded-sm border p-2.5 pt-8';
 
 export const slot =
   'absolute left-1/2 top-2.5 h-3 w-16 -translate-x-1/2 rounded-sm shadow-[inset_0_2px_3px_rgb(6_1_30/0.45)] ring-1';

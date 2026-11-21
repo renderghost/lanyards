@@ -1,14 +1,14 @@
 import { useLingui } from '@lingui/react/macro';
-import { useRef } from 'react';
+import { useState } from 'react';
 
 import { CoverPattern } from '@/components/CoverPattern/CoverPattern';
 import { Logo } from '@/components/Logo/Logo';
 import { BadgeSleeve } from '@/features/qr/components/BadgeSleeve/BadgeSleeve';
 import { LanyardRibbon } from '@/features/qr/components/LanyardRibbon/LanyardRibbon';
 import { BRAND_PRINT } from '@/features/qr/components/LanyardRibbon/LanyardRibbon.constants';
+import { useLanyardSway } from '@/features/qr/useLanyardSway';
 import { cn } from '@/lib/utils';
 
-import { usePointerSway } from '../../usePointerSway';
 import { ACCENT, BOARD, COVER } from './HomeBadge.constants';
 import * as styles from './HomeBadge.styles';
 import type { HomeBadgeProps } from './HomeBadge.types';
@@ -17,20 +17,26 @@ import type { HomeBadgeProps } from './HomeBadge.types';
  * Lanyards' own billboard badge, hanging at the top of the homepage
  * (#145): the old homepage's welcome, in the new design language. It
  * hangs in a clear sleeve from a lanyard printed with the site's address,
- * as a person's does on the Share screen (#170). A mouse moving across the
- * lanyard sways the sleeve on its clasp (#151).
+ * as a person's does on the Share screen (#170). It hangs straight, swings
+ * in as it arrives, and a mouse brushing past sways it and its lanyard,
+ * with real physics (#151, #174).
  */
 export function HomeBadge({ headingId, className }: HomeBadgeProps) {
   const { t, i18n } = useLingui();
-  const lanyard = useRef<HTMLDivElement>(null);
-  const sleeve = useRef<HTMLDivElement>(null);
-  usePointerSway(lanyard, sleeve);
+  const [lanyard, setLanyard] = useState<HTMLDivElement | null>(null);
+  const [sleeve, setSleeve] = useState<HTMLDivElement | null>(null);
+  const [ribbon, setRibbon] = useState<SVGSVGElement | null>(null);
+  useLanyardSway({ area: lanyard, sleeve, ribbon, arrive: true });
   return (
     <div data-accent={ACCENT} className={cn(styles.stage, className)}>
-      <div ref={lanyard} className={styles.hang}>
-        <LanyardRibbon text={BRAND_PRINT} className={styles.ribbon} />
+      <div ref={setLanyard} className={styles.hang}>
+        <LanyardRibbon
+          ref={setRibbon}
+          text={BRAND_PRINT}
+          className={styles.ribbon}
+        />
         <BadgeSleeve
-          ref={sleeve}
+          ref={setSleeve}
           className={styles.sleeve}
           slotClassName={styles.slot}
         >

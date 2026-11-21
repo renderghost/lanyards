@@ -95,14 +95,21 @@ test.describe('the homepage (#145)', () => {
 
 test.describe('the homepage’s hero (#151)', () => {
   /** The element around the heading that sways: its inline transform. */
+  /** The badge's sleeve's transform, as the lanyard sways it (#174). */
   const swayOf = (page: import('@playwright/test').Page) =>
-    page.evaluate(() => {
-      let element = document.querySelector<HTMLElement>('main h1');
-      while (element && !element.classList.contains('origin-top')) {
-        element = element.parentElement;
-      }
-      return element?.style.transform ?? null;
-    });
+    page.evaluate(
+      () =>
+        document.querySelector('main h1')?.closest<HTMLElement>('[data-sleeve]')
+          ?.style.transform ?? null
+    );
+
+  /** The lanyard's tab's shift, as it sways with the badge. */
+  const tabOf = (page: import('@playwright/test').Page) =>
+    page.evaluate(
+      () =>
+        document.querySelector('main [data-tab]')?.getAttribute('transform') ??
+        null
+    );
 
   /** Sweeps the mouse right across the badge, in small steps. */
   async function sweep(page: import('@playwright/test').Page) {
@@ -151,21 +158,28 @@ test.describe('the homepage’s hero (#151)', () => {
     });
   }
 
-  test('sways the badge with the mouse, then lets it settle', async ({
+  test('swings in, settles, then sways with the mouse and settles (#174)', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
-    expect(await swayOf(page)).toBe('');
+    // It arrives swinging, then hangs straight within about six seconds.
+    expect(await swayOf(page)).toMatch(/rotate\(/);
+    await expect.poll(() => swayOf(page), { timeout: 9000 }).toBe('');
     await sweep(page);
     await expect
       .poll(() => swayOf(page), { timeout: 2000 })
-      .toMatch(/^rotate\(-?[\d.]+deg\)$/);
+      .toMatch(/^translateX\(-?[\d.]+px\) rotate\(-?[\d.]+deg\)$/);
+    // The lanyard sways with it, a little.
+    expect(await tabOf(page)).toMatch(/^translate\(-?[\d.]+ 0\)$/);
     // A few degrees at most, and still again after about six seconds.
-    const angle = Number(/-?[\d.]+/.exec((await swayOf(page)) ?? '')?.[0]);
+    const angle = Number(
+      /rotate\((-?[\d.]+)/.exec((await swayOf(page)) ?? '')?.[1]
+    );
     expect(Math.abs(angle)).toBeLessThan(5);
     await expect.poll(() => swayOf(page), { timeout: 9000 }).toBe('');
+    expect(await tabOf(page)).toBeNull();
   });
 
   test('keeps the badge still with reduced motion', async ({ page }) => {
@@ -173,6 +187,8 @@ test.describe('the homepage’s hero (#151)', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
+    // No swing as it arrives, and none for the mouse.
+    expect(await swayOf(page)).toBe('');
     await sweep(page);
     await page.waitForTimeout(300);
     expect(await swayOf(page)).toBe('');

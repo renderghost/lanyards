@@ -219,6 +219,34 @@ test.describe('QR sheet', () => {
     await expect(sheet).toBeHidden();
   });
 
+  test('sways with the mouse, as the homepage’s does, then settles (#174)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/lanyard');
+    await page.getByRole('link', { name: 'Share' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
+    const sleeve = sheet.locator('[data-sleeve]');
+    // Straight as it opens: the code is there to be scanned.
+    expect(await sleeve.evaluate((element) => element.style.transform)).toBe(
+      ''
+    );
+    const box = await sleeve.boundingBox();
+    const y = (box?.y ?? 0) + (box?.height ?? 0) * 0.7;
+    await page.mouse.move((box?.x ?? 0) + 10, y);
+    await page.mouse.move((box?.x ?? 0) + (box?.width ?? 0) - 10, y, {
+      steps: 12,
+    });
+    await expect
+      .poll(() => sleeve.evaluate((element) => element.style.transform))
+      .toMatch(/rotate\(/);
+    await expect
+      .poll(() => sleeve.evaluate((element) => element.style.transform), {
+        timeout: 9000,
+      })
+      .toBe('');
+  });
+
   test('stays black on white in dark mode', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/lanyard');
