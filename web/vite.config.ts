@@ -8,6 +8,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { lanyardChunkName } from './plugins/lanyardChunks.ts';
 import { oauthMetadataPlugin } from './plugins/oauthMetadata.ts';
 
 export default defineConfig({
@@ -64,14 +65,9 @@ export default defineConfig({
             // out what it shares with lazy routes, so every page would start
             // with eight files, not one (spec §2, #177).
             { name: 'app', tags: ['$initial'] },
-            // A badge's drawing, wherever one hangs (#173): its cover, its
-            // lanyard and its sleeve, in one request, not three. A lanyard
-            // loads its route's code in a burst, and over HTTP/1.1 every
-            // extra file there can cost another round trip (spec §2).
-            {
-              name: 'badge',
-              test: /src[\\/](components[\\/]CoverPattern|features[\\/]qr[\\/]components[\\/](LanyardRibbon|BadgeSleeve))[\\/]/,
-            },
+            // A lanyard's own code in two files, not a dozen (#177). One of
+            // them holds a badge's drawing, wherever one hangs (#173).
+            { name: lanyardChunkName },
           ],
         },
       },
@@ -89,6 +85,7 @@ export default defineConfig({
     setupFiles: ['src/test/setup.ts'],
     include: [
       'src/**/*.test.{ts,tsx}',
+      'plugins/**/*.test.ts',
       'scripts/**/*.test.ts',
       'server/**/*.test.{ts,tsx}',
     ],
