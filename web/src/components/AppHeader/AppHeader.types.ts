@@ -6,7 +6,7 @@ export type AppHeaderProps = {
    * Show QR and Account, and the only ones in the top bar on phones.
    */
   actions?: ReactNode;
-  /** Offer Sign in and Make your lanyard when signed out (#129). */
+  /** Offer Sign in when signed out (#129, #162). */
   signedOutActions?: boolean;
   className?: string;
 };

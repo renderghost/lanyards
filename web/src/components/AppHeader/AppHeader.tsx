@@ -3,10 +3,9 @@ import { Link, useLocation } from '@tanstack/react-router';
 import { IdCard, SlidersHorizontal } from 'lucide-react';
 
 import { AccountLink } from '@/components/AccountLink/AccountLink';
-import { Button } from '@/components/Button/Button';
+import { buttonClassName } from '@/components/Button/buttonClassName';
 import { Logo } from '@/components/Logo/Logo';
 import { useSession } from '@/features/auth/session/useSession';
-import { useMakeLanyard } from '@/features/auth/useMakeLanyard';
 import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
 import { useOwnPaths } from '@/hooks/useOwnPaths';
 import { OWN_PAGE_ACTIVE } from '@/lib/person/ownPaths';
@@ -19,7 +18,8 @@ import type { AppHeaderProps } from './AppHeader.types';
  * The top bar. Signed in (#150): the logo (your customiser), Customise and
  * View on the left; a page's own actions, Show QR and Account on the
  * right. On phones, the bottom bar carries the rest. Signed out, where
- * asked: Sign in and Make your lanyard. (The homepage has its own.)
+ * asked: Sign in, as a primary button (#162); account creation is on the
+ * sign-in page. (The homepage has its own header.)
  */
 export function AppHeader({
   actions,
@@ -30,7 +30,6 @@ export function AppHeader({
   const session = useSession();
   const path = useLocation({ select: (location) => location.pathname });
   const own = useOwnPaths();
-  const makeLanyard = useMakeLanyard();
 
   let end = null;
   if (own) {
@@ -42,22 +41,13 @@ export function AppHeader({
     );
   } else if (signedOutActions && session.status === 'signedOut') {
     end = (
-      <div className={styles.nav}>
-        <Link
-          to="/sign-in"
-          search={{ returnTo: path }}
-          className={styles.navLink}
-        >
-          {t`Sign in`}
-        </Link>
-        <Button
-          size="md"
-          className={styles.signUp}
-          onClick={() => makeLanyard(path)}
-        >
-          {t`Make your lanyard`}
-        </Button>
-      </div>
+      <Link
+        to="/sign-in"
+        search={{ returnTo: path }}
+        className={buttonClassName({ className: styles.signIn })}
+      >
+        {t`Sign in`}
+      </Link>
     );
   }
 
