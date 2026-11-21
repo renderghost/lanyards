@@ -3,6 +3,7 @@ import { useId } from 'react';
 import { cn } from '@/lib/utils';
 
 import {
+  EDGE,
   METAL,
   REPEATS,
   SEPARATOR,
@@ -12,27 +13,23 @@ import {
 import * as styles from './LanyardRibbon.styles';
 import type { LanyardRibbonProps } from './LanyardRibbon.types';
 
+const SIDES = ['left', 'right'] as const;
+
 /**
  * A lanyard (#169): two straps printed with `text`, meeting at a sewn tab
  * above a swivel ring and a clasp. The clasp's hook ends at the bottom
  * edge, to go through the slot of the badge below.
  */
-export function LanyardRibbon({ text, className }: LanyardRibbonProps) {
+export function LanyardRibbon({
+  text,
+  tone = 'ink',
+  className,
+}: LanyardRibbonProps) {
   const id = useId();
-  const printed = Array.from({ length: REPEATS }, () => text).join(SEPARATOR);
-  const strap = (side: 'left' | 'right') => (
-    <>
-      <path
-        id={`${id}-${side}`}
-        d={STRAPS[side]}
-        strokeWidth={STRAPS.width}
-        className={styles.strap}
-      />
-      <text dominantBaseline="central" className={styles.print}>
-        <textPath href={`#${id}-${side}`}>{printed}</textPath>
-      </text>
-    </>
-  );
+  const colours = styles.tones[tone];
+  const printed = text
+    ? Array.from({ length: REPEATS }, () => text).join(SEPARATOR)
+    : '';
 
   return (
     <svg
@@ -52,21 +49,46 @@ export function LanyardRibbon({ text, className }: LanyardRibbonProps) {
           ))}
         </linearGradient>
       </defs>
-      {strap('left')}
-      {strap('right')}
+      {colours.edge &&
+        SIDES.map((side) => (
+          <path
+            key={side}
+            data-edge
+            d={STRAPS[side]}
+            strokeWidth={STRAPS.width + EDGE * 2}
+            className={colours.edge}
+          />
+        ))}
+      {SIDES.map((side) => (
+        <g key={side}>
+          <path
+            id={`${id}-${side}`}
+            d={STRAPS[side]}
+            strokeWidth={STRAPS.width}
+            className={colours.strap}
+          />
+          <text
+            dominantBaseline="central"
+            className={cn(styles.print, colours.print)}
+          >
+            <textPath href={`#${id}-${side}`}>{printed}</textPath>
+          </text>
+        </g>
+      ))}
       <rect
         x="126"
         y="140"
         width="68"
         height="26"
         rx="2"
-        className={styles.tab}
+        strokeWidth={colours.edge ? EDGE : 0}
+        className={colours.tab}
       />
       <path
         d="M131 148 H189"
         strokeWidth="1"
         strokeDasharray="3 2"
-        className={styles.stitch}
+        className={colours.stitch}
       />
       <circle
         cx="160"
@@ -88,7 +110,7 @@ export function LanyardRibbon({ text, className }: LanyardRibbonProps) {
         d="M152 191 h16 v10 a8 8 0 0 1 -16 0 z"
         fill={`url(#${id}-metal)`}
       />
-      <path d="M157 196 h6 v5 a3 3 0 0 1 -6 0 z" className={styles.gap} />
+      <path d="M157 196 h6 v5 a3 3 0 0 1 -6 0 z" className={colours.gap} />
     </svg>
   );
 }

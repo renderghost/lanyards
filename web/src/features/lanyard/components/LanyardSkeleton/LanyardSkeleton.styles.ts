@@ -2,10 +2,10 @@
 // the badge's sizes, so nothing jumps when it arrives.
 
 export const page =
-  'flex w-full max-w-[70rem] flex-col items-center gap-10 self-center px-4 py-8 sm:px-6 sm:py-10';
+  'flex w-full max-w-[70rem] flex-col items-center gap-10 self-center px-4 pb-8 sm:px-6 sm:pb-10';
 
 export const badge =
-  '@container flex w-full flex-col overflow-hidden rounded-sm shadow-badge outline outline-1 -outline-offset-1 outline-border';
+  '@container flex w-full flex-col overflow-hidden rounded-sm outline outline-1 -outline-offset-1 outline-border';
 
 const pulse = 'motion-safe:animate-pulse';
 

@@ -12,6 +12,9 @@ export const STRAPS = {
   width: 44,
 };
 
+/** The hairline each side of an edged strap (#173). */
+export const EDGE = 1;
+
 /** Enough repeats to print each strap from the top of any screen. */
 export const REPEATS = 14;
 

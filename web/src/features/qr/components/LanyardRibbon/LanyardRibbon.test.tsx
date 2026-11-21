@@ -33,4 +33,28 @@ describe('LanyardRibbon (#169)', () => {
     const ids = [...container.querySelectorAll('path[id]')].map((p) => p.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
+
+  it('wears the ink strap by default, as on the brand blue (#169)', () => {
+    const { container } = render(<LanyardRibbon text="@alice.test" />);
+    const straps = container.querySelectorAll('path[id]');
+    for (const strap of straps) {
+      expect(strap.getAttribute('class')).toContain('stroke-qr-strap');
+    }
+    expect(container.querySelector('[data-edge]')).toBeNull();
+  });
+
+  it('wears the accent, edged, on a page that may be light or dark (#173)', () => {
+    const { container } = render(
+      <LanyardRibbon text="@alice.test" tone="accent" />
+    );
+    const straps = container.querySelectorAll('path[id]');
+    for (const strap of straps) {
+      expect(strap.getAttribute('class')).toContain('stroke-accent');
+    }
+    for (const print of container.querySelectorAll('text')) {
+      expect(print.getAttribute('class')).toContain('fill-on-accent');
+    }
+    // A hairline under each strap, so a pale accent reads on white.
+    expect(container.querySelectorAll('[data-edge]')).toHaveLength(2);
+  });
 });

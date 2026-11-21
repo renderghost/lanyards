@@ -1,5 +1,5 @@
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { ADA } from '@/test/people';
@@ -49,6 +49,28 @@ describe('BadgeHero', () => {
     expect(
       screen.getByRole('heading', { level: 2, name: 'Prof Ada Example, OBE' })
     ).toBeInTheDocument();
+  });
+
+  it('hangs in a laminate sleeve from a lanyard printed with the handle (#173)', () => {
+    const { container } = renderWithProviders(<BadgeHero hero={hero} />);
+    const badge = screen.getByRole('region', { name: 'Dr Ada Example' });
+    expect(badge.closest('[data-sleeve]')).not.toBeNull();
+    const straps = container.querySelectorAll('textPath');
+    expect(straps).toHaveLength(2);
+    for (const strap of straps) {
+      expect(strap.textContent).toContain('@alice.test');
+    }
+  });
+
+  it('never sways: it holds buttons, which must stay put (#173)', () => {
+    const { container } = renderWithProviders(<BadgeHero hero={hero} />);
+    const badge = screen.getByRole('region', { name: 'Dr Ada Example' });
+    for (let x = 100; x <= 600; x += 50) {
+      fireEvent.pointerMove(badge, { pointerType: 'mouse', clientX: x });
+    }
+    for (const element of container.querySelectorAll<HTMLElement>('*')) {
+      expect(element.style.transform).toBe('');
+    }
   });
 
   it('wears a decorative cover and shows initials without an avatar (#129)', () => {

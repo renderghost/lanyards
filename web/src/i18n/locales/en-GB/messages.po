@@ -405,7 +405,7 @@ msgstr "Create your lanyard"
 msgid "Customise"
 msgstr "Customise"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:161
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:160
 msgid "Customise your lanyard"
 msgstr "Customise your lanyard"
 
@@ -720,7 +720,7 @@ msgstr "Link to add"
 msgid "Links"
 msgstr "Links"
 
-#: src/features/lanyard/components/LanyardSkeleton/LanyardSkeleton.tsx:14
+#: src/features/lanyard/components/LanyardSkeleton/LanyardSkeleton.tsx:19
 msgid "Loading lanyard…"
 msgstr "Loading lanyard…"
 
@@ -911,7 +911,7 @@ msgstr "Powerful tools designed for academic needs, not corporate networking."
 msgid "Preparing screenshot…"
 msgstr "Preparing screenshot…"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:187
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:192
 msgid "Preview"
 msgstr "Preview"
 
@@ -972,7 +972,7 @@ msgstr "Researcher profiles on the AT Protocol"
 msgid "Reset"
 msgstr "Reset"
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:182
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:186
 msgid "Reset to defaults"
 msgstr "Reset to defaults"
 
@@ -1224,7 +1224,7 @@ msgstr "The visibility paradox"
 msgid "There’s no single place that represents your complete, current scholarly identity when opportunities arise."
 msgstr "There’s no single place that represents your complete, current scholarly identity when opportunities arise."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:175
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:179
 msgid "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 msgstr "They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults."
 
@@ -1310,7 +1310,7 @@ msgstr "Update"
 msgid "Update once, share everywhere. No more Sunday afternoons updating ten different websites or managing multiple link collections."
 msgstr "Update once, share everywhere. No more Sunday afternoons updating ten different websites or managing multiple link collections."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:167
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:163
 msgid "Updating your podcasts and videos…"
 msgstr "Updating your podcasts and videos…"
 
@@ -1385,7 +1385,7 @@ msgstr "We couldn't load this lanyard"
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
-#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:172
+#: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:176
 msgid "We couldn't read your lanyard settings"
 msgstr "We couldn't read your lanyard settings"
 
