@@ -52,6 +52,25 @@ describe('SignInPage (#157)', () => {
     await expectNoAxeViolations(container);
   });
 
+  it('hangs in a clear sleeve from a lanyard printed lanyards.app (#170)', async () => {
+    const { container } = page();
+    const heading = await screen.findByRole('heading', {
+      level: 1,
+      name: 'Sign in',
+    });
+    const sleeve = heading.closest('[data-sleeve]');
+    expect(sleeve).not.toBeNull();
+    expect(sleeve).toContainElement(
+      screen.getByRole('combobox', { name: 'Your handle' })
+    );
+    const straps = container.querySelectorAll('textPath');
+    expect(straps).toHaveLength(2);
+    for (const strap of straps) {
+      expect(strap.textContent).toContain('lanyards.app');
+    }
+    expect(container.querySelectorAll('polygon')).toHaveLength(0);
+  });
+
   it('has the homepage’s header, without a Sign in link to itself', async () => {
     page();
     const banner = await screen.findByRole('banner');

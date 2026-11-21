@@ -7,7 +7,9 @@ import { Logo } from '@/components/Logo/Logo';
 import { SIGNED_IN_HOME } from '@/features/auth/components/LandingPage/LandingPage.constants';
 import { SignInForm } from '@/features/auth/components/SignInForm/SignInForm';
 import { useSession } from '@/features/auth/session/useSession';
-import { LanyardStraps } from '@/features/qr/components/LanyardStraps/LanyardStraps';
+import { BadgeSleeve } from '@/features/qr/components/BadgeSleeve/BadgeSleeve';
+import { LanyardRibbon } from '@/features/qr/components/LanyardRibbon/LanyardRibbon';
+import { BRAND_PRINT } from '@/features/qr/components/LanyardRibbon/LanyardRibbon.constants';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { safeReturnTo } from '@/lib/atproto/oauthConfig';
 
@@ -18,8 +20,9 @@ import type { SignInPageProps } from './SignInPage.types';
 
 /**
  * `/sign-in` (#157): the sign-in form, with its handle typeahead, on a
- * badge hanging on the brand blue. Signed in already, it sends people on
- * to where they were going.
+ * badge in a clear sleeve, hanging from a lanyard on the brand blue as the
+ * homepage's does (#170). Signed in already, it sends people on to where
+ * they were going.
  */
 export function SignInPage({ returnTo }: SignInPageProps) {
   const { t } = useLingui();
@@ -42,31 +45,32 @@ export function SignInPage({ returnTo }: SignInPageProps) {
       <HomeHeader signIn={false} />
       <main className={styles.main}>
         <div data-accent={BADGE_ACCENT} className={styles.hang}>
-          <LanyardStraps className={styles.straps} />
-          <section aria-labelledby={headingId} className={styles.badge}>
-            <div className={styles.cover}>
-              <CoverPattern pattern={COVER} initials="L" />
-              <span aria-hidden="true" className={styles.slot} />
-            </div>
-            <div className={styles.field}>
-              <div className={styles.logoBox}>
-                <Logo fixed="blue" className={styles.logo} />
+          <LanyardRibbon text={BRAND_PRINT} className={styles.ribbon} />
+          <BadgeSleeve>
+            <section aria-labelledby={headingId} className={styles.badge}>
+              <div className={styles.cover}>
+                <CoverPattern pattern={COVER} initials="L" />
               </div>
-              <h1 id={headingId} className={styles.heading}>
-                {t`Sign in`}
-              </h1>
-              <p className={styles.lede}>
-                {t`Use your handle from Bluesky or any other AT Protocol app. New here? Create an account, and it’s yours to take anywhere.`}
-              </p>
-              {session.status === 'signedOut' ? (
-                <SignInForm returnTo={destination} className={styles.form} />
-              ) : (
-                <p role="status" className={styles.loading}>
-                  {t`Loading…`}
+              <div className={styles.field}>
+                <div className={styles.logoBox}>
+                  <Logo fixed="blue" className={styles.logo} />
+                </div>
+                <h1 id={headingId} className={styles.heading}>
+                  {t`Sign in`}
+                </h1>
+                <p className={styles.lede}>
+                  {t`Use your handle from Bluesky or any other AT Protocol app. New here? Create an account, and it’s yours to take anywhere.`}
                 </p>
-              )}
-            </div>
-          </section>
+                {session.status === 'signedOut' ? (
+                  <SignInForm returnTo={destination} className={styles.form} />
+                ) : (
+                  <p role="status" className={styles.loading}>
+                    {t`Loading…`}
+                  </p>
+                )}
+              </div>
+            </section>
+          </BadgeSleeve>
         </div>
       </main>
     </div>

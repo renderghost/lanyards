@@ -122,10 +122,9 @@ const CHROME = [
 const LANYARD_ONLY = [
   'src/components/RichText/',
   'src/features/qr/components/QrSheet/',
-  // Show QR as a page (#150): the badge's ground while it loads.
+  // Share as a page (#150): the badge's ground while it loads.
   'src/features/qr/components/SharePage/',
-  'src/features/qr/components/LanyardStraps/',
-  // The Share badge's printed lanyard (#169).
+  // The printed lanyard every badge hangs from (#169, #170).
   'src/features/qr/components/LanyardRibbon/',
   // The clear sleeve a badge hangs in (#170).
   'src/features/qr/components/BadgeSleeve/',
