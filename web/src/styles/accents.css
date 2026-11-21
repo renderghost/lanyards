@@ -2,7 +2,7 @@
    ACCENT PALETTES (#128)
    The brand's four: blue 4020DF, mint 8BF9BE, lime EAFF00 and pink F7879A.
    Selected with <html data-accent="…">; blue is the default. Any other
-   element with data-accent (a swatch, the Show QR badge) gets that palette.
+   element with data-accent (a swatch, the Share badge) gets that palette.
 
    --accent fills the badge field, tags and marks; --on-accent is text on
    it. --accent-text is the accent as text on the page: the light fills are
@@ -11,7 +11,7 @@
    badge's cover patterns. --board-label labels the badge's departure board
    (always brand ink), and --badge-button is the badge's main action on the
    accent field. The badge looks the same in light and dark. --qr-* is the
-   Show QR badge's ground (brand blue, or ink under a blue card), its
+   Share badge's ground (brand blue, or ink under a blue card), its
    lanyard straps and its Close button.
 
    Every pair is contrast-checked by src/design/accents.test.ts:

@@ -10,7 +10,7 @@ import * as styles from './SharePage.styles';
 import type { SharePageProps } from './SharePage.types';
 
 /**
- * Show QR as a page, `/<handle>/share` (#150): the badge full screen, for
+ * Share as a page, `/<handle>/share` (#150): the badge full screen, for
  * anyone's public lanyard. Close goes back where you were, or to the
  * lanyard when the page was opened on its own.
  */

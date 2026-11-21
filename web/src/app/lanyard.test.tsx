@@ -394,7 +394,7 @@ describe('visitor actions on the page', () => {
     );
   });
 
-  it('gives owners Edit lanyard and Show QR on the badge', async () => {
+  it('gives owners Edit lanyard and Share on the badge', async () => {
     servePerson();
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
     renderRoute('/alice.test');
@@ -403,7 +403,7 @@ describe('visitor actions on the page', () => {
       within(badge).getByRole('link', { name: 'Edit lanyard' })
     ).toHaveAttribute('href', '/alice.test/edit');
     expect(
-      within(badge).getByRole('link', { name: 'Show QR' })
+      within(badge).getByRole('link', { name: 'Share' })
     ).toBeInTheDocument();
   });
 });

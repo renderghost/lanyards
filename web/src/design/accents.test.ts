@@ -179,8 +179,8 @@ describe('accent palettes', () => {
     ).toBeGreaterThanOrEqual(3);
   });
 
-  // The Show QR badge stands on brand blue, or ink when the card is blue.
-  it.each(cases)('%s/%s: the Show QR actions stand out', (a, m) => {
+  // The Share badge stands on brand blue, or ink when the card is blue.
+  it.each(cases)('%s/%s: the Share actions stand out', (a, m) => {
     const p = palette(a, m);
     expect(contrastRatio('#ffffff', p['--qr-close']!)).toBeGreaterThanOrEqual(
       7

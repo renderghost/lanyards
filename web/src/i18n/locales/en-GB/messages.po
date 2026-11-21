@@ -1029,6 +1029,11 @@ msgstr "Send feedback"
 msgid "Send more"
 msgstr "Send more"
 
+#: src/components/MobileNav/MobileNav.tsx:71
+#: src/features/qr/components/ShareLink/ShareLink.tsx:26
+msgid "Share"
+msgstr "Share"
+
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:50
 msgid "Show"
 msgstr "Show"
@@ -1052,11 +1057,6 @@ msgstr "Show lanyard"
 #: src/features/lanyard/customise/StylePanel/StylePanel.tsx:31
 msgid "Show location"
 msgstr "Show location"
-
-#: src/components/MobileNav/MobileNav.tsx:71
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:26
-msgid "Show QR"
-msgstr "Show QR"
 
 #: src/features/lanyard/customise/StylePanel/StylePanel.tsx:32
 msgid "Show what you’re open to"

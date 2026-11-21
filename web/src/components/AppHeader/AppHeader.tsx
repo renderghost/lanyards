@@ -6,7 +6,7 @@ import { AccountLink } from '@/components/AccountLink/AccountLink';
 import { buttonClassName } from '@/components/Button/buttonClassName';
 import { Logo } from '@/components/Logo/Logo';
 import { useSession } from '@/features/auth/session/useSession';
-import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
+import { ShareLink } from '@/features/qr/components/ShareLink/ShareLink';
 import { useOwnPaths } from '@/hooks/useOwnPaths';
 import { OWN_PAGE_ACTIVE } from '@/lib/person/ownPaths';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ import type { AppHeaderProps } from './AppHeader.types';
 
 /**
  * The top bar. Signed in (#150): the logo (your customiser), Customise and
- * View on the left; a page's own actions, Show QR and Account on the
+ * View on the left; a page's own actions, Share and Account on the
  * right. On phones, the bottom bar carries the rest. Signed out, where
  * asked: Sign in, as a primary button (#162): a plain log in, landing on
  * your own customiser (#167); account creation is on the sign-in page.
@@ -35,7 +35,7 @@ export function AppHeader({
   if (own) {
     end = (
       <div className={styles.own}>
-        <ShowQrButton />
+        <ShareLink />
         <AccountLink labelled />
       </div>
     );

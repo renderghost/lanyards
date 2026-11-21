@@ -34,7 +34,7 @@ afterEach(() => {
   delete document.documentElement.dataset.accent;
 });
 
-describe('QrSheet, the Show QR badge (#129)', () => {
+describe('QrSheet, the Share badge (#129)', () => {
   it('wears the owner’s accent on the sheet, never on the page', async () => {
     servePerson({ config: { accent: 'pink' } });
     const { rerender } = sheet();

@@ -118,11 +118,11 @@ describe('CustomiserActions', () => {
     expect(onReset).toHaveBeenCalledOnce();
   });
 
-  // The header adds Show QR and Account after these (#150).
-  it('leaves Show QR and Account to the header', async () => {
+  // The header adds Share and Account after these (#150).
+  it('leaves Share and Account to the header', async () => {
     renderActions();
     await screen.findByRole('button', { name: 'Save' });
-    expect(screen.queryByRole('link', { name: 'Show QR' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Share' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Your account' })).toBeNull();
   });
 

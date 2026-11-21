@@ -119,13 +119,13 @@ describe('HeroActions when signed in', () => {
     expect(follow).toBeDisabled();
   });
 
-  it('gives the owner Edit lanyard and Show QR instead of Follow', async () => {
+  it('gives the owner Edit lanyard and Share instead of Follow', async () => {
     vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
     const { container } = actions('/@alice.test', true);
     expect(
       await screen.findByRole('link', { name: 'Edit lanyard' })
     ).toHaveAttribute('href', '/alice.test/edit');
-    expect(screen.getByRole('link', { name: 'Show QR' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Share' })).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Follow' })
     ).not.toBeInTheDocument();

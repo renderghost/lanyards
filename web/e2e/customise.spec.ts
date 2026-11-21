@@ -415,7 +415,7 @@ test.describe('lanyard customiser', () => {
     await expect(sidebar).toBeVisible();
   });
 
-  test('gives phones a bottom bar, Show QR first among equals (#150)', async ({
+  test('gives phones a bottom bar, Share first among equals (#150)', async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 640 });
@@ -426,12 +426,12 @@ test.describe('lanyard customiser', () => {
     const box = await bar.boundingBox();
     expect((box?.y ?? 0) + (box?.height ?? 0)).toBeCloseTo(640, 0);
     const widths: Record<string, number> = {};
-    for (const name of ['Customise', 'View', 'Show QR', 'Your account']) {
+    for (const name of ['Customise', 'View', 'Share', 'Your account']) {
       const link = bar.getByRole('link', { name });
       await expect(link).toBeVisible();
       widths[name] = (await link.boundingBox())?.width ?? 0;
     }
-    expect(widths['Show QR']).toBeGreaterThan(
+    expect(widths['Share']).toBeGreaterThan(
       Math.max(
         widths.Customise ?? 0,
         widths.View ?? 0,
@@ -441,7 +441,7 @@ test.describe('lanyard customiser', () => {
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth)
     ).toBeLessThanOrEqual(320);
-    await bar.getByRole('link', { name: 'Show QR' }).click();
+    await bar.getByRole('link', { name: 'Share' }).click();
     await expect(page).toHaveURL(/\/alice\.test\/share$/);
   });
 

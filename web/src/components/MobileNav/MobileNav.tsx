@@ -12,8 +12,8 @@ import * as styles from './MobileNav.styles';
 import type { MobileNavProps } from './MobileNav.types';
 
 /**
- * On phones, signed in (#150): Customise, View, Show QR and Account at the
- * foot of every page. Show QR comes first in weight: wide and filled.
+ * On phones, signed in (#150): Customise, View, Share and Account at the
+ * foot of every page. Share comes first in weight: wide and filled.
  */
 export function MobileNav({ className }: MobileNavProps) {
   const { t } = useLingui();
@@ -68,7 +68,7 @@ export function MobileNav({ className }: MobileNavProps) {
         className={styles.showQr}
       >
         <QrCode aria-hidden="true" className={styles.icon} />
-        {t`Show QR`}
+        {t`Share`}
       </Link>
       <Link
         to="/settings"

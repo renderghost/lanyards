@@ -7,7 +7,7 @@ import { ADA } from '@/test/people';
 import { servePerson, signedInSession, signedOutSession } from '@/test/person';
 import { renderInRouter } from '@/test/router';
 
-import { ShowQrButton } from './ShowQrButton';
+import { ShareLink } from './ShareLink';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 
@@ -16,10 +16,10 @@ beforeEach(() => {
   servePerson();
 });
 
-describe('ShowQrButton (#150)', () => {
-  it('goes to your own Show QR page', async () => {
-    const { container } = renderInRouter(<ShowQrButton />);
-    const link = await screen.findByRole('link', { name: 'Show QR' });
+describe('ShareLink (#150)', () => {
+  it('goes to your own Share page', async () => {
+    const { container } = renderInRouter(<ShareLink />);
+    const link = await screen.findByRole('link', { name: 'Share' });
     await vi.waitFor(() =>
       expect(link).toHaveAttribute('href', `/${ADA.handle}/share`)
     );
@@ -27,15 +27,15 @@ describe('ShowQrButton (#150)', () => {
   });
 
   it('is a link on the badge too', async () => {
-    renderInRouter(<ShowQrButton tone="badge" />);
+    renderInRouter(<ShareLink tone="badge" />);
     expect(
-      await screen.findByRole('link', { name: 'Show QR' })
+      await screen.findByRole('link', { name: 'Share' })
     ).toBeInTheDocument();
   });
 
   it('shows nothing when signed out', () => {
     vi.mocked(useSession).mockReturnValue(signedOutSession());
-    renderInRouter(<ShowQrButton />);
-    expect(screen.queryByRole('link', { name: 'Show QR' })).toBeNull();
+    renderInRouter(<ShareLink />);
+    expect(screen.queryByRole('link', { name: 'Share' })).toBeNull();
   });
 });

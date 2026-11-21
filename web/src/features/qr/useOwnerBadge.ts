@@ -15,7 +15,7 @@ import type { BadgeHero } from '@/lib/person/personView.types';
 import type { BlueskyProfile } from '@/lib/sources/bluesky/bluesky.types';
 
 /**
- * The owner's badge for the Show QR sheet (spec §8), read as the lanyard
+ * The owner's badge for the Share sheet (spec §8), read as the lanyard
  * reads it, through the same queries. While they load, or when they fail,
  * it falls back: Sifa to Bluesky; Bluesky to the account's own profile
  * (which the app header has usually read already); then no badge at all.

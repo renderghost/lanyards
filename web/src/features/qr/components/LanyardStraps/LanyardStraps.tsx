@@ -4,7 +4,7 @@ import { STRAPS, VIEW } from './LanyardStraps.constants';
 import * as styles from './LanyardStraps.styles';
 import type { LanyardStrapsProps } from './LanyardStraps.types';
 
-/** Two lanyard straps meeting above the Show QR badge (spec §8). */
+/** Two lanyard straps meeting above the Share badge (spec §8). */
 export function LanyardStraps({ className }: LanyardStrapsProps) {
   return (
     <svg

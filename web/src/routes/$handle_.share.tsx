@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { SharePage } from '@/features/qr/components/SharePage/SharePage';
 
-/** Show QR, at `/<handle>/share` (#150): anyone's badge, full screen. */
+/** Share, at `/<handle>/share` (#150): anyone's badge, full screen. */
 export const Route = createFileRoute('/$handle_/share')({
   beforeLoad: ({ params }) => {
     const lower = params.handle.toLowerCase();

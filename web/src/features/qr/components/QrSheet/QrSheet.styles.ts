@@ -1,4 +1,4 @@
-// The Show QR badge (spec §8). Upright: the straps, then the card in the
+// The Share badge (spec §8). Upright: the straps, then the card in the
 // owner's accent, then the actions, on brand blue (ink under a blue card).
 // On short screens these give way, in order: the straps, the cover (to
 // 56 px, then gone), the pronouns and handle, the ink strip. The name, the

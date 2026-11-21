@@ -25,7 +25,7 @@ const nameSize = (name: string): keyof typeof styles.names => {
 };
 
 /**
- * The Show QR badge (spec §8): the owner's badge, full screen, with the
+ * The Share badge (spec §8): the owner's badge, full screen, with the
  * code to their lanyard and Copy link as its text alternative. It wears
  * the owner's accent on itself alone, never on the page behind, which may
  * be someone else's lanyard. Keeps the screen awake while open.
