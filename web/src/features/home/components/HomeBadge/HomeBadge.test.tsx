@@ -40,6 +40,22 @@ afterEach(() => {
 });
 
 describe('HomeBadge (#151)', () => {
+  it('hangs in a clear sleeve from a lanyard printed lanyards.app (#170)', () => {
+    pointer(false);
+    const { container } = renderWithProviders(
+      <HomeBadge headingId="welcome" />
+    );
+    const heading = screen.getByRole('heading', { level: 1 });
+    expect(heading.closest('[data-sleeve]')).not.toBeNull();
+    const straps = container.querySelectorAll('textPath');
+    expect(straps).toHaveLength(2);
+    for (const strap of straps) {
+      expect(strap.textContent).toContain('lanyards.app');
+    }
+    // The old plain straps are gone: one lanyard, not two.
+    expect(container.querySelectorAll('polygon')).toHaveLength(0);
+  });
+
   it('sways on its clip as a mouse moves across the lanyard', () => {
     pointer(true);
     vi.useFakeTimers({
@@ -50,6 +66,8 @@ describe('HomeBadge (#151)', () => {
     sweep(heading);
     const badge = turned(heading);
     expect(badge).not.toBeNull();
+    // The badge turns in its sleeve, together, on the clasp (#170).
+    expect(badge).toHaveAttribute('data-sleeve');
     expect(badge?.style.transform).toMatch(/^rotate\(-[\d.]+deg\)$/);
     // It turns about its clip, at the top, as the arrival swing does.
     expect(badge?.className).toMatch(/(^|\s)origin-top(\s|$)/);

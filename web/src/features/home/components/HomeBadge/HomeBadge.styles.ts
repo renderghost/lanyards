@@ -1,25 +1,30 @@
-// Lanyards' own billboard badge (#145), hung from its straps on brand
-// blue as on the Share screen (spec §8), and built as a person's is
-// (spec §7). The badge's tokens are the same in light and dark.
+// Lanyards' own billboard badge (#145), in a clear sleeve on a lanyard
+// printed with the site's address, on brand blue, as on the Share screen
+// (#170), and built as a person's is (spec §7). The badge's tokens are the
+// same in light and dark.
 
-/** Edge to edge: the ground the badge hangs on. */
+/** Edge to edge: the ground the badge hangs on. Crops the straps' tops. */
 export const stage =
   'flex w-full flex-col items-center overflow-hidden bg-qr-ground px-4 pb-14 md:px-8 md:pb-20';
 
 export const hang = 'flex w-full max-w-[58rem] flex-col items-center';
 
-export const straps = 'h-28 w-[11.75rem] md:h-40 md:w-[16.75rem]';
+// The clasp's hook ends in the sleeve's slot, a little below its top edge.
+export const ribbon =
+  'relative z-10 h-32 w-auto shrink-0 translate-y-[1.125rem] md:h-52 md:translate-y-7';
 
-// Tilted on its clip from md up, after one swing as it arrives. A mouse
-// sways it on the same clip (#151), with a transform added to the tilt.
+// Tilted on its clasp from md up, after one swing as it arrives. A mouse
+// sways it on the same clasp (#151), with a transform added to the tilt.
+export const sleeve =
+  'origin-top md:-rotate-[1.5deg] md:p-4 md:pt-12 md:motion-safe:animate-swing';
+
+/** A bigger slot for the bigger sleeve. */
+export const slot = 'md:top-4 md:h-4 md:w-24';
+
 export const badge =
-  '@container flex w-full origin-top flex-col overflow-hidden rounded-sm bg-accent text-on-accent shadow-[0_2px_4px_rgb(6_1_30/0.2),0_12px_24px_rgb(6_1_30/0.2),0_32px_64px_rgb(6_1_30/0.3)] md:-rotate-[1.5deg] md:motion-safe:animate-swing';
+  '@container flex w-full flex-col overflow-hidden rounded-sm bg-accent text-on-accent';
 
 export const cover = 'relative h-30 @min-[40rem]:h-52';
-
-/** Where the clip goes through the badge: the ground shows through. */
-export const slot =
-  'absolute left-1/2 top-3.5 h-3 w-16 -translate-x-1/2 rounded-sm bg-qr-ground shadow-[inset_0_2px_3px_rgb(6_1_30/0.4)] @min-[40rem]:top-[1.125rem] @min-[40rem]:h-3.5 @min-[40rem]:w-24';
 
 export const field =
   'flex flex-col gap-4 px-5 pb-8 @min-[40rem]:px-12 @min-[40rem]:pb-12';

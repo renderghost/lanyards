@@ -19,3 +19,6 @@ export const SEPARATOR = '  ·  ';
 
 /** The clasp's metal, light along its middle. */
 export const METAL = ['#8d8ba3', '#f1f1f7', '#77758c'] as const;
+
+/** What Lanyards' own lanyards print, where there's no person's handle. */
+export const BRAND_PRINT = 'lanyards.app';

@@ -13,6 +13,7 @@ import { heroName } from '@/lib/person/hero';
 
 import { qrUrl } from '../../qrUrl';
 import { useOwnerBadge } from '../../useOwnerBadge';
+import { BadgeSleeve } from '../BadgeSleeve/BadgeSleeve';
 import { LanyardRibbon } from '../LanyardRibbon/LanyardRibbon';
 import { NAME_LENGTHS } from './QrSheet.constants';
 import * as styles from './QrSheet.styles';
@@ -120,9 +121,11 @@ export function QrSheet({
                 className={styles.ribbon}
               />
             )}
-            <div className={styles.sleeve}>
-              <span aria-hidden="true" className={styles.slot} />
-              <span aria-hidden="true" className={styles.glare} />
+            <BadgeSleeve
+              className={styles.sleeve}
+              slotClassName={styles.slot}
+              glareClassName={styles.glare}
+            >
               <div className={styles.card}>
                 <div aria-hidden="true" className={styles.top}>
                   <Logo
@@ -161,7 +164,7 @@ export function QrSheet({
                   </dl>
                 )}
               </div>
-            </div>
+            </BadgeSleeve>
           </div>
           <div className={styles.actions}>
             {canShare() && (
