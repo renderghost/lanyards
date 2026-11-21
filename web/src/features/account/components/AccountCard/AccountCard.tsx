@@ -1,4 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
+import { useRouter } from '@tanstack/react-router';
 
 import { Button } from '@/components/Button/Button';
 import { useSession } from '@/features/auth/session/useSession';
@@ -11,6 +12,7 @@ import type { AccountCardProps } from './AccountCard.types';
 export function AccountCard({ className }: AccountCardProps) {
   const { t } = useLingui();
   const session = useSession();
+  const router = useRouter();
   const did = session.status === 'signedIn' ? session.session.did : undefined;
   const profile = useProfile(did);
 
@@ -39,7 +41,11 @@ export function AccountCard({ className }: AccountCardProps) {
             : t`Loading your profile…`}
         </p>
       )}
-      <Button variant="secondary" onClick={() => void session.signOut()}>
+      <Button
+        variant="secondary"
+        // Signed out, the homepage (#172), not a page asking to sign in.
+        onClick={() => void session.signOut(() => router.navigate({ to: '/' }))}
+      >
         {t`Sign out`}
       </Button>
     </section>

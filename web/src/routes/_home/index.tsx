@@ -1,11 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 
-import { LandingPage } from '@/features/auth/components/LandingPage/LandingPage';
 import { safeReturnTo } from '@/lib/atproto/oauthConfig';
 
 type LandingSearch = { returnTo?: string };
 
-export const Route = createFileRoute('/')({
+/** `/`: the homepage, drawn by the _home layout (#175). */
+export const Route = createFileRoute('/_home/')({
   // Always return the key: search params merge with the parent route's raw
   // params, so omitting it would let an unvalidated value through.
   validateSearch: (search: Record<string, unknown>): LandingSearch => {
@@ -22,11 +22,4 @@ export const Route = createFileRoute('/')({
       });
     }
   },
-  // The homepage draws its own header, on the brand blue (#151).
-  staticData: { ownHeader: true },
-  component: Landing,
 });
-
-function Landing() {
-  return <LandingPage />;
-}

@@ -13,6 +13,7 @@ import { HomeBadge } from '../HomeBadge/HomeBadge';
 import { HomeBoard } from '../HomeBoard/HomeBoard';
 import { HomeHeader } from '../HomeHeader/HomeHeader';
 import { HomeSection } from '../HomeSection/HomeSection';
+import { SignInFace } from '../SignInFace/SignInFace';
 import { BENEFITS, FEATURES, LINKS, PARADOX } from './HomePage.constants';
 import * as styles from './HomePage.styles';
 import type { HomePageProps } from './HomePage.types';
@@ -20,20 +21,29 @@ import type { HomePageProps } from './HomePage.types';
 /**
  * The homepage for people who aren't signed in: the old site's homepage
  * (#145) in the new design language. It makes its case and points to the
- * sign-in page (#157). It wears brand blue whatever lanyard was last open,
+ * sign-in page (#157), which is this page with its badge turned over to
+ * the form on its back (#175). It wears brand blue whatever lanyard was last open,
  * and draws its own header on that blue (#151).
  */
-export function HomePage({ className }: HomePageProps) {
+export function HomePage({
+  face = 'front',
+  returnTo = '/',
+  className,
+}: HomePageProps) {
   const { t, i18n } = useLingui();
   const headingId = useId();
   const ctaId = useId();
 
   return (
     <div data-accent="blue" className={cn(styles.page, className)}>
-      <HomeHeader />
+      <HomeHeader signIn={face === 'front'} />
       <main className={styles.main}>
         <section aria-labelledby={headingId}>
-          <HomeBadge headingId={headingId} />
+          <HomeBadge
+            headingId={headingId}
+            face={face}
+            back={<SignInFace returnTo={returnTo} />}
+          />
         </section>
 
         <div className={styles.body}>

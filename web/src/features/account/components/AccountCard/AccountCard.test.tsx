@@ -6,7 +6,7 @@ import { useSession } from '@/features/auth/session/useSession';
 import { useProfile } from '@/lib/atproto/useProfile';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ALICE } from '@/test/fixtures';
-import { renderWithProviders } from '@/test/render';
+import { renderInRouter, waitForRoute } from '@/test/router';
 
 import { AccountCard } from './AccountCard';
 
@@ -31,31 +31,47 @@ const signedInAs = (profile: object | undefined, status = 'success') => {
 };
 
 describe('AccountCard', () => {
-  it('shows who is signed in', () => {
+  it('shows who is signed in', async () => {
     signedInAs(ALICE);
-    renderWithProviders(<AccountCard />);
-    expect(screen.getByText('Alice')).toBeInTheDocument();
+    renderInRouter(<AccountCard />, '/settings');
+    expect(await screen.findByText('Alice')).toBeInTheDocument();
     expect(screen.getByText('@alice.bsky.social')).toBeInTheDocument();
   });
 
-  it('falls back to the handle when there is no display name', () => {
+  it('falls back to the handle when there is no display name', async () => {
     signedInAs({ did: ALICE.did, handle: ALICE.handle });
-    renderWithProviders(<AccountCard />);
-    expect(screen.getByText('alice.bsky.social')).toBeInTheDocument();
+    renderInRouter(<AccountCard />, '/settings');
+    expect(await screen.findByText('alice.bsky.social')).toBeInTheDocument();
+  });
+
+  it('signs out to the homepage (#172)', async () => {
+    signedInAs(ALICE);
+    // The session ends, then calls back to say where to go.
+    signOut.mockImplementation(async (leave?: () => Promise<void>) => {
+      await leave?.();
+    });
+    const { router } = renderInRouter(<AccountCard />, '/settings');
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Sign out' })
+    );
+    expect(signOut).toHaveBeenCalledWith(expect.any(Function));
+    await waitForRoute(router, '/');
   });
 
   it('signs out', async () => {
     signedInAs(ALICE);
-    renderWithProviders(<AccountCard />);
-    await userEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+    renderInRouter(<AccountCard />, '/settings');
+    await userEvent.click(
+      await screen.findByRole('button', { name: 'Sign out' })
+    );
     expect(signOut).toHaveBeenCalled();
   });
 
   it('still offers sign-out when the profile cannot load', async () => {
     signedInAs(undefined, 'error');
-    renderWithProviders(<AccountCard />);
+    renderInRouter(<AccountCard />, '/settings');
     expect(
-      screen.getByText("We couldn't load your profile.")
+      await screen.findByText("We couldn't load your profile.")
     ).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'Sign out' }));
     expect(signOut).toHaveBeenCalled();
@@ -63,7 +79,8 @@ describe('AccountCard', () => {
 
   it('has no axe violations', async () => {
     signedInAs(ALICE);
-    const { container } = renderWithProviders(<AccountCard />);
+    const { container } = renderInRouter(<AccountCard />, '/settings');
+    await screen.findByText('Alice');
     await expectNoAxeViolations(container);
   });
 });

@@ -53,4 +53,25 @@ describe('BadgeSleeve (#170)', () => {
     expect(slot?.className).toMatch(/(^|\s)top-4(\s|$)/);
     expect(glare?.className).toMatch(/(^|\s)hidden(\s|$)/);
   });
+
+  it('is white plastic on the brand ground, and themed on a page (#173)', () => {
+    const { container, rerender } = render(
+      <BadgeSleeve>
+        <p>Badge</p>
+      </BadgeSleeve>
+    );
+    const sleeve = () => container.querySelector('[data-sleeve]');
+    expect(sleeve()?.className).toContain('border-white/60');
+    rerender(
+      <BadgeSleeve ground="page">
+        <p>Badge</p>
+      </BadgeSleeve>
+    );
+    // The page may be light or dark: its own ink shows the edge.
+    expect(sleeve()?.className).not.toContain('border-white/60');
+    expect(sleeve()?.className).toContain('border-foreground/20');
+    expect(sleeve()?.querySelector('span')?.className).toContain(
+      'bg-background'
+    );
+  });
 });

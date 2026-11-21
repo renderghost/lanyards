@@ -13,17 +13,18 @@ export const workspace = 'flex flex-1 items-stretch md:min-h-0';
 // From md up it scrolls, and is positioned, so absolutely placed content
 // inside it (such as screen-reader text) scrolls with it rather than
 // stretching the page.
+// The lanyard hangs from its top edge (#173), unless a notice comes first.
 export const canvas =
-  'min-w-0 items-center gap-6 px-4 py-6 md:relative md:overflow-y-auto md:px-8 md:py-8';
+  'min-w-0 items-center gap-6 px-4 pb-6 has-[>[data-notice]:not(:empty)]:pt-6 md:relative md:overflow-y-auto md:px-8 md:pb-8 md:has-[>[data-notice]:not(:empty)]:pt-8';
 
 export const intro = 'flex w-full max-w-[640px] flex-col gap-3';
 
-export const heading =
-  'text-[22px] font-semibold leading-7 tracking-tight text-ui-text';
+/** For screen readers: the header already says Customise (#173). */
+export const heading = 'sr-only';
 
 /** Empty but present, so the status is announced when it appears. */
 export const moving =
-  'text-[15px] leading-[22px] text-ui-text-muted empty:sr-only';
+  'w-full max-w-[640px] text-[15px] leading-[22px] text-ui-text-muted empty:sr-only';
 
 export const frame = 'w-full max-w-[640px]';
 

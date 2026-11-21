@@ -56,7 +56,19 @@ export default defineConfig({
     rolldownOptions: {
       output: {
         codeSplitting: {
-          groups: [{ name: 'posthog', test: /node_modules[\\/]posthog-js/ }],
+          // A group holds only what it names, not everything that imports.
+          includeDependenciesRecursively: false,
+          groups: [
+            { name: 'posthog', test: /node_modules[\\/]posthog-js/ },
+            // A badge's drawing, wherever one hangs (#173): its cover, its
+            // lanyard and its sleeve, in one request, not three. A lanyard
+            // loads its route's code in a burst, and over HTTP/1.1 every
+            // extra file there can cost another round trip (spec §2).
+            {
+              name: 'badge',
+              test: /src[\\/](components[\\/]CoverPattern|features[\\/]qr[\\/]components[\\/](LanyardRibbon|BadgeSleeve))[\\/]/,
+            },
+          ],
         },
       },
     },

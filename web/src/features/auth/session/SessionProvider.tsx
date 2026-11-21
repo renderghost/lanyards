@@ -71,14 +71,25 @@ export function SessionProvider({ children }: SessionProviderProps) {
     if (started === generation.current) apply(result);
   }, [apply]);
 
-  const signOut = useCallback(async () => {
-    if (state.status !== 'signedIn') return;
-    generation.current++;
-    await endSession(state.session);
-    setState({ status: 'signedOut' });
-    track('signed_out');
-    notify.success(t`Signed out`);
-  }, [state, t]);
+  const signOut = useCallback(
+    async (leave?: () => Promise<unknown>) => {
+      if (state.status !== 'signedIn') return;
+      generation.current++;
+      // Neither signed in nor out until `leave` has moved on.
+      setState({ status: 'loading' });
+      await endSession(state.session);
+      try {
+        await leave?.();
+      } catch (error) {
+        // Wherever they are, they're signed out all the same.
+        captureError(error, { source: 'sign-out-leave' });
+      }
+      setState({ status: 'signedOut' });
+      track('signed_out');
+      notify.success(t`Signed out`);
+    },
+    [state, t]
+  );
 
   const value = useMemo<SessionContextValue>(
     () => ({ ...state, signOut, refresh }),

@@ -189,9 +189,14 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
     expect(grounds()).toHaveLength(1);
     const [ground] = grounds();
     expect(ground).toContainElement(region);
-    expect(ground).toContainElement(
-      screen.getByRole('heading', { level: 1, name: 'Customise your lanyard' })
-    );
+    const heading = screen.getByRole('heading', {
+      level: 1,
+      name: 'Customise your lanyard',
+    });
+    expect(ground).toContainElement(heading);
+    // For screen readers only: the lanyard hangs from the canvas's top
+    // edge, and the header already says Customise (#173).
+    expect(heading).toHaveClass('sr-only');
   });
 
   it('shows only its own header, with the customiser’s actions', async () => {

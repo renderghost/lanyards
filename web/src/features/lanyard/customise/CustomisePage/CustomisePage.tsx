@@ -156,34 +156,39 @@ function Customiser({
             />
           </CustomiserSidebar>
           <LanyardSurface className={styles.canvas}>
-            <div className={styles.intro}>
-              <h1 id={headingId} className={styles.heading}>
-                {t`Customise your lanyard`}
-              </h1>
-              {(!canEdit || !canKeep || draft.permissionLost) && (
-                <PermissionNotice returnTo={path} />
-              )}
-              <p role="status" className={styles.moving}>
-                {move.moving ? t`Updating your podcasts and videos…` : ''}
-              </p>
-              {settings.invalid && (
-                <div role="status" className={styles.notice}>
-                  <p className={styles.noticeHeading}>
-                    {t`We couldn't read your lanyard settings`}
-                  </p>
-                  <p className={styles.noticeText}>
-                    {t`They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults.`}
-                  </p>
-                  <Button
-                    variant="secondary"
-                    disabled={!canEdit}
-                    onClick={settings.resetInvalid}
-                  >
-                    {t`Reset to defaults`}
-                  </Button>
-                </div>
-              )}
-            </div>
+            <h1 id={headingId} className={styles.heading}>
+              {t`Customise your lanyard`}
+            </h1>
+            <p data-notice role="status" className={styles.moving}>
+              {move.moving ? t`Updating your podcasts and videos…` : ''}
+            </p>
+            {(!canEdit ||
+              !canKeep ||
+              draft.permissionLost ||
+              settings.invalid) && (
+              <div data-notice className={styles.intro}>
+                {(!canEdit || !canKeep || draft.permissionLost) && (
+                  <PermissionNotice returnTo={path} />
+                )}
+                {settings.invalid && (
+                  <div role="status" className={styles.notice}>
+                    <p className={styles.noticeHeading}>
+                      {t`We couldn't read your lanyard settings`}
+                    </p>
+                    <p className={styles.noticeText}>
+                      {t`They may have been saved in a form Lanyards doesn't recognise. Resetting replaces them with the defaults.`}
+                    </p>
+                    <Button
+                      variant="secondary"
+                      disabled={!canEdit}
+                      onClick={settings.resetInvalid}
+                    >
+                      {t`Reset to defaults`}
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
             <section aria-label={t`Preview`} className={styles.frame}>
               <LanyardEditor
                 did={did}

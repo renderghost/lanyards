@@ -4,13 +4,9 @@
 // only generates classes it finds in the source.
 
 export const badge =
-  '@container flex w-full flex-col overflow-hidden rounded-sm shadow-badge outline outline-1 -outline-offset-1 outline-border';
+  '@container flex w-full flex-col overflow-hidden rounded-sm outline outline-1 -outline-offset-1 outline-border';
 
 export const cover = 'relative h-30 @min-[40rem]:h-60';
-
-/** Where a real lanyard's clip would go through the badge. */
-export const slot =
-  'absolute left-1/2 top-[1.125rem] h-3.5 w-24 -translate-x-1/2 rounded-sm bg-background shadow-[inset_0_2px_3px_rgb(6_1_30/0.35)]';
 
 export const field =
   'flex flex-wrap items-end gap-x-10 gap-y-6 bg-accent px-5 pb-6 text-on-accent @min-[40rem]:px-12 @min-[40rem]:pb-10';

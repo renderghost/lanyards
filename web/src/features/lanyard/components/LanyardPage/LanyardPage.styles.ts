@@ -1,6 +1,7 @@
 // The badge is up to 1,120 px wide; the blocks under it up to 760 px (#129).
+// No padding on top: the badge's lanyard starts under the header (#173).
 export const page =
-  'flex w-full max-w-[70rem] flex-col items-center gap-10 self-center px-4 py-8 sm:px-6 sm:py-10';
+  'flex w-full max-w-[70rem] flex-col items-center gap-10 self-center px-4 pb-8 sm:px-6 sm:pb-10';
 
 export const column = 'flex w-full max-w-[47.5rem] flex-col gap-6';
 

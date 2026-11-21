@@ -12,6 +12,7 @@ import { captureError } from '@/lib/analytics/analytics';
 import { heroName } from '@/lib/person/hero';
 
 import { qrUrl } from '../../qrUrl';
+import { useLanyardSway } from '../../useLanyardSway';
 import { useOwnerBadge } from '../../useOwnerBadge';
 import { BadgeSleeve } from '../BadgeSleeve/BadgeSleeve';
 import { LanyardRibbon } from '../LanyardRibbon/LanyardRibbon';
@@ -54,6 +55,12 @@ export function QrSheet({
   // An avatar that won't load gives way to the initials, not a blank disc.
   const [brokenAvatar, setBrokenAvatar] = useState<string | null>(null);
   useWakeLock(open);
+  // A mouse brushing past sways it, as on the homepage (#174). It doesn't
+  // swing in as it opens: the code is there to be scanned at once.
+  const [hang, setHang] = useState<HTMLDivElement | null>(null);
+  const [sleeve, setSleeve] = useState<HTMLDivElement | null>(null);
+  const [ribbon, setRibbon] = useState<SVGSVGElement | null>(null);
+  useLanyardSway({ area: hang, sleeve, ribbon, enabled: open && !!hero });
 
   async function copy() {
     try {
@@ -114,14 +121,16 @@ export function QrSheet({
               {t`Point a camera at the code to open my lanyard, or send the link.`}
             </Dialog.Description>
           </div>
-          <div className={styles.hang}>
+          <div ref={setHang} className={styles.hang}>
             {hero && (
               <LanyardRibbon
+                ref={setRibbon}
                 text={`@${hero.handle}`}
                 className={styles.ribbon}
               />
             )}
             <BadgeSleeve
+              ref={setSleeve}
               className={styles.sleeve}
               slotClassName={styles.slot}
               glareClassName={styles.glare}
