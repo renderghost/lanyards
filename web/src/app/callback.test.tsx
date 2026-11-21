@@ -9,6 +9,8 @@ import { completeSignIn, OAuthCallbackError } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
 import { TYPEAHEAD_URL } from '@/test/fixtures';
 import { server } from '@/test/msw';
+import { ADA } from '@/test/people';
+import { servePerson, signedInSession } from '@/test/person';
 import { renderRoute, waitForRoute } from '@/test/router';
 
 vi.mock('@/lib/atproto/session', async (importOriginal) => {
@@ -140,6 +142,19 @@ describe('OAuth callback', () => {
     finish({ did: 'did:plc:x' as never, returnTo: '/somewhere-else' });
     await waitForRoute(router, '/somewhere-else');
     expect(refresh).toHaveBeenCalled();
+  });
+
+  // A plain sign-in (no page to go back to) lands on your own customiser
+  // (#167): /lanyard forwards to /<handle>/edit.
+  it('lands on your own /<handle>/edit after a plain sign-in', async () => {
+    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
+    servePerson();
+    vi.mocked(completeSignIn).mockResolvedValue({
+      did: ADA.did as never,
+      returnTo: '/lanyard',
+    });
+    const { router } = renderRoute('/oauth/callback#code=a&state=b');
+    await waitForRoute(router, `/${ADA.handle}/edit`, 5000);
   });
 
   it('has no axe violations when showing an error', async () => {

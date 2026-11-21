@@ -362,12 +362,10 @@ describe('visitor actions on the page', () => {
       })
     ).toBeInTheDocument();
     const header = screen.getByRole('banner');
+    // A plain log in, landing on your own customiser (#167).
     expect(
       within(header).getByRole('link', { name: 'Sign in' })
-    ).toHaveAttribute(
-      'href',
-      `/sign-in?returnTo=${encodeURIComponent('/alice.test')}`
-    );
+    ).toHaveAttribute('href', '/sign-in');
     expect(
       within(header).queryByRole('button', { name: 'Make your lanyard' })
     ).toBeNull();

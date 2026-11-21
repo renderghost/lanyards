@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react/macro';
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { IdCard, SlidersHorizontal } from 'lucide-react';
 
 import { AccountLink } from '@/components/AccountLink/AccountLink';
@@ -18,8 +18,9 @@ import type { AppHeaderProps } from './AppHeader.types';
  * The top bar. Signed in (#150): the logo (your customiser), Customise and
  * View on the left; a page's own actions, Show QR and Account on the
  * right. On phones, the bottom bar carries the rest. Signed out, where
- * asked: Sign in, as a primary button (#162); account creation is on the
- * sign-in page. (The homepage has its own header.)
+ * asked: Sign in, as a primary button (#162): a plain log in, landing on
+ * your own customiser (#167); account creation is on the sign-in page.
+ * (The homepage has its own header.)
  */
 export function AppHeader({
   actions,
@@ -28,7 +29,6 @@ export function AppHeader({
 }: AppHeaderProps) {
   const { t } = useLingui();
   const session = useSession();
-  const path = useLocation({ select: (location) => location.pathname });
   const own = useOwnPaths();
 
   let end = null;
@@ -43,7 +43,6 @@ export function AppHeader({
     end = (
       <Link
         to="/sign-in"
-        search={{ returnTo: path }}
         className={buttonClassName({ className: styles.signIn })}
       >
         {t`Sign in`}

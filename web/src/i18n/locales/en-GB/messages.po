@@ -392,7 +392,7 @@ msgstr "Create an account"
 msgid "Create your lanyard"
 msgstr "Create your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:69
+#: src/components/AppHeader/AppHeader.tsx:68
 #: src/components/MobileNav/MobileNav.tsx:42
 msgid "Customise"
 msgstr "Customise"
@@ -1066,7 +1066,7 @@ msgstr "Show what you’re open to"
 msgid "Sifa"
 msgstr "Sifa"
 
-#: src/components/AppHeader/AppHeader.tsx:49
+#: src/components/AppHeader/AppHeader.tsx:48
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:22
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/SignInForm/SignInForm.tsx:109
@@ -1323,8 +1323,8 @@ msgstr "Verify your ORCID iD"
 msgid "Video"
 msgstr "Video"
 
-#: src/components/AppHeader/AppHeader.tsx:79
-#: src/components/AppHeader/AppHeader.tsx:89
+#: src/components/AppHeader/AppHeader.tsx:78
+#: src/components/AppHeader/AppHeader.tsx:88
 #: src/components/MobileNav/MobileNav.tsx:52
 #: src/components/MobileNav/MobileNav.tsx:62
 msgid "View"
@@ -1463,7 +1463,7 @@ msgstr "Your handle"
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:61
+#: src/components/AppHeader/AppHeader.tsx:60
 #: src/components/MobileNav/MobileNav.tsx:30
 msgid "Your Lanyards"
 msgstr "Your Lanyards"

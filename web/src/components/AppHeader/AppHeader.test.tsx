@@ -149,10 +149,8 @@ describe('AppHeader', () => {
       '/@alice.test'
     );
     const signIn = await screen.findByRole('link', { name: 'Sign in' });
-    expect(signIn).toHaveAttribute(
-      'href',
-      `/sign-in?returnTo=${encodeURIComponent('/@alice.test')}`
-    );
+    // A plain log in: it lands on your own customiser (#167).
+    expect(signIn).toHaveAttribute('href', '/sign-in');
     // The app's primary button, as a link.
     expect(signIn.className).toContain('bg-ui-primary');
     // Account creation is on the sign-in page.
