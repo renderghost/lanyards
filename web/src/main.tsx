@@ -5,6 +5,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { AppProviders } from './app/AppProviders';
+import { preloadRouteCode } from './app/preloadRouteCode';
 import { router } from './app/router';
 import {
   browserDoNotTrack,
@@ -16,6 +17,8 @@ import {
 import { configureAuth } from './lib/atproto/session';
 
 function start() {
+  // The page's own code downloads while React starts (spec §2, #177).
+  preloadRouteCode(router);
   configureAuth();
   void initAnalytics({
     key: import.meta.env.VITE_POSTHOG_KEY,
