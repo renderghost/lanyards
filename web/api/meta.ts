@@ -1,6 +1,7 @@
 import { readFile } from 'node:fs/promises';
 
 import { createMetaHandler } from '../server/metaHandler.ts';
+import { runtimeBaseUrl } from '../src/lib/atproto/oauthConfig.ts';
 
 let index: Promise<string> | undefined;
 
@@ -16,5 +17,5 @@ function readIndex(): Promise<string> {
 /** /:handle and /d/:did, with person-specific link-preview meta. */
 export const GET = createMetaHandler({
   readIndex,
-  baseUrl: process.env.PUBLIC_BASE_URL,
+  baseUrl: runtimeBaseUrl(process.env),
 });

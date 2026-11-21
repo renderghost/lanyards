@@ -74,7 +74,7 @@ The repository holds two apps during the rebuild (epic #94):
 - **Protocol**: `@atcute/*` packages (client, lexicons, identity resolver)
 - **Copy**: British English via Lingui (`web/src/i18n/`)
 - **Tests**: Vitest + Testing Library + MSW + axe-core; Playwright for e2e
-- **Hosting**: Vercel project `lanyards` with Root Directory `web`, serving `lanyards.app` (`PUBLIC_BASE_URL=https://lanyards.app` in Production). `www` and the retired `next.lanyards.app` redirect to it (#154)
+- **Hosting**: Vercel project `lanyards` with Root Directory `web`, serving `lanyards.app`; `www` redirects to it. Production's address is fixed in code (`PRODUCTION_BASE_URL`, #159)
 
 **Repository root: the legacy Next.js app.** It is frozen and no longer served: `lanyards.app` moved to the new app (#154), and Slice 1c (#103) deletes it. Don't start new work on it.
 
@@ -92,7 +92,7 @@ AT Protocol OAuth will reject `localhost` with "invalid_request" error.
 
 **OAuth Client Configuration (`web/`):**
 - **Local development and e2e** (`http://127.0.0.1:5173` / `:4173`): uses the RFC 8252 loopback client. Its `client_id` is literally `http://localhost?redirect_uri=…&scope=…`; that's the only place `localhost` appears, and every redirect URI uses `127.0.0.1`.
-- **Production and preview** (`https://`): the client metadata is generated at build time into `oauth-client-metadata.json` from `PUBLIC_BASE_URL` (or Vercel's branch URL for previews), by `web/plugins/oauthMetadata.ts`.
+- **Production and preview** (`https://`): the client metadata is generated at build time into `oauth-client-metadata.json` by `web/plugins/oauthMetadata.ts`, for `https://lanyards.app` in Vercel production (`PRODUCTION_BASE_URL`), Vercel's branch URL for previews, and `PUBLIC_BASE_URL` for other builds.
 - Access the dev app via `http://127.0.0.1:5173` (NOT localhost)
 
 ---

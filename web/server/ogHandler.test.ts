@@ -58,7 +58,7 @@ describe('OG image handler', () => {
       'image/jpeg'
     );
     await createOgHandler({ fetchImpl: impl, render })(
-      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+      new Request(`https://lanyards.app/api/og?did=${DID}`)
     );
     expect(urls).toContain(
       `https://cdn.bsky.app/img/avatar_thumbnail/plain/${DID}/bafkreiavatar@jpeg`
@@ -75,7 +75,7 @@ describe('OG image handler', () => {
       'image/webp'
     );
     await createOgHandler({ fetchImpl: impl, render })(
-      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+      new Request(`https://lanyards.app/api/og?did=${DID}`)
     );
     expect(render).toHaveBeenCalledWith(
       expect.not.objectContaining({ avatarDataUri: expect.anything() })
@@ -85,7 +85,7 @@ describe('OG image handler', () => {
   it('draws the person’s badge with their small avatar', async () => {
     const render = vi.fn(async () => PNG);
     const response = await createOgHandler({ fetchImpl, render })(
-      new Request(`https://next.lanyards.app/og/p/${DID}.png?did=${DID}`)
+      new Request(`https://lanyards.app/og/p/${DID}.png?did=${DID}`)
     );
     expect(response.headers.get('content-type')).toBe('image/png');
     expect(response.headers.get('cache-control')).toBe(
@@ -102,7 +102,7 @@ describe('OG image handler', () => {
   it('draws the default badge without a DID', async () => {
     const render = vi.fn(async () => PNG);
     await createOgHandler({ fetchImpl, render })(
-      new Request('https://next.lanyards.app/og/default.png')
+      new Request('https://lanyards.app/og/default.png')
     );
     expect(render).toHaveBeenCalledWith(null);
   });
@@ -110,7 +110,7 @@ describe('OG image handler', () => {
   it('keeps the default badge for a day when no person was asked for', async () => {
     const render = vi.fn(async () => PNG);
     const response = await createOgHandler({ fetchImpl, render })(
-      new Request('https://next.lanyards.app/og/default.png')
+      new Request('https://lanyards.app/og/default.png')
     );
     expect(response.headers.get('cache-control')).toBe(
       'public, s-maxage=86400, stale-while-revalidate=604800'
@@ -122,7 +122,7 @@ describe('OG image handler', () => {
     const failing = (async () =>
       new Response(null, { status: 500 })) as typeof fetch;
     const response = await createOgHandler({ fetchImpl: failing, render })(
-      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+      new Request(`https://lanyards.app/api/og?did=${DID}`)
     );
     expect(render).toHaveBeenCalledWith(null);
     expect(response.headers.get('cache-control')).toBe('public, s-maxage=60');
@@ -135,7 +135,7 @@ describe('OG image handler', () => {
       return PNG;
     });
     const response = await createOgHandler({ fetchImpl, render })(
-      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+      new Request(`https://lanyards.app/api/og?did=${DID}`)
     );
     expect(render).toHaveBeenLastCalledWith(null);
     expect(response.status).toBe(200);
@@ -151,7 +151,7 @@ describe('OG image handler', () => {
       throw new Error('wasm failed to load');
     });
     const response = await createOgHandler({ fetchImpl, render })(
-      new Request(`https://next.lanyards.app/api/og?did=${DID}`)
+      new Request(`https://lanyards.app/api/og?did=${DID}`)
     );
     expect(response.status).toBe(503);
     expect(response.headers.get('cache-control')).toBe('no-store');
