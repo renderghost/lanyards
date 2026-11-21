@@ -75,17 +75,47 @@ export type OAuthEnv = {
   metadata: ClientMetadata | null;
 };
 
+/**
+ * Where the app lives: its OAuth client and canonical links. Fixed, so a
+ * stale variable can't put another origin in the client again: it once
+ * kept the retired beta address there, and sign-in broke (#159).
+ */
+export const PRODUCTION_BASE_URL = 'https://lanyards.app';
+
+type Env = Record<string, string | undefined>;
+
+const withoutSlash = (url: string) => url.replace(/\/+$/, '');
+
+/**
+ * The origin a build is for. Vercel's production is always lanyards.app;
+ * a preview, its branch URL; any other build, PUBLIC_BASE_URL (e2e uses
+ * the preview server), or else lanyards.app.
+ */
 export function resolveBaseUrl(input: {
   command: 'serve' | 'build';
-  env: Record<string, string | undefined>;
+  env: Env;
 }): string {
   if (input.command === 'serve') return DEV_BASE_URL;
   const { PUBLIC_BASE_URL, VERCEL_ENV, VERCEL_BRANCH_URL } = input.env;
-  if (PUBLIC_BASE_URL) return PUBLIC_BASE_URL.replace(/\/+$/, '');
-  if (VERCEL_ENV === 'preview' && VERCEL_BRANCH_URL) {
-    return `https://${VERCEL_BRANCH_URL}`;
+  if (VERCEL_ENV === 'production') return PRODUCTION_BASE_URL;
+  if (PUBLIC_BASE_URL) return withoutSlash(PUBLIC_BASE_URL);
+  if (VERCEL_ENV === 'preview') {
+    if (VERCEL_BRANCH_URL) return `https://${VERCEL_BRANCH_URL}`;
+    throw new Error(
+      'Preview builds need VERCEL_BRANCH_URL: expose system environment variables'
+    );
   }
-  throw new Error('PUBLIC_BASE_URL must be set for production builds');
+  return PRODUCTION_BASE_URL;
+}
+
+/**
+ * The origin a server function answers for: lanyards.app in Vercel's
+ * production, PUBLIC_BASE_URL elsewhere, or else undefined, so the
+ * request's own origin is used (a preview).
+ */
+export function runtimeBaseUrl(env: Env): string | undefined {
+  if (env.VERCEL_ENV === 'production') return PRODUCTION_BASE_URL;
+  return env.PUBLIC_BASE_URL ? withoutSlash(env.PUBLIC_BASE_URL) : undefined;
 }
 
 export function buildOAuthEnv(baseUrl: string, scope: string): OAuthEnv {

@@ -8,7 +8,7 @@ import { renderWithProviders } from '@/test/render';
 
 import { QrCode } from './QrCode';
 
-const URL = 'https://next.lanyards.app/d/did:plc:fixturealiceaaaaaaaaaaaa';
+const URL = 'https://lanyards.app/d/did:plc:fixturealiceaaaaaaaaaaaa';
 
 /** Paints the module matrix, with a 4-module quiet zone, and scans it. */
 function scan(code: Bitmap2D): string | undefined {

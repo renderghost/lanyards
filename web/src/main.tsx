@@ -14,7 +14,6 @@ import {
   track,
 } from './lib/analytics/analytics';
 import { configureAuth } from './lib/atproto/session';
-import { leaveFor, movedTo } from './lib/origin/movedOrigin';
 
 function start() {
   configureAuth();
@@ -38,11 +37,4 @@ function start() {
   );
 }
 
-// On a retired origin, such as an installed copy of the beta, go to where
-// the app lives now instead of starting here (#154).
-const moved = movedTo(
-  window.location.href,
-  import.meta.env.VITE_PUBLIC_BASE_URL
-);
-if (moved) void leaveFor(moved);
-else start();
+start();

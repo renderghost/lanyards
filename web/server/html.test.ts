@@ -72,11 +72,11 @@ describe('injectMeta', () => {
 
 describe('defaultMeta', () => {
   it('describes Lanyards itself, with the default image', () => {
-    expect(defaultMeta('https://next.lanyards.app')).toEqual({
+    expect(defaultMeta('https://lanyards.app')).toEqual({
       title: 'Lanyards',
       description: 'Your conference lanyard on the AT Protocol',
-      canonical: 'https://next.lanyards.app/',
-      image: 'https://next.lanyards.app/og/default.png',
+      canonical: 'https://lanyards.app/',
+      image: 'https://lanyards.app/og/default.png',
       imageAlt: 'Lanyards',
       type: 'website',
     });

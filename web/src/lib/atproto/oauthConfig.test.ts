@@ -6,7 +6,9 @@ import {
   FEEDBACK_SCOPE,
   FALLBACK_SCOPE,
   GRANULAR_SCOPE,
+  PRODUCTION_BASE_URL,
   resolveBaseUrl,
+  runtimeBaseUrl,
   safeReturnTo,
 } from './oauthConfig';
 
@@ -21,14 +23,12 @@ describe('buildOAuthEnv', () => {
   });
 
   it('builds hosted client metadata for https origins', () => {
-    expect(
-      buildOAuthEnv('https://next.lanyards.app', 'atproto').metadata
-    ).toEqual({
-      client_id: 'https://next.lanyards.app/oauth-client-metadata.json',
+    expect(buildOAuthEnv('https://lanyards.app', 'atproto').metadata).toEqual({
+      client_id: 'https://lanyards.app/oauth-client-metadata.json',
       client_name: 'Lanyards',
-      client_uri: 'https://next.lanyards.app',
-      logo_uri: 'https://next.lanyards.app/pwa-192x192.png',
-      redirect_uris: ['https://next.lanyards.app/oauth/callback'],
+      client_uri: 'https://lanyards.app',
+      logo_uri: 'https://lanyards.app/pwa-192x192.png',
+      redirect_uris: ['https://lanyards.app/oauth/callback'],
       scope: 'atproto',
       grant_types: ['authorization_code', 'refresh_token'],
       response_types: ['code'],
@@ -51,13 +51,28 @@ describe('resolveBaseUrl', () => {
     );
   });
 
-  it('uses PUBLIC_BASE_URL without a trailing slash for builds', () => {
+  // A stale variable once put the retired beta address in production's
+  // OAuth client, and sign-in broke (#159).
+  it('builds Vercel production for lanyards.app, whatever the variable says', () => {
+    expect(PRODUCTION_BASE_URL).toBe('https://lanyards.app');
     expect(
       resolveBaseUrl({
         command: 'build',
-        env: { PUBLIC_BASE_URL: 'https://next.lanyards.app/' },
+        env: {
+          VERCEL_ENV: 'production',
+          PUBLIC_BASE_URL: 'https://next.lanyards.app',
+        },
       })
-    ).toBe('https://next.lanyards.app');
+    ).toBe('https://lanyards.app');
+  });
+
+  it('uses PUBLIC_BASE_URL without a trailing slash for other builds', () => {
+    expect(
+      resolveBaseUrl({
+        command: 'build',
+        env: { PUBLIC_BASE_URL: 'http://127.0.0.1:4173/' },
+      })
+    ).toBe('http://127.0.0.1:4173');
   });
 
   it('falls back to the Vercel branch URL for preview builds', () => {
@@ -69,10 +84,34 @@ describe('resolveBaseUrl', () => {
     ).toBe('https://x.vercel.app');
   });
 
-  it('refuses production builds without a base URL', () => {
-    expect(() => resolveBaseUrl({ command: 'build', env: {} })).toThrow(
-      'PUBLIC_BASE_URL must be set for production builds'
+  it('refuses a preview build with no branch URL to use', () => {
+    expect(() =>
+      resolveBaseUrl({ command: 'build', env: { VERCEL_ENV: 'preview' } })
+    ).toThrow('Preview builds need VERCEL_BRANCH_URL');
+  });
+
+  it('builds for lanyards.app when nothing else is said', () => {
+    expect(resolveBaseUrl({ command: 'build', env: {} })).toBe(
+      'https://lanyards.app'
     );
+  });
+});
+
+describe('runtimeBaseUrl (#159)', () => {
+  it('is lanyards.app in Vercel production, whatever the variable says', () => {
+    expect(
+      runtimeBaseUrl({
+        VERCEL_ENV: 'production',
+        PUBLIC_BASE_URL: 'https://next.lanyards.app',
+      })
+    ).toBe('https://lanyards.app');
+  });
+
+  it('is PUBLIC_BASE_URL elsewhere, or nothing, so the request decides', () => {
+    expect(runtimeBaseUrl({ PUBLIC_BASE_URL: 'https://x.test/' })).toBe(
+      'https://x.test'
+    );
+    expect(runtimeBaseUrl({ VERCEL_ENV: 'preview' })).toBeUndefined();
   });
 });
 
@@ -137,10 +176,7 @@ describe('OAuth scopes', () => {
   });
 
   it('puts the client scope into the hosted metadata', () => {
-    const { metadata } = buildOAuthEnv(
-      'https://next.lanyards.app',
-      CLIENT_SCOPE
-    );
+    const { metadata } = buildOAuthEnv('https://lanyards.app', CLIENT_SCOPE);
     expect(metadata?.scope).toBe(CLIENT_SCOPE);
   });
 });

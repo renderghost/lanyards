@@ -146,27 +146,22 @@ Environment Variables"** on, because preview builds use `VERCEL_ENV` and
 
 | Name                | Environment         | Value                              |
 | ------------------- | ------------------- | ---------------------------------- |
-| `PUBLIC_BASE_URL`   | Production only     | `https://lanyards.app`             |
 | `VITE_POSTHOG_KEY`  | Production, Preview | optional: analytics is off without |
 | `VITE_POSTHOG_HOST` | Production, Preview | optional: defaults to PostHog's EU |
 
-Production builds fail on purpose without `PUBLIC_BASE_URL`, because the
-OAuth client metadata is generated from it. Don't set it for Preview:
-previews use their own branch URL.
+The OAuth client metadata and canonical links are built from the app's
+address. Vercel production is always `https://lanyards.app`, fixed in code
+(`PRODUCTION_BASE_URL` in `src/lib/atproto/oauthConfig.ts`), so no variable
+can put another origin in the OAuth client (#159). Previews use their own
+branch URL. `PUBLIC_BASE_URL` sets the address for other builds, such as
+`npm run build:e2e`; Vercel doesn't need it.
 
 ### 3. Domains
 
-| Domain              | Setting                                                   |
-| ------------------- | --------------------------------------------------------- |
-| `lanyards.app`      | Production, primary                                       |
-| `www.lanyards.app`  | Redirect to `lanyards.app`, 308                           |
-| `next.lanyards.app` | Production, **no** redirect: `web/vercel.json` handles it |
-
-`next.lanyards.app` is the retired beta. `web/vercel.json` redirects its
-page visits to the same path on `lanyards.app`, and only page visits, so a
-copy installed from the beta can still fetch its update. The updated app
-then sends it to `lanyards.app` (`src/lib/origin/movedOrigin.ts`). A Vercel
-domain redirect would cut installed copies off from their update.
+| Domain             | Setting                         |
+| ------------------ | ------------------------------- |
+| `lanyards.app`     | Production, primary             |
+| `www.lanyards.app` | Redirect to `lanyards.app`, 308 |
 
 DNS is on Cloudflare. Keep every Vercel record **DNS only** (grey cloud) so
 Vercel can issue certificates. The `_atproto` TXT record verifies the
@@ -184,11 +179,6 @@ curl -sI https://lanyards.app/oauth-client-metadata.json | grep -i content-type
 # → application/json
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.lanyards.app/renderg.host
 # → 308 https://lanyards.app/renderg.host
-for path in / /renderg.host; do
-  curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' \
-    -H 'sec-fetch-dest: document' "https://next.lanyards.app$path"
-done
-# → 308 https://lanyards.app/ and 308 https://lanyards.app/renderg.host
 ```
 
 Then sign in with a real account, check your name and handle on `/settings`,

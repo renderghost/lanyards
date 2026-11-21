@@ -22,13 +22,13 @@ const handler = (fetchImpl: typeof fetch = profileFetch) =>
   createMetaHandler({
     readIndex: async () => INDEX,
     fetchImpl,
-    baseUrl: 'https://next.lanyards.app',
+    baseUrl: 'https://lanyards.app',
   });
 
 describe('meta handler', () => {
   it('serves the app with person-specific meta, cached for ten minutes', async () => {
     const response = await handler()(
-      new Request('https://next.lanyards.app/alice.test?handle=alice.test')
+      new Request('https://lanyards.app/alice.test?handle=alice.test')
     );
     const html = await response.text();
     expect(response.status).toBe(200);
@@ -42,14 +42,14 @@ describe('meta handler', () => {
       '<meta property="og:title" content="Ada Example (@alice.test) · Lanyards" />'
     );
     expect(html).toContain(
-      `<meta property="og:image" content="https://next.lanyards.app/og/p/${DID}.png" />`
+      `<meta property="og:image" content="https://lanyards.app/og/p/${DID}.png" />`
     );
   });
 
   it('reads the handle or DID from the path when the query has none', async () => {
     const fetchImpl = vi.fn(profileFetch);
     await handler(fetchImpl as unknown as typeof fetch)(
-      new Request(`https://next.lanyards.app/d/${DID}`)
+      new Request(`https://lanyards.app/d/${DID}`)
     );
     expect(String(vi.mocked(fetchImpl).mock.calls[0]?.[0])).toContain(
       `actor=${encodeURIComponent(DID)}`
@@ -59,7 +59,7 @@ describe('meta handler', () => {
   it('reads a bare handle from the path, the lanyard’s address (#150)', async () => {
     const fetchImpl = vi.fn(profileFetch);
     await handler(fetchImpl as unknown as typeof fetch)(
-      new Request('https://next.lanyards.app/alice.test')
+      new Request('https://lanyards.app/alice.test')
     );
     expect(String(vi.mocked(fetchImpl).mock.calls[0]?.[0])).toContain(
       'actor=alice.test'
@@ -73,19 +73,19 @@ describe('meta handler', () => {
         { status: 400 }
       )) as typeof fetch;
     const response = await handler(missing)(
-      new Request('https://next.lanyards.app/nobody.test?handle=nobody.test')
+      new Request('https://lanyards.app/nobody.test?handle=nobody.test')
     );
     expect(response.status).toBe(200);
     expect(response.headers.get('cache-control')).toBe('public, s-maxage=60');
     expect(await response.text()).toContain(
-      '<meta property="og:image" content="https://next.lanyards.app/og/default.png" />'
+      '<meta property="og:image" content="https://lanyards.app/og/default.png" />'
     );
   });
 
   it.each([
-    'https://next.lanyards.app/@ada%',
-    'https://next.lanyards.app/@x?handle=ada%25',
-    'https://next.lanyards.app/d/did%3Aplc%3Aa%',
+    'https://lanyards.app/@ada%',
+    'https://lanyards.app/@x?handle=ada%25',
+    'https://lanyards.app/d/did%3Aplc%3Aa%',
   ])('serves default meta for a malformed escape in %s', async (url) => {
     const fetchImpl = vi.fn(profileFetch);
     const response = await handler(fetchImpl as unknown as typeof fetch)(
@@ -99,7 +99,7 @@ describe('meta handler', () => {
   it('never looks up something that is not a handle or DID', async () => {
     const fetchImpl = vi.fn(profileFetch);
     const response = await handler(fetchImpl as unknown as typeof fetch)(
-      new Request('https://next.lanyards.app/@x?handle=%3Cscript%3E')
+      new Request('https://lanyards.app/@x?handle=%3Cscript%3E')
     );
     expect(fetchImpl).not.toHaveBeenCalled();
     expect(await response.text()).toContain('<title>Lanyards</title>');
