@@ -26,13 +26,16 @@ vi.mock('@/components/Toaster/notify', () => ({
 
 const session = { did: 'did:plc:ewvi7nxzyoun6zhxrhs64oiz' } as never;
 
-function Probe() {
+function Probe({ leave }: { leave?: () => Promise<void> }) {
   const session = useSession();
   return (
     <>
       <p>status: {session.status}</p>
       <button type="button" onClick={() => void session.signOut()}>
         Sign out
+      </button>
+      <button type="button" onClick={() => void session.signOut(leave)}>
+        Sign out and leave
       </button>
       <button type="button" onClick={() => void session.refresh()}>
         Refresh
@@ -41,10 +44,10 @@ function Probe() {
   );
 }
 
-const renderProvider = () =>
+const renderProvider = (leave?: () => Promise<void>) =>
   renderWithProviders(
     <SessionProvider>
-      <Probe />
+      <Probe leave={leave} />
     </SessionProvider>
   );
 
@@ -103,6 +106,51 @@ describe('SessionProvider', () => {
     expect(signOut).toHaveBeenCalledWith(session);
     expect(notify.success).toHaveBeenCalledWith('Signed out');
     expect(track).toHaveBeenCalledWith('signed_out');
+  });
+
+  it('moves on before anyone is shown as signed out (#172)', async () => {
+    vi.mocked(restoreSession).mockResolvedValue({
+      status: 'restored',
+      session,
+    });
+    vi.mocked(signOut).mockResolvedValue(undefined);
+    const seen: string[] = [];
+    // Where to go next, once the session has ended. Meanwhile nobody is
+    // signed in or out, so a page that needs a session doesn't send
+    // people off to sign in again.
+    const leave = vi.fn(async () => {
+      await screen.findByText('status: loading');
+      seen.push(
+        vi.mocked(signOut).mock.calls.length ? 'ended' : 'still signed in'
+      );
+    });
+    renderProvider(leave);
+    await screen.findByText('status: signedIn');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Sign out and leave' })
+    );
+    expect(await screen.findByText('status: signedOut')).toBeInTheDocument();
+    expect(leave).toHaveBeenCalledTimes(1);
+    expect(seen).toEqual(['ended']);
+    expect(notify.success).toHaveBeenCalledWith('Signed out');
+  });
+
+  it('signs out even if moving on fails', async () => {
+    vi.mocked(restoreSession).mockResolvedValue({
+      status: 'restored',
+      session,
+    });
+    vi.mocked(signOut).mockResolvedValue(undefined);
+    const failure = new Error('navigation failed');
+    renderProvider(() => Promise.reject(failure));
+    await screen.findByText('status: signedIn');
+    await userEvent.click(
+      screen.getByRole('button', { name: 'Sign out and leave' })
+    );
+    expect(await screen.findByText('status: signedOut')).toBeInTheDocument();
+    expect(captureError).toHaveBeenCalledWith(failure, {
+      source: 'sign-out-leave',
+    });
   });
 
   it('refresh() picks up a session stored after sign-in', async () => {

@@ -724,7 +724,7 @@ msgstr "Links"
 msgid "Loading lanyard…"
 msgstr "Loading lanyard…"
 
-#: src/features/account/components/AccountCard/AccountCard.tsx:39
+#: src/features/account/components/AccountCard/AccountCard.tsx:41
 msgid "Loading your profile…"
 msgstr "Loading your profile…"
 
@@ -1105,7 +1105,7 @@ msgstr "Sign in to see this lanyard"
 msgid "Sign in with your Bluesky handle, or any AT Protocol account, and Lanyards gathers your publications, talks, affiliations and profiles into one lanyard to share anywhere: on a conference badge, in an email signature, on a slide."
 msgstr "Sign in with your Bluesky handle, or any AT Protocol account, and Lanyards gathers your publications, talks, affiliations and profiles into one lanyard to share anywhere: on a conference badge, in an email signature, on a slide."
 
-#: src/features/account/components/AccountCard/AccountCard.tsx:43
+#: src/features/account/components/AccountCard/AccountCard.tsx:49
 msgid "Sign out"
 msgstr "Sign out"
 
@@ -1125,7 +1125,7 @@ msgstr "Signal username copied"
 msgid "Signed in, you can send us feedback, with screenshots, right from Lanyards. Or reach us here:"
 msgstr "Signed in, you can send us feedback, with screenshots, right from Lanyards. Or reach us here:"
 
-#: src/features/auth/session/SessionProvider.tsx:80
+#: src/features/auth/session/SessionProvider.tsx:89
 msgid "Signed out"
 msgstr "Signed out"
 
@@ -1381,7 +1381,7 @@ msgstr "We couldn't finish signing you in."
 msgid "We couldn't load this lanyard"
 msgstr "We couldn't load this lanyard"
 
-#: src/features/account/components/AccountCard/AccountCard.tsx:38
+#: src/features/account/components/AccountCard/AccountCard.tsx:40
 msgid "We couldn't load your profile."
 msgstr "We couldn't load your profile."
 
