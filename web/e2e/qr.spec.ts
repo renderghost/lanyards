@@ -206,6 +206,19 @@ test.describe('QR sheet', () => {
     }
   });
 
+  test('closes from its corner on a portrait tablet, over the lanyard (#170)', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 820, height: 1180 });
+    await page.goto('/lanyard');
+    await page.getByRole('link', { name: 'Share' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
+    await expect(sheet).toBeVisible();
+    // A real click: it fails if the strap is over the button.
+    await sheet.getByRole('button', { name: 'Close' }).click({ timeout: 2000 });
+    await expect(sheet).toBeHidden();
+  });
+
   test('stays black on white in dark mode', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/lanyard');

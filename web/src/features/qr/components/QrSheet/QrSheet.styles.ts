@@ -41,17 +41,13 @@ export const hang =
 export const ribbon =
   'relative z-10 h-28 w-auto shrink-0 translate-y-[1.125rem] [@media(max-height:44rem)]:hidden wide:h-44 flat:hidden';
 
-// Clear plastic, with a lip where the clasp goes through.
-export const sleeve =
-  'relative isolate w-full rounded-sm border border-white/60 bg-white/15 p-2.5 pt-8 shadow-[inset_0_0_0_1px_rgb(255_255_255/0.15),0_30px_60px_rgb(6_1_30/0.3)] max-[22.5rem]:p-1.5 max-[22.5rem]:pt-7 flat:contents';
+// The sleeve (BadgeSleeve), a little tighter on the narrowest phones;
+// sideways the screen is the badge, so there's no sleeve.
+export const sleeve = 'max-[22.5rem]:p-1.5 max-[22.5rem]:pt-7 flat:contents';
 
-export const slot =
-  'absolute left-1/2 top-2.5 h-3 w-16 -translate-x-1/2 rounded-sm bg-qr-ground shadow-[inset_0_2px_3px_rgb(6_1_30/0.45)] ring-1 ring-white/60 max-[22.5rem]:top-2 flat:hidden';
+export const slot = 'max-[22.5rem]:top-2 flat:hidden';
 
-// Light on the plastic, over the badge but under the code, so the code
-// always scans.
-export const glare =
-  'pointer-events-none absolute inset-0 z-10 rounded-sm bg-[linear-gradient(115deg,transparent_30%,rgb(255_255_255/0.22)_38%,transparent_47%,transparent_62%,rgb(255_255_255/0.12)_66%,transparent_72%)] flat:hidden';
+export const glare = 'flat:hidden';
 
 export const card =
   'relative flex w-full flex-col overflow-hidden rounded-sm bg-accent text-on-accent flat:contents';
@@ -128,8 +124,8 @@ export const copy = `${action} border-white text-white hover:bg-white/10 flat:bo
 export const icon = 'size-[1.125rem] shrink-0 max-[22.5rem]:hidden';
 
 // With the actions on phones; in the corner where there's room, and
-// sideways.
+// sideways, drawn over the lanyard where a strap runs past (#170).
 export const close =
-  'flex size-14 shrink-0 items-center justify-center rounded-sm text-white hover:bg-white/10 focus-visible:outline-white wide:absolute wide:right-5 wide:top-5 flat:absolute flat:right-3 flat:top-3 flat:text-on-accent flat:hover:bg-on-accent/10 flat:focus-visible:outline-(--focus-ring-on-accent)';
+  'relative z-30 flex size-14 shrink-0 items-center justify-center rounded-sm text-white hover:bg-white/10 focus-visible:outline-white wide:absolute wide:right-5 wide:top-5 flat:absolute flat:right-3 flat:top-3 flat:text-on-accent flat:hover:bg-on-accent/10 flat:focus-visible:outline-(--focus-ring-on-accent)';
 
 export const closeIcon = 'size-6';

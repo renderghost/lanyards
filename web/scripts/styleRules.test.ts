@@ -127,6 +127,8 @@ const LANYARD_ONLY = [
   'src/features/qr/components/LanyardStraps/',
   // The Share badge's printed lanyard (#169).
   'src/features/qr/components/LanyardRibbon/',
+  // The clear sleeve a badge hangs in (#170).
+  'src/features/qr/components/BadgeSleeve/',
 ];
 
 /**

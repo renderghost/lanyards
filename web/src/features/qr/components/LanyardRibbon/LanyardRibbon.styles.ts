@@ -1,6 +1,7 @@
 // The straps in the owner's strap colour, printed in the badge's label
 // colour, which reads on it (spec §8); the clasp is metal on any accent.
-export const ribbon = 'overflow-visible';
+// Decoration: anything it hangs over still takes the click.
+export const ribbon = 'pointer-events-none overflow-visible';
 
 export const strap = 'fill-none stroke-qr-strap';
 
