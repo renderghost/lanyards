@@ -60,6 +60,10 @@ export default defineConfig({
           includeDependenciesRecursively: false,
           groups: [
             { name: 'posthog', test: /node_modules[\\/]posthog-js/ },
+            // The entry's code in the entry. Rolldown would otherwise split
+            // out what it shares with lazy routes, so every page would start
+            // with eight files, not one (spec §2, #177).
+            { name: 'app', tags: ['$initial'] },
             // A badge's drawing, wherever one hangs (#173): its cover, its
             // lanyard and its sleeve, in one request, not three. A lanyard
             // loads its route's code in a burst, and over HTTP/1.1 every
