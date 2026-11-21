@@ -16,7 +16,7 @@ export const icon = 'size-4 shrink-0';
 
 export const end = 'flex min-w-0 items-center gap-2 md:gap-3';
 
-/** Show QR and Account, from md up; on phones they're in the bottom bar. */
+/** Share and Account, from md up; on phones they're in the bottom bar. */
 export const own = 'hidden items-center gap-1 md:flex';
 
 /** Sign in, signed out: a primary button, sized for the bar (#162). */

@@ -132,7 +132,11 @@ describe('/<handle>/edit', { timeout: 20_000 }, () => {
   it('sends signed-out visitors to sign in, then back here', async () => {
     vi.mocked(useSession).mockReturnValue(signedOutSession());
     const { router } = renderRoute(EDIT);
-    await waitForRoute(router, `/sign-in?returnTo=${encodeURIComponent(EDIT)}`, 5000);
+    await waitForRoute(
+      router,
+      `/sign-in?returnTo=${encodeURIComponent(EDIT)}`,
+      5000
+    );
   });
 
   it('forwards /lanyard to your own /<handle>/edit (#150)', async () => {

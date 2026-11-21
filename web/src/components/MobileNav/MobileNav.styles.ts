@@ -1,5 +1,5 @@
 // Phones only (#150): sticky at the foot of the page, clearing the home
-// indicator in the installed app. Show QR, the main thing on a phone at a
+// indicator in the installed app. Share, the main thing on a phone at a
 // conference, is the wide filled button.
 export const bar =
   'sticky bottom-0 z-30 grid grid-cols-[1fr_1fr_2fr_1fr] items-center gap-1 border-t border-ui-border bg-ui-surface px-2 pt-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] md:hidden';

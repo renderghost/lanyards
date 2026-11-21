@@ -10,7 +10,7 @@ import type { CustomiserActionsProps } from './CustomiserActions.types';
 
 /**
  * The customiser's own top-bar controls (#150): the save status, Style on
- * phones, Reset and Save. The header puts Show QR and Account after them.
+ * phones, Reset and Save. The header puts Share and Account after them.
  * Save and Reset stay focusable but unavailable with nothing to save.
  */
 export function CustomiserActions({

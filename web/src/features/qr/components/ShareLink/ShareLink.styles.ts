@@ -1,6 +1,6 @@
-import type { ShowQrButtonTone } from './ShowQrButton.types';
+import type { ShareLinkTone } from './ShareLink.types';
 
-export const tones: Record<ShowQrButtonTone, string> = {
+export const tones: Record<ShareLinkTone, string> = {
   ui: 'inline-flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-sm px-2 text-sm font-medium leading-5 text-ui-text hover:bg-ui-surface-muted sm:px-3',
   // On the badge's accent field (#129), beside Edit lanyard.
   badge:
@@ -10,7 +10,7 @@ export const tones: Record<ShowQrButtonTone, string> = {
 export const icon = 'size-5 shrink-0';
 
 /** In the header, icon only on small screens, so it fits at 320 px. */
-export const labels: Record<ShowQrButtonTone, string> = {
+export const labels: Record<ShareLinkTone, string> = {
   ui: 'sr-only sm:not-sr-only',
   badge: '',
 };

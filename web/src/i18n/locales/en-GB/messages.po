@@ -42,6 +42,10 @@ msgstr "{name} is over position {position} of {total}."
 msgid "{name} moved to position {position} of {total}"
 msgstr "{name} moved to position {position} of {total}"
 
+#: src/features/qr/components/QrSheet/QrSheet.tsx:69
+msgid "{name} on Lanyards"
+msgstr "{name} on Lanyards"
+
 #: src/features/lanyard/customise/LanyardEditor/LanyardEditor.tsx:141
 msgid "{name} stayed where it was."
 msgstr "{name} stayed where it was."
@@ -155,7 +159,7 @@ msgid "Badge"
 msgstr "Badge"
 
 #: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:84
-#: src/features/qr/components/QrSheet/QrSheet.tsx:104
+#: src/features/qr/components/QrSheet/QrSheet.tsx:157
 msgid "Based"
 msgstr "Based"
 
@@ -262,7 +266,7 @@ msgstr "Clear"
 
 #: src/components/Dialog/Dialog.tsx:75
 #: src/components/Sheet/Sheet.tsx:59
-#: src/features/qr/components/QrSheet/QrSheet.tsx:123
+#: src/features/qr/components/QrSheet/QrSheet.tsx:188
 msgid "Close"
 msgstr "Close"
 
@@ -311,7 +315,7 @@ msgid "Contract roles"
 msgstr "Contract roles"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:149
-#: src/features/qr/components/QrSheet/QrSheet.tsx:119
+#: src/features/qr/components/QrSheet/QrSheet.tsx:186
 msgid "Copy link"
 msgstr "Copy link"
 
@@ -336,7 +340,7 @@ msgid "Couldn't copy it. Please try again."
 msgstr "Couldn't copy it. Please try again."
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:94
-#: src/features/qr/components/QrSheet/QrSheet.tsx:51
+#: src/features/qr/components/QrSheet/QrSheet.tsx:63
 msgid "Couldn't copy the link. Please try again."
 msgstr "Couldn't copy the link. Please try again."
 
@@ -352,6 +356,10 @@ msgstr "Couldn't load your lanyard settings"
 #: src/features/feedback/components/FeedbackProvider/FeedbackProvider.tsx:45
 msgid "Couldn't open feedback. Please try again."
 msgstr "Couldn't open feedback. Please try again."
+
+#: src/features/qr/components/QrSheet/QrSheet.tsx:74
+msgid "Couldn't open sharing. Copy the link instead."
+msgstr "Couldn't open sharing. Copy the link instead."
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:76
 msgid "Couldn't reach ORCID. Please try again."
@@ -392,7 +400,7 @@ msgstr "Create an account"
 msgid "Create your lanyard"
 msgstr "Create your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:69
+#: src/components/AppHeader/AppHeader.tsx:68
 #: src/components/MobileNav/MobileNav.tsx:42
 msgid "Customise"
 msgstr "Customise"
@@ -700,7 +708,7 @@ msgid "Lime"
 msgstr "Lime"
 
 #: src/features/lanyard/customise/OrcidHelper/OrcidHelper.tsx:91
-#: src/features/qr/components/QrSheet/QrSheet.tsx:48
+#: src/features/qr/components/QrSheet/QrSheet.tsx:60
 msgid "Link copied"
 msgstr "Link copied"
 
@@ -792,6 +800,7 @@ msgstr "Nothing to show yet"
 
 #: src/features/lanyard/components/blocks/RolesBlock/RolesBlock.tsx:59
 #: src/features/lanyard/components/DepartureBoard/DepartureBoard.tsx:67
+#: src/features/qr/components/QrSheet/QrSheet.tsx:151
 msgid "Now"
 msgstr "Now"
 
@@ -886,6 +895,10 @@ msgstr "Podcast episode"
 msgid "Podcasts and videos"
 msgstr "Podcasts and videos"
 
+#: src/features/qr/components/QrSheet/QrSheet.tsx:113
+msgid "Point a camera at the code to open my lanyard, or send the link."
+msgstr "Point a camera at the code to open my lanyard, or send the link."
+
 #: src/features/lanyard/components/blocks/BskyPostsBlock/BskyPostsBlock.tsx:31
 msgid "Post on Bluesky, {date}"
 msgstr "Post on Bluesky, {date}"
@@ -918,7 +931,7 @@ msgstr "Publications, talks, and events—both formal and informal contributions
 msgid "Put your work in the order you want, and hide what’s not relevant."
 msgstr "Put your work in the order you want, and hide what’s not relevant."
 
-#: src/components/QrCode/QrCode.tsx:31
+#: src/components/QrCode/QrCode.tsx:30
 msgid "QR code for {value}"
 msgstr "QR code for {value}"
 
@@ -992,7 +1005,7 @@ msgstr "Save or reset your lanyard changes first: giving permission leaves this 
 msgid "Saving…"
 msgstr "Saving…"
 
-#: src/features/qr/components/QrSheet/QrSheet.tsx:97
+#: src/features/qr/components/QrSheet/QrSheet.tsx:138
 msgid "Scan to see my lanyard"
 msgstr "Scan to see my lanyard"
 
@@ -1029,6 +1042,13 @@ msgstr "Send feedback"
 msgid "Send more"
 msgstr "Send more"
 
+#: src/components/MobileNav/MobileNav.tsx:71
+#: src/features/qr/components/QrSheet/QrSheet.tsx:110
+#: src/features/qr/components/QrSheet/QrSheet.tsx:175
+#: src/features/qr/components/ShareLink/ShareLink.tsx:26
+msgid "Share"
+msgstr "Share"
+
 #: src/features/lanyard/customise/BlockControls/BlockControls.tsx:50
 msgid "Show"
 msgstr "Show"
@@ -1053,11 +1073,6 @@ msgstr "Show lanyard"
 msgid "Show location"
 msgstr "Show location"
 
-#: src/components/MobileNav/MobileNav.tsx:71
-#: src/features/qr/components/ShowQrButton/ShowQrButton.tsx:26
-msgid "Show QR"
-msgstr "Show QR"
-
 #: src/features/lanyard/customise/StylePanel/StylePanel.tsx:32
 msgid "Show what you’re open to"
 msgstr "Show what you’re open to"
@@ -1066,7 +1081,7 @@ msgstr "Show what you’re open to"
 msgid "Sifa"
 msgstr "Sifa"
 
-#: src/components/AppHeader/AppHeader.tsx:49
+#: src/components/AppHeader/AppHeader.tsx:48
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:22
 #: src/features/auth/components/CallbackStatus/CallbackStatus.tsx:32
 #: src/features/auth/components/SignInForm/SignInForm.tsx:109
@@ -1323,8 +1338,8 @@ msgstr "Verify your ORCID iD"
 msgid "Video"
 msgstr "Video"
 
-#: src/components/AppHeader/AppHeader.tsx:79
-#: src/components/AppHeader/AppHeader.tsx:89
+#: src/components/AppHeader/AppHeader.tsx:78
+#: src/components/AppHeader/AppHeader.tsx:88
 #: src/components/MobileNav/MobileNav.tsx:52
 #: src/components/MobileNav/MobileNav.tsx:62
 msgid "View"
@@ -1459,11 +1474,11 @@ msgid "Your handle"
 msgstr "Your handle"
 
 #: src/features/lanyard/customise/CustomisePage/CustomisePage.tsx:51
-#: src/features/qr/components/QrSheet/QrSheet.tsx:41
+#: src/features/qr/components/QrSheet/QrSheet.tsx:50
 msgid "Your lanyard"
 msgstr "Your lanyard"
 
-#: src/components/AppHeader/AppHeader.tsx:61
+#: src/components/AppHeader/AppHeader.tsx:60
 #: src/components/MobileNav/MobileNav.tsx:30
 msgid "Your Lanyards"
 msgstr "Your Lanyards"

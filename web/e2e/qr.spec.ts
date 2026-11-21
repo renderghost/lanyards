@@ -28,7 +28,7 @@ test.describe('QR sheet', () => {
     await expect(
       page.getByRole('heading', { name: 'Customise your lanyard' })
     ).toBeVisible();
-    await page.getByRole('link', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Share' }).click();
     await expect(
       page.getByRole('dialog', { name: 'Dr Ada Example' })
     ).toBeVisible();
@@ -41,7 +41,7 @@ test.describe('QR sheet', () => {
   }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await page.goto('/lanyard');
-    const show = page.getByRole('link', { name: 'Show QR' });
+    const show = page.getByRole('link', { name: 'Share' });
     await expect(show).toBeVisible();
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth)
@@ -80,7 +80,7 @@ test.describe('QR sheet', () => {
     page,
   }) => {
     await page.goto('/lanyard');
-    await page.getByRole('link', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Share' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     const qr = sheet.getByRole('img', { name: /^QR code for / });
     await expect(qr).toBeVisible();
@@ -106,7 +106,7 @@ test.describe('QR sheet', () => {
     const viewport = { width: 844, height: 390 };
     await page.setViewportSize(viewport);
     await page.goto('/lanyard');
-    await page.getByRole('link', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Share' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     const qr = sheet.getByRole('img', { name: /^QR code for / });
     await expect(qr).toBeVisible();
@@ -131,7 +131,7 @@ test.describe('QR sheet', () => {
     await mockPerson(page, { config: { accent: 'lime' } });
     await page.setViewportSize({ width: 844, height: 390 });
     await page.goto('/lanyard');
-    await page.getByRole('link', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Share' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toHaveAttribute('data-accent', 'lime');
     for (const name of ['Copy link', 'Close']) {
@@ -174,7 +174,7 @@ test.describe('QR sheet', () => {
     const viewport = { width: 430, height: 390 };
     await page.setViewportSize(viewport);
     await page.goto('/lanyard');
-    await page.getByRole('link', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Share' }).click();
     const sheet = page.getByRole('dialog', { name: 'Dr Ada Example' });
     await expect(sheet).toBeVisible();
     // Nothing spills or scrolls, in either direction.
@@ -209,14 +209,14 @@ test.describe('QR sheet', () => {
   test('stays black on white in dark mode', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'dark' });
     await page.goto('/lanyard');
-    await page.getByRole('link', { name: 'Show QR' }).click();
+    await page.getByRole('link', { name: 'Share' }).click();
     const qr = page.getByRole('img', { name: /^QR code for / });
     await expect(qr.locator('rect')).toHaveAttribute('fill', '#ffffff');
     await expect(qr.locator('path')).toHaveAttribute('fill', '#000000');
   });
 });
 
-test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', () => {
+test.describe('the Share badge, opened on someone else’s lanyard (#129)', () => {
   const BEA_PDS = 'https://pds.bea.test';
   const CID = `bafyrei${'b'.repeat(52)}`;
 
@@ -302,7 +302,7 @@ test.describe('the Show QR badge, opened on someone else’s lanyard (#129)', ()
     expect(await pageAccent()).toBe('mint');
 
     const show = page.getByRole('banner').getByRole('link', {
-      name: 'Show QR',
+      name: 'Share',
     });
     await show.click();
     const sheet = page.getByRole('dialog', { name: 'Bea Example' });

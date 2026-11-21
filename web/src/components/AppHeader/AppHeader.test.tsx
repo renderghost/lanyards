@@ -31,7 +31,7 @@ describe('AppHeader', () => {
       screen.queryByRole('link', { name: 'My lanyard' })
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: 'Show QR' })
+      screen.queryByRole('link', { name: 'Share' })
     ).not.toBeInTheDocument();
   });
 
@@ -45,7 +45,7 @@ describe('AppHeader', () => {
         control.textContent
     );
 
-  it('gives signed-in people Customise and View, then Show QR and Account (#150)', async () => {
+  it('gives signed-in people Customise and View, then Share and Account (#150)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedIn',
       session: { did: ALICE.did } as never,
@@ -67,9 +67,10 @@ describe('AppHeader', () => {
     expect(
       within(nav).getByRole('link', { name: 'Customise' })
     ).not.toHaveAttribute('aria-current');
-    expect(
-      within(banner).getByRole('link', { name: 'Show QR' })
-    ).toHaveAttribute('href', `/${ALICE.handle}/share`);
+    expect(within(banner).getByRole('link', { name: 'Share' })).toHaveAttribute(
+      'href',
+      `/${ALICE.handle}/share`
+    );
     expect(
       within(banner).getByRole('link', { name: 'Your account' })
     ).toHaveAttribute('href', '/settings');
@@ -77,12 +78,12 @@ describe('AppHeader', () => {
       'Lanyards',
       'Customise',
       'View',
-      'Show QR',
+      'Share',
       'Your account',
     ]);
   });
 
-  it('puts a page’s own actions before Show QR and Account (#150)', async () => {
+  it('puts a page’s own actions before Share and Account (#150)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedIn',
       session: { did: ALICE.did } as never,
@@ -100,7 +101,7 @@ describe('AppHeader', () => {
       'Customise',
       'View',
       'Save',
-      'Show QR',
+      'Share',
       'Your account',
     ]);
     expect(
@@ -149,10 +150,8 @@ describe('AppHeader', () => {
       '/@alice.test'
     );
     const signIn = await screen.findByRole('link', { name: 'Sign in' });
-    expect(signIn).toHaveAttribute(
-      'href',
-      `/sign-in?returnTo=${encodeURIComponent('/@alice.test')}`
-    );
+    // A plain log in: it lands on your own customiser (#167).
+    expect(signIn).toHaveAttribute('href', '/sign-in');
     // The app's primary button, as a link.
     expect(signIn.className).toContain('bg-ui-primary');
     // Account creation is on the sign-in page.

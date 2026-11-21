@@ -3,7 +3,7 @@ import { Link, useLocation } from '@tanstack/react-router';
 
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { useSession } from '@/features/auth/session/useSession';
-import { ShowQrButton } from '@/features/qr/components/ShowQrButton/ShowQrButton';
+import { ShareLink } from '@/features/qr/components/ShareLink/ShareLink';
 import { profileId } from '@/lib/atproto/profileId';
 import { ownPaths } from '@/lib/person/ownPaths';
 import { cn } from '@/lib/utils';
@@ -37,7 +37,7 @@ export function HeroActions({
         >
           {t`Edit lanyard`}
         </Link>
-        <ShowQrButton tone="badge" />
+        <ShareLink tone="badge" />
       </div>
     );
   }

@@ -1,5 +1,5 @@
 // Lanyards' own billboard badge (#145), hung from its straps on brand
-// blue as on the Show QR screen (spec §8), and built as a person's is
+// blue as on the Share screen (spec §8), and built as a person's is
 // (spec §7). The badge's tokens are the same in light and dark.
 
 /** Edge to edge: the ground the badge hangs on. */

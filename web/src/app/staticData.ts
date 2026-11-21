@@ -12,7 +12,7 @@ declare module '@tanstack/react-router' {
      */
     signedOutActions?: boolean;
     /**
-     * The route fills the screen itself (Show QR, #150): the root layout
+     * The route fills the screen itself (Share, #150): the root layout
      * renders no header, no <main> and no navigation around it.
      */
     fullScreen?: boolean;

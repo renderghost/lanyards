@@ -8,7 +8,7 @@ export type OwnPaths = {
   edit: string;
   /** View: the public lanyard, `/<handle>`. */
   view: string;
-  /** Show QR: `/<handle>/share`. */
+  /** Share: `/<handle>/share`. */
   share: string;
 };
 

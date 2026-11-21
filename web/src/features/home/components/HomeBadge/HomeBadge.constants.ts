@@ -4,7 +4,7 @@ import type { Accent } from '@/design/accents';
 import type { CoverPattern } from '@/design/covers';
 
 /**
- * Lanyards' own badge: lime on brand blue, as the Show QR screen hangs a
+ * Lanyards' own badge: lime on brand blue, as the Share screen hangs a
  * lime badge (spec §8). Its cover points the way, like an airport sign.
  */
 export const ACCENT: Accent = 'lime';

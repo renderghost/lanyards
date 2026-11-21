@@ -23,7 +23,7 @@ const signIn = () => {
 };
 
 describe('MobileNav (#150)', () => {
-  it('offers Customise, View, Show QR and Account, in that order', async () => {
+  it('offers Customise, View, Share and Account, in that order', async () => {
     signIn();
     const { container } = renderInRouter(
       <MobileNav />,
@@ -41,7 +41,7 @@ describe('MobileNav (#150)', () => {
     ).toEqual([
       ['Customise', `/${ALICE.handle}/edit`],
       ['View', `/${ALICE.handle}`],
-      ['Show QR', `/${ALICE.handle}/share`],
+      ['Share', `/${ALICE.handle}/share`],
       ['Your account', '/settings'],
     ]);
     expect(links[0]).toHaveAttribute('aria-current', 'page');
