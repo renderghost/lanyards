@@ -1,15 +1,13 @@
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
 import { startSignIn, startSignUp } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
-import { ADA } from '@/test/people';
-import { signedInSession } from '@/test/person';
 import { renderInRouter } from '@/test/router';
 
-import { SignInPage } from './SignInPage';
+import { SignInFace } from './SignInFace';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 vi.mock('@/lib/atproto/session', async (importOriginal) => ({
@@ -25,19 +23,21 @@ const signedOut = () =>
     refresh: vi.fn(),
   });
 
-const page = (returnTo = '/settings') =>
+const face = (returnTo = '/settings') =>
   renderInRouter(
-    <SignInPage returnTo={returnTo} />,
-    `/sign-in?returnTo=${encodeURIComponent(returnTo)}`
+    <div data-accent="lime">
+      <SignInFace returnTo={returnTo} />
+    </div>,
+    '/sign-in'
   );
 
 beforeEach(() => {
   signedOut();
 });
 
-describe('SignInPage (#157)', () => {
-  it('puts the sign-in form on a badge, with the typeahead', async () => {
-    const { container } = page();
+describe('SignInFace, the homepage badge’s back (#157, #175)', () => {
+  it('puts the sign-in form on the badge, with the typeahead', async () => {
+    const { container } = face();
     expect(
       await screen.findByRole('heading', { level: 1, name: 'Sign in' })
     ).toBeInTheDocument();
@@ -48,41 +48,11 @@ describe('SignInPage (#157)', () => {
     expect(
       screen.getByRole('button', { name: 'Create an account' })
     ).toBeInTheDocument();
-    expect(document.title).toBe('Sign in · Lanyards');
     await expectNoAxeViolations(container);
   });
 
-  it('hangs in a clear sleeve from a lanyard printed lanyards.app (#170)', async () => {
-    const { container } = page();
-    const heading = await screen.findByRole('heading', {
-      level: 1,
-      name: 'Sign in',
-    });
-    const sleeve = heading.closest('[data-sleeve]');
-    expect(sleeve).not.toBeNull();
-    expect(sleeve).toContainElement(
-      screen.getByRole('combobox', { name: 'Your handle' })
-    );
-    const straps = container.querySelectorAll('textPath');
-    expect(straps).toHaveLength(2);
-    for (const strap of straps) {
-      expect(strap.textContent).toContain('lanyards.app');
-    }
-    expect(container.querySelectorAll('polygon')).toHaveLength(0);
-  });
-
-  it('has the homepage’s header, without a Sign in link to itself', async () => {
-    page();
-    const banner = await screen.findByRole('banner');
-    expect(
-      within(banner).getByRole('link', { name: 'Lanyards' })
-    ).toHaveAttribute('href', '/');
-    expect(within(banner).queryByRole('link', { name: 'Sign in' })).toBeNull();
-    expect(screen.getByRole('main')).not.toContainElement(banner);
-  });
-
   it('signs in, coming back to where the person was', async () => {
-    page();
+    face();
     await userEvent.type(
       await screen.findByRole('combobox', { name: 'Your handle' }),
       'alice.bsky.social'
@@ -92,7 +62,7 @@ describe('SignInPage (#157)', () => {
   });
 
   it('creates an account, coming back to where the person was', async () => {
-    page();
+    face();
     await userEvent.click(
       await screen.findByRole('button', { name: 'Create an account' })
     );
@@ -105,24 +75,23 @@ describe('SignInPage (#157)', () => {
       signOut: vi.fn(),
       refresh: vi.fn(),
     });
-    page();
+    face();
     expect(await screen.findByRole('status')).toHaveTextContent('Loading…');
     expect(screen.queryByRole('combobox')).toBeNull();
   });
 
-  it('sends someone already signed in on to where they were going', async () => {
-    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-    const { router } = page();
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/settings')
-    );
-  });
-
-  it('sends someone already signed in to their lanyard by default', async () => {
-    vi.mocked(useSession).mockReturnValue(signedInSession(ADA.did));
-    const { router } = page('/');
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe('/lanyard')
-    );
+  // The badge clips nothing on its back: the suggestions hang below it.
+  it('lets the handle’s suggestions hang out of the badge (#176)', async () => {
+    face();
+    const combobox = await screen.findByRole('combobox', {
+      name: 'Your handle',
+    });
+    for (
+      let element: HTMLElement | null = combobox.parentElement;
+      element && !element.hasAttribute('data-accent');
+      element = element.parentElement
+    ) {
+      expect(element.className).not.toMatch(/\boverflow-(hidden|clip)\b/);
+    }
   });
 });

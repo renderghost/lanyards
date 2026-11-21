@@ -94,13 +94,12 @@ test.describe('the homepage (#145)', () => {
 });
 
 test.describe('the homepage’s hero (#151)', () => {
-  /** The element around the heading that sways: its inline transform. */
-  /** The badge's sleeve's transform, as the lanyard sways it (#174). */
+  /** The badge's transform, as the lanyard sways it (#174). */
   const swayOf = (page: import('@playwright/test').Page) =>
     page.evaluate(
       () =>
-        document.querySelector('main h1')?.closest<HTMLElement>('[data-sleeve]')
-          ?.style.transform ?? null
+        document.querySelector<HTMLElement>('main [data-swing]')?.style
+          .transform ?? null
     );
 
   /** The lanyard's tab's shift, as it sways with the badge. */
@@ -192,5 +191,117 @@ test.describe('the homepage’s hero (#151)', () => {
     await sweep(page);
     await page.waitForTimeout(300);
     expect(await swayOf(page)).toBe('');
+  });
+});
+
+test.describe('the homepage badge, turned over to sign in (#175)', () => {
+  /** The badge's two faces, front then back. */
+  const faces = (page: import('@playwright/test').Page) =>
+    page.locator('main [data-face] > [data-sleeve]');
+
+  test('turns over to the form, at the same size, and back again', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    const turning = page.locator('main [data-face]');
+    await expect(turning).toHaveAttribute('data-face', 'front');
+    // It turns, rather than jumping.
+    expect(
+      await turning.evaluate(
+        (element) => getComputedStyle(element).transitionDuration
+      )
+    ).toBe('0.7s');
+
+    await page
+      .getByRole('banner')
+      .getByRole('link', { name: 'Sign in' })
+      .click();
+    await expect(page).toHaveURL('/sign-in');
+    await expect(turning).toHaveAttribute('data-face', 'back');
+    await expect(page.getByRole('heading', SIGN_IN)).toBeFocused();
+    await page.waitForTimeout(800);
+    // Front and back are one size, so the turn is convincing.
+    const [front, back] = await Promise.all([
+      faces(page).nth(0).boundingBox(),
+      faces(page).nth(1).boundingBox(),
+    ]);
+    expect(back?.width).toBeCloseTo(front?.width ?? 0, 0);
+    expect(back?.height).toBeCloseTo(front?.height ?? 0, 0);
+    await expect(
+      page.getByRole('combobox', { name: 'Your handle' })
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: HEADING })).toHaveCount(0);
+
+    await page.goBack();
+    await expect(page).toHaveURL('/');
+    await expect(turning).toHaveAttribute('data-face', 'front');
+    await expect(page.getByRole('heading', { name: HEADING })).toBeFocused();
+    await expect(page.getByRole('combobox')).toHaveCount(0);
+  });
+
+  test('turns over at once with reduced motion', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/sign-in');
+    const turning = page.locator('main [data-face]');
+    await expect(turning).toHaveAttribute('data-face', 'back');
+    expect(
+      await turning.evaluate(
+        (element) => getComputedStyle(element).transitionDuration
+      )
+    ).toBe('0s');
+  });
+
+  test('shows every suggestion for a handle, past the badge’s edge (#176)', async ({
+    page,
+  }) => {
+    await page.route(
+      'https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead**',
+      (route) =>
+        route.fulfill({
+          json: {
+            actors: Array.from({ length: 8 }, (_, index) => ({
+              did: `did:plc:suggestion${index}aaaaaaaaaaaaaa`,
+              handle: `ren${index}.bsky.social`,
+              displayName: `Ren ${index}`,
+            })),
+          },
+        })
+    );
+    // On a phone the form is at the badge's foot, so the list hangs out.
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/sign-in');
+    await page.getByRole('combobox', { name: 'Your handle' }).fill('ren');
+    const listbox = page.getByRole('listbox');
+    await expect(listbox.getByRole('option')).toHaveCount(8);
+    await listbox.evaluate((element) =>
+      element.scrollIntoView({ block: 'end' })
+    );
+    // Nothing it sits in clips it, however tall it grows.
+    const clippers = await listbox.evaluate((element) => {
+      const found: string[] = [];
+      for (
+        let parent = element.parentElement;
+        parent && parent !== document.body;
+        parent = parent.parentElement
+      ) {
+        const { overflowY } = getComputedStyle(parent);
+        if (overflowY !== 'visible')
+          found.push(`${parent.tagName}: ${overflowY}`);
+      }
+      return found;
+    });
+    expect(clippers).toEqual([]);
+    const box = await listbox.boundingBox();
+    // Its foot is its own: nothing covers it.
+    const foot = await page.evaluate(
+      ({ x, y }) =>
+        Boolean(document.elementFromPoint(x, y)?.closest('[role="listbox"]')),
+      {
+        x: (box?.x ?? 0) + (box?.width ?? 0) / 2,
+        y: (box?.y ?? 0) + (box?.height ?? 0) - 4,
+      }
+    );
+    expect(foot).toBe(true);
   });
 });

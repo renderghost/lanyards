@@ -1,4 +1,5 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -48,7 +49,11 @@ describe('landing page', () => {
     expect(
       await screen.findByRole('heading', { name: 'Welcome to Lanyards' })
     ).toBeInTheDocument();
+    // The form is on the badge's back, out of reach until it turns (#175).
     expect(screen.queryByRole('combobox')).toBeNull();
+    expect(
+      screen.getByRole('combobox', { hidden: true }).closest('[inert]')
+    ).not.toBeNull();
     expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     expect(document.title).toBe(
       'Researcher profiles on the AT Protocol · Lanyards'
@@ -86,6 +91,45 @@ describe('landing page', () => {
     ).toBeInTheDocument();
     expect(screen.getAllByRole('banner')).toHaveLength(1);
     expect(document.title).toBe('Sign in · Lanyards');
+  });
+
+  it('turns the homepage badge over to sign in, and back (#175)', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    const { router } = renderRoute('/');
+    const welcome = await screen.findByRole('heading', {
+      name: 'Welcome to Lanyards',
+    });
+    // One badge, two faces: the sign-in face is behind, out of reach.
+    const signIn = () =>
+      screen.getByRole('heading', { level: 1, name: 'Sign in', hidden: true });
+    expect(welcome.closest('[inert]')).toBeNull();
+    expect(signIn().closest('[inert]')).not.toBeNull();
+
+    const banner = screen.getByRole('banner');
+    await userEvent.click(
+      await within(banner).findByRole('link', { name: 'Sign in' })
+    );
+    await waitForRoute(router, '/sign-in');
+    // The same badge, turned over: nothing was rebuilt.
+    await waitFor(() => expect(welcome.closest('[inert]')).not.toBeNull());
+    expect(welcome).toBeInTheDocument();
+    expect(signIn().closest('[inert]')).toBeNull();
+    expect(signIn()).toHaveFocus();
+    expect(document.title).toBe('Sign in · Lanyards');
+    expect(within(banner).queryByRole('link', { name: 'Sign in' })).toBeNull();
+
+    router.history.back();
+    await waitForRoute(router, '/');
+    await waitFor(() => expect(welcome.closest('[inert]')).toBeNull());
+    expect(signIn().closest('[inert]')).not.toBeNull();
+    expect(welcome).toHaveFocus();
+    expect(document.title).toBe(
+      'Researcher profiles on the AT Protocol · Lanyards'
+    );
   });
 
   // Links from before the sign-in page had its own address (#157).

@@ -12,6 +12,7 @@ export function BadgeSleeve({
   children,
   ref,
   ground = 'brand',
+  inert,
   className,
   slotClassName,
   glareClassName,
@@ -20,6 +21,10 @@ export function BadgeSleeve({
     <div
       ref={ref}
       data-sleeve
+      inert={inert}
+      // Inert is out of the accessibility tree already; say so to every
+      // tool, too.
+      aria-hidden={inert ? true : undefined}
       className={cn(styles.sleeve, styles.grounds[ground].sleeve, className)}
     >
       <span

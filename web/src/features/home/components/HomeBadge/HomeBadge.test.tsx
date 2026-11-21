@@ -75,7 +75,7 @@ describe('HomeBadge (#151)', () => {
     const badge = turned(heading);
     expect(badge).not.toBeNull();
     // The badge turns in its sleeve, together, on the clasp (#170, #174).
-    expect(badge).toHaveAttribute('data-sleeve');
+    expect(badge?.querySelector('[data-sleeve]')).not.toBeNull();
     expect(badge?.style.transform).toMatch(
       /^translateX\([\d.]+px\) rotate\(-[\d.]+deg\)$/
     );
@@ -100,7 +100,7 @@ describe('HomeBadge (#151)', () => {
     renderWithProviders(<HomeBadge headingId="welcome" />);
     const heading = screen.getByRole('heading', { level: 1 });
     vi.advanceTimersByTime(100);
-    expect(turned(heading)).toHaveAttribute('data-sleeve');
+    expect(turned(heading)?.querySelector('[data-sleeve]')).not.toBeNull();
     vi.advanceTimersByTime(8000);
     expect(turned(heading)).toBeNull();
   });
@@ -113,6 +113,51 @@ describe('HomeBadge (#151)', () => {
     renderWithProviders(<HomeBadge headingId="welcome" />);
     const heading = screen.getByRole('heading', { level: 1 });
     sweep(heading);
+    expect(turned(heading)).toBeNull();
+  });
+
+  it('has a back, out of reach until it’s turned over (#175)', () => {
+    pointer(false);
+    const { rerender } = renderWithProviders(
+      <HomeBadge headingId="welcome" back={<h2>Sign in here</h2>} />
+    );
+    const front = screen.getByRole('heading', { level: 1 });
+    // Turned away, it's hidden from assistive technology too.
+    expect(screen.queryByRole('heading', { name: 'Sign in here' })).toBeNull();
+    const back = screen.getByRole('heading', {
+      name: 'Sign in here',
+      hidden: true,
+    });
+    const turning = front.closest('[data-face]');
+    expect(turning).toHaveAttribute('data-face', 'front');
+    expect(front.closest('[inert]')).toBeNull();
+    expect(back.closest('[inert]')).not.toBeNull();
+    // Both faces in one place, so they're always the same size.
+    expect(turning).toContainElement(back);
+
+    rerender(
+      <HomeBadge headingId="welcome" face="back" back={<h2>Sign in here</h2>} />
+    );
+    expect(turning).toHaveAttribute('data-face', 'back');
+    expect(front.closest('[inert]')).not.toBeNull();
+    expect(back.closest('[inert]')).toBeNull();
+    expect(
+      screen.getByRole('heading', { name: 'Sign in here' })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull();
+  });
+
+  it('stays straight and still while turned over (#175)', () => {
+    pointer(true, true);
+    vi.useFakeTimers({
+      toFake: ['requestAnimationFrame', 'cancelAnimationFrame'],
+    });
+    renderWithProviders(
+      <HomeBadge headingId="welcome" face="back" back={<p>Form</p>} />
+    );
+    const heading = screen.getByRole('heading', { level: 1, hidden: true });
+    sweep(heading);
+    vi.advanceTimersByTime(100);
     expect(turned(heading)).toBeNull();
   });
 });

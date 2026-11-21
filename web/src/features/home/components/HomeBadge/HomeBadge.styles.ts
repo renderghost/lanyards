@@ -3,9 +3,11 @@
 // (#170), and built as a person's is (spec §7). The badge's tokens are the
 // same in light and dark.
 
-/** Edge to edge: the ground the badge hangs on. Crops the straps' tops. */
+// Edge to edge: the ground the badge hangs on. It clips only sideways, so
+// a badge swinging or turning never makes the page scroll, while the
+// handle's suggestions on its back can hang below it (#176).
 export const stage =
-  'flex w-full flex-col items-center overflow-hidden bg-qr-ground px-4 pb-14 md:px-8 md:pb-28';
+  'flex w-full flex-col items-center overflow-x-clip bg-qr-ground px-4 pb-14 md:px-8 md:pb-28';
 
 export const hang = 'flex w-full max-w-[58rem] flex-col items-center';
 
@@ -14,20 +16,36 @@ export const hang = 'flex w-full max-w-[58rem] flex-col items-center';
 export const ribbon =
   'relative z-10 h-32 w-auto shrink-0 translate-y-[1.125rem] md:h-40 md:translate-y-7';
 
-// Straight at rest (#174). It turns on the clasp, in the middle of its
-// bigger slot.
-export const sleeve = 'md:origin-[50%_1.5rem] md:p-4 md:pt-12';
+// What sways (#174): straight at rest, turning on the clasp, in the
+// middle of its slot. Over what follows, so the handle's suggestions on
+// its back are too (#176).
+export const swing =
+  'relative z-10 w-full origin-[50%_1rem] [perspective:2400px] md:origin-[50%_1.5rem]';
+
+// What turns over (#175): both faces in one grid cell, so they share a
+// size. Its back is half a turn round. With reduced motion it turns at
+// once.
+export const turn =
+  'grid w-full [transform-style:preserve-3d] data-[face=back]:[transform:rotateY(180deg)] motion-safe:transition-transform motion-safe:duration-700 motion-safe:ease-[cubic-bezier(0.45,0,0.2,1)]';
+
+const face =
+  'flex flex-col [backface-visibility:hidden] [grid-area:1/1] md:p-4 md:pt-12';
+
+export const front = face;
+
+export const back = `${face} [transform:rotateY(180deg)]`;
 
 /** A bigger slot for the bigger sleeve. */
 export const slot = 'md:top-4 md:h-4 md:w-24';
 
+/** It fills its face, however tall its back is. */
 export const badge =
-  '@container flex w-full flex-col overflow-hidden rounded-sm bg-accent text-on-accent';
+  '@container flex w-full flex-1 flex-col overflow-hidden rounded-sm bg-accent text-on-accent';
 
 export const cover = 'relative h-30 @min-[40rem]:h-52';
 
 export const field =
-  'flex flex-col gap-4 px-5 pb-8 @min-[40rem]:px-12 @min-[40rem]:pb-12';
+  'flex flex-1 flex-col gap-4 px-5 pb-8 @min-[40rem]:px-12 @min-[40rem]:pb-12';
 
 /** Half the logo's height: the other half overlaps the cover. */
 export const logoBox = 'h-12 @min-[40rem]:h-17';
