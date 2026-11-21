@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 
+import { buttonClassName } from '@/components/Button/buttonClassName';
 import { Logo } from '@/components/Logo/Logo';
 import { useSession } from '@/features/auth/session/useSession';
 import { cn } from '@/lib/utils';
@@ -24,7 +25,13 @@ export function HomeHeader({ signIn = true, className }: HomeHeaderProps) {
         <Logo fixed="lime" />
       </Link>
       {signIn && session.status === 'signedOut' && (
-        <Link to="/sign-in" className={styles.signIn}>
+        <Link
+          to="/sign-in"
+          className={buttonClassName({
+            tone: 'badge',
+            className: styles.signIn,
+          })}
+        >
           {t`Sign in`}
         </Link>
       )}

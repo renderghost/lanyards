@@ -353,7 +353,7 @@ describe('lanyard blocks', () => {
 });
 
 describe('visitor actions on the page', () => {
-  it('offers signed-out visitors Bluesky, with sign-in and sign-up in the header', async () => {
+  it('offers signed-out visitors Bluesky, and only Sign in in the header', async () => {
     servePerson();
     renderRoute('/alice.test');
     expect(
@@ -369,8 +369,8 @@ describe('visitor actions on the page', () => {
       `/sign-in?returnTo=${encodeURIComponent('/alice.test')}`
     );
     expect(
-      within(header).getByRole('button', { name: 'Make your lanyard' })
-    ).toBeInTheDocument();
+      within(header).queryByRole('button', { name: 'Make your lanyard' })
+    ).toBeNull();
   });
 
   it('gives owners edit links by DID when their handle doesn’t verify', async () => {

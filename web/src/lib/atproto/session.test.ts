@@ -180,14 +180,15 @@ describe('isUnknownAccountError', () => {
 });
 
 describe('startSignUp', () => {
-  // mu.social's accounts live on the Eurosky PDS (#157).
-  it('opens account creation on mu.social', async () => {
+  // mu.social's accounts live on the Eurosky PDS (#157). Its own address,
+  // not pds.mu.social, whose metadata names eurosky.social (#161).
+  it('opens account creation on mu.social’s server', async () => {
     vi.mocked(createAuthorizationUrl).mockResolvedValue(
       new URL('https://eurosky.social/oauth/authorize')
     );
     await startSignUp('/settings');
     expect(createAuthorizationUrl).toHaveBeenCalledWith({
-      target: { type: 'pds', serviceUrl: 'https://pds.mu.social' },
+      target: { type: 'pds', serviceUrl: 'https://eurosky.social' },
       scope: GRANULAR_SCOPE,
       prompt: 'create',
       state: { returnTo: '/settings' },

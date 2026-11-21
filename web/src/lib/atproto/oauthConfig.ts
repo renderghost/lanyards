@@ -32,10 +32,11 @@ export const CLIENT_SCOPE = `${GRANULAR_SCOPE} ${FEEDBACK_SCOPE} transition:gene
 
 /**
  * Where new accounts are created when someone has no AT Protocol account:
- * mu.social, whose accounts live on the Eurosky PDS (#157). Its server,
- * eurosky.social, supports OAuth account creation (prompt=create).
+ * mu.social, whose accounts live on the Eurosky PDS (#157), which offers
+ * .mu.social handles. Its own address: pds.mu.social's metadata names
+ * eurosky.social as the resource, which the OAuth client rejects (#161).
  */
-export const SIGN_UP_PDS = 'https://pds.mu.social';
+export const SIGN_UP_PDS = 'https://eurosky.social';
 
 export const REDIRECT_PATH = '/oauth/callback';
 export const METADATA_PATH = '/oauth-client-metadata.json';

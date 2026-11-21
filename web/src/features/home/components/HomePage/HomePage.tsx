@@ -2,6 +2,7 @@ import { useLingui } from '@lingui/react/macro';
 import { Link } from '@tanstack/react-router';
 import { useId } from 'react';
 
+import { buttonClassName } from '@/components/Button/buttonClassName';
 import { CoverPattern } from '@/components/CoverPattern/CoverPattern';
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
 import { cn } from '@/lib/utils';
@@ -43,7 +44,14 @@ export function HomePage({ className }: HomePageProps) {
               intro={t`Sign in with your Bluesky handle, or any AT Protocol account, and Lanyards gathers your publications, talks, affiliations and profiles into one lanyard to share anywhere: on a conference badge, in an email signature, on a slide.`}
             >
               <div className={styles.start}>
-                <Link to="/sign-in" className={styles.startLink}>
+                <Link
+                  to="/sign-in"
+                  className={buttonClassName({
+                    tone: 'accent',
+                    size: 'lg',
+                    className: styles.startLink,
+                  })}
+                >
                   {t`Sign in to get started`}
                 </Link>
                 <ExternalLink
@@ -114,7 +122,10 @@ export function HomePage({ className }: HomePageProps) {
                   {t`Join researchers building their professional identity on open infrastructure.`}
                 </p>
                 <div className={styles.actions}>
-                  <Link to="/sign-in" className={styles.bannerLink}>
+                  <Link
+                    to="/sign-in"
+                    className={buttonClassName({ tone: 'badge', size: 'lg' })}
+                  >
                     {t`Create your lanyard`}
                   </Link>
                   <ExternalLink

@@ -1,10 +1,10 @@
 /**
  * How the homepage badge sways when a pointer brushes past it (#151): a
- * heavily damped spring, pushed by how fast the pointer moves sideways.
- * A brisk sweep swings it about 2 degrees, then a quarter of that back,
- * a little more, and it's still two to three seconds after the pointer
- * stops. The angle shown never reaches MAX_ANGLE, however hard it's
- * pushed.
+ * damped spring, pushed by how fast the pointer moves sideways. A brisk
+ * sweep swings it nearly 3 degrees (#163), then back and forth,
+ * each swing about half the last, and it's still about six seconds after
+ * the pointer stops. The angle shown never reaches MAX_ANGLE, however
+ * hard it's pushed.
  *
  * Angles are in degrees, as CSS turns them: positive is clockwise, which
  * moves the bottom of the badge left.
@@ -19,19 +19,22 @@ export type Sway = {
 export const REST: Sway = { angle: 0, velocity: 0 };
 
 /** The furthest the badge ever leans, either way. */
-export const MAX_ANGLE = 4;
+export const MAX_ANGLE = 5;
 
-/** About 1.4 seconds a swing. */
-const STIFFNESS = 4.5;
+/** About 1.6 seconds a swing. */
+const STIFFNESS = 4;
 
-/** Heavy enough that each swing is about a quarter of the last. */
-const DAMPING = 0.4;
+/**
+ * Light enough to sway on, heavy enough that each swing is about half the
+ * last, so it's still in about six seconds.
+ */
+const DAMPING = 0.2;
 
 /** Degrees a second, squared, for each pixel a second of pointer. */
-const GAIN = 0.035;
+const GAIN = 0.032;
 
 /** The most the pointer pushes: a brisk sweep, not a fling. */
-const MAX_PUSH = 70;
+const MAX_PUSH = 80;
 
 /** The fastest it turns, and how far it can wind up past what it shows. */
 const MAX_VELOCITY = 60;

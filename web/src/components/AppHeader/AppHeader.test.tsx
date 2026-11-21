@@ -1,9 +1,7 @@
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
-import { startSignUp } from '@/lib/atproto/session';
 import { useProfile } from '@/lib/atproto/useProfile';
 import { expectNoAxeViolations } from '@/test/axe';
 import { ALICE } from '@/test/fixtures';
@@ -13,10 +11,6 @@ import { AppHeader } from './AppHeader';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 vi.mock('@/lib/atproto/useProfile', () => ({ useProfile: vi.fn() }));
-vi.mock('@/lib/atproto/session', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/atproto/session')>()),
-  startSignUp: vi.fn(() => Promise.resolve()),
-}));
 
 describe('AppHeader', () => {
   it('links the logo home and shows no account link when signed out', async () => {
@@ -143,7 +137,7 @@ describe('AppHeader', () => {
     await expectNoAxeViolations(container);
   });
 
-  it('offers sign-in and sign-up to signed-out visitors where asked', async () => {
+  it('offers signed-out visitors only Sign in, as a primary button (#162)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',
       signOut: vi.fn(),
@@ -154,16 +148,15 @@ describe('AppHeader', () => {
       <AppHeader signedOutActions />,
       '/@alice.test'
     );
-    expect(
-      await screen.findByRole('link', { name: 'Sign in' })
-    ).toHaveAttribute(
+    const signIn = await screen.findByRole('link', { name: 'Sign in' });
+    expect(signIn).toHaveAttribute(
       'href',
       `/sign-in?returnTo=${encodeURIComponent('/@alice.test')}`
     );
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Make your lanyard' })
-    );
-    expect(startSignUp).toHaveBeenCalledWith('/@alice.test');
+    // The app's primary button, as a link.
+    expect(signIn.className).toContain('bg-ui-primary');
+    // Account creation is on the sign-in page.
+    expect(within(screen.getByRole('banner')).queryByRole('button')).toBeNull();
     await expectNoAxeViolations(container);
   });
 

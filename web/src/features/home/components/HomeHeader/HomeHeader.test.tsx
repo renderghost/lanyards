@@ -41,9 +41,10 @@ describe('HomeHeader (#151)', () => {
       '/logo-dark.svg'
     );
     // Sign in has its own page; account creation is there too.
-    expect(
-      within(banner).getByRole('link', { name: 'Sign in' })
-    ).toHaveAttribute('href', '/sign-in');
+    const signIn = within(banner).getByRole('link', { name: 'Sign in' });
+    expect(signIn).toHaveAttribute('href', '/sign-in');
+    // A primary button: the badge's main button, white on the blue (#162).
+    expect(signIn.className).toContain('bg-badge-button');
     expect(within(banner).queryByRole('button')).toBeNull();
     // No bar: it sits over the badge's ground.
     expect(banner.className).not.toMatch(/\bbg-|\bborder-b\b/);

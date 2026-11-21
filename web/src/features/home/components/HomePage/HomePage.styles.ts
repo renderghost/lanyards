@@ -1,9 +1,3 @@
-import {
-  base as buttonBase,
-  sizes as buttonSizes,
-  tones as buttonTones,
-} from '@/components/Button/Button.styles';
-
 // The brand's own page (#145), in the lanyard's palette pinned to brand
 // blue: the hanging badge edge to edge, then sections in billboard type,
 // then a billboard to close. Bold like the badge; quiet where it reads.
@@ -21,7 +15,7 @@ export const column = 'flex w-full max-w-[70rem] flex-col gap-20 md:gap-28';
 /** The call to action's way in: sign in, or read more first (#157). */
 export const start = 'flex flex-wrap items-center gap-x-6 gap-y-4';
 
-export const startLink = `${buttonBase} ${buttonTones.accent.primary} ${buttonSizes.lg} font-semibold`;
+export const startLink = 'font-semibold';
 
 export const startMore = 'text-base font-medium leading-6 underline-offset-4';
 
@@ -43,9 +37,6 @@ export const ctaIntro =
   'max-w-[40ch] text-xl font-medium leading-7 tracking-[-0.01em]';
 
 export const actions = 'flex flex-wrap gap-3';
-
-/** Create your lanyard: the badge's main button, as a link. */
-export const bannerLink = `${buttonBase} ${buttonTones.badge.primary} ${buttonSizes.lg}`;
 
 /** Follow on Bluesky: the badge's secondary button, as a link. */
 export const secondaryLink =
