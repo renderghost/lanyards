@@ -30,8 +30,12 @@ export const FALLBACK_SCOPE = 'atproto transition:generic';
 /** Everything the client may request, declared in its metadata. */
 export const CLIENT_SCOPE = `${GRANULAR_SCOPE} ${FEEDBACK_SCOPE} transition:generic`;
 
-/** Where new accounts are created when someone has no AT Protocol account. */
-export const SIGN_UP_PDS = 'https://bsky.social';
+/**
+ * Where new accounts are created when someone has no AT Protocol account:
+ * mu.social, whose accounts live on the Eurosky PDS (#157). Its server,
+ * eurosky.social, supports OAuth account creation (prompt=create).
+ */
+export const SIGN_UP_PDS = 'https://pds.mu.social';
 
 export const REDIRECT_PATH = '/oauth/callback';
 export const METADATA_PATH = '/oauth-client-metadata.json';
