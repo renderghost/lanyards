@@ -10,22 +10,21 @@ import * as styles from './QrCode.styles';
 import type { QrCodeProps } from './QrCode.types';
 
 /**
- * A QR code drawn on the device as SVG, at error correction level M, black
- * on white with a full quiet zone in every colour scheme (spec §7.6).
+ * A QR code drawn on the device as SVG, black on white with a full quiet
+ * zone in every colour scheme (spec §7.6). Error correction is level M, or
+ * level H under a centre picture, so the code still scans (#169).
  */
-export function QrCode({ value, className }: QrCodeProps) {
+export function QrCode({ value, centre, className }: QrCodeProps) {
   const { t } = useLingui();
+  const level = centre ? correction.H : correction.M;
   const code = useMemo(
     () =>
-      generate(value, {
-        minCorrectionLevel: correction.M,
-        maxCorrectionLevel: correction.M,
-      }),
-    [value]
+      generate(value, { minCorrectionLevel: level, maxCorrectionLevel: level }),
+    [value, level]
   );
   const side = code.size + QUIET_ZONE * 2;
 
-  return (
+  const svg = (
     <svg
       role="img"
       aria-label={t`QR code for ${value}`}
@@ -42,5 +41,14 @@ export function QrCode({ value, className }: QrCodeProps) {
       />
       <path d={toSvgPath(code)} fill={DARK} />
     </svg>
+  );
+  if (!centre) return svg;
+  return (
+    <div className={styles.frame}>
+      {svg}
+      <div aria-hidden="true" className={styles.centre}>
+        {centre}
+      </div>
+    </div>
   );
 }

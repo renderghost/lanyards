@@ -125,6 +125,8 @@ const LANYARD_ONLY = [
   // Show QR as a page (#150): the badge's ground while it loads.
   'src/features/qr/components/SharePage/',
   'src/features/qr/components/LanyardStraps/',
+  // The Share badge's printed lanyard (#169).
+  'src/features/qr/components/LanyardRibbon/',
 ];
 
 /**

@@ -6,6 +6,11 @@
 
 @custom-variant dark (@media (prefers-color-scheme: dark));
 
+/* The Share badge's layouts (#169): two columns where there's room; the
+   screen itself as the badge on short landscape screens. Exclusive. */
+@custom-variant wide (@media (min-width: 48rem) and (min-height: 36.0625rem));
+@custom-variant flat (@media (orientation: landscape) and (max-height: 36rem));
+
 /* The homepage's badge swings once on its straps as it arrives (#145). */
 @theme {
   --animate-swing: swing 1.6s cubic-bezier(0.25, 1.5, 0.4, 1) both;
