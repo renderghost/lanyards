@@ -33,7 +33,7 @@ export function CallbackStatus({ status }: CallbackStatusProps) {
       <p role="alert" className={styles.message}>
         {t(ERROR_COPY[status])}
       </p>
-      <Link to="/" search={tryAgainSearch()} className={styles.link}>
+      <Link to="/sign-in" search={tryAgainSearch()} className={styles.link}>
         {t`Try again`}
       </Link>
     </section>

@@ -158,7 +158,7 @@ describe('AppHeader', () => {
       await screen.findByRole('link', { name: 'Sign in' })
     ).toHaveAttribute(
       'href',
-      `/?returnTo=${encodeURIComponent('/@alice.test')}`
+      `/sign-in?returnTo=${encodeURIComponent('/@alice.test')}`
     );
     await userEvent.click(
       screen.getByRole('button', { name: 'Make your lanyard' })

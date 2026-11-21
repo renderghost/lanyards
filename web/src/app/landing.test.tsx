@@ -33,12 +33,12 @@ describe('landing page', () => {
       refresh: vi.fn(),
     });
     renderRoute('/');
-    await screen.findByRole('button', { name: 'Sign in' });
+    await screen.findByRole('heading', { name: 'Welcome to Lanyards' });
     expect(screen.queryByRole('button', { name: 'Send feedback' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Give feedback' })).toBeNull();
   });
 
-  it('shows the sign-in form to signed-out visitors', async () => {
+  it('shows signed-out visitors the homepage, with no form on it (#157)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',
       signOut: vi.fn(),
@@ -48,13 +48,14 @@ describe('landing page', () => {
     expect(
       await screen.findByRole('heading', { name: 'Welcome to Lanyards' })
     ).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Sign in' })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sign in' })).toBeNull();
     expect(document.title).toBe(
       'Researcher profiles on the AT Protocol · Lanyards'
     );
   });
 
-  it('offers Sign in and Make your lanyard in the header (#148)', async () => {
+  it('offers Sign in in the header, to its own page (#157)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',
       signOut: vi.fn(),
@@ -64,21 +65,41 @@ describe('landing page', () => {
     const banner = await screen.findByRole('banner');
     expect(
       await within(banner).findByRole('link', { name: 'Sign in' })
-    ).toBeInTheDocument();
+    ).toHaveAttribute('href', '/sign-in');
     expect(
-      within(banner).getByRole('button', { name: 'Make your lanyard' })
-    ).toBeInTheDocument();
+      within(banner).queryByRole('button', { name: 'Make your lanyard' })
+    ).toBeNull();
   });
 
-  it('is titled for signing in when sent here to sign in (#145)', async () => {
+  it('signs in on /sign-in, with the typeahead (#157)', async () => {
     vi.mocked(useSession).mockReturnValue({
       status: 'signedOut',
       signOut: vi.fn(),
       refresh: vi.fn(),
     });
-    renderRoute('/?returnTo=%2Fsettings');
-    await screen.findByRole('heading', { name: 'Welcome to Lanyards' });
+    renderRoute('/sign-in?returnTo=%2Fsettings');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sign in' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('combobox', { name: 'Your handle' })
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('banner')).toHaveLength(1);
     expect(document.title).toBe('Sign in · Lanyards');
+  });
+
+  // Links from before the sign-in page had its own address (#157).
+  it('sends /?returnTo= on to /sign-in, keeping where to return', async () => {
+    vi.mocked(useSession).mockReturnValue({
+      status: 'signedOut',
+      signOut: vi.fn(),
+      refresh: vi.fn(),
+    });
+    const { router } = renderRoute('/?returnTo=%2Fsettings');
+    await waitForRoute(router, '/sign-in?returnTo=%2Fsettings');
+    expect(
+      await screen.findByRole('heading', { level: 1, name: 'Sign in' })
+    ).toBeInTheDocument();
   });
 
   it('sends a signed-in visitor to their own customiser (#150)', async () => {

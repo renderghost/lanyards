@@ -19,9 +19,6 @@ import {
 type Message = ReturnType<typeof msg>;
 type Point = { title: Message; text: Message };
 
-/** The lanyard shown as a sample, live (#145). */
-export const SAMPLE_HANDLE = 'renderg.host';
-
 export const LINKS = {
   docs: DOCS_URL,
   github: 'https://github.com/renderghost/lanyards',

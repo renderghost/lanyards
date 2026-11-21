@@ -27,7 +27,7 @@ describe('/settings', () => {
       refresh: vi.fn(),
     });
     const { router } = renderRoute('/settings');
-    await waitForRoute(router, '/?returnTo=%2Fsettings');
+    await waitForRoute(router, '/sign-in?returnTo=%2Fsettings');
   });
 
   it('shows the account to signed-in visitors', async () => {

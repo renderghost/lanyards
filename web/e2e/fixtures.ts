@@ -2,9 +2,6 @@ import { test as base, expect } from '@playwright/test';
 
 export const HEADING = 'Welcome to Lanyards';
 
-/** The homepage's live sample lanyard (#145), framed at `md` and up. */
-export const SAMPLE_PATH = '/renderg.host';
-
 const APP_ORIGIN = 'http://127.0.0.1:4173';
 
 /**
@@ -23,16 +20,6 @@ export const test = base.extend({
     );
     await page.route('https://public.api.bsky.app/**', (route) =>
       route.fulfill({ json: { actors: [] } })
-    );
-    // The homepage frames a real person's lanyard: stand in a page, so its
-    // reads of that person never leave the run.
-    await page.route(
-      (url) => url.origin === APP_ORIGIN && url.pathname === SAMPLE_PATH,
-      (route) =>
-        route.fulfill({
-          contentType: 'text/html',
-          body: '<!doctype html><title>Sample lanyard</title><h1>Sample</h1>',
-        })
     );
     await use(page);
     expect(unexpected, 'unexpected third-party requests').toEqual([]);

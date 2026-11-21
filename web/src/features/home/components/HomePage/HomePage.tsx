@@ -1,10 +1,9 @@
 import { useLingui } from '@lingui/react/macro';
+import { Link } from '@tanstack/react-router';
 import { useId } from 'react';
 
-import { Button } from '@/components/Button/Button';
 import { CoverPattern } from '@/components/CoverPattern/CoverPattern';
 import { ExternalLink } from '@/components/ExternalLink/ExternalLink';
-import { FIELD_ID } from '@/features/auth/components/SignInForm/SignInForm.constants';
 import { cn } from '@/lib/utils';
 
 import { BenefitList } from '../BenefitList/BenefitList';
@@ -13,30 +12,20 @@ import { HomeBadge } from '../HomeBadge/HomeBadge';
 import { HomeBoard } from '../HomeBoard/HomeBoard';
 import { HomeHeader } from '../HomeHeader/HomeHeader';
 import { HomeSection } from '../HomeSection/HomeSection';
-import { SampleLanyard } from '../SampleLanyard/SampleLanyard';
-import {
-  BENEFITS,
-  FEATURES,
-  LINKS,
-  PARADOX,
-  SAMPLE_HANDLE,
-} from './HomePage.constants';
+import { BENEFITS, FEATURES, LINKS, PARADOX } from './HomePage.constants';
 import * as styles from './HomePage.styles';
 import type { HomePageProps } from './HomePage.types';
 
 /**
  * The homepage for people who aren't signed in: the old site's homepage
- * (#145) in the new design language, with sign-in where its "Get started"
- * button was. It wears brand blue whatever lanyard was last open, and
- * draws its own header on that blue (#151).
+ * (#145) in the new design language. It makes its case and points to the
+ * sign-in page (#157). It wears brand blue whatever lanyard was last open,
+ * and draws its own header on that blue (#151).
  */
-export function HomePage({ signIn, className }: HomePageProps) {
+export function HomePage({ className }: HomePageProps) {
   const { t, i18n } = useLingui();
   const headingId = useId();
   const ctaId = useId();
-
-  // Focusing the handle field scrolls the sign-in form into view.
-  const toSignIn = () => document.getElementById(FIELD_ID)?.focus();
 
   return (
     <div data-accent="blue" className={cn(styles.page, className)}>
@@ -49,21 +38,21 @@ export function HomePage({ signIn, className }: HomePageProps) {
         <div className={styles.body}>
           <div className={styles.column}>
             <HomeSection
-              eyebrow={t`Sign in or sign up`}
-              heading={t`Get started`}
+              eyebrow={t`Get started`}
+              heading={t`Everything you work on, in one link`}
+              intro={t`Sign in with your Bluesky handle, or any AT Protocol account, and Lanyards gathers your publications, talks, affiliations and profiles into one lanyard to share anywhere: on a conference badge, in an email signature, on a slide.`}
             >
               <div className={styles.start}>
-                <div className={styles.signIn}>
-                  {signIn}
-                  <ExternalLink
-                    href={LINKS.docs}
-                    tone="accent"
-                    className={styles.learnMore}
-                  >
-                    {t`Learn more`}
-                  </ExternalLink>
-                </div>
-                <SampleLanyard handle={SAMPLE_HANDLE} />
+                <Link to="/sign-in" className={styles.startLink}>
+                  {t`Sign in to get started`}
+                </Link>
+                <ExternalLink
+                  href={LINKS.docs}
+                  tone="accent"
+                  className={styles.startMore}
+                >
+                  {t`Learn more`}
+                </ExternalLink>
               </div>
             </HomeSection>
 
@@ -125,9 +114,9 @@ export function HomePage({ signIn, className }: HomePageProps) {
                   {t`Join researchers building their professional identity on open infrastructure.`}
                 </p>
                 <div className={styles.actions}>
-                  <Button tone="badge" size="lg" onClick={toSignIn}>
+                  <Link to="/sign-in" className={styles.bannerLink}>
                     {t`Create your lanyard`}
-                  </Button>
+                  </Link>
                   <ExternalLink
                     href={LINKS.bluesky}
                     tone="badge"

@@ -1,5 +1,4 @@
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useSession } from '@/features/auth/session/useSession';
@@ -12,17 +11,9 @@ vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
 
 const WIKI = 'https://github.com/renderghost/lanyards/wiki/';
 
-/** Stands in for the sign-in form, which the landing route provides. */
-const signIn = (
-  <label>
-    Your handle
-    <input id="sign-in-handle" />
-  </label>
-);
-
 /** The homepage, once its router has loaded. */
 async function home() {
-  const view = renderInRouter(<HomePage signIn={signIn} />, '/');
+  const view = renderInRouter(<HomePage />, '/');
   await screen.findByRole('heading', { level: 1 });
   return view;
 }
@@ -36,7 +27,7 @@ beforeEach(() => {
 });
 
 describe('HomePage (#145)', () => {
-  it('welcomes visitors, with sign-in where Get started was', async () => {
+  it('welcomes visitors', async () => {
     const { container } = await home();
     expect(
       screen.getByRole('heading', { level: 1, name: 'Welcome to Lanyards' })
@@ -49,14 +40,31 @@ describe('HomePage (#145)', () => {
     expect(
       screen.getByText(/collects your complete scholarly presence/)
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('textbox', { name: 'Your handle' })
-    ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Learn more/ })).toHaveAttribute(
-      'href',
-      WIKI
-    );
     await expectNoAxeViolations(container);
+  });
+
+  // Sign-in has its own page: the homepage makes its case and points there.
+  it('leads with what Lanyards does, then a way in (#157)', async () => {
+    await home();
+    const start = screen.getByRole('region', {
+      name: 'Everything you work on, in one link',
+    });
+    expect(
+      within(start).getByText(/gathers your publications, talks/)
+    ).toBeInTheDocument();
+    expect(
+      within(start).getByRole('link', { name: 'Sign in to get started' })
+    ).toHaveAttribute('href', '/sign-in');
+    expect(
+      within(start).getByRole('link', { name: /Learn more/ })
+    ).toHaveAttribute('href', WIKI);
+  });
+
+  it('has no sign-in form and no live sample lanyard (#157)', async () => {
+    await home();
+    expect(screen.queryByRole('combobox')).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByTitle('Sample lanyard')).toBeNull();
   });
 
   it('puts its own header on the blue, over the hanging badge (#151)', async () => {
@@ -83,8 +91,8 @@ describe('HomePage (#145)', () => {
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent)
     ).toEqual([
-      // Sign-in, under the old "Get started" call to action.
-      'Get started',
+      // The call to action, where the sign-in widget was (#157).
+      'Everything you work on, in one link',
       'The visibility paradox',
       'One link, everything visible',
       'Built for researchers',
@@ -134,23 +142,11 @@ describe('HomePage (#145)', () => {
     expect(screen.getByText(/Decentralised, open, yours/)).toBeInTheDocument();
   });
 
-  it('shows a sample lanyard, live in a phone frame, and links to it', async () => {
+  it('takes “Create your lanyard” to the sign-in page (#157)', async () => {
     await home();
-    const frame = screen.getByTitle('Sample lanyard');
-    expect(frame.tagName).toBe('IFRAME');
-    expect(frame).toHaveAttribute('src', '/renderg.host');
-    expect(frame).toHaveAttribute('loading', 'lazy');
     expect(
-      screen.getByRole('link', { name: /View sample profile/ })
-    ).toHaveAttribute('href', '/renderg.host');
-  });
-
-  it('takes “Create your lanyard” to the sign-in form', async () => {
-    await home();
-    await userEvent.click(
-      screen.getByRole('button', { name: 'Create your lanyard' })
-    );
-    expect(screen.getByRole('textbox', { name: 'Your handle' })).toHaveFocus();
+      screen.getByRole('link', { name: 'Create your lanyard' })
+    ).toHaveAttribute('href', '/sign-in');
     expect(
       screen.getByRole('link', { name: /Follow on Bluesky/ })
     ).toHaveAttribute('href', 'https://bsky.app/profile/lanyards.app');

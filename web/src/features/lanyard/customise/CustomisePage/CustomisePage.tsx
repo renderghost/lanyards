@@ -53,7 +53,7 @@ export function CustomisePage({
   // Signed out: sign in, then come back to this page. Once, from where
   // they are: the page is still here while the sign-in page loads.
   const signIn = useEffectEvent(() => {
-    router.history.replace(`/?returnTo=${encodeURIComponent(path)}`);
+    router.history.replace(`/sign-in?returnTo=${encodeURIComponent(path)}`);
   });
   useEffect(() => {
     if (signedOut) signIn();

@@ -43,7 +43,10 @@ describe('OAuth callback, trying again', () => {
     );
     renderRoute('/oauth/callback#error=access_denied');
     await screen.findByText('Sign-in was cancelled.');
-    expect(tryAgain()).toHaveAttribute('href', '/?returnTo=%2F%40alice.test');
+    expect(tryAgain()).toHaveAttribute(
+      'href',
+      '/sign-in?returnTo=%2F%40alice.test'
+    );
     sessionStorage.clear();
   });
 
@@ -54,7 +57,7 @@ describe('OAuth callback, trying again', () => {
     );
     renderRoute('/oauth/callback#error=access_denied');
     await screen.findByText('Sign-in was cancelled.');
-    expect(tryAgain()).toHaveAttribute('href', '/');
+    expect(tryAgain()).toHaveAttribute('href', '/sign-in');
     sessionStorage.clear();
   });
 });
@@ -68,7 +71,7 @@ describe('OAuth callback', () => {
     expect(
       await screen.findByText('Sign-in was cancelled.')
     ).toBeInTheDocument();
-    expect(tryAgain()).toHaveAttribute('href', '/');
+    expect(tryAgain()).toHaveAttribute('href', '/sign-in');
     expect(completeSignIn).toHaveBeenCalledTimes(1);
     expect(completeSignIn).toHaveBeenCalledWith('#error=access_denied');
     expect(router.state.location.hash).toBe('');
@@ -83,13 +86,16 @@ describe('OAuth callback', () => {
     vi.mocked(completeSignIn).mockRejectedValue(
       new OAuthCallbackError('denied')
     );
-    renderRoute('/oauth/callback#error=access_denied');
+    const { router } = renderRoute('/oauth/callback#error=access_denied');
     await userEvent.click(
       await screen.findByRole('link', { name: 'Try again' })
     );
+    // Trying again goes to the sign-in page (#157), whose heading is also
+    // "Sign in": wait for it to replace the callback page's.
+    await waitForRoute(router, '/sign-in');
     const heading = await screen.findByRole('heading', {
       level: 1,
-      name: 'Welcome to Lanyards',
+      name: 'Sign in',
     });
     await waitFor(() => expect(heading).toHaveFocus());
   });
@@ -104,7 +110,7 @@ describe('OAuth callback', () => {
         'This sign-in link has expired or was already used.'
       )
     ).toBeInTheDocument();
-    expect(tryAgain()).toHaveAttribute('href', '/');
+    expect(tryAgain()).toHaveAttribute('href', '/sign-in');
   });
 
   it('explains a failed exchange and reports it', async () => {

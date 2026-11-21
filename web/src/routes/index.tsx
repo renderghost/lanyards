@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 
 import { LandingPage } from '@/features/auth/components/LandingPage/LandingPage';
 import { safeReturnTo } from '@/lib/atproto/oauthConfig';
@@ -12,12 +12,21 @@ export const Route = createFileRoute('/')({
     const returnTo = safeReturnTo(search.returnTo);
     return { returnTo: returnTo === '/' ? undefined : returnTo };
   },
+  // Links from before sign-in had its own page go there (#157).
+  beforeLoad: ({ search }) => {
+    if (search.returnTo) {
+      throw redirect({
+        to: '/sign-in',
+        search: { returnTo: search.returnTo },
+        replace: true,
+      });
+    }
+  },
   // The homepage draws its own header, on the brand blue (#151).
   staticData: { ownHeader: true },
   component: Landing,
 });
 
 function Landing() {
-  const { returnTo } = Route.useSearch();
-  return <LandingPage returnTo={returnTo ?? '/'} />;
+  return <LandingPage />;
 }
