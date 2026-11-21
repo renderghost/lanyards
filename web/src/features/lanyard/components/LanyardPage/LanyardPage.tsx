@@ -94,7 +94,7 @@ export function LanyardPage({
         <p className={styles.text}>
           {t`This person has chosen to show their lanyard only to people who are signed in.`}
         </p>
-        <a href={`/?returnTo=${returnTo}`} className={styles.link}>
+        <a href={`/sign-in?returnTo=${returnTo}`} className={styles.link}>
           {t`Sign in`}
         </a>
       </LanyardNotice>

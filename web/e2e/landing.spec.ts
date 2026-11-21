@@ -1,12 +1,15 @@
 import AxeBuilder from '@axe-core/playwright';
 
-import { expect, HEADING, SAMPLE_PATH, test } from './fixtures';
+import { expect, HEADING, test } from './fixtures';
 
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 
+/** The sign-in page's heading (#157). */
+const SIGN_IN = { level: 1, name: 'Sign in' } as const;
+
 test('asks for a handle when submitted empty', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
+  await page.goto('/sign-in');
+  await expect(page.getByRole('heading', SIGN_IN)).toBeVisible();
   await page.getByRole('button', { name: 'Sign in' }).click();
   await expect(page.getByText('Enter your handle')).toBeVisible();
 });
@@ -16,6 +19,11 @@ for (const colorScheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme });
     await page.goto('/');
     await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
+    const home = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+    expect(home.violations).toEqual([]);
+
+    await page.goto('/sign-in');
+    await expect(page.getByRole('heading', SIGN_IN)).toBeVisible();
     const clean = await new AxeBuilder({ page }).withTags(WCAG).analyze();
     expect(clean.violations).toEqual([]);
 
@@ -26,70 +34,62 @@ for (const colorScheme of ['light', 'dark'] as const) {
   });
 }
 
-test('fits a 320px-wide screen without sideways scrolling', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 320, height: 640 });
-  await page.goto('/');
-  await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
-  const scrollWidth = await page.evaluate(
-    () => document.documentElement.scrollWidth
-  );
-  expect(scrollWidth).toBeLessThanOrEqual(320);
-});
-
-test.describe('the homepage (#145)', () => {
-  test('frames a sample lanyard on desktop, and links to it', async ({
-    page,
-  }) => {
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto('/');
-    await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
-    const frame = page.getByTitle('Sample lanyard');
-    await expect(frame).toBeVisible();
-    await expect(frame).toHaveAttribute('src', SAMPLE_PATH);
-    await expect(
-      page.frameLocator('iframe[title="Sample lanyard"]').getByRole('heading')
-    ).toHaveText('Sample');
-    await expect(
-      page.getByRole('link', { name: /View sample profile/ })
-    ).toHaveAttribute('href', SAMPLE_PATH);
-  });
-
-  test('links to the sample, without the frame, on phones', async ({
+for (const path of ['/', '/sign-in']) {
+  test(`fits a 320px-wide screen without sideways scrolling (${path})`, async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 640 });
+    await page.goto(path);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    const scrollWidth = await page.evaluate(
+      () => document.documentElement.scrollWidth
+    );
+    expect(scrollWidth).toBeLessThanOrEqual(320);
+  });
+}
+
+test.describe('the homepage (#145)', () => {
+  test('takes Sign in at the top to the sign-in page (#157)', async ({
+    page,
+  }) => {
     await page.goto('/');
-    await expect(page.getByRole('heading', { name: HEADING })).toBeVisible();
-    await expect(page.getByTitle('Sample lanyard')).toBeHidden();
+    const banner = page.getByRole('banner');
     await expect(
-      page.getByRole('link', { name: /View sample profile/ })
+      banner.getByRole('button', { name: 'Make your lanyard' })
+    ).toHaveCount(0);
+    await banner.getByRole('link', { name: 'Sign in' }).click();
+    await expect(page).toHaveURL('/sign-in');
+    await expect(page.getByRole('heading', SIGN_IN)).toBeVisible();
+    await expect(
+      page.getByRole('combobox', { name: 'Your handle' })
     ).toBeVisible();
   });
 
-  test('takes “Create your lanyard” to the sign-in form', async ({ page }) => {
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Create your lanyard' }).click();
-    const handle = page.getByRole('combobox', { name: 'Your handle' });
-    await expect(handle).toBeFocused();
-    await expect(handle).toBeInViewport();
-  });
-
-  test('offers Sign in at the top, taking people to the form (#148)', async ({
+  test('leads with a call to action to the sign-in page (#157)', async ({
     page,
   }) => {
-    await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/');
-    const signIn = page
-      .getByRole('banner')
-      .getByRole('link', { name: 'Sign in' });
-    await expect(signIn).toBeInViewport();
-    const handle = page.getByRole('combobox', { name: 'Your handle' });
-    await expect(handle).not.toBeInViewport();
-    await signIn.click();
-    await expect(handle).toBeFocused();
-    await expect(handle).toBeInViewport();
+    await expect(page.getByRole('combobox')).toHaveCount(0);
+    await expect(page.getByTitle('Sample lanyard')).toHaveCount(0);
+    const start = page.getByRole('region', {
+      name: 'Everything you work on, in one link',
+    });
+    await start.getByRole('link', { name: 'Sign in to get started' }).click();
+    await expect(page).toHaveURL('/sign-in');
+  });
+
+  test('takes “Create your lanyard” to the sign-in page', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('link', { name: 'Create your lanyard' }).click();
+    await expect(page).toHaveURL('/sign-in');
+    await expect(page.getByRole('heading', SIGN_IN)).toBeVisible();
+  });
+
+  // Old links to the homepage's sign-in (#157).
+  test('sends /?returnTo= on to the sign-in page', async ({ page }) => {
+    await page.goto('/?returnTo=%2Fsettings');
+    await expect(page).toHaveURL('/sign-in?returnTo=%2Fsettings');
+    await expect(page.getByRole('heading', SIGN_IN)).toBeVisible();
   });
 });
 

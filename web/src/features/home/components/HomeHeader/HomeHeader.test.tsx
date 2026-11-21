@@ -1,23 +1,13 @@
 import { screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { notify } from '@/components/Toaster/notify';
 import { useSession } from '@/features/auth/session/useSession';
-import { startSignUp } from '@/lib/atproto/session';
 import { expectNoAxeViolations } from '@/test/axe';
 import { renderInRouter } from '@/test/router';
 
 import { HomeHeader } from './HomeHeader';
 
 vi.mock('@/features/auth/session/useSession', () => ({ useSession: vi.fn() }));
-vi.mock('@/lib/atproto/session', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/atproto/session')>()),
-  startSignUp: vi.fn(() => Promise.resolve()),
-}));
-vi.mock('@/components/Toaster/notify', () => ({
-  notify: { success: vi.fn(), error: vi.fn(), info: vi.fn() },
-}));
 
 const signedOut = () =>
   vi.mocked(useSession).mockReturnValue({
@@ -26,12 +16,11 @@ const signedOut = () =>
     refresh: vi.fn(),
   });
 
-/** The header on the homepage's blue, with the form it signs in at. */
-const header = () =>
+/** The header on the homepage's blue. */
+const header = (props: { signIn?: boolean } = {}) =>
   renderInRouter(
     <div data-accent="blue">
-      <HomeHeader />
-      <input id="sign-in-handle" aria-label="Your handle" />
+      <HomeHeader {...props} />
     </div>,
     '/'
   );
@@ -41,7 +30,7 @@ beforeEach(() => {
 });
 
 describe('HomeHeader (#151)', () => {
-  it('puts the logo, Sign in and Make your lanyard on the blue', async () => {
+  it('puts the logo and Sign in on the blue (#157)', async () => {
     const { container } = header();
     const banner = await screen.findByRole('banner');
     const home = within(banner).getByRole('link', { name: 'Lanyards' });
@@ -51,44 +40,15 @@ describe('HomeHeader (#151)', () => {
       'src',
       '/logo-dark.svg'
     );
+    // Sign in has its own page; account creation is there too.
     expect(
       within(banner).getByRole('link', { name: 'Sign in' })
-    ).toHaveAttribute('href', '/#sign-in-handle');
-    expect(
-      within(banner).getByRole('button', { name: 'Make your lanyard' })
-    ).toBeInTheDocument();
+    ).toHaveAttribute('href', '/sign-in');
+    expect(within(banner).queryByRole('button')).toBeNull();
     // No bar: it sits over the badge's ground.
     expect(banner.className).not.toMatch(/\bbg-|\bborder-b\b/);
     expect(banner.className).toContain('env(safe-area-inset-top)');
     await expectNoAxeViolations(container);
-  });
-
-  it('takes Sign in to the form on the page, ready to type (#148)', async () => {
-    const { router } = header();
-    await userEvent.click(await screen.findByRole('link', { name: 'Sign in' }));
-    expect(screen.getByRole('textbox', { name: 'Your handle' })).toHaveFocus();
-    expect(router.state.location.href).toBe('/');
-  });
-
-  it('starts account creation, coming back to the homepage', async () => {
-    header();
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Make your lanyard' })
-    );
-    expect(startSignUp).toHaveBeenCalledWith('/');
-  });
-
-  it('says so if account creation can’t start', async () => {
-    vi.mocked(startSignUp).mockRejectedValueOnce(new Error('offline'));
-    header();
-    await userEvent.click(
-      await screen.findByRole('button', { name: 'Make your lanyard' })
-    );
-    await vi.waitFor(() =>
-      expect(notify.error).toHaveBeenCalledWith(
-        "Couldn't start account creation. Please try again."
-      )
-    );
   });
 
   it('offers only the logo while the session loads', async () => {
@@ -103,8 +63,14 @@ describe('HomeHeader (#151)', () => {
       within(banner).getByRole('link', { name: 'Lanyards' })
     ).toBeInTheDocument();
     expect(within(banner).queryByRole('link', { name: 'Sign in' })).toBeNull();
+  });
+
+  it('leaves Sign in off the sign-in page itself', async () => {
+    header({ signIn: false });
+    const banner = await screen.findByRole('banner');
     expect(
-      within(banner).queryByRole('button', { name: 'Make your lanyard' })
-    ).toBeNull();
+      within(banner).getByRole('link', { name: 'Lanyards' })
+    ).toBeInTheDocument();
+    expect(within(banner).queryByRole('link', { name: 'Sign in' })).toBeNull();
   });
 });

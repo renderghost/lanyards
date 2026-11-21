@@ -43,7 +43,11 @@ export function AppHeader({
   } else if (signedOutActions && session.status === 'signedOut') {
     end = (
       <div className={styles.nav}>
-        <Link to="/" search={{ returnTo: path }} className={styles.navLink}>
+        <Link
+          to="/sign-in"
+          search={{ returnTo: path }}
+          className={styles.navLink}
+        >
           {t`Sign in`}
         </Link>
         <Button

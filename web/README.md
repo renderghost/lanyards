@@ -124,10 +124,9 @@ keep falling back to broad permissions for a few minutes after publishing.
 ## Deploying (`lanyards.app`)
 
 The app deploys from the Vercel project **`lanyards`** (team `renderghost`,
-Git repo `renderghost/lanyards`), with Root Directory `web`. Until the swap
-(#154), that project served the legacy Next.js app from the repository root,
-and the beta ran on a second project, `lanyards-next`, at
-`next.lanyards.app`.
+Git repo `renderghost/lanyards`), with Root Directory `web`. It was the
+beta's project, `lanyards-next`, renamed at the swap (#154), when the legacy
+Next.js project was deleted and `lanyards.app` moved to it.
 
 ### 1. Project settings
 

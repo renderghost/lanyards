@@ -6,7 +6,7 @@ test('explains a cancelled sign-in and scrubs the URL', async ({ page }) => {
   expect(page.url()).not.toContain('#');
   await expect(page.getByRole('link', { name: 'Try again' })).toHaveAttribute(
     'href',
-    '/'
+    '/sign-in'
   );
 });
 

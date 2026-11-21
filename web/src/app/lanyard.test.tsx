@@ -201,7 +201,7 @@ describe('lanyard page states', () => {
     ).toBeInTheDocument();
     expect(
       within(screen.getByRole('main')).getByRole('link', { name: 'Sign in' })
-    ).toHaveAttribute('href', '/?returnTo=%2Falice.test');
+    ).toHaveAttribute('href', '/sign-in?returnTo=%2Falice.test');
     expect(screen.queryByText('Dr Ada Example')).not.toBeInTheDocument();
     // The name must not leak through the tab title either.
     await waitFor(() =>
@@ -366,7 +366,7 @@ describe('visitor actions on the page', () => {
       within(header).getByRole('link', { name: 'Sign in' })
     ).toHaveAttribute(
       'href',
-      `/?returnTo=${encodeURIComponent('/alice.test')}`
+      `/sign-in?returnTo=${encodeURIComponent('/alice.test')}`
     );
     expect(
       within(header).getByRole('button', { name: 'Make your lanyard' })

@@ -6,6 +6,7 @@ import { HandleCombobox } from '@/components/HandleCombobox/HandleCombobox';
 import { notify } from '@/components/Toaster/notify';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { captureError, track } from '@/lib/analytics/analytics';
+import { cn } from '@/lib/utils';
 import {
   isUnknownAccountError,
   startSignIn,
@@ -21,7 +22,7 @@ import {
   validateIdentifier,
 } from './SignInForm.validation';
 
-export function SignInForm({ returnTo }: SignInFormProps) {
+export function SignInForm({ returnTo, className }: SignInFormProps) {
   const { t } = useLingui();
   const online = useOnlineStatus();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +83,11 @@ export function SignInForm({ returnTo }: SignInFormProps) {
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
+    <form
+      className={cn(styles.form, className)}
+      onSubmit={handleSubmit}
+      noValidate
+    >
       <HandleCombobox
         id={FIELD_ID}
         label={t`Your handle`}
